@@ -6,7 +6,9 @@ namespace TentaPress\AdminShell\Admin\Menu;
 
 use Illuminate\Routing\Router;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use TentaPress\System\Support\Paths;
 
@@ -319,6 +321,11 @@ final class MenuBuilder
 
         // If cache missing, fall back to scanning plugins/*/*/tentapress.json
         if (!is_file($cachePath)) {
+            $fromDatabase = $this->loadEnabledManifestsFromDatabase();
+            if ($fromDatabase !== []) {
+                return $fromDatabase;
+            }
+
             return $this->scanPluginManifestsFallback();
         }
 
@@ -348,6 +355,11 @@ final class MenuBuilder
         }
 
         if (!is_array($plugins)) {
+            $fromDatabase = $this->loadEnabledManifestsFromDatabase();
+            if ($fromDatabase !== []) {
+                return $fromDatabase;
+            }
+
             return $this->scanPluginManifestsFallback();
         }
 
@@ -407,7 +419,48 @@ final class MenuBuilder
         }
 
         if ($manifests === []) {
+            $fromDatabase = $this->loadEnabledManifestsFromDatabase();
+            if ($fromDatabase !== []) {
+                return $fromDatabase;
+            }
+
             return $this->scanPluginManifestsFallback();
+        }
+
+        return $manifests;
+    }
+
+    /**
+     * @return array<int,array<string,mixed>>
+     */
+    private function loadEnabledManifestsFromDatabase(): array
+    {
+        if (!Schema::hasTable('tp_plugins')) {
+            return [];
+        }
+
+        $rows = DB::table('tp_plugins')
+            ->where('enabled', 1)
+            ->orderBy('id')
+            ->get(['manifest'])
+            ->all();
+
+        if ($rows === []) {
+            return [];
+        }
+
+        $manifests = [];
+
+        foreach ($rows as $row) {
+            $raw = (string) ($row->manifest ?? '');
+            if ($raw === '') {
+                continue;
+            }
+
+            $decoded = $this->decodeJson($raw);
+            if ($decoded !== null) {
+                $manifests[] = $decoded;
+            }
         }
 
         return $manifests;
