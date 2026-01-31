@@ -93,11 +93,13 @@ if (! $hasComposerLock && ! $hasVendorFolder) {
 
     $run($composerCommand . ' run post-autoload-dump', 'Running Composer post-autoload-dump scripts...');
     $run(escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($artisanPath) . ' key:generate', 'Generating app key...');
-    $run(escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($artisanPath) . ' migrate --force', 'Running migrations...');
+    $run(escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($artisanPath) . ' migrate --force', 'Running initial migrations...');
     $run($composerCommand . ' run post-update-cmd', 'Running Composer post-update-cmd scripts...');
-    $run(escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($artisanPath) . ' tp:plugins defaults --no-interaction', 'Applying plugin defaults...');
-    $run(escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($artisanPath) . ' migrate --force', 'Running migrations (post-plugins)...');
     $run(escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($artisanPath) . ' storage:link', 'Linking your local storage files...');
+    $run(escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($artisanPath) . ' tp:plugins defaults --no-interaction', 'Applying default plugins...');
+    $run(escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($artisanPath) . ' migrate --force', 'Running migrations (post plugins installation)...');
+    $run(escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($artisanPath) . ' tp:plugins enable --all', 'Enabling all default plugins...');
+    $run(escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($artisanPath) . ' tp:permissions seed', 'Seeding permissions...');
 } else {
     fwrite(
         STDOUT,
