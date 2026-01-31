@@ -6,11 +6,13 @@ namespace TentaPress\AdminShell;
 
 use Illuminate\Support\ServiceProvider;
 use TentaPress\AdminShell\Admin\Menu\MenuBuilder;
+use TentaPress\AdminShell\Admin\Menu\MenuBuilderContract;
 
 final class AdminShellServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
+        $this->app->singleton(MenuBuilderContract::class, MenuBuilder::class);
     }
 
     public function boot(): void
@@ -22,7 +24,7 @@ final class AdminShellServiceProvider extends ServiceProvider
 
         // Inject menu + common admin view data into the shell layout.
         view()->composer('tentapress-admin::layouts.shell', function ($view): void {
-            $menus = $this->app->make(MenuBuilder::class)->build(auth()->user());
+            $menus = $this->app->make(MenuBuilderContract::class)->build(auth()->user());
 
             $view->with('tpMenu', $menus);
         });

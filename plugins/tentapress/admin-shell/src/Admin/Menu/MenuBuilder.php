@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use TentaPress\System\Support\Paths;
 
-final class MenuBuilder
+final class MenuBuilder implements MenuBuilderContract
 {
     /**
      * Cached flat items (unfiltered).
