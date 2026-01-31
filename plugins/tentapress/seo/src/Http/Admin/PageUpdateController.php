@@ -7,9 +7,14 @@ namespace TentaPress\Seo\Http\Admin;
 use Illuminate\Http\Request;
 use TentaPress\Pages\Models\TpPage;
 use TentaPress\Seo\Models\TpSeoPage;
+use TentaPress\Seo\Services\SeoPayload;
 
 final class PageUpdateController
 {
+    public function __construct(private readonly SeoPayload $payload)
+    {
+    }
+
     public function __invoke(Request $request, TpPage $page)
     {
         $data = $request->validate([
@@ -27,16 +32,16 @@ final class PageUpdateController
 
         $payload = [
             'page_id' => (int) $page->id,
-            'title' => $this->nullIfEmpty($data['title'] ?? null),
-            'description' => $this->nullIfEmpty($data['description'] ?? null),
-            'canonical_url' => $this->nullIfEmpty($data['canonical_url'] ?? null),
-            'robots' => $this->nullIfEmpty($data['robots'] ?? null),
-            'og_title' => $this->nullIfEmpty($data['og_title'] ?? null),
-            'og_description' => $this->nullIfEmpty($data['og_description'] ?? null),
-            'og_image' => $this->nullIfEmpty($data['og_image'] ?? null),
-            'twitter_title' => $this->nullIfEmpty($data['twitter_title'] ?? null),
-            'twitter_description' => $this->nullIfEmpty($data['twitter_description'] ?? null),
-            'twitter_image' => $this->nullIfEmpty($data['twitter_image'] ?? null),
+            'title' => $this->payload->nullIfEmpty($data['title'] ?? null),
+            'description' => $this->payload->nullIfEmpty($data['description'] ?? null),
+            'canonical_url' => $this->payload->nullIfEmpty($data['canonical_url'] ?? null),
+            'robots' => $this->payload->nullIfEmpty($data['robots'] ?? null),
+            'og_title' => $this->payload->nullIfEmpty($data['og_title'] ?? null),
+            'og_description' => $this->payload->nullIfEmpty($data['og_description'] ?? null),
+            'og_image' => $this->payload->nullIfEmpty($data['og_image'] ?? null),
+            'twitter_title' => $this->payload->nullIfEmpty($data['twitter_title'] ?? null),
+            'twitter_description' => $this->payload->nullIfEmpty($data['twitter_description'] ?? null),
+            'twitter_image' => $this->payload->nullIfEmpty($data['twitter_image'] ?? null),
         ];
 
         $row = TpSeoPage::query()->updateOrCreate(
@@ -53,16 +58,24 @@ final class PageUpdateController
             ->with('tp_notice_success', 'SEO updated.');
     }
 
-    private function nullIfEmpty(mixed $value): ?string
-    {
-        $v = trim((string) ($value ?? ''));
-
-        return $v === '' ? null : $v;
-    }
-
     private function isEmptyRow(TpSeoPage $row): bool
     {
-        foreach ([
+        $keys = $this->payloadKeys();
+        $payload = [];
+
+        foreach ($keys as $key) {
+            $payload[$key] = $row->{$key};
+        }
+
+        return $this->payload->isEmpty($payload, $keys);
+    }
+
+    /**
+     * @return array<int,string>
+     */
+    private function payloadKeys(): array
+    {
+        return [
             'title',
             'description',
             'canonical_url',
@@ -73,18 +86,6 @@ final class PageUpdateController
             'twitter_title',
             'twitter_description',
             'twitter_image',
-         ] as $k) {
-            $v = $row->{$k};
-
-            if (is_string($v) && trim($v) !== '') {
-                return false;
-            }
-
-            if ($v !== null && !is_string($v)) {
-                return false;
-            }
-        }
-
-        return true;
+        ];
     }
 }
