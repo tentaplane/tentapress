@@ -135,6 +135,12 @@ $themeChoice = $promptChoice(
 );
 
 if ($themeChoice !== 'none') {
+    $run(
+        $composerCommand . ' require ' . escapeshellarg($themeChoice) . ' --no-interaction --no-scripts --no-dev',
+        "Installing theme package {$themeChoice}..."
+    );
+    $run($composerCommand . ' run post-autoload-dump', 'Running Composer post-autoload-dump scripts...');
+    $run($composerCommand . ' run post-update-cmd', 'Running Composer post-update-cmd scripts...');
     $run(escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($artisanPath) . ' tp:themes sync', 'Syncing themes...');
     $run(
         escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($artisanPath) . ' tp:themes activate ' . escapeshellarg($themeChoice),
