@@ -8,6 +8,7 @@ use Illuminate\Support\ServiceProvider;
 use TentaPress\Pages\Models\TpPage;
 use TentaPress\Posts\Models\TpPost;
 use TentaPress\Seo\Services\SeoManager;
+use TentaPress\Seo\Services\SeoEntitySaver;
 use TentaPress\Seo\Services\SeoPageSaver;
 use TentaPress\Seo\Services\SeoPostSaver;
 use TentaPress\Seo\Services\SeoSettings;
@@ -18,6 +19,7 @@ final class SeoServiceProvider extends ServiceProvider
     {
         $this->app->singleton(SeoSettings::class);
         $this->app->singleton(SeoManager::class);
+        $this->app->singleton(SeoEntitySaver::class);
         $this->app->singleton(SeoPageSaver::class);
         $this->app->singleton(SeoPostSaver::class);
     }
