@@ -1,0 +1,53 @@
+{
+    "type": "blocks/content",
+    "name": "Content",
+    "description": "A basic content area.",
+    "version": 2,
+    "view": "blocks.content",
+    "fields": [
+        { "key": "content", "label": "Content", "type": "textarea", "rows": 8 },
+        {
+            "key": "width",
+            "label": "Content Width",
+            "type": "select",
+            "options": [
+                { "value": "narrow", "label": "Narrow" },
+                { "value": "normal", "label": "Normal" },
+                { "value": "wide", "label": "Wide" }
+            ]
+        },
+        {
+            "key": "alignment",
+            "label": "Text Alignment",
+            "type": "select",
+            "options": [
+                { "value": "left", "label": "Left" },
+                { "value": "center", "label": "Center" }
+            ]
+        },
+        {
+            "key": "background",
+            "label": "Background",
+            "type": "select",
+            "options": [
+                { "value": "white", "label": "White" },
+                { "value": "muted", "label": "Muted" },
+                { "value": "none", "label": "None" }
+            ]
+        }
+    ],
+    "defaults": {
+        "content": "",
+        "width": "normal",
+        "alignment": "left",
+        "background": "white"
+    },
+    "example": {
+        "props": {
+            "content": "Write your content here.\n\nYou can later upgrade this to a rich editor.",
+            "width": "normal",
+            "alignment": "left",
+            "background": "white"
+        }
+    }
+}

@@ -1,0 +1,17 @@
+{
+    "type": "theme",
+    "id": "tentapress/bootstrap",
+    "name": "Bootstrap Theme",
+    "version": "0.1.2",
+    "description": "A Bootstrap v5 theme for TentaPress.",
+    "provider": "TentaPress\\Themes\\Bootstrap\\BootstrapThemeServiceProvider",
+    "provider_path": "src/BootstrapThemeServiceProvider.php",
+    "layouts": [
+        { "key": "default", "label": "Default" },
+        { "key": "landing", "label": "Landing" }
+    ],
+    "menu_locations": {
+        "primary": "Primary Navigation",
+        "footer": "Footer Navigation"
+    }
+}

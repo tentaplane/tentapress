@@ -1,0 +1,74 @@
+{
+    "type": "blocks/hero",
+    "name": "Hero",
+    "description": "A hero section with headline, media, and CTAs.",
+    "version": 2,
+    "view": "blocks.hero",
+    "variants": [
+        { "key": "default", "label": "Default" },
+        { "key": "split", "label": "Split" }
+    ],
+    "default_variant": "default",
+    "fields": [
+        { "key": "eyebrow", "label": "Eyebrow", "type": "text", "help": "Short label above the headline." },
+        { "key": "headline", "label": "Headline", "type": "text" },
+        { "key": "subheadline", "label": "Subheadline", "type": "textarea", "rows": 3 },
+        {
+            "key": "alignment",
+            "label": "Text Alignment",
+            "type": "select",
+            "options": [
+                { "value": "left", "label": "Left" },
+                { "value": "center", "label": "Center" }
+            ]
+        },
+        { "key": "background_image", "label": "Background Image", "type": "media" },
+        {
+            "key": "image_position",
+            "label": "Image Position",
+            "type": "select",
+            "options": [
+                { "value": "top", "label": "Top" },
+                { "value": "right", "label": "Right" }
+            ],
+            "help": "Split variant places the image on the right."
+        },
+        { "key": "primary_cta.label", "label": "Primary CTA Label", "type": "text" },
+        { "key": "primary_cta.url", "label": "Primary CTA URL", "type": "text" },
+        {
+            "key": "primary_cta.style",
+            "label": "Primary CTA Style",
+            "type": "select",
+            "options": [
+                { "value": "primary", "label": "Primary" },
+                { "value": "outline", "label": "Outline" },
+                { "value": "ghost", "label": "Ghost" }
+            ]
+        },
+        { "key": "secondary_cta.label", "label": "Secondary CTA Label", "type": "text" },
+        { "key": "secondary_cta.url", "label": "Secondary CTA URL", "type": "text" }
+    ],
+    "defaults": {
+        "eyebrow": "",
+        "headline": "Your headline",
+        "subheadline": "",
+        "alignment": "left",
+        "background_image": "",
+        "image_position": "top",
+        "primary_cta": { "label": "Get started", "url": "#", "style": "primary" },
+        "secondary_cta": { "label": "", "url": "" }
+    },
+    "example": {
+        "variant": "default",
+        "props": {
+            "eyebrow": "Introducing TentaPress",
+            "headline": "Build pages faster",
+            "subheadline": "A flexible block editor powered by Laravel.",
+            "alignment": "left",
+            "background_image": "",
+            "image_position": "top",
+            "primary_cta": { "label": "Get started", "url": "#", "style": "primary" },
+            "secondary_cta": { "label": "Learn more", "url": "#" }
+        }
+    }
+}

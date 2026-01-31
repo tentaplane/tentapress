@@ -1,0 +1,48 @@
+{
+    "type": "blocks/buttons",
+    "name": "Buttons Row",
+    "description": "A row of buttons with styles.",
+    "version": 1,
+    "view": "blocks.buttons",
+    "fields": [
+        {
+            "key": "buttons",
+            "label": "Buttons",
+            "type": "textarea",
+            "rows": 5,
+            "help": "JSON array of {label,url,style} or one per line: Label | URL | Style."
+        },
+        {
+            "key": "alignment",
+            "label": "Alignment",
+            "type": "select",
+            "options": [
+                { "value": "left", "label": "Left" },
+                { "value": "center", "label": "Center" },
+                { "value": "right", "label": "Right" }
+            ]
+        },
+        {
+            "key": "size",
+            "label": "Size",
+            "type": "select",
+            "options": [
+                { "value": "sm", "label": "Small" },
+                { "value": "md", "label": "Medium" },
+                { "value": "lg", "label": "Large" }
+            ]
+        }
+    ],
+    "defaults": {
+        "buttons": "",
+        "alignment": "left",
+        "size": "md"
+    },
+    "example": {
+        "props": {
+            "buttons": "Get started | # | primary\nLearn more | # | outline",
+            "alignment": "left",
+            "size": "md"
+        }
+    }
+}

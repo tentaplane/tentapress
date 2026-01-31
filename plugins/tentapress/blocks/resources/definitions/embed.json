@@ -1,0 +1,43 @@
+{
+    "type": "blocks/embed",
+    "name": "Embed",
+    "description": "Embed external content via iframe.",
+    "version": 1,
+    "view": "blocks.embed",
+    "fields": [
+        { "key": "title", "label": "Title", "type": "text" },
+        { "key": "url", "label": "Embed URL", "type": "url" },
+        {
+            "key": "aspect",
+            "label": "Aspect Ratio",
+            "type": "select",
+            "options": [
+                { "value": "auto", "label": "Auto" },
+                { "value": "16:9", "label": "16:9" },
+                { "value": "4:3", "label": "4:3" },
+                { "value": "square", "label": "1:1" }
+            ]
+        },
+        { "key": "height", "label": "Height (px)", "type": "number", "min": 200, "max": 1200, "step": 10 },
+        { "key": "allow_fullscreen", "label": "Allow fullscreen", "type": "toggle" },
+        { "key": "caption", "label": "Caption", "type": "textarea", "rows": 2 }
+    ],
+    "defaults": {
+        "title": "",
+        "url": "",
+        "aspect": "16:9",
+        "height": 480,
+        "allow_fullscreen": true,
+        "caption": ""
+    },
+    "example": {
+        "props": {
+            "title": "Demo",
+            "url": "https://www.youtube.com/embed/dQw4w9WgXcQ",
+            "aspect": "16:9",
+            "height": 480,
+            "allow_fullscreen": true,
+            "caption": ""
+        }
+    }
+}

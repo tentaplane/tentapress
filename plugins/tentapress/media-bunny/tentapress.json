@@ -1,0 +1,8 @@
+{
+    "id": "tentapress/media-bunny",
+    "name": "Media Bunny CDN",
+    "description": "Bunny CDN media URL generator.",
+    "version": "0.1.2",
+    "provider": "TentaPress\\MediaBunny\\MediaBunnyServiceProvider",
+    "requires": ["tentapress/media"]
+}

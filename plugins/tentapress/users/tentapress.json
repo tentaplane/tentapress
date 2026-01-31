@@ -1,0 +1,26 @@
+{
+    "id": "tentapress/users",
+    "name": "Users",
+    "description": "Users, roles, capabilities and admin authentication.",
+    "version": "0.1.4",
+    "provider": "TentaPress\\Users\\UsersServiceProvider",
+    "requires": [],
+    "admin": {
+        "menus": [
+            {
+                "label": "Users",
+                "route": "tp.users.index",
+                "capability": "manage_users",
+                "icon": "users",
+                "position": 70
+            },
+            {
+                "label": "Roles",
+                "route": "tp.roles.index",
+                "capability": "manage_roles",
+                "position": 20,
+                "parent": "Users"
+            }
+        ]
+    }
+}

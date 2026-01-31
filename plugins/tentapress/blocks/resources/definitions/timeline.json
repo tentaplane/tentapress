@@ -1,0 +1,27 @@
+{
+    "type": "blocks/timeline",
+    "name": "Timeline",
+    "description": "A chronological list of events.",
+    "version": 1,
+    "view": "blocks.timeline",
+    "fields": [
+        { "key": "title", "label": "Title", "type": "text" },
+        {
+            "key": "items",
+            "label": "Items",
+            "type": "textarea",
+            "rows": 6,
+            "help": "JSON array of {date,title,body} or one per line: Date | Title | Body."
+        }
+    ],
+    "defaults": {
+        "title": "Timeline",
+        "items": ""
+    },
+    "example": {
+        "props": {
+            "title": "Timeline",
+            "items": "2024 | Launch | First release\n2025 | Scale | New features"
+        }
+    }
+}

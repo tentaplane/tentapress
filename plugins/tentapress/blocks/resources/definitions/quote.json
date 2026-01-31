@@ -1,0 +1,46 @@
+{
+    "type": "blocks/quote",
+    "name": "Quote",
+    "description": "A simple pull quote.",
+    "version": 1,
+    "view": "blocks.quote",
+    "fields": [
+        { "key": "quote", "label": "Quote", "type": "textarea", "rows": 4 },
+        { "key": "name", "label": "Name", "type": "text" },
+        { "key": "role", "label": "Role", "type": "text" },
+        {
+            "key": "alignment",
+            "label": "Alignment",
+            "type": "select",
+            "options": [
+                { "value": "left", "label": "Left" },
+                { "value": "center", "label": "Center" }
+            ]
+        },
+        {
+            "key": "style",
+            "label": "Style",
+            "type": "select",
+            "options": [
+                { "value": "simple", "label": "Simple" },
+                { "value": "card", "label": "Card" }
+            ]
+        }
+    ],
+    "defaults": {
+        "quote": "",
+        "name": "",
+        "role": "",
+        "alignment": "left",
+        "style": "simple"
+    },
+    "example": {
+        "props": {
+            "quote": "A thoughtful quote can add trust.",
+            "name": "Jordan Lee",
+            "role": "Design Lead",
+            "alignment": "left",
+            "style": "simple"
+        }
+    }
+}

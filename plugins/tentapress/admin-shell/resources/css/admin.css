@@ -1,0 +1,199 @@
+@import "tailwindcss";
+
+@plugin "@tailwindcss/forms";
+
+/* Laravel core / cached views (from Tailwind guide) */
+@source '../../../../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../../../../storage/framework/views/*.php';
+
+/* TentaPress packages + plugins (monorepo paths) */
+@source '../../../../../packages/**/resources/views/**/*.blade.php';
+@source '../../../../../plugins/**/resources/views/**/*.blade.php';
+
+/* If plugins ship JS that contains class names */
+@source '../../../../../packages/**/resources/js/**/*.js';
+@source '../../../../../plugins/**/resources/js/**/*.js';
+
+@layer base {
+	button:not(:disabled),
+	[role="button"]:not(:disabled) {
+		cursor: pointer;
+	}
+}
+
+/* -------------------------------------------------
+   TentaPress Admin UI Kit
+-------------------------------------------------- */
+@layer components {
+	/* -----------------------------
+	   Layout
+	------------------------------ */
+	.tp-wrap {
+		@apply mx-auto;
+	}
+
+	.tp-editor {
+		@apply w-full;
+	}
+
+	.tp-page-header {
+		@apply mb-6 flex items-center justify-between gap-4;
+	}
+
+	.tp-page-title {
+		@apply text-2xl font-semibold text-[#1d2327];
+	}
+
+	.tp-description {
+		@apply mt-1 text-sm text-black/60;
+	}
+
+	.tp-muted {
+		@apply text-black/60;
+	}
+
+	.tp-code {
+		@apply font-mono text-xs text-black/70;
+	}
+
+	.tp-pre {
+		@apply whitespace-pre-wrap rounded bg-[#f6f7f7] p-3 text-xs text-black/80;
+	}
+
+	/* -----------------------------
+	   Notices (no composition)
+	------------------------------ */
+	.tp-notice-success {
+		@apply mb-4 rounded border px-4 py-3 text-sm border-emerald-200 bg-emerald-50 text-emerald-900;
+	}
+
+	.tp-notice-warning {
+		@apply mb-4 rounded border px-4 py-3 text-sm border-amber-200 bg-amber-50 text-amber-900;
+	}
+
+	.tp-notice-error {
+		@apply mb-4 rounded border px-4 py-3 text-sm border-red-200 bg-red-50 text-red-900;
+	}
+
+	.tp-notice-info {
+		@apply mb-4 rounded border px-4 py-3 text-sm border-sky-200 bg-sky-50 text-sky-900;
+	}
+
+	/* -----------------------------
+	   Buttons (no composition)
+	------------------------------ */
+	.tp-button-primary {
+		@apply inline-flex items-center rounded-md px-3 py-2 text-sm font-semibold transition
+		bg-[#2271b1] text-white hover:brightness-95 shadow-sm cursor-pointer;
+	}
+
+	.tp-button-secondary {
+		@apply inline-flex items-center rounded-md px-3 py-2 text-sm font-semibold transition
+		border border-black/20 bg-white text-black/80 hover:bg-black/5 cursor-pointer;
+	}
+
+	.tp-button-danger {
+		@apply inline-flex items-center rounded-md px-3 py-2 text-sm font-semibold transition
+		bg-red-600 text-white hover:brightness-95 shadow-sm cursor-pointer;
+	}
+
+	.tp-button-link {
+		@apply inline-flex items-center text-sm font-semibold text-[#2271b1] hover:underline cursor-pointer;
+	}
+
+	.tp-button-disabled {
+		@apply inline-flex items-center rounded-md px-3 py-2 text-sm font-semibold
+		bg-black/10 text-black/40 cursor-not-allowed;
+	}
+
+	/* -----------------------------
+	   Metabox (no composition)
+	------------------------------ */
+	.tp-metabox {
+		@apply rounded-lg border border-black/5 bg-white shadow-sm;
+	}
+
+	.tp-metabox__title {
+		@apply border-b border-black/10 bg-[#f6f7f7]/70 px-4 py-3 text-sm font-semibold;
+	}
+
+	.tp-metabox__body {
+		@apply px-4 py-3;
+	}
+
+	/* -----------------------------
+	   Tables
+	------------------------------ */
+	.tp-table-wrap {
+		@apply overflow-x-auto;
+	}
+
+	.tp-table {
+		@apply min-w-full text-left text-sm;
+	}
+
+	.tp-table__thead {
+		@apply bg-[#f6f7f7] text-xs uppercase text-black/60;
+	}
+
+	.tp-table__th {
+		@apply px-4 py-3 font-semibold;
+	}
+
+	.tp-table__tbody {
+		@apply divide-y divide-black/10;
+	}
+
+	.tp-table__row {
+		@apply hover:bg-black/2;
+	}
+
+	.tp-table__td {
+		@apply px-4 py-3 align-top;
+	}
+
+	/* -----------------------------
+	   Forms
+	------------------------------ */
+	.tp-field {
+		@apply space-y-1;
+	}
+
+	.tp-label {
+		@apply text-sm font-semibold text-[#1d2327];
+	}
+
+	.tp-help {
+		@apply text-xs text-black/60;
+	}
+
+	.tp-input {
+		@apply w-full rounded border border-black/20 bg-white px-3 py-2 text-sm text-[#1d2327]
+		outline-none focus:border-[#2271b1] focus:ring-2 focus:ring-[#2271b1]/20;
+	}
+
+	.tp-textarea {
+		@apply w-full rounded border border-black/20 bg-white px-3 py-2 text-sm text-[#1d2327]
+		outline-none focus:border-[#2271b1] focus:ring-2 focus:ring-[#2271b1]/20;
+	}
+
+	.tp-select {
+		@apply w-full rounded border border-black/20 bg-white px-3 py-2 text-sm text-[#1d2327]
+		outline-none focus:border-[#2271b1] focus:ring-2 focus:ring-[#2271b1]/20;
+	}
+
+	.tp-checkbox {
+		@apply h-5 w-5 rounded border border-black/30 text-[#2271b1] focus:ring-[#2271b1]/20;
+	}
+
+	/* -----------------------------
+	   Panels / Separators
+	------------------------------ */
+	.tp-panel {
+		@apply rounded-lg border border-black/5 bg-white/70 p-4;
+	}
+
+	.tp-divider {
+		@apply my-4 border-t border-black/10;
+	}
+}

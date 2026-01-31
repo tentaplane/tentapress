@@ -1,0 +1,19 @@
+{
+    "id": "tentapress/posts",
+    "name": "Posts",
+    "description": "Create and manage blog posts.",
+    "version": "0.1.2",
+    "provider": "TentaPress\\Posts\\PostsServiceProvider",
+    "requires": ["tentapress/users", "tentapress/blocks"],
+    "admin": {
+        "menus": [
+            {
+                "label": "Posts",
+                "route": "tp.posts.index",
+                "capability": "manage_posts",
+                "icon": "file-text",
+                "position": 30
+            }
+        ]
+    }
+}

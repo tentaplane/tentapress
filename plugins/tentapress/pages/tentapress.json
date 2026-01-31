@@ -1,0 +1,19 @@
+{
+    "id": "tentapress/pages",
+    "name": "Pages",
+    "description": "Create and manage pages.",
+    "version": "0.1.2",
+    "provider": "TentaPress\\Pages\\PagesServiceProvider",
+    "requires": [],
+    "admin": {
+        "menus": [
+            {
+                "label": "Pages",
+                "route": "tp.pages.index",
+                "capability": "manage_pages",
+                "icon": "file",
+                "position": 20
+            }
+        ]
+    }
+}

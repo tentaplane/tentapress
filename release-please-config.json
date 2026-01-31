@@ -1,0 +1,11 @@
+{
+    "packages": {
+        ".": {
+            "release-type": "php",
+            "changelog-path": "CHANGELOG.md",
+            "extra-files": [
+                "composer.json"
+            ]
+        }
+    }
+}

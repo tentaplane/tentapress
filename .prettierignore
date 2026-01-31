@@ -1,0 +1,7 @@
+node_modules
+.env*
+vendor/
+public/
+.git
+composer.lock
+bun.locl

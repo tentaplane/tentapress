@@ -1,0 +1,58 @@
+{
+    "type": "blocks/image",
+    "name": "Image",
+    "description": "A single image with optional caption and link.",
+    "version": 2,
+    "view": "blocks.image",
+    "fields": [
+        { "key": "image", "label": "Image", "type": "media" },
+        { "key": "alt", "label": "Alt text", "type": "text" },
+        { "key": "caption", "label": "Caption", "type": "textarea", "rows": 3 },
+        { "key": "link_url", "label": "Link URL", "type": "url" },
+        {
+            "key": "alignment",
+            "label": "Alignment",
+            "type": "select",
+            "options": [
+                { "value": "left", "label": "Left" },
+                { "value": "center", "label": "Center" },
+                { "value": "right", "label": "Right" }
+            ]
+        },
+        {
+            "key": "width",
+            "label": "Width",
+            "type": "select",
+            "options": [
+                { "value": "narrow", "label": "Narrow" },
+                { "value": "normal", "label": "Normal" },
+                { "value": "wide", "label": "Wide" },
+                { "value": "full", "label": "Full" }
+            ]
+        },
+        { "key": "rounded", "label": "Rounded corners", "type": "toggle" },
+        { "key": "shadow", "label": "Drop shadow", "type": "toggle" }
+    ],
+    "defaults": {
+        "image": "",
+        "alt": "",
+        "caption": "",
+        "link_url": "",
+        "alignment": "center",
+        "width": "normal",
+        "rounded": true,
+        "shadow": false
+    },
+    "example": {
+        "props": {
+            "image": "",
+            "alt": "",
+            "caption": "",
+            "link_url": "",
+            "alignment": "center",
+            "width": "normal",
+            "rounded": true,
+            "shadow": false
+        }
+    }
+}

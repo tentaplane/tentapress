@@ -1,0 +1,19 @@
+{
+    "id": "tentapress/static-deploy",
+    "name": "Static Deploy",
+    "description": "Generate a downloadable static ZIP archive.",
+    "version": "0.1.2",
+    "provider": "TentaPress\\StaticDeploy\\StaticDeployServiceProvider",
+    "requires": [],
+    "admin": {
+        "menus": [
+            {
+                "label": "Static Deploy",
+                "route": "tp.static.index",
+                "capability": "deploy_static",
+                "position": 100,
+                "parent": "Settings"
+            }
+        ]
+    }
+}

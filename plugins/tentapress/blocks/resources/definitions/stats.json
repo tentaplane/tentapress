@@ -1,0 +1,42 @@
+{
+    "type": "blocks/stats",
+    "name": "Stats",
+    "description": "A row of key numbers.",
+    "version": 1,
+    "view": "blocks.stats",
+    "fields": [
+        { "key": "title", "label": "Title", "type": "text" },
+        {
+            "key": "items",
+            "label": "Items",
+            "type": "textarea",
+            "rows": 5,
+            "help": "JSON array of {value,label} or one per line: Value | Label."
+        },
+        {
+            "key": "columns",
+            "label": "Columns",
+            "type": "select",
+            "options": [
+                { "value": "2", "label": "2" },
+                { "value": "3", "label": "3" },
+                { "value": "4", "label": "4" }
+            ]
+        },
+        { "key": "dividers", "label": "Show dividers", "type": "toggle" }
+    ],
+    "defaults": {
+        "title": "",
+        "items": "",
+        "columns": "3",
+        "dividers": false
+    },
+    "example": {
+        "props": {
+            "title": "By the numbers",
+            "items": "10k+ | Monthly visitors\n120 | Pages shipped\n4.9★ | Avg rating",
+            "columns": "3",
+            "dividers": true
+        }
+    }
+}

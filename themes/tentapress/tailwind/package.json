@@ -1,0 +1,14 @@
+{
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "build": "vite build --config vite.config.js",
+        "dev": "vite --config vite.config.js"
+    },
+    "devDependencies": {
+        "@tailwindcss/vite": "^4.1.18",
+        "laravel-vite-plugin": "^2.0.1",
+        "tailwindcss": "^4.1.18",
+        "vite": "^7.3.1"
+    }
+}

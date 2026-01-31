@@ -1,0 +1,52 @@
+{
+    "type": "blocks/testimonial",
+    "name": "Testimonial",
+    "description": "A quote with name, role and optional avatar.",
+    "version": 2,
+    "view": "blocks.testimonial",
+    "fields": [
+        { "key": "quote", "label": "Quote", "type": "textarea", "rows": 4 },
+        { "key": "name", "label": "Name", "type": "text" },
+        { "key": "role", "label": "Role", "type": "text" },
+        { "key": "avatar", "label": "Avatar", "type": "media" },
+        { "key": "rating", "label": "Rating (0-5)", "type": "number", "min": 0, "max": 5, "step": 1 },
+        {
+            "key": "alignment",
+            "label": "Alignment",
+            "type": "select",
+            "options": [
+                { "value": "left", "label": "Left" },
+                { "value": "center", "label": "Center" }
+            ]
+        },
+        {
+            "key": "style",
+            "label": "Style",
+            "type": "select",
+            "options": [
+                { "value": "card", "label": "Card" },
+                { "value": "simple", "label": "Simple" }
+            ]
+        }
+    ],
+    "defaults": {
+        "quote": "",
+        "name": "",
+        "role": "",
+        "avatar": "",
+        "rating": 0,
+        "alignment": "left",
+        "style": "card"
+    },
+    "example": {
+        "props": {
+            "quote": "This is the fastest way we’ve shipped landing pages.",
+            "name": "Alex Smith",
+            "role": "Founder",
+            "avatar": "",
+            "rating": 5,
+            "alignment": "left",
+            "style": "card"
+        }
+    }
+}

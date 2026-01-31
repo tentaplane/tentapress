@@ -1,0 +1,53 @@
+{
+    "type": "blocks/logo-cloud",
+    "name": "Logo Cloud",
+    "description": "A grid of brand logos.",
+    "version": 1,
+    "view": "blocks.logo-cloud",
+    "fields": [
+        { "key": "title", "label": "Title", "type": "text" },
+        { "key": "subtitle", "label": "Subtitle", "type": "textarea", "rows": 3 },
+        { "key": "logos", "label": "Logos", "type": "media-list" },
+        {
+            "key": "columns",
+            "label": "Columns",
+            "type": "select",
+            "options": [
+                { "value": "2", "label": "2" },
+                { "value": "3", "label": "3" },
+                { "value": "4", "label": "4" },
+                { "value": "5", "label": "5" },
+                { "value": "6", "label": "6" }
+            ]
+        },
+        { "key": "grayscale", "label": "Grayscale", "type": "toggle" },
+        {
+            "key": "size",
+            "label": "Logo Size",
+            "type": "select",
+            "options": [
+                { "value": "sm", "label": "Small" },
+                { "value": "md", "label": "Medium" },
+                { "value": "lg", "label": "Large" }
+            ]
+        }
+    ],
+    "defaults": {
+        "title": "Trusted by",
+        "subtitle": "",
+        "logos": [],
+        "columns": "5",
+        "grayscale": true,
+        "size": "md"
+    },
+    "example": {
+        "props": {
+            "title": "Trusted by",
+            "subtitle": "",
+            "logos": [],
+            "columns": "5",
+            "grayscale": true,
+            "size": "md"
+        }
+    }
+}

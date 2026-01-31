@@ -1,0 +1,18 @@
+{
+    "type": "theme",
+    "id": "tentapress/tailwind",
+    "name": "Tailwind Theme",
+    "version": "0.1.2",
+    "description": "A Tailwind v4 theme for TentaPress.",
+    "provider": "TentaPress\\Themes\\Tailwind\\TailwindThemeServiceProvider",
+    "provider_path": "src/TailwindThemeServiceProvider.php",
+    "layouts": [
+        { "key": "default", "label": "Default" },
+        { "key": "landing", "label": "Landing" },
+        { "key": "post", "label": "Post" }
+    ],
+    "menu_locations": {
+        "primary": "Primary Navigation",
+        "footer": "Footer Navigation"
+    }
+}

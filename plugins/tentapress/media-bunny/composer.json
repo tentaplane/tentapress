@@ -1,0 +1,23 @@
+{
+    "name": "tentapress/media-bunny",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "php": "^8.2",
+        "tentapress/media": "<1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "TentaPress\\MediaBunny\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "TentaPress\\MediaBunny\\MediaBunnyServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

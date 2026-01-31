@@ -1,0 +1,42 @@
+{
+    "type": "blocks/features",
+    "name": "Features",
+    "description": "A list of feature highlights.",
+    "version": 1,
+    "view": "blocks.features",
+    "fields": [
+        { "key": "title", "label": "Title", "type": "text" },
+        { "key": "subtitle", "label": "Subtitle", "type": "textarea", "rows": 3 },
+        {
+            "key": "items",
+            "label": "Items",
+            "type": "textarea",
+            "rows": 6,
+            "help": "JSON array of {title, body, icon} or one per line: Title | Body | Icon."
+        },
+        {
+            "key": "columns",
+            "label": "Columns",
+            "type": "select",
+            "options": [
+                { "value": "2", "label": "2" },
+                { "value": "3", "label": "3" },
+                { "value": "4", "label": "4" }
+            ]
+        }
+    ],
+    "defaults": {
+        "title": "Features",
+        "subtitle": "",
+        "items": "",
+        "columns": "3"
+    },
+    "example": {
+        "props": {
+            "title": "Features",
+            "subtitle": "",
+            "items": "Fast setup | Get started quickly | ⚡\nFlexible layouts | Mix blocks freely | ✨\nOpen source | Extend as needed | 🧩",
+            "columns": "3"
+        }
+    }
+}

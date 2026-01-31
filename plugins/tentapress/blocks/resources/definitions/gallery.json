@@ -1,0 +1,59 @@
+{
+    "type": "blocks/gallery",
+    "name": "Gallery",
+    "description": "A responsive gallery of images.",
+    "version": 2,
+    "view": "blocks.gallery",
+    "fields": [
+        { "key": "images", "label": "Images", "type": "media-list" },
+        {
+            "key": "columns",
+            "label": "Columns",
+            "type": "select",
+            "options": [
+                { "value": "2", "label": "2" },
+                { "value": "3", "label": "3" },
+                { "value": "4", "label": "4" },
+                { "value": "5", "label": "5" }
+            ]
+        },
+        {
+            "key": "gap",
+            "label": "Gap",
+            "type": "select",
+            "options": [
+                { "value": "sm", "label": "Small" },
+                { "value": "md", "label": "Medium" },
+                { "value": "lg", "label": "Large" }
+            ]
+        },
+        {
+            "key": "aspect",
+            "label": "Aspect Ratio",
+            "type": "select",
+            "options": [
+                { "value": "auto", "label": "Auto" },
+                { "value": "square", "label": "1:1" },
+                { "value": "4:3", "label": "4:3" },
+                { "value": "16:9", "label": "16:9" }
+            ]
+        },
+        { "key": "rounded", "label": "Rounded corners", "type": "toggle" }
+    ],
+    "defaults": {
+        "images": [],
+        "columns": "3",
+        "gap": "md",
+        "aspect": "4:3",
+        "rounded": true
+    },
+    "example": {
+        "props": {
+            "images": [],
+            "columns": "3",
+            "gap": "md",
+            "aspect": "4:3",
+            "rounded": true
+        }
+    }
+}

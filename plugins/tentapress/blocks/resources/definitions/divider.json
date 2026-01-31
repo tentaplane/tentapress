@@ -1,0 +1,33 @@
+{
+    "type": "blocks/divider",
+    "name": "Divider",
+    "description": "A spacer or horizontal divider.",
+    "version": 1,
+    "view": "blocks.divider",
+    "fields": [
+        { "key": "height", "label": "Height (px)", "type": "number", "min": 0, "max": 200, "step": 4 },
+        { "key": "label", "label": "Label", "type": "text" },
+        {
+            "key": "style",
+            "label": "Style",
+            "type": "select",
+            "options": [
+                { "value": "line", "label": "Line" },
+                { "value": "dashed", "label": "Dashed" },
+                { "value": "none", "label": "None" }
+            ]
+        }
+    ],
+    "defaults": {
+        "height": 24,
+        "label": "",
+        "style": "line"
+    },
+    "example": {
+        "props": {
+            "height": 24,
+            "label": "",
+            "style": "line"
+        }
+    }
+}

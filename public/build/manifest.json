@@ -1,0 +1,26 @@
+{
+  "plugins/tentapress/admin-shell/resources/css/admin.css": {
+    "file": "assets/admin-ByQ5TcEd.css",
+    "src": "plugins/tentapress/admin-shell/resources/css/admin.css",
+    "isEntry": true,
+    "name": "admin",
+    "names": [
+      "admin.css"
+    ]
+  },
+  "plugins/tentapress/admin-shell/resources/js/admin.js": {
+    "file": "assets/admin-JrkvV8eq.js",
+    "name": "admin",
+    "src": "plugins/tentapress/admin-shell/resources/js/admin.js",
+    "isEntry": true
+  },
+  "resources/css/fallback.css": {
+    "file": "assets/fallback-BPxXGkJ5.css",
+    "src": "resources/css/fallback.css",
+    "isEntry": true,
+    "name": "fallback",
+    "names": [
+      "fallback.css"
+    ]
+  }
+}

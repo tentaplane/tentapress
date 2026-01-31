@@ -1,0 +1,17 @@
+{
+    "id": "tentapress/import",
+    "name": "Import",
+    "version": "0.1.2",
+    "provider": "TentaPress\\Import\\ImportServiceProvider",
+    "admin": {
+        "menus": [
+            {
+                "label": "Import",
+                "route": "tp.import.index",
+                "capability": "import_site",
+                "position": 20,
+                "parent": "Settings"
+            }
+        ]
+    }
+}

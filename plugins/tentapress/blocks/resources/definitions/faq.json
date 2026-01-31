@@ -1,0 +1,33 @@
+{
+    "type": "blocks/faq",
+    "name": "FAQ",
+    "description": "A list of frequently asked questions.",
+    "version": 1,
+    "view": "blocks.faq",
+    "fields": [
+        { "key": "title", "label": "Title", "type": "text" },
+        { "key": "subtitle", "label": "Subtitle", "type": "textarea", "rows": 3 },
+        {
+            "key": "items",
+            "label": "Questions",
+            "type": "textarea",
+            "rows": 6,
+            "help": "JSON array of {question,answer} or one per line: Question | Answer."
+        },
+        { "key": "open_first", "label": "Open first question", "type": "toggle" }
+    ],
+    "defaults": {
+        "title": "FAQs",
+        "subtitle": "",
+        "items": "",
+        "open_first": false
+    },
+    "example": {
+        "props": {
+            "title": "FAQs",
+            "subtitle": "",
+            "items": "Is it open source? | Yes.\nCan I add plugins? | Absolutely.",
+            "open_first": true
+        }
+    }
+}

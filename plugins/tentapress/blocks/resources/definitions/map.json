@@ -1,0 +1,30 @@
+{
+    "type": "blocks/map",
+    "name": "Map",
+    "description": "Embed a map iframe.",
+    "version": 1,
+    "view": "blocks.map",
+    "fields": [
+        { "key": "title", "label": "Title", "type": "text" },
+        { "key": "embed_url", "label": "Embed URL", "type": "url" },
+        { "key": "height", "label": "Height (px)", "type": "number", "min": 200, "max": 1200, "step": 10 },
+        { "key": "caption", "label": "Caption", "type": "textarea", "rows": 2 },
+        { "key": "border", "label": "Show border", "type": "toggle" }
+    ],
+    "defaults": {
+        "title": "",
+        "embed_url": "",
+        "height": 420,
+        "caption": "",
+        "border": true
+    },
+    "example": {
+        "props": {
+            "title": "Our office",
+            "embed_url": "https://www.google.com/maps/embed?...",
+            "height": 420,
+            "caption": "",
+            "border": true
+        }
+    }
+}

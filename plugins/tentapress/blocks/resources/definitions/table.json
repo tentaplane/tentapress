@@ -1,0 +1,30 @@
+{
+    "type": "blocks/table",
+    "name": "Table",
+    "description": "A simple data table from CSV.",
+    "version": 1,
+    "view": "blocks.table",
+    "fields": [
+        { "key": "title", "label": "Title", "type": "text" },
+        {
+            "key": "data",
+            "label": "CSV Data",
+            "type": "textarea",
+            "rows": 6,
+            "help": "First row is headers. Comma-separated values per line."
+        },
+        { "key": "striped", "label": "Striped rows", "type": "toggle" }
+    ],
+    "defaults": {
+        "title": "",
+        "data": "",
+        "striped": true
+    },
+    "example": {
+        "props": {
+            "title": "Pricing",
+            "data": "Plan,Price,Users\nStarter,$9,1\nTeam,$29,5",
+            "striped": true
+        }
+    }
+}

@@ -1,0 +1,44 @@
+{
+    "type": "blocks/newsletter",
+    "name": "Newsletter",
+    "description": "A simple newsletter signup form.",
+    "version": 1,
+    "view": "blocks.newsletter",
+    "fields": [
+        { "key": "title", "label": "Title", "type": "text" },
+        { "key": "body", "label": "Body", "type": "textarea", "rows": 3 },
+        { "key": "action_url", "label": "Form Action URL", "type": "url" },
+        { "key": "email_placeholder", "label": "Email Placeholder", "type": "text" },
+        { "key": "button_label", "label": "Button Label", "type": "text" },
+        { "key": "disclaimer", "label": "Disclaimer", "type": "textarea", "rows": 2 },
+        {
+            "key": "alignment",
+            "label": "Alignment",
+            "type": "select",
+            "options": [
+                { "value": "left", "label": "Left" },
+                { "value": "center", "label": "Center" }
+            ]
+        }
+    ],
+    "defaults": {
+        "title": "Stay in the loop",
+        "body": "",
+        "action_url": "",
+        "email_placeholder": "you@example.com",
+        "button_label": "Subscribe",
+        "disclaimer": "",
+        "alignment": "left"
+    },
+    "example": {
+        "props": {
+            "title": "Stay in the loop",
+            "body": "Monthly updates, no spam.",
+            "action_url": "",
+            "email_placeholder": "you@example.com",
+            "button_label": "Subscribe",
+            "disclaimer": "",
+            "alignment": "left"
+        }
+    }
+}
