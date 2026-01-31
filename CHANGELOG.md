@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.4.3](https://github.com/tentaplane/tentapress/compare/v0.4.2...v0.4.3) (2026-01-31)
+
+
+### Bug Fixes
+
+* Bumping admin shell plugin version to include new menu builder ([862ae39](https://github.com/tentaplane/tentapress/commit/862ae39de2db8a710026f74df66d058ecf50a4a0))
+
 ## [0.4.2](https://github.com/tentaplane/tentapress/compare/v0.4.1...v0.4.2) (2026-01-31)
 
 
