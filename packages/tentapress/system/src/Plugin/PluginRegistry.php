@@ -417,19 +417,7 @@ final class PluginRegistry
      */
     private function pluginSearchPaths(): array
     {
-        $paths = [Paths::pluginsPath()];
-
-        $vendorNamespaces = config('tentapress.plugin_vendor_namespaces', ['tentapress']);
-        if (is_array($vendorNamespaces)) {
-            foreach ($vendorNamespaces as $namespace) {
-                $namespace = trim((string) $namespace);
-                if ($namespace !== '') {
-                    $paths[] = base_path('vendor/'.$namespace);
-                }
-            }
-        }
-
-        return array_values(array_filter($paths, static fn (string $path): bool => is_dir($path)));
+        return Paths::pluginSearchRoots();
     }
 
     private function providerForId(string $id): string
