@@ -12,10 +12,15 @@ use Illuminate\Support\Str;
 use TentaPress\Media\Models\TpMedia;
 use TentaPress\Pages\Models\TpPage;
 use TentaPress\Posts\Models\TpPost;
+use TentaPress\System\Support\JsonPayload;
 use ZipArchive;
 
 final class Importer
 {
+    public function __construct(private readonly JsonPayload $jsonPayload)
+    {
+    }
+
     /**
      * Analyze the uploaded zip, extract relevant JSON into storage, return summary + token.
      *
@@ -77,28 +82,28 @@ final class Importer
             ],
         ];
 
-        File::put($baseDir . DIRECTORY_SEPARATOR . 'plan.json', $this->json($plan));
+        File::put($baseDir . DIRECTORY_SEPARATOR . 'plan.json', $this->jsonPayload->encode($plan));
 
         if ($pages !== null) {
-            File::put($baseDir . DIRECTORY_SEPARATOR . 'pages.json', $this->json($pages));
+            File::put($baseDir . DIRECTORY_SEPARATOR . 'pages.json', $this->jsonPayload->encode($pages));
         }
         if ($posts !== null) {
-            File::put($baseDir . DIRECTORY_SEPARATOR . 'posts.json', $this->json($posts));
+            File::put($baseDir . DIRECTORY_SEPARATOR . 'posts.json', $this->jsonPayload->encode($posts));
         }
         if ($media !== null) {
-            File::put($baseDir . DIRECTORY_SEPARATOR . 'media.json', $this->json($media));
+            File::put($baseDir . DIRECTORY_SEPARATOR . 'media.json', $this->jsonPayload->encode($media));
         }
         if ($settings !== null) {
-            File::put($baseDir . DIRECTORY_SEPARATOR . 'settings.json', $this->json($settings));
+            File::put($baseDir . DIRECTORY_SEPARATOR . 'settings.json', $this->jsonPayload->encode($settings));
         }
         if ($theme !== null) {
-            File::put($baseDir . DIRECTORY_SEPARATOR . 'theme.json', $this->json($theme));
+            File::put($baseDir . DIRECTORY_SEPARATOR . 'theme.json', $this->jsonPayload->encode($theme));
         }
         if ($plugins !== null) {
-            File::put($baseDir . DIRECTORY_SEPARATOR . 'plugins.json', $this->json($plugins));
+            File::put($baseDir . DIRECTORY_SEPARATOR . 'plugins.json', $this->jsonPayload->encode($plugins));
         }
         if ($seo !== null) {
-            File::put($baseDir . DIRECTORY_SEPARATOR . 'seo.json', $this->json($seo));
+            File::put($baseDir . DIRECTORY_SEPARATOR . 'seo.json', $this->jsonPayload->encode($seo));
         }
 
         $summary = [
@@ -733,16 +738,11 @@ final class Importer
         }
 
         $raw = $zip->getFromIndex($idx);
-        if (!is_string($raw) || trim($raw) === '') {
+        if (!is_string($raw)) {
             return null;
         }
 
-        try {
-            $decoded = json_decode($raw, true, 512, JSON_THROW_ON_ERROR);
-            return is_array($decoded) ? $decoded : null;
-        } catch (\Throwable) {
-            return null;
-        }
+        return $this->jsonPayload->decode($raw);
     }
 
     /**
@@ -751,20 +751,8 @@ final class Importer
     private function readJsonFile(string $path): array
     {
         $raw = File::get($path);
-        try {
-            $decoded = json_decode((string) $raw, true, 512, JSON_THROW_ON_ERROR);
-            return is_array($decoded) ? $decoded : [];
-        } catch (\Throwable) {
-            return [];
-        }
-    }
 
-    /**
-     * @param mixed $data
-     */
-    private function json(mixed $data): string
-    {
-        return json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . "\n";
+        return $this->jsonPayload->decodeOrEmpty((string) $raw);
     }
 
     private function token(): string
