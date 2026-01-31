@@ -23,3 +23,4 @@ The format is based on Keep a Changelog, and this project adheres to Semantic Ve
 
 ## [Unreleased]
 - Initial release automation setup.
+- Release Please bootstrap entry.
