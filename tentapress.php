@@ -50,6 +50,22 @@ $prompt = static function (string $label): string {
     return $line === false ? '' : trim($line);
 };
 
+$promptChoice = static function (string $label, array $choices, string $default) use ($prompt): string {
+    while (true) {
+        $choice = strtolower($prompt($label));
+
+        if ($choice === '') {
+            return $default;
+        }
+
+        if (array_key_exists($choice, $choices)) {
+            return $choices[$choice];
+        }
+
+        fwrite(STDOUT, 'Please choose ' . implode(', ', array_keys($choices)) . ".\n");
+    }
+};
+
 $composerPath = trim((string) shell_exec('command -v composer 2>/dev/null'));
 
 if ($composerPath !== '') {
@@ -105,6 +121,24 @@ if (! $hasComposerLock && ! $hasVendorFolder) {
         STDOUT,
         "Detected existing Composer install (composer.lock or vendor/ present).\n" .
         "Skipping Composer install and setup steps, proceeding to admin creation.\n\n"
+    );
+}
+
+$themeChoice = $promptChoice(
+    "Install a theme? [tailwind/bootstrap/none] (default: none): ",
+    [
+        'tailwind' => 'tentapress/tailwind',
+        'bootstrap' => 'tentapress/bootstrap',
+        'none' => 'none',
+    ],
+    'none'
+);
+
+if ($themeChoice !== 'none') {
+    $run(escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($artisanPath) . ' tp:themes sync', 'Syncing themes...');
+    $run(
+        escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($artisanPath) . ' tp:themes activate ' . escapeshellarg($themeChoice),
+        "Activating theme {$themeChoice}..."
     );
 }
 
