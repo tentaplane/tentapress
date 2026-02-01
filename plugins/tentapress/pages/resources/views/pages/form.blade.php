@@ -1,19 +1,42 @@
 @extends('tentapress-admin::layouts.shell')
 
-@section('title', $mode === 'create' ? 'Add New Page' : 'Edit Page')
+@php
+    $editorMode = (bool) ($editorMode ?? false);
+@endphp
+
+@section('title', $editorMode ? 'Blocks Editor' : ($mode === 'create' ? 'Add New Page' : 'Edit Page'))
 
 @section('content')
     <div class="tp-editor space-y-6">
         <div class="tp-page-header">
             <div>
                 <h1 class="tp-page-title">
-                    {{ $mode === 'create' ? 'Add New Page' : 'Edit Page' }}
+                    @if ($editorMode)
+                        Blocks Editor: {{ $page->title }}
+                    @else
+                        {{ $mode === 'create' ? 'Add New Page' : 'Edit Page' }}
+                    @endif
                 </h1>
             </div>
+
+            @if ($mode === 'edit')
+                <div class="flex flex-wrap gap-2">
+                    @if ($editorMode)
+                        <button type="submit" form="page-form" class="tp-button-primary">Save changes</button>
+                        <a href="{{ route('tp.pages.edit', ['page' => $page->id]) }}" class="tp-button-secondary">
+                            Exit full screen
+                        </a>
+                    @else
+                        <a href="{{ route('tp.pages.editor', ['page' => $page->id]) }}" class="tp-button-secondary">
+                            Full screen editor
+                        </a>
+                    @endif
+                </div>
+            @endif
         </div>
 
-        <div class="grid grid-cols-1 gap-6 lg:grid-cols-4">
-            <div class="space-y-6 lg:col-span-3">
+        <div class="grid grid-cols-1 gap-6 {{ $editorMode ? 'lg:grid-cols-1' : 'lg:grid-cols-4' }}">
+            <div class="space-y-6 {{ $editorMode ? 'lg:col-span-1' : 'lg:col-span-3' }}">
                 <div class="tp-metabox">
                     <div class="tp-metabox__body space-y-4">
                         <form
@@ -1356,81 +1379,83 @@
                 </div>
             </div>
 
-            <div class="space-y-6 lg:sticky lg:top-6 lg:self-start">
-                <div class="tp-metabox">
-                    <div class="tp-metabox__title">Status</div>
-                    <div class="tp-metabox__body space-y-4 text-sm">
-                        <div class="space-y-2">
-                            <div>
-                                <span class="tp-muted">Status:</span>
-                                <span class="font-semibold">{{ ucfirst($page->status) }}</span>
+            @if (! $editorMode)
+                <div class="space-y-6 lg:sticky lg:top-6 lg:self-start">
+                    <div class="tp-metabox">
+                        <div class="tp-metabox__title">Status</div>
+                        <div class="tp-metabox__body space-y-4 text-sm">
+                            <div class="space-y-2">
+                                <div>
+                                    <span class="tp-muted">Status:</span>
+                                    <span class="font-semibold">{{ ucfirst($page->status) }}</span>
+                                </div>
+                                <div>
+                                    <span class="tp-muted">Published:</span>
+                                    <span class="tp-code">{{ $page->published_at?->toDateTimeString() ?? '—' }}</span>
+                                </div>
+                                <div>
+                                    <span class="tp-muted">Updated:</span>
+                                    <span class="tp-code">{{ $page->updated_at?->toDateTimeString() ?? '—' }}</span>
+                                </div>
                             </div>
-                            <div>
-                                <span class="tp-muted">Published:</span>
-                                <span class="tp-code">{{ $page->published_at?->toDateTimeString() ?? '—' }}</span>
+
+                            <div class="tp-divider"></div>
+
+                            <div class="space-y-2">
+                                <button type="submit" form="page-form" class="tp-button-primary w-full justify-center">
+                                    {{ $mode === 'create' ? 'Create Page' : 'Save Changes' }}
+                                </button>
+
+                                @if ($mode === 'edit')
+                                    <a
+                                        class="tp-button-secondary w-full justify-center"
+                                        href="/{{ $page->slug }}"
+                                        target="_blank"
+                                        rel="noreferrer">
+                                        View
+                                    </a>
+                                @endif
+
+                                @if ($mode === 'edit' && $page->status === 'draft')
+                                    <form method="POST" action="{{ route('tp.pages.publish', ['page' => $page->id]) }}">
+                                        @csrf
+                                        <button class="tp-button-primary w-full justify-center" type="submit">
+                                            Publish
+                                        </button>
+                                    </form>
+                                @endif
+
+                                @if ($mode === 'edit' && $page->status === 'published')
+                                    <form method="POST" action="{{ route('tp.pages.unpublish', ['page' => $page->id]) }}">
+                                        @csrf
+                                        <button class="tp-button-secondary w-full justify-center" type="submit">
+                                            Unpublish
+                                        </button>
+                                    </form>
+                                @endif
+
+                                @if ($mode === 'edit')
+                                    <form
+                                        method="POST"
+                                        action="{{ route('tp.pages.destroy', ['page' => $page->id]) }}"
+                                        onsubmit="return confirm('Delete this page? This cannot be undone.');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button
+                                            type="submit"
+                                            class="tp-button-danger w-full justify-center"
+                                            aria-label="Delete page">
+                                            Delete
+                                        </button>
+                                    </form>
+                                @endif
                             </div>
-                            <div>
-                                <span class="tp-muted">Updated:</span>
-                                <span class="tp-code">{{ $page->updated_at?->toDateTimeString() ?? '—' }}</span>
-                            </div>
-                        </div>
-
-                        <div class="tp-divider"></div>
-
-                        <div class="space-y-2">
-                            <button type="submit" form="page-form" class="tp-button-primary w-full justify-center">
-                                {{ $mode === 'create' ? 'Create Page' : 'Save Changes' }}
-                            </button>
-
-                            @if ($mode === 'edit')
-                                <a
-                                    class="tp-button-secondary w-full justify-center"
-                                    href="/{{ $page->slug }}"
-                                    target="_blank"
-                                    rel="noreferrer">
-                                    View
-                                </a>
-                            @endif
-
-                            @if ($mode === 'edit' && $page->status === 'draft')
-                                <form method="POST" action="{{ route('tp.pages.publish', ['page' => $page->id]) }}">
-                                    @csrf
-                                    <button class="tp-button-primary w-full justify-center" type="submit">
-                                        Publish
-                                    </button>
-                                </form>
-                            @endif
-
-                            @if ($mode === 'edit' && $page->status === 'published')
-                                <form method="POST" action="{{ route('tp.pages.unpublish', ['page' => $page->id]) }}">
-                                    @csrf
-                                    <button class="tp-button-secondary w-full justify-center" type="submit">
-                                        Unpublish
-                                    </button>
-                                </form>
-                            @endif
-
-                            @if ($mode === 'edit')
-                                <form
-                                    method="POST"
-                                    action="{{ route('tp.pages.destroy', ['page' => $page->id]) }}"
-                                    onsubmit="return confirm('Delete this page? This cannot be undone.');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button
-                                        type="submit"
-                                        class="tp-button-danger w-full justify-center"
-                                        aria-label="Delete page">
-                                        Delete
-                                    </button>
-                                </form>
-                            @endif
                         </div>
                     </div>
-                </div>
 
-                @includeIf('tentapress-seo::page-metabox', ['page' => $page, 'mode' => $mode])
-            </div>
+                    @includeIf('tentapress-seo::page-metabox', ['page' => $page, 'mode' => $mode])
+                </div>
+            @endif
         </div>
     </div>
 @endsection
