@@ -7,9 +7,18 @@
 @section('title', $editorMode ? 'Blocks Editor' : ($mode === 'create' ? 'Add New Page' : 'Edit Page'))
 
 @section('content')
-    <div class="tp-editor space-y-6">
+    <div class="tp-editor {{ $editorMode ? 'space-y-4' : 'space-y-6' }}">
         <div class="tp-page-header">
-            <div>
+            <div class="{{ $editorMode ? 'space-y-1' : '' }}">
+                @if ($editorMode)
+                    <a
+                        href="{{ route('tp.pages.index') }}"
+                        class="inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+                        Pages
+                        <span class="text-slate-300">/</span>
+                        Editor
+                    </a>
+                @endif
                 <h1 class="tp-page-title">
                     @if ($editorMode)
                         Blocks Editor: {{ $page->title }}
@@ -22,7 +31,34 @@
             @if ($mode === 'edit')
                 <div class="flex flex-wrap gap-2">
                     @if ($editorMode)
+                        <span
+                            class="inline-flex items-center rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-600">
+                            {{ ucfirst($page->status) }}
+                        </span>
                         <button type="submit" form="page-form" class="tp-button-primary">Save changes</button>
+                        <a
+                            class="tp-button-secondary"
+                            href="/{{ $page->slug }}"
+                            target="_blank"
+                            rel="noreferrer">
+                            View
+                        </a>
+                        @if ($page->status === 'draft')
+                            <form method="POST" action="{{ route('tp.pages.publish', ['page' => $page->id]) }}">
+                                @csrf
+                                <button class="tp-button-primary" type="submit">
+                                    Publish
+                                </button>
+                            </form>
+                        @endif
+                        @if ($page->status === 'published')
+                            <form method="POST" action="{{ route('tp.pages.unpublish', ['page' => $page->id]) }}">
+                                @csrf
+                                <button class="tp-button-secondary" type="submit">
+                                    Unpublish
+                                </button>
+                            </form>
+                        @endif
                         <a href="{{ route('tp.pages.edit', ['page' => $page->id]) }}" class="tp-button-secondary">
                             Exit full screen
                         </a>
@@ -50,7 +86,7 @@
                             @endif
 
                             <div
-                                class="space-y-4"
+                                class="{{ $editorMode ? 'space-y-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm' : 'space-y-4' }}"
                                 x-data="{
                                     title: @js(old('title', $page->title)),
                                     slug: @js(old('slug', $page->slug)),
@@ -161,10 +197,11 @@
                                 x-init="init()">
                                 <label class="tp-label">Blocks</label>
 
-                                <div class="tp-panel space-y-4">
+                                <div
+                                    class="{{ $editorMode ? 'space-y-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm' : 'tp-panel space-y-4' }}">
                                     <div
                                         class="flex flex-col items-center justify-between gap-2 sm:flex-row sm:items-center">
-                                        <div>
+                                        <div class="flex flex-wrap items-center gap-2">
                                             <select class="tp-select w-full sm:w-72" x-model="addType">
                                                 <option value="">Add a block…</option>
                                                 <template x-for="def in definitions" :key="def.type">
@@ -172,7 +209,10 @@
                                                 </template>
                                             </select>
 
-                                            <button type="button" class="tp-button-secondary" @click="addBlock()">
+                                            <button
+                                                type="button"
+                                                class="{{ $editorMode ? 'tp-button-primary' : 'tp-button-secondary' }}"
+                                                @click="addBlock()">
                                                 Add block
                                             </button>
                                         </div>
@@ -197,7 +237,8 @@
 
                                     <div class="space-y-3">
                                         <template x-if="blocks.length === 0">
-                                            <div class="rounded-md border border-slate-200 bg-white p-4 text-sm">
+                                            <div
+                                                class="{{ $editorMode ? 'rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-6 text-sm' : 'rounded-md border border-slate-200 bg-white p-4 text-sm' }}">
                                                 <div class="font-semibold">Start with a block</div>
                                                 <div class="tp-muted mt-1">Choose a block type above.</div>
                                             </div>
@@ -216,7 +257,7 @@
 
                                         <template x-for="(block, index) in blocks" :key="block._key">
                                             <div
-                                                class="tp-metabox bg-zinc-50"
+                                                class="{{ $editorMode ? 'rounded-2xl border border-slate-200 bg-white shadow-sm' : 'tp-metabox bg-zinc-50' }}"
                                                 :class="{
                                                 'opacity-60': dragIndex === index,
                                                 'ring-2 ring-black/10': dragOverIndex === index && dragIndex !== index,
@@ -225,37 +266,66 @@
                                                 @dragleave="dragLeave(index)"
                                                 @drop="dropOn(index)">
                                                 <div
-                                                    class="tp-metabox__title flex flex-wrap items-center justify-between gap-3">
-                                                    <div class="flex min-w-0 items-center gap-2">
-                                                        <button
-                                                            type="button"
-                                                            class="tp-button-link cursor-move text-slate-400"
-                                                            draggable="true"
-                                                            aria-label="Drag to reorder"
-                                                            x-show="block._collapsed"
-                                                            x-cloak
-                                                            @dragstart="dragStart(index, $event)"
-                                                            @dragend="dragEnd()">
-                                                            <svg
-                                                                xmlns="http://www.w3.org/2000/svg"
-                                                                fill="none"
-                                                                viewBox="0 0 24 24"
-                                                                stroke-width="1.5"
-                                                                stroke="currentColor"
-                                                                class="size-5">
-                                                                <path
-                                                                    stroke-linecap="round"
-                                                                    stroke-linejoin="round"
-                                                                    d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-                                                            </svg>
-                                                        </button>
+                                                    class="{{ $editorMode ? 'flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-4 py-3' : 'tp-metabox__title flex flex-wrap items-center justify-between gap-3' }}">
+                                                    <div class="flex min-w-0 items-center gap-3">
+                                                        @if ($editorMode)
+                                                            <div
+                                                                class="flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 text-xs font-semibold text-slate-500">
+                                                                <span x-text="index + 1"></span>
+                                                            </div>
+                                                            <button
+                                                                type="button"
+                                                                class="tp-button-link cursor-move text-slate-400"
+                                                                draggable="true"
+                                                                aria-label="Drag to reorder"
+                                                                @dragstart="dragStart(index, $event)"
+                                                                @dragend="dragEnd()">
+                                                                <svg
+                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                    fill="none"
+                                                                    viewBox="0 0 24 24"
+                                                                    stroke-width="1.5"
+                                                                    stroke="currentColor"
+                                                                    class="size-5">
+                                                                    <path
+                                                                        stroke-linecap="round"
+                                                                        stroke-linejoin="round"
+                                                                        d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                                                                </svg>
+                                                            </button>
+                                                        @else
+                                                            <button
+                                                                type="button"
+                                                                class="tp-button-link cursor-move text-slate-400"
+                                                                draggable="true"
+                                                                aria-label="Drag to reorder"
+                                                                x-show="block._collapsed"
+                                                                x-cloak
+                                                                @dragstart="dragStart(index, $event)"
+                                                                @dragend="dragEnd()">
+                                                                <svg
+                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                    fill="none"
+                                                                    viewBox="0 0 24 24"
+                                                                    stroke-width="1.5"
+                                                                    stroke="currentColor"
+                                                                    class="size-5">
+                                                                    <path
+                                                                        stroke-linecap="round"
+                                                                        stroke-linejoin="round"
+                                                                        d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                                                                </svg>
+                                                            </button>
+                                                        @endif
 
                                                         <div class="min-w-0">
                                                             <div class="flex flex-wrap items-center gap-2">
-                                                                <span class="tp-muted text-xs">
-                                                                    #
-                                                                    <span x-text="index + 1"></span>
-                                                                </span>
+                                                                @if (! $editorMode)
+                                                                    <span class="tp-muted text-xs">
+                                                                        #
+                                                                        <span x-text="index + 1"></span>
+                                                                    </span>
+                                                                @endif
                                                                 <span
                                                                     class="font-semibold"
                                                                     x-text="titleFor(block.type)"></span>
@@ -317,7 +387,7 @@
                                                 </div>
 
                                                 <div
-                                                    class="tp-metabox__body space-y-4"
+                                                    class="{{ $editorMode ? 'space-y-4 px-4 py-4' : 'tp-metabox__body space-y-4' }}"
                                                     x-show="!block._collapsed"
                                                     x-cloak>
                                                     <template x-if="variantsFor(block.type).length > 0">
