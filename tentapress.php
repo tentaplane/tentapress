@@ -45,6 +45,7 @@ $run = static function (string $shellCommand, string $label): void {
 
 $prompt = static function (string $label): string {
     fwrite(STDOUT, $label);
+
     $line = fgets(STDIN);
 
     return $line === false ? '' : trim($line);
@@ -68,8 +69,10 @@ $promptChoice = static function (string $label, array $choices, string $default)
 
 $loadInstalledPackages = static function () use ($root): array {
     $installedPath = $root . '/vendor/composer/installed.php';
+
     if (is_file($installedPath)) {
         $installed = require $installedPath;
+
         if (is_array($installed)) {
             if (isset($installed['packages']) && is_array($installed['packages'])) {
                 return $installed['packages'];
@@ -77,6 +80,7 @@ $loadInstalledPackages = static function () use ($root): array {
 
             if (isset($installed['versions']) && is_array($installed['versions'])) {
                 $packages = [];
+
                 foreach ($installed['versions'] as $name => $version) {
                     if (is_array($version)) {
                         $version['name'] = $name;
@@ -97,6 +101,7 @@ $loadInstalledPackages = static function () use ($root): array {
     if (is_file($installedJson)) {
         $raw = file_get_contents($installedJson);
         $decoded = is_string($raw) ? json_decode($raw, true) : null;
+
         if (! is_array($decoded)) {
             return [];
         }
@@ -126,12 +131,14 @@ $resolvePackagePath = static function (string $packageName) use ($loadInstalledP
         }
 
         $installPath = $package['install_path'] ?? $package['install-path'] ?? null;
+
         if (is_string($installPath) && $installPath !== '') {
             return $installPath;
         }
     }
 
     $vendorPath = $root . '/vendor/' . $packageName;
+
     if (is_dir($vendorPath)) {
         return $vendorPath;
     }
@@ -139,14 +146,16 @@ $resolvePackagePath = static function (string $packageName) use ($loadInstalledP
     return null;
 };
 
-$copyThemeFromVendor = static function (string $packageName) use ($prompt, $resolvePackagePath, $root): ?string {
+$copyThemeFromVendor = static function (string $packageName) use ($prompt, $resolvePackagePath, $root): ?array {
     $installPath = $resolvePackagePath($packageName);
+
     if ($installPath === null) {
         fwrite(STDOUT, "Unable to locate installed package {$packageName}.\n");
         return null;
     }
 
     $manifestPath = rtrim($installPath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'tentapress.json';
+
     if (! is_file($manifestPath)) {
         fwrite(STDOUT, "Missing tentapress.json in {$packageName}.\n");
         return null;
@@ -161,6 +170,7 @@ $copyThemeFromVendor = static function (string $packageName) use ($prompt, $reso
     }
 
     [$vendor, $name] = array_pad(explode('/', $themeId, 2), 2, '');
+
     if ($vendor === '' || $name === '') {
         fwrite(STDOUT, "Invalid theme id for {$packageName}.\n");
         return null;
@@ -170,12 +180,14 @@ $copyThemeFromVendor = static function (string $packageName) use ($prompt, $reso
 
     if (is_dir($destination)) {
         $overwrite = strtolower($prompt("Theme already exists at themes/{$vendor}/{$name}. Overwrite? [y/N]: "));
+
         if (! in_array($overwrite, ['y', 'yes'], true)) {
             return $themeId;
         }
     }
 
     $skip = ['.git', 'node_modules', 'vendor'];
+
     $iterator = new RecursiveIteratorIterator(
         new RecursiveDirectoryIterator($installPath, FilesystemIterator::SKIP_DOTS),
         RecursiveIteratorIterator::SELF_FIRST
@@ -184,6 +196,7 @@ $copyThemeFromVendor = static function (string $packageName) use ($prompt, $reso
     foreach ($iterator as $item) {
         $relative = $iterator->getSubPathName();
         $parts = explode(DIRECTORY_SEPARATOR, $relative);
+
         if ($parts !== [] && in_array($parts[0], $skip, true)) {
             $iterator->next();
             continue;
@@ -199,6 +212,7 @@ $copyThemeFromVendor = static function (string $packageName) use ($prompt, $reso
         }
 
         $targetDir = dirname($targetPath);
+
         if (! is_dir($targetDir)) {
             mkdir($targetDir, 0755, true);
         }
@@ -206,13 +220,18 @@ $copyThemeFromVendor = static function (string $packageName) use ($prompt, $reso
         copy($item->getPathname(), $targetPath);
     }
 
-    return $themeId;
+    return [
+        'id' => $themeId,
+        'install_path' => $installPath,
+    ];
 };
 
 $resolveCommands = static function (array $candidates): array {
     $available = [];
+
     foreach ($candidates as $candidate) {
         $path = trim((string) shell_exec('command -v ' . escapeshellarg($candidate) . ' 2>/dev/null'));
+
         if ($path !== '') {
             $available[] = $candidate;
         }
@@ -242,6 +261,7 @@ $hasVendorFolder = is_dir($root . '/vendor');
 if (! $hasComposerLock && ! $hasVendorFolder) {
     $envFile = $root . '/.env';
     $exampleEnvFile = $root . '/.env.example';
+
     if (! file_exists($envFile) && file_exists($exampleEnvFile)) {
         $run(
             escapeshellarg(PHP_BINARY) . ' -r ' . escapeshellarg("file_exists('.env') || copy('.env.example', '.env');"),
@@ -250,6 +270,7 @@ if (! $hasComposerLock && ! $hasVendorFolder) {
     }
 
     $sqlitePath = $root . '/database/database.sqlite';
+
     if (! file_exists($sqlitePath)) {
         $run(
             escapeshellarg(PHP_BINARY) . ' -r ' . escapeshellarg("file_exists('database/database.sqlite') || touch('database/database.sqlite');"),
@@ -294,7 +315,9 @@ if ($themeChoice !== 'none') {
         $composerCommand . ' require ' . escapeshellarg($themeChoice) . ' --no-interaction --no-scripts',
         "Installing theme package {$themeChoice}..."
     );
-    $themeId = $copyThemeFromVendor($themeChoice) ?? $themeChoice;
+    $themeCopy = $copyThemeFromVendor($themeChoice);
+    $themeId = is_array($themeCopy) ? (string) ($themeCopy['id'] ?? $themeChoice) : $themeChoice;
+    $themeInstallPath = is_array($themeCopy) ? ($themeCopy['install_path'] ?? null) : null;
     $themePath = $root . DIRECTORY_SEPARATOR . 'themes' . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $themeId);
     $buildTool = null;
     $shouldBuildAssets = false;
@@ -307,9 +330,11 @@ if ($themeChoice !== 'none') {
     );
 
     $buildAssets = strtolower($prompt('Build theme assets now? [Y/n]: '));
+
     if (in_array($buildAssets, ['y', 'yes'], true)) {
         $shouldBuildAssets = true;
         $availableTools = $resolveCommands(['bun', 'pnpm', 'npm']);
+
         if ($availableTools === []) {
             fwrite(STDOUT, "No bun/pnpm/npm detected. Skipping theme asset build.\n");
             $shouldBuildAssets = false;
@@ -326,7 +351,29 @@ if ($themeChoice !== 'none') {
     }
 
     $seedDemo = strtolower($prompt('Create a demo home page with sample blocks? [Y/n]: '));
+
     if ($seedDemo === '' || in_array($seedDemo, ['y', 'yes'], true)) {
+        if (is_string($themeInstallPath) && is_dir($themeInstallPath)) {
+            $sourceBlocksPath = $themeInstallPath . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR . 'blocks';
+            $targetBlocksPath = $themePath . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR . 'blocks';
+            $demoBlockViews = ['hero', 'logo-cloud', 'features', 'stats', 'testimonial', 'cta'];
+
+            if (is_dir($sourceBlocksPath)) {
+                if (! is_dir($targetBlocksPath)) {
+                    mkdir($targetBlocksPath, 0755, true);
+                }
+
+                foreach ($demoBlockViews as $blockView) {
+                    $sourceFile = $sourceBlocksPath . DIRECTORY_SEPARATOR . $blockView . '.blade.php';
+                    $targetFile = $targetBlocksPath . DIRECTORY_SEPARATOR . $blockView . '.blade.php';
+
+                    if (is_file($sourceFile) && ! is_file($targetFile)) {
+                        copy($sourceFile, $targetFile);
+                    }
+                }
+            }
+        }
+
         $demoBlocks = [
             [
                 'type' => 'blocks/hero',
@@ -444,10 +491,11 @@ PHP;
 
     if ($shouldBuildAssets && $buildTool !== null) {
         if (is_dir($themePath)) {
-            usleep(300000);
             $nodeModulesPath = $themePath . DIRECTORY_SEPARATOR . 'node_modules';
+
             if (! is_dir($nodeModulesPath)) {
                 $installDeps = strtolower($prompt("Install theme dependencies with {$buildTool}? [Y/n]: "));
+
                 if ($installDeps === '' || in_array($installDeps, ['y', 'yes'], true)) {
                     $run(
                         escapeshellarg($buildTool) . ' install --cwd ' . escapeshellarg($themePath),
@@ -455,17 +503,19 @@ PHP;
                     );
                 }
             }
+
             $run(
                 escapeshellarg($buildTool) . ' run --cwd ' . escapeshellarg($themePath) . ' build',
                 "Building theme assets with {$buildTool}..."
             );
         } else {
-            fwrite(STDOUT, "Theme path not found at {$themePath}. Skipping asset build.\n");
+            fwrite(STDOUT, "Theme not found at {$themePath}. Skipping asset build.\n");
         }
     }
 }
 
 $email = '';
+
 if ($skipUser) {
     fwrite(STDOUT, "Skipping admin user creation (--no-user).\n\n");
 } else {
@@ -479,6 +529,7 @@ if ($skipUser) {
 if (! $skipUser) {
     while ($email === '') {
         $email = $prompt('Admin email address: ');
+
         if ($email === '') {
             fwrite(STDOUT, "Email address is required.\n");
         }
