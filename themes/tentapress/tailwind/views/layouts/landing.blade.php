@@ -10,8 +10,12 @@
     <body class="bg-green-50 text-zinc-900">
         <main class="mx-auto max-w-5xl p-6">
             @include('tentapress-pages::partials.blocks', [
-                'blocks' => $page->blocks,
+            'blocks' => $page->blocks,
             ])
         </main>
     </body>
+
+    <footer class="border-t border-black/10">
+        <div class="mx-auto max-w-5xl p-6 text-sm text-black/60">&copy; {{ date('Y') }} Your Company</div>
+    </footer>
 </html>

@@ -11,7 +11,7 @@
     <body class="bg-green-50 text-zinc-900">
         <header class="border-b border-black/10">
             <div class="mx-auto flex max-w-5xl items-center justify-between p-6">
-                <div class="font-semibold">Tailwind Theme - TentaPress</div>
+                <div class="font-semibold">TentaPress</div>
                 <x-tp-theme::menu location="primary">
                     <a href="/" class="hover:underline">Home</a>
                 </x-tp-theme::menu>
@@ -25,7 +25,7 @@
         </main>
 
         <footer class="border-t border-black/10">
-            <div class="mx-auto max-w-5xl p-6 text-sm text-black/60">&copy; {{ date('Y') }} TentaPress</div>
+            <div class="mx-auto max-w-5xl p-6 text-sm text-black/60">&copy; {{ date('Y') }} Your Company</div>
         </footer>
     </body>
 </html>

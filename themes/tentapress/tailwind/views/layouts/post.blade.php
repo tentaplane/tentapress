@@ -54,7 +54,7 @@
         </main>
 
         <footer class="border-t border-black/10">
-            <div class="mx-auto max-w-5xl p-6 text-sm text-black/60">&copy; {{ date('Y') }} TentaPress</div>
+            <div class="mx-auto max-w-5xl p-6 text-sm text-black/60">&copy; {{ date('Y') }} Your Company</div>
         </footer>
     </body>
 </html>

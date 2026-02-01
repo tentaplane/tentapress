@@ -10,7 +10,7 @@
     <body>
         <header class="border-bottom">
             <div class="d-flex align-items-center justify-content-between container flex-wrap gap-3 py-4">
-                <div class="fw-semibold">Bootstrap Theme - TentaPress</div>
+                <div class="fw-semibold">TentaPress</div>
                 <x-tp-theme::menu location="primary" />
             </div>
         </header>
@@ -22,7 +22,7 @@
         </main>
 
         <footer class="border-top">
-            <div class="small text-secondary container py-4">&copy; {{ date('Y') }} TentaPress</div>
+            <div class="small text-secondary container py-4">&copy; {{ date('Y') }} Your Company</div>
         </footer>
     </body>
 </html>
