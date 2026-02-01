@@ -334,14 +334,13 @@
                                                                     <template x-if="field.type === 'select'">
                                                                         <select
                                                                             class="tp-select"
-                                                                            :value="getProp(index, field.key)"
-                                                                            x-effect="$el.value = getProp(index, field.key)"
                                                                             @change="setProp(index, field.key, $event.target.value)">
                                                                             <template
                                                                                 x-for="opt in selectOptions(field)"
                                                                                 :key="opt.value">
                                                                                 <option
                                                                                     :value="opt.value"
+                                                                                    :selected="getProp(index, field.key) === opt.value"
                                                                                     x-text="opt.label"></option>
                                                                             </template>
                                                                         </select>
