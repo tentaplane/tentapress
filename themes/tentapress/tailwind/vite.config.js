@@ -10,6 +10,10 @@ const appRoot = resolve(root, '../../../');
 export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, appRoot, '');
     const appUrl = env.APP_URL || 'http://localhost';
+    const url = new URL(appUrl);
+    const hmrHost = env.VITE_HMR_HOST || url.hostname;
+    const hmrProtocol = env.VITE_HMR_PROTOCOL || url.protocol.replace(':', '');
+    const hmrPort = env.VITE_HMR_PORT ? Number(env.VITE_HMR_PORT) : 5173;
 
     return {
         root,
@@ -33,7 +37,13 @@ export default defineConfig(({ mode }) => {
             manifest: 'manifest.json',
         },
         server: {
-            origin: appUrl,
+            host: env.VITE_DEV_SERVER_HOST || 'localhost',
+            origin: `${url.protocol}//${hmrHost}:${hmrPort}`,
+            hmr: {
+                host: hmrHost,
+                protocol: hmrProtocol,
+                port: hmrPort,
+            },
             watch: {
                 ignored: ['**/storage/framework/views/**'],
             },
