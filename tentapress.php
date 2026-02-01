@@ -354,7 +354,7 @@ if ($themeChoice !== 'none') {
     if ($seedDemo === '' || in_array($seedDemo, ['y', 'yes'], true)) {
         $sourceBlocksPath = $root
             . DIRECTORY_SEPARATOR
-            . 'plugins'
+            . 'vendor'
             . DIRECTORY_SEPARATOR
             . 'tentapress'
             . DIRECTORY_SEPARATOR
@@ -394,13 +394,13 @@ if ($themeChoice !== 'none') {
                     'alignment' => 'left',
                     'image_position' => 'right',
                     'primary_cta' => [
-                        'label' => 'Start free',
+                        'label' => 'Admin logo',
                         'url' => '/admin',
                         'style' => 'primary',
                     ],
                     'secondary_cta' => [
                         'label' => 'View docs',
-                        'url' => '#features',
+                        'url' => 'https://tentapress.com/docs',
                     ],
                 ],
             ],
@@ -452,13 +452,13 @@ if ($themeChoice !== 'none') {
                     'alignment' => 'left',
                     'background' => 'muted',
                     'button' => [
-                        'label' => 'Get started',
+                        'label' => 'Admin logo',
                         'url' => '/admin',
                         'style' => 'primary',
                     ],
                     'secondary_button' => [
-                        'label' => 'Your admin login',
-                        'url' => '/admin',
+                        'label' => 'View docs',
+                        'url' => 'https://tentapress.com/docs',
                     ],
                 ],
             ],
