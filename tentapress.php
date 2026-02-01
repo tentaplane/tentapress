@@ -301,13 +301,12 @@ if (! $hasComposerLock && ! $hasVendorFolder) {
 }
 
 $themeChoice = $promptChoice(
-    "Install a theme? [tailwind/bootstrap/none] (default: none): ",
+    "Install a theme? [tailwind/none] (default: tailwind): ",
     [
         'tailwind' => 'tentaplane/theme-tailwind',
-        'bootstrap' => 'tentaplane/theme-bootstrap',
         'none' => 'none',
     ],
-    'none'
+    'tailwind'
 );
 
 if ($themeChoice !== 'none') {
@@ -353,23 +352,33 @@ if ($themeChoice !== 'none') {
     $seedDemo = strtolower($prompt('Create a demo home page with sample blocks? [Y/n]: '));
 
     if ($seedDemo === '' || in_array($seedDemo, ['y', 'yes'], true)) {
-        if (is_string($themeInstallPath) && is_dir($themeInstallPath)) {
-            $sourceBlocksPath = $themeInstallPath . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR . 'blocks';
-            $targetBlocksPath = $themePath . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR . 'blocks';
-            $demoBlockViews = ['hero', 'logo-cloud', 'features', 'stats', 'testimonial', 'cta'];
+        $sourceBlocksPath = $root
+            . DIRECTORY_SEPARATOR
+            . 'plugins'
+            . DIRECTORY_SEPARATOR
+            . 'tentapress'
+            . DIRECTORY_SEPARATOR
+            . 'blocks'
+            . DIRECTORY_SEPARATOR
+            . 'resources'
+            . DIRECTORY_SEPARATOR
+            . 'views'
+            . DIRECTORY_SEPARATOR
+            . 'blocks';
+        $targetBlocksPath = $themePath . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR . 'blocks';
+        $demoBlockViews = ['hero', 'logo-cloud', 'features', 'stats', 'testimonial', 'cta'];
 
-            if (is_dir($sourceBlocksPath)) {
-                if (! is_dir($targetBlocksPath)) {
-                    mkdir($targetBlocksPath, 0755, true);
-                }
+        if (is_dir($sourceBlocksPath)) {
+            if (! is_dir($targetBlocksPath)) {
+                mkdir($targetBlocksPath, 0755, true);
+            }
 
-                foreach ($demoBlockViews as $blockView) {
-                    $sourceFile = $sourceBlocksPath . DIRECTORY_SEPARATOR . $blockView . '.blade.php';
-                    $targetFile = $targetBlocksPath . DIRECTORY_SEPARATOR . $blockView . '.blade.php';
+            foreach ($demoBlockViews as $blockView) {
+                $sourceFile = $sourceBlocksPath . DIRECTORY_SEPARATOR . $blockView . '.blade.php';
+                $targetFile = $targetBlocksPath . DIRECTORY_SEPARATOR . $blockView . '.blade.php';
 
-                    if (is_file($sourceFile) && ! is_file($targetFile)) {
-                        copy($sourceFile, $targetFile);
-                    }
+                if (is_file($sourceFile) && ! is_file($targetFile)) {
+                    copy($sourceFile, $targetFile);
                 }
             }
         }
