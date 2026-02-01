@@ -45,12 +45,10 @@ final class Paths
      */
     public static function themeSearchRoots(): array
     {
-        $vendorNamespaces = config(
-            'tentapress.theme_vendor_namespaces',
-            config('tentapress.plugin_vendor_namespaces', ['tentapress'])
-        );
-
-        return self::manifestSearchRoots(self::themesPath(), is_array($vendorNamespaces) ? $vendorNamespaces : []);
+        return array_values(array_filter(
+            [self::themesPath()],
+            static fn (string $path): bool => is_dir($path)
+        ));
     }
 
     /**
