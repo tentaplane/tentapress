@@ -68,23 +68,54 @@ $promptChoice = static function (string $label, array $choices, string $default)
 
 $loadInstalledPackages = static function () use ($root): array {
     $installedPath = $root . '/vendor/composer/installed.php';
-    if (! is_file($installedPath)) {
-        return [];
+    if (is_file($installedPath)) {
+        $installed = require $installedPath;
+        if (is_array($installed)) {
+            if (isset($installed['packages']) && is_array($installed['packages'])) {
+                return $installed['packages'];
+            }
+
+            if (isset($installed['versions']) && is_array($installed['versions'])) {
+                $packages = [];
+                foreach ($installed['versions'] as $name => $version) {
+                    if (is_array($version)) {
+                        $version['name'] = $name;
+                        $packages[] = $version;
+                    }
+                }
+
+                return $packages;
+            }
+
+            if ($installed !== []) {
+                return $installed;
+            }
+        }
     }
 
-    $installed = require $installedPath;
-    if (! is_array($installed)) {
-        return [];
+    $installedJson = $root . '/vendor/composer/installed.json';
+    if (is_file($installedJson)) {
+        $raw = file_get_contents($installedJson);
+        $decoded = is_string($raw) ? json_decode($raw, true) : null;
+        if (! is_array($decoded)) {
+            return [];
+        }
+
+        if (isset($decoded['packages']) && is_array($decoded['packages'])) {
+            return $decoded['packages'];
+        }
+
+        if (isset($decoded[0]['packages']) && is_array($decoded[0]['packages'])) {
+            return $decoded[0]['packages'];
+        }
+
+        return $decoded;
     }
 
-    if (isset($installed['packages']) && is_array($installed['packages'])) {
-        return $installed['packages'];
-    }
-
-    return $installed;
+    return [];
 };
 
-$resolvePackagePath = static function (string $packageName) use ($loadInstalledPackages): ?string {
+$resolvePackagePath = static function (string $packageName) use ($loadInstalledPackages, $root): ?string {
     foreach ($loadInstalledPackages() as $package) {
         if (! is_array($package)) {
             continue;
@@ -98,6 +129,11 @@ $resolvePackagePath = static function (string $packageName) use ($loadInstalledP
         if (is_string($installPath) && $installPath !== '') {
             return $installPath;
         }
+    }
+
+    $vendorPath = $root . '/vendor/' . $packageName;
+    if (is_dir($vendorPath)) {
+        return $vendorPath;
     }
 
     return null;
