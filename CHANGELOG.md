@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.8.0](https://github.com/tentaplane/tentapress/compare/v0.7.0...v0.8.0) (2026-02-01)
+
+
+### Features
+
+* **setup:** rebuild assets after demo seed ([4f279f6](https://github.com/tentaplane/tentapress/commit/4f279f6ebbf9316072d9066640e95e7e1917cc97))
+* **theme:** add bold tailwind landing ([73ed24f](https://github.com/tentaplane/tentapress/commit/73ed24fec78b6e6dd936c1837a189062ca193b7b))
+
+
+### Bug Fixes
+
+* **setup:** avoid tinker for demo seed ([7daced2](https://github.com/tentaplane/tentapress/commit/7daced29d4606900efccdaf768c968f113beefec))
+
 ## [0.7.0](https://github.com/tentaplane/tentapress/compare/v0.6.0...v0.7.0) (2026-02-01)
 
 
