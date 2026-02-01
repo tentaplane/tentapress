@@ -189,16 +189,16 @@
                             <div
                                 class="tp-field space-y-4"
                                 x-data="tpBlocksEditor({
-                                            initialJson: @js($initialBlocksJson),
-                                            definitions: @js($blockDefinitions),
-                                            mediaOptions: @js($mediaOptions),
-                                            mediaIndexUrl: @js($mediaIndexUrl),
-                                        })"
+                                    initialJson: @js($initialBlocksJson),
+                                    definitions: @js($blockDefinitions),
+                                    mediaOptions: @js($mediaOptions),
+                                    mediaIndexUrl: @js($mediaIndexUrl),
+                                })"
                                 x-init="init()">
                                 <label class="tp-label">Blocks</label>
 
                                 <div
-                                    class="{{ $editorMode ? 'space-y-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm' : 'tp-panel space-y-4' }}">
+                                    class="{{ $editorMode ? 'space-y-6 rounded-2xl border border-slate-200 bg-slate-50/60 p-6 shadow-sm' : 'tp-panel space-y-4' }}">
                                     <div
                                         class="flex flex-col items-center justify-between gap-2 sm:flex-row sm:items-center">
                                         <div class="flex flex-wrap items-center gap-2">
@@ -256,423 +256,468 @@
                                         </div>
 
                                         <template x-for="(block, index) in blocks" :key="block._key">
-                                            <div
-                                                class="{{ $editorMode ? 'rounded-2xl border border-slate-200 bg-white shadow-sm' : 'tp-metabox bg-zinc-50' }}"
-                                                :class="{
-                                                'opacity-60': dragIndex === index,
-                                                'ring-2 ring-black/10': dragOverIndex === index && dragIndex !== index,
-                                            }"
-                                                @dragover.prevent="dragOver(index)"
-                                                @dragleave="dragLeave(index)"
-                                                @drop="dropOn(index)">
+                                            <div class="space-y-2">
                                                 <div
-                                                    class="{{ $editorMode ? 'flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-4 py-3' : 'tp-metabox__title flex flex-wrap items-center justify-between gap-3' }}">
-                                                    <div class="flex min-w-0 items-center gap-3">
-                                                        @if ($editorMode)
-                                                            <div
-                                                                class="flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 text-xs font-semibold text-slate-500">
-                                                                <span x-text="index + 1"></span>
-                                                            </div>
-                                                            <button
-                                                                type="button"
-                                                                class="tp-button-link cursor-move text-slate-400"
-                                                                draggable="true"
-                                                                aria-label="Drag to reorder"
-                                                                @dragstart="dragStart(index, $event)"
-                                                                @dragend="dragEnd()">
-                                                                <svg
-                                                                    xmlns="http://www.w3.org/2000/svg"
-                                                                    fill="none"
-                                                                    viewBox="0 0 24 24"
-                                                                    stroke-width="1.5"
-                                                                    stroke="currentColor"
-                                                                    class="size-5">
-                                                                    <path
-                                                                        stroke-linecap="round"
-                                                                        stroke-linejoin="round"
-                                                                        d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-                                                                </svg>
-                                                            </button>
-                                                        @else
-                                                            <button
-                                                                type="button"
-                                                                class="tp-button-link cursor-move text-slate-400"
-                                                                draggable="true"
-                                                                aria-label="Drag to reorder"
-                                                                x-show="block._collapsed"
-                                                                x-cloak
-                                                                @dragstart="dragStart(index, $event)"
-                                                                @dragend="dragEnd()">
-                                                                <svg
-                                                                    xmlns="http://www.w3.org/2000/svg"
-                                                                    fill="none"
-                                                                    viewBox="0 0 24 24"
-                                                                    stroke-width="1.5"
-                                                                    stroke="currentColor"
-                                                                    class="size-5">
-                                                                    <path
-                                                                        stroke-linecap="round"
-                                                                        stroke-linejoin="round"
-                                                                        d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-                                                                </svg>
-                                                            </button>
-                                                        @endif
+                                                    class="{{ $editorMode ? 'group rounded-2xl border border-slate-200 bg-white shadow-sm transition-shadow hover:border-slate-300 hover:shadow-md' : 'tp-metabox bg-zinc-50' }}"
+                                                    :class="{
+                                                    'opacity-60': dragIndex === index,
+                                                    'ring-2 ring-black/10': dragOverIndex === index && dragIndex !== index,
+                                                }"
+                                                    @dragover.prevent="dragOver(index)"
+                                                    @dragleave="dragLeave(index)"
+                                                    @drop="dropOn(index)">
+                                                    <div
+                                                        class="{{ $editorMode ? 'flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-4 py-3' : 'tp-metabox__title flex flex-wrap items-center justify-between gap-3' }}">
+                                                        <div class="flex min-w-0 items-center gap-3">
+                                                            @if ($editorMode)
+                                                                <div
+                                                                    class="flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 text-xs font-semibold text-slate-500">
+                                                                    <span x-text="index + 1"></span>
+                                                                </div>
+                                                                <button
+                                                                    type="button"
+                                                                    class="tp-button-link cursor-move text-slate-400"
+                                                                    draggable="true"
+                                                                    aria-label="Drag to reorder"
+                                                                    @dragstart="dragStart(index, $event)"
+                                                                    @dragend="dragEnd()">
+                                                                    <svg
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        fill="none"
+                                                                        viewBox="0 0 24 24"
+                                                                        stroke-width="1.5"
+                                                                        stroke="currentColor"
+                                                                        class="size-5">
+                                                                        <path
+                                                                            stroke-linecap="round"
+                                                                            stroke-linejoin="round"
+                                                                            d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                                                                    </svg>
+                                                                </button>
+                                                            @else
+                                                                <button
+                                                                    type="button"
+                                                                    class="tp-button-link cursor-move text-slate-400"
+                                                                    draggable="true"
+                                                                    aria-label="Drag to reorder"
+                                                                    x-show="block._collapsed"
+                                                                    x-cloak
+                                                                    @dragstart="dragStart(index, $event)"
+                                                                    @dragend="dragEnd()">
+                                                                    <svg
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        fill="none"
+                                                                        viewBox="0 0 24 24"
+                                                                        stroke-width="1.5"
+                                                                        stroke="currentColor"
+                                                                        class="size-5">
+                                                                        <path
+                                                                            stroke-linecap="round"
+                                                                            stroke-linejoin="round"
+                                                                            d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                                                                    </svg>
+                                                                </button>
+                                                            @endif
 
-                                                        <div class="min-w-0">
-                                                            <div class="flex flex-wrap items-center gap-2">
-                                                                @if (! $editorMode)
-                                                                    <span class="tp-muted text-xs">
-                                                                        #
-                                                                        <span x-text="index + 1"></span>
-                                                                    </span>
-                                                                @endif
-                                                                <span
-                                                                    class="font-semibold"
-                                                                    x-text="titleFor(block.type)"></span>
-                                                                <span
-                                                                    class="tp-muted text-xs font-normal"
-                                                                    x-text="block.type"></span>
-                                                                <template x-if="block.version">
+                                                            <div class="min-w-0">
+                                                                <div class="flex flex-wrap items-center gap-2">
+                                                                    @if (! $editorMode)
+                                                                        <span class="tp-muted text-xs">
+                                                                            #
+                                                                            <span x-text="index + 1"></span>
+                                                                        </span>
+                                                                    @endif
                                                                     <span
-                                                                        class="tp-muted text-xs font-normal"
-                                                                        x-text="'v' + block.version"></span>
-                                                                </template>
-                                                                <template x-if="block.variant">
+                                                                        class="font-semibold"
+                                                                        x-text="titleFor(block.type)"></span>
                                                                     <span
-                                                                        class="tp-muted text-xs font-normal"
-                                                                        x-text="block.variant"></span>
-                                                                </template>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="flex flex-wrap items-center gap-2 text-xs">
-                                                        <button
-                                                            type="button"
-                                                            class="tp-button-link"
-                                                            @click="toggleCollapse(index)">
-                                                            <span
-                                                                x-text="block._collapsed ? 'Expand' : 'Collapse'"></span>
-                                                        </button>
-                                                        <span class="text-slate-300">|</span>
-                                                        <button
-                                                            type="button"
-                                                            class="tp-button-link"
-                                                            @click="duplicateBlock(index)">
-                                                            Duplicate
-                                                        </button>
-                                                        <span class="text-slate-300">|</span>
-                                                        <button
-                                                            type="button"
-                                                            class="tp-button-link"
-                                                            @click="move(index, -1)"
-                                                            :disabled="index === 0">
-                                                            Move up
-                                                        </button>
-                                                        <button
-                                                            type="button"
-                                                            class="tp-button-link"
-                                                            @click="move(index, +1)"
-                                                            :disabled="index === blocks.length - 1">
-                                                            Move down
-                                                        </button>
-                                                        <span class="text-slate-300">|</span>
-                                                        <button
-                                                            type="button"
-                                                            class="tp-button-link text-red-600 hover:text-red-700"
-                                                            @click="remove(index)">
-                                                            Delete
-                                                        </button>
-                                                    </div>
-                                                </div>
-
-                                                <div
-                                                    class="{{ $editorMode ? 'space-y-4 px-4 py-4' : 'tp-metabox__body space-y-4' }}"
-                                                    x-show="!block._collapsed"
-                                                    x-cloak>
-                                                    <template x-if="variantsFor(block.type).length > 0">
-                                                        <div class="tp-field">
-                                                            <label class="tp-label">Variant</label>
-                                                            <select class="tp-select" x-model="block.variant">
-                                                                <template
-                                                                    x-for="variant in variantsFor(block.type)"
-                                                                    :key="variant.key">
-                                                                    <option
-                                                                        :value="variant.key"
-                                                                        x-text="variant.label || variant.key"></option>
-                                                                </template>
-                                                            </select>
-                                                        </div>
-                                                    </template>
-
-                                                    <template x-if="fieldsFor(block.type).length > 0">
-                                                        <div class="space-y-4">
-                                                            <template
-                                                                x-for="field in fieldsFor(block.type)"
-                                                                :key="field.key">
-                                                                <div class="tp-field">
-                                                                    <label
-                                                                        class="tp-label"
-                                                                        x-text="field.label"></label>
-
-                                                                    <template x-if="field.type === 'textarea'">
-                                                                        <textarea
-                                                                            class="tp-textarea"
-                                                                            :rows="field.rows ? field.rows : 4"
-                                                                            :placeholder="field.placeholder || ''"
-                                                                            :value="getProp(index, field.key)"
-                                                                            @input="setProp(index, field.key, $event.target.value)"></textarea>
+                                                                        class="{{ $editorMode ? 'rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500' : 'tp-muted text-xs font-normal' }}"
+                                                                        x-text="block.type"></span>
+                                                                    <template x-if="block.version">
+                                                                        <span
+                                                                            class="{{ $editorMode ? 'rounded-full border border-slate-200 bg-slate-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500' : 'tp-muted text-xs font-normal' }}"
+                                                                            x-text="'v' + block.version"></span>
                                                                     </template>
-
-                                                                    <template x-if="field.type === 'select'">
-                                                                        <select
-                                                                            class="tp-select"
-                                                                            @change="setProp(index, field.key, $event.target.value)">
-                                                                            <template
-                                                                                x-for="opt in selectOptions(field)"
-                                                                                :key="opt.value">
-                                                                                <option
-                                                                                    :value="opt.value"
-                                                                                    :selected="getProp(index, field.key) === opt.value"
-                                                                                    x-text="opt.label"></option>
-                                                                            </template>
-                                                                        </select>
-                                                                    </template>
-
-                                                                    <template x-if="field.type === 'toggle'">
-                                                                        <label class="flex items-center gap-2 text-sm">
-                                                                            <input
-                                                                                type="checkbox"
-                                                                                class="tp-checkbox"
-                                                                                :checked="!!getPropRaw(index, field.key)"
-                                                                                @change="setProp(index, field.key, $event.target.checked)" />
-                                                                            <span
-                                                                                x-text="field.toggle_label || 'Enabled'"></span>
-                                                                        </label>
-                                                                    </template>
-
-                                                                    <template x-if="field.type === 'number'">
-                                                                        <input
-                                                                            class="tp-input"
-                                                                            type="number"
-                                                                            :min="field.min !== undefined ? field.min : null"
-                                                                            :max="field.max !== undefined ? field.max : null"
-                                                                            :step="field.step !== undefined ? field.step : null"
-                                                                            :placeholder="field.placeholder || ''"
-                                                                            :value="getProp(index, field.key)"
-                                                                            @input="setProp(index, field.key, $event.target.value)" />
-                                                                    </template>
-
-                                                                    <template x-if="field.type === 'range'">
-                                                                        <input
-                                                                            class="tp-input"
-                                                                            type="range"
-                                                                            :min="field.min !== undefined ? field.min : null"
-                                                                            :max="field.max !== undefined ? field.max : null"
-                                                                            :step="field.step !== undefined ? field.step : null"
-                                                                            :value="getProp(index, field.key)"
-                                                                            @input="setProp(index, field.key, $event.target.value)" />
-                                                                    </template>
-
-                                                                    <template x-if="field.type === 'color'">
-                                                                        <input
-                                                                            class="tp-input h-10 p-1"
-                                                                            type="color"
-                                                                            :value="getProp(index, field.key)"
-                                                                            @input="setProp(index, field.key, $event.target.value)" />
-                                                                    </template>
-
-                                                                    <template x-if="field.type === 'media'">
-                                                                        <div class="space-y-3">
-                                                                            <div
-                                                                                class="flex flex-wrap items-center gap-2">
-                                                                                <button
-                                                                                    type="button"
-                                                                                    class="tp-button-secondary"
-                                                                                    @click="openMediaModal(index, field.key, 'single')">
-                                                                                    Choose media
-                                                                                </button>
-                                                                                <a
-                                                                                    x-show="mediaIndexUrl"
-                                                                                    :href="mediaIndexUrl"
-                                                                                    target="_blank"
-                                                                                    rel="noopener"
-                                                                                    class="tp-button-link">
-                                                                                    Manage
-                                                                                </a>
-                                                                            </div>
-
-                                                                            <div
-                                                                                class="flex flex-wrap items-center gap-3 rounded border border-black/10 bg-white p-3"
-                                                                                x-show="getProp(index, field.key)"
-                                                                                x-cloak>
-                                                                                <img
-                                                                                    x-show="isMediaImage(getProp(index, field.key))"
-                                                                                    :src="getProp(index, field.key)"
-                                                                                    alt=""
-                                                                                    class="h-14 w-14 rounded border border-slate-200 object-cover" />
-                                                                                <div class="min-w-0 flex-1">
-                                                                                    <div
-                                                                                        class="truncate text-sm font-semibold"
-                                                                                        x-text="mediaLabel(getProp(index, field.key))"></div>
-                                                                                    <div
-                                                                                        class="tp-code truncate text-[11px]"
-                                                                                        x-text="getProp(index, field.key)"></div>
-                                                                                </div>
-                                                                                <button
-                                                                                    type="button"
-                                                                                    class="tp-button-link"
-                                                                                    @click="setProp(index, field.key, '')">
-                                                                                    Clear
-                                                                                </button>
-                                                                            </div>
-
-                                                                            <div class="space-y-1">
-                                                                                <input
-                                                                                    class="tp-input"
-                                                                                    type="text"
-                                                                                    :value="getProp(index, field.key)"
-                                                                                    placeholder="/storage/… or https://…"
-                                                                                    @input="setProp(index, field.key, $event.target.value)" />
-                                                                                <div class="tp-help">
-                                                                                    Pick from media or paste a URL.
-                                                                                </div>
-                                                                            </div>
-
-                                                                            <div
-                                                                                class="tp-muted text-xs"
-                                                                                x-show="mediaOptions.length === 0">
-                                                                                Upload media first to select it here.
-                                                                            </div>
-                                                                        </div>
-                                                                    </template>
-
-                                                                    <template x-if="field.type === 'media-list'">
-                                                                        <div class="space-y-3">
-                                                                            <div
-                                                                                class="flex flex-wrap items-center gap-2">
-                                                                                <button
-                                                                                    type="button"
-                                                                                    class="tp-button-secondary"
-                                                                                    @click="openMediaModal(index, field.key, 'multi')">
-                                                                                    Choose images
-                                                                                </button>
-                                                                                <a
-                                                                                    x-show="mediaIndexUrl"
-                                                                                    :href="mediaIndexUrl"
-                                                                                    target="_blank"
-                                                                                    rel="noopener"
-                                                                                    class="tp-button-link">
-                                                                                    Manage
-                                                                                </a>
-                                                                            </div>
-
-                                                                            <div
-                                                                                class="grid grid-cols-2 gap-3 md:grid-cols-3"
-                                                                                x-show="getMediaList(index, field.key).length > 0"
-                                                                                x-cloak>
-                                                                                <template
-                                                                                    x-for="(url, mediaIdx) in getMediaList(index, field.key)"
-                                                                                    :key="url + ':' + mediaIdx">
-                                                                                    <div
-                                                                                        class="space-y-2 rounded border border-black/10 bg-white p-2">
-                                                                                        <div
-                                                                                            class="flex aspect-4/3 items-center justify-center overflow-hidden rounded border border-slate-200 bg-slate-50">
-                                                                                            <img
-                                                                                                x-show="isMediaImage(url)"
-                                                                                                :src="url"
-                                                                                                alt=""
-                                                                                                class="h-full w-full object-cover" />
-                                                                                            <div
-                                                                                                x-show="! isMediaImage(url)"
-                                                                                                class="tp-muted text-xs">
-                                                                                                File
-                                                                                            </div>
-                                                                                        </div>
-                                                                                        <div
-                                                                                            class="tp-muted truncate text-xs"
-                                                                                            x-text="mediaLabel(url)"></div>
-                                                                                        <div
-                                                                                            class="flex items-center justify-between gap-2 text-xs">
-                                                                                            <button
-                                                                                                type="button"
-                                                                                                class="tp-button-link text-red-600 hover:text-red-700"
-                                                                                                @click="removeFromMediaList(index, field.key, mediaIdx)">
-                                                                                                Remove
-                                                                                            </button>
-                                                                                            <a
-                                                                                                :href="url"
-                                                                                                target="_blank"
-                                                                                                rel="noopener"
-                                                                                                class="tp-button-link">
-                                                                                                Open
-                                                                                            </a>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </template>
-                                                                            </div>
-
-                                                                            <div class="space-y-1">
-                                                                                <textarea
-                                                                                    class="tp-textarea font-mono text-xs"
-                                                                                    rows="3"
-                                                                                    :value="mediaListText(index, field.key)"
-                                                                                    @blur="applyMediaListText(index, field.key, $event.target.value)"></textarea>
-                                                                                <div class="tp-help">
-                                                                                    One URL per line for advanced edits.
-                                                                                </div>
-                                                                            </div>
-
-                                                                            <div
-                                                                                class="tp-muted text-xs"
-                                                                                x-show="mediaOptions.length === 0">
-                                                                                Upload media first to select it here.
-                                                                            </div>
-                                                                        </div>
-                                                                    </template>
-
-                                                                    <template
-                                                                        x-if="
-                                                                        field.type !== 'textarea' &&
-                                                                        field.type !== 'media' &&
-                                                                        field.type !== 'media-list' &&
-                                                                        field.type !== 'select' &&
-                                                                        field.type !== 'toggle' &&
-                                                                        field.type !== 'number' &&
-                                                                        field.type !== 'range' &&
-                                                                        field.type !== 'color'
-                                                                    ">
-                                                                        <input
-                                                                            class="tp-input"
-                                                                            :type="field.type === 'url' ? 'url' : 'text'"
-                                                                            :placeholder="field.placeholder || ''"
-                                                                            :value="getProp(index, field.key)"
-                                                                            @input="setProp(index, field.key, $event.target.value)" />
-                                                                    </template>
-
-                                                                    <template x-if="field.help">
-                                                                        <div
-                                                                            class="tp-help"
-                                                                            x-text="field.help"></div>
+                                                                    <template x-if="block.variant">
+                                                                        <span
+                                                                            class="{{ $editorMode ? 'rounded-full border border-slate-200 bg-slate-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500' : 'tp-muted text-xs font-normal' }}"
+                                                                            x-text="block.variant"></span>
                                                                     </template>
                                                                 </div>
-                                                            </template>
-                                                        </div>
-                                                    </template>
-
-                                                    <template x-if="fieldsFor(block.type).length === 0">
-                                                        <div class="tp-field">
-                                                            <label class="tp-label">Props (JSON)</label>
-                                                            <textarea
-                                                                class="tp-textarea font-mono text-xs"
-                                                                rows="10"
-                                                                @blur="setPropsJson(index, $event.target.value)"
-                                                                x-text="propsJson(index)"></textarea>
-                                                            <div class="tp-help">
-                                                                Unknown block type — edit props directly.
+                                                                <template
+                                                                    x-if="block._collapsed && summaryFor(block, index)">
+                                                                    <div
+                                                                        class="mt-1 text-xs text-slate-500"
+                                                                        x-text="summaryFor(block, index)"></div>
+                                                                </template>
                                                             </div>
                                                         </div>
-                                                    </template>
+
+                                                        <div class="flex flex-wrap items-center gap-2 text-xs">
+                                                            <button
+                                                                type="button"
+                                                                class="tp-button-link"
+                                                                @click="toggleCollapse(index)">
+                                                                <span
+                                                                    x-text="block._collapsed ? 'Expand' : 'Collapse'"></span>
+                                                            </button>
+                                                            <span class="text-slate-300">|</span>
+                                                            <button
+                                                                type="button"
+                                                                class="tp-button-link"
+                                                                @click="duplicateBlock(index)">
+                                                                Duplicate
+                                                            </button>
+                                                            <span class="text-slate-300">|</span>
+                                                            <button
+                                                                type="button"
+                                                                class="tp-button-link"
+                                                                @click="move(index, -1)"
+                                                                :disabled="index === 0">
+                                                                Move up
+                                                            </button>
+                                                            <button
+                                                                type="button"
+                                                                class="tp-button-link"
+                                                                @click="move(index, +1)"
+                                                                :disabled="index === blocks.length - 1">
+                                                                Move down
+                                                            </button>
+                                                            <span class="text-slate-300">|</span>
+                                                            <button
+                                                                type="button"
+                                                                class="tp-button-link text-red-600 hover:text-red-700"
+                                                                @click="remove(index)">
+                                                                Delete
+                                                            </button>
+                                                        </div>
+                                                    </div>
+
+                                                    <div
+                                                        class="{{ $editorMode ? 'space-y-4 px-5 pb-5 pt-4' : 'tp-metabox__body space-y-4' }}"
+                                                        x-show="!block._collapsed"
+                                                        x-cloak>
+                                                        <template x-if="variantsFor(block.type).length > 0">
+                                                            <div class="tp-field">
+                                                                <label class="tp-label">Variant</label>
+                                                                <select class="tp-select" x-model="block.variant">
+                                                                    <template
+                                                                        x-for="variant in variantsFor(block.type)"
+                                                                        :key="variant.key">
+                                                                        <option
+                                                                            :value="variant.key"
+                                                                            x-text="variant.label || variant.key"></option>
+                                                                    </template>
+                                                                </select>
+                                                            </div>
+                                                        </template>
+
+                                                        <template x-if="fieldsFor(block.type).length > 0">
+                                                            <div class="space-y-4">
+                                                                <template
+                                                                    x-for="field in fieldsFor(block.type)"
+                                                                    :key="field.key">
+                                                                    <div class="tp-field">
+                                                                        <label
+                                                                            class="tp-label"
+                                                                            x-text="field.label"></label>
+
+                                                                        <template x-if="field.type === 'textarea'">
+                                                                            <textarea
+                                                                                class="tp-textarea"
+                                                                                :rows="field.rows ? field.rows : 4"
+                                                                                :placeholder="field.placeholder || ''"
+                                                                                :value="getProp(index, field.key)"
+                                                                                @input="setProp(index, field.key, $event.target.value)"></textarea>
+                                                                        </template>
+
+                                                                        <template x-if="field.type === 'select'">
+                                                                            <select
+                                                                                class="tp-select"
+                                                                                @change="setProp(index, field.key, $event.target.value)">
+                                                                                <template
+                                                                                    x-for="opt in selectOptions(field)"
+                                                                                    :key="opt.value">
+                                                                                    <option
+                                                                                        :value="opt.value"
+                                                                                        :selected="getProp(index, field.key) === opt.value"
+                                                                                        x-text="opt.label"></option>
+                                                                                </template>
+                                                                            </select>
+                                                                        </template>
+
+                                                                        <template x-if="field.type === 'toggle'">
+                                                                            <label class="flex items-center gap-2 text-sm">
+                                                                                <input
+                                                                                    type="checkbox"
+                                                                                    class="tp-checkbox"
+                                                                                    :checked="!!getPropRaw(index, field.key)"
+                                                                                    @change="setProp(index, field.key, $event.target.checked)" />
+                                                                                <span
+                                                                                    x-text="field.toggle_label || 'Enabled'"></span>
+                                                                            </label>
+                                                                        </template>
+
+                                                                        <template x-if="field.type === 'number'">
+                                                                            <input
+                                                                                class="tp-input"
+                                                                                type="number"
+                                                                                :min="field.min !== undefined ? field.min : null"
+                                                                                :max="field.max !== undefined ? field.max : null"
+                                                                                :step="field.step !== undefined ? field.step : null"
+                                                                                :placeholder="field.placeholder || ''"
+                                                                                :value="getProp(index, field.key)"
+                                                                                @input="setProp(index, field.key, $event.target.value)" />
+                                                                        </template>
+
+                                                                        <template x-if="field.type === 'range'">
+                                                                            <input
+                                                                                class="tp-input"
+                                                                                type="range"
+                                                                                :min="field.min !== undefined ? field.min : null"
+                                                                                :max="field.max !== undefined ? field.max : null"
+                                                                                :step="field.step !== undefined ? field.step : null"
+                                                                                :value="getProp(index, field.key)"
+                                                                                @input="setProp(index, field.key, $event.target.value)" />
+                                                                        </template>
+
+                                                                        <template x-if="field.type === 'color'">
+                                                                            <input
+                                                                                class="tp-input h-10 p-1"
+                                                                                type="color"
+                                                                                :value="getProp(index, field.key)"
+                                                                                @input="setProp(index, field.key, $event.target.value)" />
+                                                                        </template>
+
+                                                                        <template x-if="field.type === 'media'">
+                                                                            <div class="space-y-3">
+                                                                                <div
+                                                                                    class="flex flex-wrap items-center gap-2">
+                                                                                    <button
+                                                                                        type="button"
+                                                                                        class="tp-button-secondary"
+                                                                                        @click="openMediaModal(index, field.key, 'single')">
+                                                                                        Choose media
+                                                                                    </button>
+                                                                                    <a
+                                                                                        x-show="mediaIndexUrl"
+                                                                                        :href="mediaIndexUrl"
+                                                                                        target="_blank"
+                                                                                        rel="noopener"
+                                                                                        class="tp-button-link">
+                                                                                        Manage
+                                                                                    </a>
+                                                                                </div>
+
+                                                                                <div
+                                                                                    class="flex flex-wrap items-center gap-3 rounded border border-black/10 bg-white p-3"
+                                                                                    x-show="getProp(index, field.key)"
+                                                                                    x-cloak>
+                                                                                    <img
+                                                                                        x-show="isMediaImage(getProp(index, field.key))"
+                                                                                        :src="getProp(index, field.key)"
+                                                                                        alt=""
+                                                                                        class="h-14 w-14 rounded border border-slate-200 object-cover" />
+                                                                                    <div class="min-w-0 flex-1">
+                                                                                        <div
+                                                                                            class="truncate text-sm font-semibold"
+                                                                                            x-text="mediaLabel(getProp(index, field.key))"></div>
+                                                                                        <div
+                                                                                            class="tp-code truncate text-[11px]"
+                                                                                            x-text="getProp(index, field.key)"></div>
+                                                                                    </div>
+                                                                                    <button
+                                                                                        type="button"
+                                                                                        class="tp-button-link"
+                                                                                        @click="setProp(index, field.key, '')">
+                                                                                        Clear
+                                                                                    </button>
+                                                                                </div>
+
+                                                                                <div class="space-y-1">
+                                                                                    <input
+                                                                                        class="tp-input"
+                                                                                        type="text"
+                                                                                        :value="getProp(index, field.key)"
+                                                                                        placeholder="/storage/… or https://…"
+                                                                                        @input="setProp(index, field.key, $event.target.value)" />
+                                                                                    <div class="tp-help">
+                                                                                        Pick from media or paste a URL.
+                                                                                    </div>
+                                                                                </div>
+
+                                                                                <div
+                                                                                    class="tp-muted text-xs"
+                                                                                    x-show="mediaOptions.length === 0">
+                                                                                    Upload media first to select it here.
+                                                                                </div>
+                                                                            </div>
+                                                                        </template>
+
+                                                                        <template x-if="field.type === 'media-list'">
+                                                                            <div class="space-y-3">
+                                                                                <div
+                                                                                    class="flex flex-wrap items-center gap-2">
+                                                                                    <button
+                                                                                        type="button"
+                                                                                        class="tp-button-secondary"
+                                                                                        @click="openMediaModal(index, field.key, 'multi')">
+                                                                                        Choose images
+                                                                                    </button>
+                                                                                    <a
+                                                                                        x-show="mediaIndexUrl"
+                                                                                        :href="mediaIndexUrl"
+                                                                                        target="_blank"
+                                                                                        rel="noopener"
+                                                                                        class="tp-button-link">
+                                                                                        Manage
+                                                                                    </a>
+                                                                                </div>
+
+                                                                                <div
+                                                                                    class="grid grid-cols-2 gap-3 md:grid-cols-3"
+                                                                                    x-show="getMediaList(index, field.key).length > 0"
+                                                                                    x-cloak>
+                                                                                    <template
+                                                                                        x-for="(url, mediaIdx) in getMediaList(index, field.key)"
+                                                                                        :key="url + ':' + mediaIdx">
+                                                                                        <div
+                                                                                            class="space-y-2 rounded border border-black/10 bg-white p-2">
+                                                                                            <div
+                                                                                                class="flex aspect-4/3 items-center justify-center overflow-hidden rounded border border-slate-200 bg-slate-50">
+                                                                                                <img
+                                                                                                    x-show="isMediaImage(url)"
+                                                                                                    :src="url"
+                                                                                                    alt=""
+                                                                                                    class="h-full w-full object-cover" />
+                                                                                                <div
+                                                                                                    x-show="! isMediaImage(url)"
+                                                                                                    class="tp-muted text-xs">
+                                                                                                    File
+                                                                                                </div>
+                                                                                            </div>
+                                                                                            <div
+                                                                                                class="tp-muted truncate text-xs"
+                                                                                                x-text="mediaLabel(url)"></div>
+                                                                                            <div
+                                                                                                class="flex items-center justify-between gap-2 text-xs">
+                                                                                                <button
+                                                                                                    type="button"
+                                                                                                    class="tp-button-link text-red-600 hover:text-red-700"
+                                                                                                    @click="removeFromMediaList(index, field.key, mediaIdx)">
+                                                                                                    Remove
+                                                                                                </button>
+                                                                                                <a
+                                                                                                    :href="url"
+                                                                                                    target="_blank"
+                                                                                                    rel="noopener"
+                                                                                                    class="tp-button-link">
+                                                                                                    Open
+                                                                                                </a>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </template>
+                                                                                </div>
+
+                                                                                <div class="space-y-1">
+                                                                                    <textarea
+                                                                                        class="tp-textarea font-mono text-xs"
+                                                                                        rows="3"
+                                                                                        :value="mediaListText(index, field.key)"
+                                                                                        @blur="applyMediaListText(index, field.key, $event.target.value)"></textarea>
+                                                                                    <div class="tp-help">
+                                                                                        One URL per line for advanced edits.
+                                                                                    </div>
+                                                                                </div>
+
+                                                                                <div
+                                                                                    class="tp-muted text-xs"
+                                                                                    x-show="mediaOptions.length === 0">
+                                                                                    Upload media first to select it here.
+                                                                                </div>
+                                                                            </div>
+                                                                        </template>
+
+                                                                        <template
+                                                                            x-if="
+                                                                            field.type !== 'textarea' &&
+                                                                            field.type !== 'media' &&
+                                                                            field.type !== 'media-list' &&
+                                                                            field.type !== 'select' &&
+                                                                            field.type !== 'toggle' &&
+                                                                            field.type !== 'number' &&
+                                                                            field.type !== 'range' &&
+                                                                            field.type !== 'color'
+                                                                        ">
+                                                                            <input
+                                                                                class="tp-input"
+                                                                                :type="field.type === 'url' ? 'url' : 'text'"
+                                                                                :placeholder="field.placeholder || ''"
+                                                                                :value="getProp(index, field.key)"
+                                                                                @input="setProp(index, field.key, $event.target.value)" />
+                                                                        </template>
+
+                                                                        <template x-if="field.help">
+                                                                            <div
+                                                                                class="tp-help"
+                                                                                x-text="field.help"></div>
+                                                                        </template>
+                                                                    </div>
+                                                                </template>
+                                                            </div>
+                                                        </template>
+
+                                                        <template x-if="fieldsFor(block.type).length === 0">
+                                                            <div class="tp-field">
+                                                                <label class="tp-label">Props (JSON)</label>
+                                                                <textarea
+                                                                    class="tp-textarea font-mono text-xs"
+                                                                    rows="10"
+                                                                    @blur="setPropsJson(index, $event.target.value)"
+                                                                    x-text="propsJson(index)"></textarea>
+                                                                <div class="tp-help">
+                                                                    Unknown block type — edit props directly.
+                                                                </div>
+                                                            </div>
+                                                        </template>
+                                                    </div>
+                                                    @if ($editorMode)
+                                                        <div class="flex items-center gap-3 pl-12 pt-2">
+                                                            <button
+                                                                type="button"
+                                                                class="group inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-400 hover:text-slate-600"
+                                                                @click="insertIndex = index; insertType = ''">
+                                                                <span
+                                                                    class="flex h-6 w-6 items-center justify-center rounded-full border border-dashed border-slate-300 text-[14px] leading-none text-slate-400 transition group-hover:border-slate-400 group-hover:text-slate-600">
+                                                                    +
+                                                                </span>
+                                                                Add block
+                                                            </button>
+                                                            <div
+                                                                class="flex flex-wrap items-center gap-2"
+                                                                x-show="insertIndex === index"
+                                                                x-cloak>
+                                                                <select class="tp-select w-full sm:w-64" x-model="insertType">
+                                                                    <option value="">Select block…</option>
+                                                                    <template x-for="def in definitions" :key="def.type">
+                                                                        <option :value="def.type" x-text="def.name || def.type"></option>
+                                                                    </template>
+                                                                </select>
+                                                                <button
+                                                                    type="button"
+                                                                    class="tp-button-primary"
+                                                                    @click="insertBlock(index)">
+                                                                    Insert
+                                                                </button>
+                                                                <button
+                                                                    type="button"
+                                                                    class="tp-button-link text-slate-400"
+                                                                    @click="insertIndex = null; insertType = ''">
+                                                                    Cancel
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    @endif
                                                 </div>
                                             </div>
                                         </template>
@@ -681,8 +726,7 @@
                                     {{-- Single source of truth posted to backend --}}
                                     <textarea name="blocks_json" class="hidden" x-ref="hidden">
 {{ $initialBlocksJson }}
-                                </textarea
-                                    >
+                                    </textarea>
 
                                     <div
                                         class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
@@ -803,6 +847,8 @@
                                             mediaIndexUrl:
                                                 typeof opts.mediaIndexUrl === 'string' ? opts.mediaIndexUrl : '',
                                             addType: '',
+                                            insertIndex: null,
+                                            insertType: '',
                                             blocks: [],
                                             dragIndex: null,
                                             dragOverIndex: null,
@@ -1205,11 +1251,32 @@
 
                                                 this.blocks.push(this.decorateBlock(this.exampleBlock(type)));
                                                 this.addType = '';
+                                                this.insertIndex = null;
+                                                this.insertType = '';
                                             },
 
                                             addBlockType(type) {
                                                 this.addType = type;
                                                 this.addBlock();
+                                            },
+
+                                            insertBlock(afterIndex) {
+                                                const type = String(this.insertType || '').trim();
+                                                if (!type) return;
+
+                                                const insertAt = Number.isFinite(afterIndex)
+                                                    ? Math.min(afterIndex + 1, this.blocks.length)
+                                                    : this.blocks.length;
+                                                const clampedIndex = Math.max(insertAt, 0);
+
+                                                this.blocks.splice(
+                                                    clampedIndex,
+                                                    0,
+                                                    this.decorateBlock(this.exampleBlock(type)),
+                                                );
+
+                                                this.insertIndex = null;
+                                                this.insertType = '';
                                             },
 
                                             duplicateBlock(index) {
