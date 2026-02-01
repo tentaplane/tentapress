@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.5.2](https://github.com/tentaplane/tentapress/compare/v0.5.1...v0.5.2) (2026-02-01)
+
+
+### Bug Fixes
+
+* **themes:** support vendor namespaces and copy ([8ca2318](https://github.com/tentaplane/tentapress/commit/8ca2318eb642c962a137773636a28471cca80b4c))
+
 ## [0.5.1](https://github.com/tentaplane/tentapress/compare/v0.5.0...v0.5.1) (2026-02-01)
 
 
