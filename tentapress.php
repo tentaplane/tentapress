@@ -209,6 +209,17 @@ $copyThemeFromVendor = static function (string $packageName) use ($prompt, $reso
     return $themeId;
 };
 
+$resolveCommand = static function (array $candidates): ?string {
+    foreach ($candidates as $candidate) {
+        $path = trim((string) shell_exec('command -v ' . escapeshellarg($candidate) . ' 2>/dev/null'));
+        if ($path !== '') {
+            return $candidate;
+        }
+    }
+
+    return null;
+};
+
 $composerPath = trim((string) shell_exec('command -v composer 2>/dev/null'));
 
 if ($composerPath !== '') {
@@ -290,6 +301,24 @@ if ($themeChoice !== 'none') {
         escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($artisanPath) . ' tp:themes activate ' . escapeshellarg($themeId),
         "Activating theme {$themeId}..."
     );
+
+    $buildAssets = strtolower($prompt('Build theme assets now? [y/N]: '));
+    if (in_array($buildAssets, ['y', 'yes'], true)) {
+        $buildTool = $resolveCommand(['bun', 'pnpm', 'npm']);
+        if ($buildTool === null) {
+            fwrite(STDOUT, "No bun/pnpm/npm detected. Skipping theme asset build.\n");
+        } else {
+            $themePath = $root . DIRECTORY_SEPARATOR . 'themes' . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $themeId);
+            if (is_dir($themePath)) {
+                $run(
+                    escapeshellarg($buildTool) . ' run --cwd ' . escapeshellarg($themePath) . ' build',
+                    "Building theme assets with {$buildTool}..."
+                );
+            } else {
+                fwrite(STDOUT, "Theme path not found at {$themePath}. Skipping asset build.\n");
+            }
+        }
+    }
 }
 
 $email = '';

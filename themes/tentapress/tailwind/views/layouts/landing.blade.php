@@ -5,7 +5,10 @@
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         @include('tentapress-seo::head', ['page' => $page])
 
-        @vite(['resources/css/theme.css', 'resources/js/theme.js'], 'themes/tentapress/tailwind/build')
+        @php($manifest = public_path('themes/tentapress/tailwind/build/manifest.json'))
+        @if (is_file($manifest))
+            @vite(['resources/css/theme.css', 'resources/js/theme.js'], 'themes/tentapress/tailwind/build')
+        @endif
     </head>
     <body class="bg-green-50 text-zinc-900">
         <main class="mx-auto max-w-5xl p-6">

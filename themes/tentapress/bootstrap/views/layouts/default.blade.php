@@ -5,7 +5,10 @@
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         @include('tentapress-seo::head', ['page' => $page])
 
-        @vite(['resources/css/theme.css', 'resources/js/theme.js'], 'themes/tentapress/bootstrap/build')
+        @php($manifest = public_path('themes/tentapress/bootstrap/build/manifest.json'))
+        @if (is_file($manifest))
+            @vite(['resources/css/theme.css', 'resources/js/theme.js'], 'themes/tentapress/bootstrap/build')
+        @endif
     </head>
     <body>
         <header class="border-bottom">
