@@ -306,7 +306,7 @@ $themeChoice = $promptChoice(
         'tailwind' => 'tentaplane/theme-tailwind',
         'none' => 'none',
     ],
-    'tailwind'
+    'tentaplane/theme-tailwind'
 );
 
 if ($themeChoice !== 'none') {
