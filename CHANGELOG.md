@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.8.2](https://github.com/tentaplane/tentapress/compare/v0.8.1...v0.8.2) (2026-02-01)
+
+
+### Bug Fixes
+
+* **setup:** delay before theme build ([f4b1198](https://github.com/tentaplane/tentapress/commit/f4b1198da60cd7dbd39c36545fb830d1e62c5cfe))
+* **setup:** ensure demo block views copied ([2bee041](https://github.com/tentaplane/tentapress/commit/2bee04157bb5e68dc9b941bed4beb595060a8442))
+
 ## [0.8.1](https://github.com/tentaplane/tentapress/compare/v0.8.0...v0.8.1) (2026-02-01)
 
 
