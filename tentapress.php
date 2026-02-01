@@ -209,15 +209,16 @@ $copyThemeFromVendor = static function (string $packageName) use ($prompt, $reso
     return $themeId;
 };
 
-$resolveCommand = static function (array $candidates): ?string {
+$resolveCommands = static function (array $candidates): array {
+    $available = [];
     foreach ($candidates as $candidate) {
         $path = trim((string) shell_exec('command -v ' . escapeshellarg($candidate) . ' 2>/dev/null'));
         if ($path !== '') {
-            return $candidate;
+            $available[] = $candidate;
         }
     }
 
-    return null;
+    return $available;
 };
 
 $composerPath = trim((string) shell_exec('command -v composer 2>/dev/null'));
@@ -304,10 +305,18 @@ if ($themeChoice !== 'none') {
 
     $buildAssets = strtolower($prompt('Build theme assets now? [y/N]: '));
     if (in_array($buildAssets, ['y', 'yes'], true)) {
-        $buildTool = $resolveCommand(['bun', 'pnpm', 'npm']);
-        if ($buildTool === null) {
+        $availableTools = $resolveCommands(['bun', 'pnpm', 'npm']);
+        if ($availableTools === []) {
             fwrite(STDOUT, "No bun/pnpm/npm detected. Skipping theme asset build.\n");
         } else {
+            $buildTool = $availableTools[0];
+            if (count($availableTools) > 1) {
+                $buildTool = $promptChoice(
+                    'Select a package manager [' . implode('/', $availableTools) . ']: ',
+                    array_combine($availableTools, $availableTools),
+                    $availableTools[0]
+                );
+            }
             $themePath = $root . DIRECTORY_SEPARATOR . 'themes' . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $themeId);
             if (is_dir($themePath)) {
                 $run(
