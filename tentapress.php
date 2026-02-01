@@ -319,6 +319,16 @@ if ($themeChoice !== 'none') {
             }
             $themePath = $root . DIRECTORY_SEPARATOR . 'themes' . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $themeId);
             if (is_dir($themePath)) {
+                $nodeModulesPath = $themePath . DIRECTORY_SEPARATOR . 'node_modules';
+                if (! is_dir($nodeModulesPath)) {
+                    $installDeps = strtolower($prompt("Install theme dependencies with {$buildTool}? [Y/n]: "));
+                    if ($installDeps === '' || in_array($installDeps, ['y', 'yes'], true)) {
+                        $run(
+                            escapeshellarg($buildTool) . ' install --cwd ' . escapeshellarg($themePath),
+                            "Installing theme dependencies with {$buildTool}..."
+                        );
+                    }
+                }
                 $run(
                     escapeshellarg($buildTool) . ' run --cwd ' . escapeshellarg($themePath) . ' build',
                     "Building theme assets with {$buildTool}..."
