@@ -338,6 +338,129 @@ if ($themeChoice !== 'none') {
             }
         }
     }
+
+    $seedDemo = strtolower($prompt('Create a demo home page with sample blocks? [Y/n]: '));
+    if ($seedDemo === '' || in_array($seedDemo, ['y', 'yes'], true)) {
+        $demoBlocks = [
+            [
+                'type' => 'blocks/hero',
+                'variant' => 'split',
+                'props' => [
+                    'eyebrow' => 'Introducing TentaPress',
+                    'headline' => "Launch standout sites\\nin days, not weeks.",
+                    'subheadline' => 'A modern block editor with a clean admin and a fast publishing workflow.',
+                    'alignment' => 'left',
+                    'image_position' => 'right',
+                    'primary_cta' => [
+                        'label' => 'Start free',
+                        'url' => '/admin',
+                        'style' => 'primary',
+                    ],
+                    'secondary_cta' => [
+                        'label' => 'View docs',
+                        'url' => '#features',
+                    ],
+                ],
+            ],
+            [
+                'type' => 'blocks/logo-cloud',
+                'props' => [
+                    'title' => 'Trusted by modern teams',
+                    'subtitle' => 'From seed to scale',
+                    'logos' => ['Northwind', 'Fable', 'Arcadia', 'Orbit', 'Shift', 'Pioneer'],
+                    'columns' => '6',
+                    'grayscale' => true,
+                    'size' => 'md',
+                ],
+            ],
+            [
+                'type' => 'blocks/features',
+                'props' => [
+                    'title' => 'Everything you need to launch',
+                    'subtitle' => 'Compose pages fast with clean blocks, predictable layouts, and powerful settings.',
+                    'items' => [
+                        ['title' => 'Instant layout system', 'body' => 'Stack blocks and ship without touching code.', 'icon' => '⚡'],
+                        ['title' => 'Theme-ready styling', 'body' => 'Utilities that keep the design consistent.', 'icon' => '🎨'],
+                        ['title' => 'Publishing workflow', 'body' => 'Draft, preview, and publish with confidence.', 'icon' => '🚀'],
+                        ['title' => 'Composable sections', 'body' => 'Mix hero, features, stats, and CTA blocks.', 'icon' => '🧩'],
+                        ['title' => 'Built for teams', 'body' => 'Clear admin screens and safe editing modes.', 'icon' => '🤝'],
+                        ['title' => 'Laravel-native', 'body' => 'Leverage a framework you already trust.', 'icon' => '🛡️'],
+                    ],
+                    'columns' => '3',
+                ],
+            ],
+            [
+                'type' => 'blocks/stats',
+                'props' => [
+                    'title' => 'By the numbers',
+                    'items' => [
+                        ['value' => '10x', 'label' => 'Faster publishing'],
+                        ['value' => '99.9%', 'label' => 'Uptime target'],
+                        ['value' => '3 min', 'label' => 'Average page launch'],
+                    ],
+                    'columns' => '3',
+                    'dividers' => true,
+                ],
+            ],
+            [
+                'type' => 'blocks/testimonial',
+                'props' => [
+                    'quote' => 'We replaced three tools with TentaPress and shipped our new site in a week.',
+                    'name' => 'Jamie Lee',
+                    'role' => 'Head of Growth, Looma',
+                    'rating' => 5,
+                    'alignment' => 'left',
+                    'style' => 'card',
+                ],
+            ],
+            [
+                'type' => 'blocks/cta',
+                'props' => [
+                    'title' => 'Launch your next site today',
+                    'body' => 'Start with a polished theme and refine your blocks as you grow.',
+                    'alignment' => 'left',
+                    'background' => 'muted',
+                    'button' => [
+                        'label' => 'Get started',
+                        'url' => '/admin',
+                        'style' => 'primary',
+                    ],
+                    'secondary_button' => [
+                        'label' => 'Talk to sales',
+                        'url' => '#',
+                    ],
+                ],
+            ],
+        ];
+
+        $blocksExport = var_export($demoBlocks, true);
+        $demoScript = <<<PHP
+use Illuminate\\Support\\Facades\\Schema;
+use TentaPress\\Pages\\Models\\TpPage;
+
+if (!class_exists(TpPage::class) || !Schema::hasTable('tp_pages')) {
+    return;
+}
+
+if (TpPage::query()->where('slug', 'home')->exists()) {
+    return;
+}
+
+TpPage::query()->create([
+    'title' => 'Home',
+    'slug' => 'home',
+    'status' => 'published',
+    'layout' => 'default',
+    'blocks' => {$blocksExport},
+    'published_at' => now(),
+]);
+PHP;
+
+        $run(
+            escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($artisanPath) . ' tinker --execute=' . escapeshellarg($demoScript),
+            'Creating demo home page...'
+        );
+    }
 }
 
 $email = '';
