@@ -12,7 +12,7 @@ $root = __DIR__;
 $artisanPath = $root . '/artisan';
 
 if (! is_file($artisanPath)) {
-    fwrite(STDERR, "Unable to find artisan at {$artisanPath}. Run this from the repo root.\n");
+    fwrite(STDERR, "Unable to find artisan at {$artisanPath}. Run this from the root folder.\n");
     exit(1);
 }
 
@@ -295,6 +295,9 @@ if ($themeChoice !== 'none') {
         "Installing theme package {$themeChoice}..."
     );
     $themeId = $copyThemeFromVendor($themeChoice) ?? $themeChoice;
+    $themePath = $root . DIRECTORY_SEPARATOR . 'themes' . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $themeId);
+    $buildTool = null;
+    $shouldBuildAssets = false;
     $run($composerCommand . ' run post-autoload-dump', 'Running Composer post-autoload-dump scripts...');
     $run($composerCommand . ' run post-update-cmd', 'Running Composer post-update-cmd scripts...');
     $run(escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($artisanPath) . ' tp:themes sync', 'Syncing themes...');
@@ -303,8 +306,9 @@ if ($themeChoice !== 'none') {
         "Activating theme {$themeId}..."
     );
 
-    $buildAssets = strtolower($prompt('Build theme assets now? [y/N]: '));
+    $buildAssets = strtolower($prompt('Build theme assets now? [Y/n]: '));
     if (in_array($buildAssets, ['y', 'yes'], true)) {
+        $shouldBuildAssets = true;
         $availableTools = $resolveCommands(['bun', 'pnpm', 'npm']);
         if ($availableTools === []) {
             fwrite(STDOUT, "No bun/pnpm/npm detected. Skipping theme asset build.\n");
@@ -317,7 +321,6 @@ if ($themeChoice !== 'none') {
                     $availableTools[0]
                 );
             }
-            $themePath = $root . DIRECTORY_SEPARATOR . 'themes' . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $themeId);
             if (is_dir($themePath)) {
                 $nodeModulesPath = $themePath . DIRECTORY_SEPARATOR . 'node_modules';
                 if (! is_dir($nodeModulesPath)) {
@@ -460,6 +463,13 @@ PHP;
             escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($artisanPath) . ' tinker --execute=' . escapeshellarg($demoScript),
             'Creating demo home page...'
         );
+
+        if ($shouldBuildAssets && $buildTool !== null && is_dir($themePath)) {
+            $run(
+                escapeshellarg($buildTool) . ' run --cwd ' . escapeshellarg($themePath) . ' build',
+                "Rebuilding theme assets with {$buildTool}..."
+            );
+        }
     }
 }
 
