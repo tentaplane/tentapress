@@ -21,6 +21,7 @@ return [
         'tentapress/menus',
         'tentapress/seo',
         'tentapress/settings',
+        'tentapress/system-info',
         'tentapress/themes',
         'tentapress/users',
     ],
@@ -38,7 +39,6 @@ return [
         'tentapress/import' => 'Import tooling',
         'tentapress/export' => 'Export tooling',
         'tentapress/static-deploy' => 'Static deployments',
-        'tentapress/system-info' => 'System diagnostics screen',
     ],
 
     /*

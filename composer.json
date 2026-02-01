@@ -15,14 +15,14 @@
         "tentapress/seo": "<1.0",
         "tentapress/settings": "<1.0",
         "tentapress/system": "<1.0",
+        "tentapress/system-info": "<1.0",
         "tentapress/themes": "<1.0",
         "tentapress/users": "<1.0"
     },
     "suggest": {
         "tentapress/import": "Import tooling",
         "tentapress/export": "Export tooling",
-        "tentapress/static-deploy": "Static deployments",
-        "tentapress/system-info": "System diagnostics screen"
+        "tentapress/static-deploy": "Static deployments"
     },
     "repositories": [
         {
