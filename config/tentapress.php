@@ -56,6 +56,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Theme Vendor Namespaces
+    |--------------------------------------------------------------------------
+    |
+    | Vendor namespaces to scan under /vendor for theme manifests. Falls back
+    | to plugin vendor namespaces when omitted.
+    |
+    */
+    'theme_vendor_namespaces' => [
+        'tentapress',
+        'tentaplane',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Media
     |--------------------------------------------------------------------------
     |

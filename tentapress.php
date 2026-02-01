@@ -66,6 +66,113 @@ $promptChoice = static function (string $label, array $choices, string $default)
     }
 };
 
+$loadInstalledPackages = static function () use ($root): array {
+    $installedPath = $root . '/vendor/composer/installed.php';
+    if (! is_file($installedPath)) {
+        return [];
+    }
+
+    $installed = require $installedPath;
+    if (! is_array($installed)) {
+        return [];
+    }
+
+    if (isset($installed['packages']) && is_array($installed['packages'])) {
+        return $installed['packages'];
+    }
+
+    return $installed;
+};
+
+$resolvePackagePath = static function (string $packageName) use ($loadInstalledPackages): ?string {
+    foreach ($loadInstalledPackages() as $package) {
+        if (! is_array($package)) {
+            continue;
+        }
+
+        if (($package['name'] ?? null) !== $packageName) {
+            continue;
+        }
+
+        $installPath = $package['install_path'] ?? $package['install-path'] ?? null;
+        if (is_string($installPath) && $installPath !== '') {
+            return $installPath;
+        }
+    }
+
+    return null;
+};
+
+$copyThemeFromVendor = static function (string $packageName) use ($prompt, $resolvePackagePath, $root): ?string {
+    $installPath = $resolvePackagePath($packageName);
+    if ($installPath === null) {
+        fwrite(STDOUT, "Unable to locate installed package {$packageName}.\n");
+        return null;
+    }
+
+    $manifestPath = rtrim($installPath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'tentapress.json';
+    if (! is_file($manifestPath)) {
+        fwrite(STDOUT, "Missing tentapress.json in {$packageName}.\n");
+        return null;
+    }
+
+    $manifestRaw = file_get_contents($manifestPath);
+    $manifest = is_string($manifestRaw) ? json_decode($manifestRaw, true) : null;
+    $themeId = is_array($manifest) ? (string) ($manifest['id'] ?? '') : '';
+
+    if ($themeId === '' || ! str_contains($themeId, '/')) {
+        $themeId = $packageName;
+    }
+
+    [$vendor, $name] = array_pad(explode('/', $themeId, 2), 2, '');
+    if ($vendor === '' || $name === '') {
+        fwrite(STDOUT, "Invalid theme id for {$packageName}.\n");
+        return null;
+    }
+
+    $destination = $root . DIRECTORY_SEPARATOR . 'themes' . DIRECTORY_SEPARATOR . $vendor . DIRECTORY_SEPARATOR . $name;
+
+    if (is_dir($destination)) {
+        $overwrite = strtolower($prompt("Theme already exists at themes/{$vendor}/{$name}. Overwrite? [y/N]: "));
+        if (! in_array($overwrite, ['y', 'yes'], true)) {
+            return $themeId;
+        }
+    }
+
+    $skip = ['.git', 'node_modules', 'vendor'];
+    $iterator = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator($installPath, FilesystemIterator::SKIP_DOTS),
+        RecursiveIteratorIterator::SELF_FIRST
+    );
+
+    foreach ($iterator as $item) {
+        $relative = $iterator->getSubPathName();
+        $parts = explode(DIRECTORY_SEPARATOR, $relative);
+        if ($parts !== [] && in_array($parts[0], $skip, true)) {
+            $iterator->next();
+            continue;
+        }
+
+        $targetPath = $destination . DIRECTORY_SEPARATOR . $relative;
+
+        if ($item->isDir()) {
+            if (! is_dir($targetPath)) {
+                mkdir($targetPath, 0755, true);
+            }
+            continue;
+        }
+
+        $targetDir = dirname($targetPath);
+        if (! is_dir($targetDir)) {
+            mkdir($targetDir, 0755, true);
+        }
+
+        copy($item->getPathname(), $targetPath);
+    }
+
+    return $themeId;
+};
+
 $composerPath = trim((string) shell_exec('command -v composer 2>/dev/null'));
 
 if ($composerPath !== '') {
@@ -136,12 +243,10 @@ $themeChoice = $promptChoice(
 
 if ($themeChoice !== 'none') {
     $run(
-        $composerCommand . ' require ' . escapeshellarg($themeChoice) . ' --no-interaction --no-scripts --no-dev',
+        $composerCommand . ' require ' . escapeshellarg($themeChoice) . ' --no-interaction --no-scripts',
         "Installing theme package {$themeChoice}..."
     );
-    $themeId = $themeChoice === 'tentaplane/theme-bootstrap'
-        ? 'tentapress/bootstrap'
-        : 'tentapress/tailwind';
+    $themeId = $copyThemeFromVendor($themeChoice) ?? $themeChoice;
     $run($composerCommand . ' run post-autoload-dump', 'Running Composer post-autoload-dump scripts...');
     $run($composerCommand . ' run post-update-cmd', 'Running Composer post-update-cmd scripts...');
     $run(escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($artisanPath) . ' tp:themes sync', 'Syncing themes...');

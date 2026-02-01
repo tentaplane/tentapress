@@ -35,7 +35,9 @@ final class Paths
      */
     public static function pluginSearchRoots(): array
     {
-        return self::manifestSearchRoots(self::pluginsPath());
+        $vendorNamespaces = config('tentapress.plugin_vendor_namespaces', ['tentapress']);
+
+        return self::manifestSearchRoots(self::pluginsPath(), is_array($vendorNamespaces) ? $vendorNamespaces : []);
     }
 
     /**
@@ -43,23 +45,25 @@ final class Paths
      */
     public static function themeSearchRoots(): array
     {
-        return self::manifestSearchRoots(self::themesPath());
+        $vendorNamespaces = config(
+            'tentapress.theme_vendor_namespaces',
+            config('tentapress.plugin_vendor_namespaces', ['tentapress'])
+        );
+
+        return self::manifestSearchRoots(self::themesPath(), is_array($vendorNamespaces) ? $vendorNamespaces : []);
     }
 
     /**
      * @return array<int,string>
      */
-    private static function manifestSearchRoots(string $firstRoot): array
+    private static function manifestSearchRoots(string $firstRoot, array $vendorNamespaces): array
     {
         $roots = [$firstRoot];
 
-        $vendorNamespaces = config('tentapress.plugin_vendor_namespaces', ['tentapress']);
-        if (is_array($vendorNamespaces)) {
-            foreach ($vendorNamespaces as $namespace) {
-                $namespace = trim((string) $namespace);
-                if ($namespace !== '') {
-                    $roots[] = base_path('vendor/'.$namespace);
-                }
+        foreach ($vendorNamespaces as $namespace) {
+            $namespace = trim((string) $namespace);
+            if ($namespace !== '') {
+                $roots[] = base_path('vendor/'.$namespace);
             }
         }
 
