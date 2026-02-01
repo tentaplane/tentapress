@@ -350,7 +350,7 @@ if ($themeChoice !== 'none') {
                 'variant' => 'split',
                 'props' => [
                     'eyebrow' => 'Introducing TentaPress',
-                    'headline' => "Launch standout sites\\nin days, not weeks.",
+                    'headline' => "Launch standout websites in days, not weeks.",
                     'subheadline' => 'A modern block editor with a clean admin and a fast publishing workflow.',
                     'alignment' => 'left',
                     'image_position' => 'right',
@@ -363,17 +363,6 @@ if ($themeChoice !== 'none') {
                         'label' => 'View docs',
                         'url' => '#features',
                     ],
-                ],
-            ],
-            [
-                'type' => 'blocks/logo-cloud',
-                'props' => [
-                    'title' => 'Trusted by modern teams',
-                    'subtitle' => 'From seed to scale',
-                    'logos' => ['Northwind', 'Fable', 'Arcadia', 'Orbit', 'Shift', 'Pioneer'],
-                    'columns' => '6',
-                    'grayscale' => true,
-                    'size' => 'md',
                 ],
             ],
             [
@@ -397,9 +386,9 @@ if ($themeChoice !== 'none') {
                 'props' => [
                     'title' => 'By the numbers',
                     'items' => [
-                        ['value' => '10x', 'label' => 'Faster publishing'],
+                        ['value' => '10 x', 'label' => 'Faster publishing'],
                         ['value' => '99.9%', 'label' => 'Uptime target'],
-                        ['value' => '3 min', 'label' => 'Average page launch'],
+                        ['value' => '5 mins', 'label' => 'Average page creation'],
                     ],
                     'columns' => '3',
                     'dividers' => true,
@@ -408,7 +397,7 @@ if ($themeChoice !== 'none') {
             [
                 'type' => 'blocks/testimonial',
                 'props' => [
-                    'quote' => 'We replaced three tools with TentaPress and shipped our new site in a week.',
+                    'quote' => 'We replaced three tools with TentaPress and shipped our new website in a week.',
                     'name' => 'Jamie Lee',
                     'role' => 'Head of Growth, Looma',
                     'rating' => 5,
@@ -438,6 +427,11 @@ if ($themeChoice !== 'none') {
 
         $blocksExport = var_export($demoBlocks, true);
         $demoScript = <<<PHP
+require __DIR__ . '/vendor/autoload.php';
+
+\$app = require __DIR__ . '/bootstrap/app.php';
+\$app->make(Illuminate\\Contracts\\Console\\Kernel::class)->bootstrap();
+
 use Illuminate\\Support\\Facades\\Schema;
 use TentaPress\\Pages\\Models\\TpPage;
 
@@ -460,7 +454,7 @@ TpPage::query()->create([
 PHP;
 
         $run(
-            escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($artisanPath) . ' tinker --execute=' . escapeshellarg($demoScript),
+            escapeshellarg(PHP_BINARY) . ' -r ' . escapeshellarg($demoScript),
             'Creating demo home page...'
         );
 
