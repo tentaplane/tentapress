@@ -336,3 +336,11 @@ if (! $skipUser) {
 }
 
 fwrite(STDOUT, "\nSetup complete.\n");
+
+fwrite(
+    STDOUT,
+    "\nNext steps:\n" .
+    "- If using Laravel Herd, visit https://tentapress.test/admin\n" .
+    "- Otherwise run: php artisan serve, then visit the printed URL + /admin\n" .
+    "- Log in with the admin email/password you just created.\n"
+);
