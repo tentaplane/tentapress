@@ -444,6 +444,7 @@ PHP;
 
     if ($shouldBuildAssets && $buildTool !== null) {
         if (is_dir($themePath)) {
+            usleep(300000);
             $nodeModulesPath = $themePath . DIRECTORY_SEPARATOR . 'node_modules';
             if (! is_dir($nodeModulesPath)) {
                 $installDeps = strtolower($prompt("Install theme dependencies with {$buildTool}? [Y/n]: "));
