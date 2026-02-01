@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.7.0](https://github.com/tentaplane/tentapress/compare/v0.6.0...v0.7.0) (2026-02-01)
+
+
+### Features
+
+* **setup:** offer theme deps install ([10519c4](https://github.com/tentaplane/tentapress/commit/10519c481db009a726fc138bde08d43160aa5ce9))
+
+
+### Bug Fixes
+
+* **themes:** sync only from local themes ([b491147](https://github.com/tentaplane/tentapress/commit/b491147b9aae61b5c35796ddeb2c0961fc098ffb))
+
 ## [0.6.0](https://github.com/tentaplane/tentapress/compare/v0.5.1...v0.6.0) (2026-02-01)
 
 
