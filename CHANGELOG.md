@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.9.0](https://github.com/tentaplane/tentapress/compare/v0.8.2...v0.9.0) (2026-02-01)
+
+
+### Features
+
+* **setup:** default to tailwind theme ([3a67da5](https://github.com/tentaplane/tentapress/commit/3a67da5b8ffdfea884a598db87dfca659e1011f9))
+
+
+### Bug Fixes
+
+* **setup:** copy demo blocks from plugin ([00ccc47](https://github.com/tentaplane/tentapress/commit/00ccc4788f10e77d97de7f4259b5ca6b7227b945))
+* **setup:** removing test installation workflow ([10f4f02](https://github.com/tentaplane/tentapress/commit/10f4f02e644c0a52b75d1dc8d7df2788853d783a))
+
 ## [0.8.2](https://github.com/tentaplane/tentapress/compare/v0.8.1...v0.8.2) (2026-02-01)
 
 
