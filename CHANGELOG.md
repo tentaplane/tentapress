@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.9.1](https://github.com/tentaplane/tentapress/compare/v0.9.0...v0.9.1) (2026-02-01)
+
+
+### Bug Fixes
+
+* **blocks:** select reflects stored value ([4c1ed04](https://github.com/tentaplane/tentapress/commit/4c1ed043c4a164c04135594bdb66e358fe1577b5))
+* **blocks:** sync select fields ([a4aa19d](https://github.com/tentaplane/tentapress/commit/a4aa19d9597f6e05494459f364983ee8a77f7cf4))
+* **setup:** blocks copying from vendors not locally ([c8034f3](https://github.com/tentaplane/tentapress/commit/c8034f3ede31ff61ec1be3cd253c6877fd6c2e7a))
+* **theme:** configure dev hmr origin ([436e4a6](https://github.com/tentaplane/tentapress/commit/436e4a6615d10d82b0c75609c9480afcfaa84d74))
+* **theme:** load env and refresh views ([d3c77c5](https://github.com/tentaplane/tentapress/commit/d3c77c510f7043621edd15e0d2b057341e5d796d))
+
 ## [0.9.0](https://github.com/tentaplane/tentapress/compare/v0.8.2...v0.9.0) (2026-02-01)
 
 
