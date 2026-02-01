@@ -312,6 +312,7 @@ if ($themeChoice !== 'none') {
         $availableTools = $resolveCommands(['bun', 'pnpm', 'npm']);
         if ($availableTools === []) {
             fwrite(STDOUT, "No bun/pnpm/npm detected. Skipping theme asset build.\n");
+            $shouldBuildAssets = false;
         } else {
             $buildTool = $availableTools[0];
             if (count($availableTools) > 1) {
@@ -320,24 +321,6 @@ if ($themeChoice !== 'none') {
                     array_combine($availableTools, $availableTools),
                     $availableTools[0]
                 );
-            }
-            if (is_dir($themePath)) {
-                $nodeModulesPath = $themePath . DIRECTORY_SEPARATOR . 'node_modules';
-                if (! is_dir($nodeModulesPath)) {
-                    $installDeps = strtolower($prompt("Install theme dependencies with {$buildTool}? [Y/n]: "));
-                    if ($installDeps === '' || in_array($installDeps, ['y', 'yes'], true)) {
-                        $run(
-                            escapeshellarg($buildTool) . ' install --cwd ' . escapeshellarg($themePath),
-                            "Installing theme dependencies with {$buildTool}..."
-                        );
-                    }
-                }
-                $run(
-                    escapeshellarg($buildTool) . ' run --cwd ' . escapeshellarg($themePath) . ' build',
-                    "Building theme assets with {$buildTool}..."
-                );
-            } else {
-                fwrite(STDOUT, "Theme path not found at {$themePath}. Skipping asset build.\n");
             }
         }
     }
@@ -397,9 +380,9 @@ if ($themeChoice !== 'none') {
             [
                 'type' => 'blocks/testimonial',
                 'props' => [
-                    'quote' => 'We replaced three tools with TentaPress and shipped our new website in a week.',
-                    'name' => 'Jamie Lee',
-                    'role' => 'Head of Growth, Looma',
+                    'quote' => 'We replaced three tools with TentaPress and shipped our new website in a week!',
+                    'name' => 'Test User',
+                    'role' => 'Head of Growth, Demo Company',
                     'rating' => 5,
                     'alignment' => 'left',
                     'style' => 'card',
@@ -418,8 +401,8 @@ if ($themeChoice !== 'none') {
                         'style' => 'primary',
                     ],
                     'secondary_button' => [
-                        'label' => 'Talk to sales',
-                        'url' => '#',
+                        'label' => 'Your admin login',
+                        'url' => '/admin',
                     ],
                 ],
             ],
@@ -457,12 +440,26 @@ PHP;
             escapeshellarg(PHP_BINARY) . ' -r ' . escapeshellarg($demoScript),
             'Creating demo home page...'
         );
+    }
 
-        if ($shouldBuildAssets && $buildTool !== null && is_dir($themePath)) {
+    if ($shouldBuildAssets && $buildTool !== null) {
+        if (is_dir($themePath)) {
+            $nodeModulesPath = $themePath . DIRECTORY_SEPARATOR . 'node_modules';
+            if (! is_dir($nodeModulesPath)) {
+                $installDeps = strtolower($prompt("Install theme dependencies with {$buildTool}? [Y/n]: "));
+                if ($installDeps === '' || in_array($installDeps, ['y', 'yes'], true)) {
+                    $run(
+                        escapeshellarg($buildTool) . ' install --cwd ' . escapeshellarg($themePath),
+                        "Installing theme dependencies with {$buildTool}..."
+                    );
+                }
+            }
             $run(
                 escapeshellarg($buildTool) . ' run --cwd ' . escapeshellarg($themePath) . ' build',
-                "Rebuilding theme assets with {$buildTool}..."
+                "Building theme assets with {$buildTool}..."
             );
+        } else {
+            fwrite(STDOUT, "Theme path not found at {$themePath}. Skipping asset build.\n");
         }
     }
 }
