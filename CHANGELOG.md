@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.8.1](https://github.com/tentaplane/tentapress/compare/v0.8.0...v0.8.1) (2026-02-01)
+
+
+### Bug Fixes
+
+* **setup:** build assets once after demo ([7b9a69d](https://github.com/tentaplane/tentapress/commit/7b9a69d768ffcbecaea2fba442d920e28b81b810))
+
 ## [0.8.0](https://github.com/tentaplane/tentapress/compare/v0.7.0...v0.8.0) (2026-02-01)
 
 
