@@ -1,5 +1,5 @@
 @php
-    $raw = $props['buttons'] ?? [];
+    $raw = $props['actions'] ?? [];
 
     if (is_string($raw)) {
         $trim = trim($raw);

@@ -335,6 +335,7 @@
                                                                         <select
                                                                             class="tp-select"
                                                                             :value="getProp(index, field.key)"
+                                                                            x-effect="$el.value = getProp(index, field.key)"
                                                                             @change="setProp(index, field.key, $event.target.value)">
                                                                             <template
                                                                                 x-for="opt in selectOptions(field)"

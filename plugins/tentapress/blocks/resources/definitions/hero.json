@@ -2,7 +2,7 @@
     "type": "blocks/hero",
     "name": "Hero",
     "description": "A hero section with headline, media, and CTAs.",
-    "version": 2,
+    "version": 3,
     "view": "blocks.hero",
     "variants": [
         { "key": "default", "label": "Default" },
@@ -33,20 +33,13 @@
             ],
             "help": "Split variant places the image on the right."
         },
-        { "key": "primary_cta.label", "label": "Primary CTA Label", "type": "text" },
-        { "key": "primary_cta.url", "label": "Primary CTA URL", "type": "text" },
         {
-            "key": "primary_cta.style",
-            "label": "Primary CTA Style",
-            "type": "select",
-            "options": [
-                { "value": "primary", "label": "Primary" },
-                { "value": "outline", "label": "Outline" },
-                { "value": "ghost", "label": "Ghost" }
-            ]
-        },
-        { "key": "secondary_cta.label", "label": "Secondary CTA Label", "type": "text" },
-        { "key": "secondary_cta.url", "label": "Secondary CTA URL", "type": "text" }
+            "key": "actions",
+            "label": "Actions",
+            "type": "textarea",
+            "rows": 4,
+            "help": "JSON array of {label,url,style} or one per line: Label | URL | Style."
+        }
     ],
     "defaults": {
         "eyebrow": "",
@@ -55,8 +48,10 @@
         "alignment": "left",
         "background_image": "",
         "image_position": "top",
-        "primary_cta": { "label": "Get started", "url": "#", "style": "primary" },
-        "secondary_cta": { "label": "", "url": "" }
+        "actions": [
+            { "label": "Get started", "url": "#", "style": "primary" },
+            { "label": "Learn more", "url": "#", "style": "outline" }
+        ]
     },
     "example": {
         "variant": "default",
@@ -67,8 +62,10 @@
             "alignment": "left",
             "background_image": "",
             "image_position": "top",
-            "primary_cta": { "label": "Get started", "url": "#", "style": "primary" },
-            "secondary_cta": { "label": "Learn more", "url": "#" }
+            "actions": [
+                { "label": "Get started", "url": "#", "style": "primary" },
+                { "label": "Learn more", "url": "#", "style": "outline" }
+            ]
         }
     }
 }

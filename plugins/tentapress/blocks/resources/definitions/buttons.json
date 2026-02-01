@@ -2,12 +2,12 @@
     "type": "blocks/buttons",
     "name": "Buttons Row",
     "description": "A row of buttons with styles.",
-    "version": 1,
+    "version": 2,
     "view": "blocks.buttons",
     "fields": [
         {
-            "key": "buttons",
-            "label": "Buttons",
+            "key": "actions",
+            "label": "Actions",
             "type": "textarea",
             "rows": 5,
             "help": "JSON array of {label,url,style} or one per line: Label | URL | Style."
@@ -34,13 +34,13 @@
         }
     ],
     "defaults": {
-        "buttons": "",
+        "actions": "",
         "alignment": "left",
         "size": "md"
     },
     "example": {
         "props": {
-            "buttons": "Get started | # | primary\nLearn more | # | outline",
+            "actions": "Get started | # | primary\nLearn more | # | outline",
             "alignment": "left",
             "size": "md"
         }

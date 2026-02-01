@@ -2,7 +2,7 @@
     "type": "blocks/cta",
     "name": "Call to Action",
     "description": "A callout section with title, body and buttons.",
-    "version": 2,
+    "version": 3,
     "view": "blocks.cta",
     "fields": [
         { "key": "title", "label": "Title", "type": "text" },
@@ -26,28 +26,23 @@
                 { "value": "none", "label": "None" }
             ]
         },
-        { "key": "button.label", "label": "Button Label", "type": "text" },
-        { "key": "button.url", "label": "Button URL", "type": "text" },
         {
-            "key": "button.style",
-            "label": "Button Style",
-            "type": "select",
-            "options": [
-                { "value": "primary", "label": "Primary" },
-                { "value": "outline", "label": "Outline" },
-                { "value": "ghost", "label": "Ghost" }
-            ]
-        },
-        { "key": "secondary_button.label", "label": "Secondary Button Label", "type": "text" },
-        { "key": "secondary_button.url", "label": "Secondary Button URL", "type": "text" }
+            "key": "actions",
+            "label": "Actions",
+            "type": "textarea",
+            "rows": 4,
+            "help": "JSON array of {label,url,style} or one per line: Label | URL | Style."
+        }
     ],
     "defaults": {
         "title": "Ready to go?",
         "body": "",
         "alignment": "left",
         "background": "white",
-        "button": { "label": "Contact us", "url": "#", "style": "primary" },
-        "secondary_button": { "label": "", "url": "" }
+        "actions": [
+            { "label": "Contact us", "url": "#", "style": "primary" },
+            { "label": "Browse docs", "url": "#", "style": "outline" }
+        ]
     },
     "example": {
         "props": {
@@ -55,8 +50,10 @@
             "body": "Add a CTA to drive action.",
             "alignment": "left",
             "background": "white",
-            "button": { "label": "Contact us", "url": "#", "style": "primary" },
-            "secondary_button": { "label": "Browse docs", "url": "#" }
+            "actions": [
+                { "label": "Contact us", "url": "#", "style": "primary" },
+                { "label": "Browse docs", "url": "#", "style": "outline" }
+            ]
         }
     }
 }

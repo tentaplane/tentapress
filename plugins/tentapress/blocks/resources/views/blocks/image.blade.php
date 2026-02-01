@@ -2,7 +2,8 @@
     $image = trim((string) ($props['image'] ?? ''));
     $alt = trim((string) ($props['alt'] ?? ''));
     $caption = trim((string) ($props['caption'] ?? ''));
-    $linkUrl = trim((string) ($props['link_url'] ?? ''));
+    $link = is_array($props['link'] ?? null) ? $props['link'] : [];
+    $linkUrl = trim((string) ($link['url'] ?? ''));
     $alignment = (string) ($props['alignment'] ?? 'center');
     $width = (string) ($props['width'] ?? 'normal');
     $rounded = filter_var($props['rounded'] ?? true, FILTER_VALIDATE_BOOL);

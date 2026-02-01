@@ -40,6 +40,10 @@ final readonly class BlocksNormalizer
             // Strip UI-only keys nested in props just in case
             unset($props['_collapsed'], $props['_key']);
 
+            if (array_key_exists('actions', $props) && is_string($props['actions'])) {
+                $props['actions'] = $this->parseActions($props['actions']);
+            }
+
             $def = $this->registry->get($type);
 
             $version = 1;
@@ -67,6 +71,41 @@ final readonly class BlocksNormalizer
         }
 
         return $out;
+    }
+
+    /**
+     * @return array<int,array<string,mixed>>
+     */
+    private function parseActions(string $raw): array
+    {
+        $trim = trim($raw);
+        if ($trim === '') {
+            return [];
+        }
+
+        $decoded = json_decode($trim, true);
+        if (is_array($decoded)) {
+            return array_values(array_filter($decoded, static fn ($item): bool => is_array($item)));
+        }
+
+        $lines = preg_split('/\r?\n/', $trim) ?: [];
+        $actions = [];
+
+        foreach ($lines as $line) {
+            $line = trim($line);
+            if ($line === '') {
+                continue;
+            }
+
+            $parts = array_map('trim', explode('|', $line));
+            $actions[] = [
+                'label' => $parts[0] ?? $line,
+                'url' => $parts[1] ?? '',
+                'style' => $parts[2] ?? 'primary',
+            ];
+        }
+
+        return $actions;
     }
 
     /**

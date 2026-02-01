@@ -1,9 +1,39 @@
 @php
     $title = (string) ($props['title'] ?? '');
     $body = (string) ($props['body'] ?? '');
-    $action = (string) ($props['action_url'] ?? '');
     $placeholder = (string) ($props['email_placeholder'] ?? 'you@example.com');
-    $buttonLabel = (string) ($props['button_label'] ?? 'Subscribe');
+    $rawActions = $props['actions'] ?? [];
+    if (is_string($rawActions)) {
+        $trim = trim($rawActions);
+        $decoded = $trim !== '' ? json_decode($trim, true) : null;
+        if (is_array($decoded)) {
+            $actions = $decoded;
+        } else {
+            $lines = preg_split('/\r?\n/', $trim) ?: [];
+            $actions = [];
+            foreach ($lines as $line) {
+                $line = trim($line);
+                if ($line === '') {
+                    continue;
+                }
+                $parts = array_map('trim', explode('|', $line));
+                $actions[] = [
+                    'label' => $parts[0] ?? $line,
+                    'url' => $parts[1] ?? '',
+                    'style' => $parts[2] ?? 'primary',
+                ];
+            }
+        }
+    } elseif (is_array($rawActions)) {
+        $actions = $rawActions;
+    } else {
+        $actions = [];
+    }
+
+    $actions = array_values(array_filter($actions, static fn ($item) => is_array($item) && ($item['label'] ?? '') !== ''));
+    $primary = $actions[0] ?? [];
+    $action = (string) ($primary['url'] ?? '');
+    $buttonLabel = (string) ($primary['label'] ?? 'Subscribe');
     $disclaimer = (string) ($props['disclaimer'] ?? '');
     $alignment = (string) ($props['alignment'] ?? 'left');
 

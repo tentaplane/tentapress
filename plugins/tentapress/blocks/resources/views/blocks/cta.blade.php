@@ -3,11 +3,42 @@
     $body = (string) ($props['body'] ?? '');
     $alignment = (string) ($props['alignment'] ?? 'left');
     $background = (string) ($props['background'] ?? 'white');
-    $btn = is_array($props['button'] ?? null) ? $props['button'] : [];
-    $btnLabel = (string) ($btn['label'] ?? '');
-    $btnUrl = (string) ($btn['url'] ?? '');
-    $btnStyle = (string) ($btn['style'] ?? 'primary');
-    $secondary = is_array($props['secondary_button'] ?? null) ? $props['secondary_button'] : [];
+    $rawActions = $props['actions'] ?? [];
+    if (is_string($rawActions)) {
+        $trim = trim($rawActions);
+        $decoded = $trim !== '' ? json_decode($trim, true) : null;
+        if (is_array($decoded)) {
+            $actions = $decoded;
+        } else {
+            $lines = preg_split('/\r?\n/', $trim) ?: [];
+            $actions = [];
+            foreach ($lines as $line) {
+                $line = trim($line);
+                if ($line === '') {
+                    continue;
+                }
+                $parts = array_map('trim', explode('|', $line));
+                $actions[] = [
+                    'label' => $parts[0] ?? $line,
+                    'url' => $parts[1] ?? '',
+                    'style' => $parts[2] ?? 'primary',
+                ];
+            }
+        }
+    } elseif (is_array($rawActions)) {
+        $actions = $rawActions;
+    } else {
+        $actions = [];
+    }
+
+    $actions = array_values(array_filter($actions, static fn ($item) => is_array($item) && ($item['label'] ?? '') !== ''));
+
+    $primary = $actions[0] ?? [];
+    $secondary = $actions[1] ?? [];
+
+    $btnLabel = (string) ($primary['label'] ?? '');
+    $btnUrl = (string) ($primary['url'] ?? '');
+    $btnStyle = (string) ($primary['style'] ?? 'primary');
     $secondaryLabel = (string) ($secondary['label'] ?? '');
     $secondaryUrl = (string) ($secondary['url'] ?? '');
 

@@ -393,14 +393,17 @@ if ($themeChoice !== 'none') {
                     'subheadline' => 'A modern block editor with a clean admin and a fast publishing workflow.',
                     'alignment' => 'left',
                     'image_position' => 'right',
-                    'primary_cta' => [
-                        'label' => 'Admin logo',
-                        'url' => '/admin',
-                        'style' => 'primary',
-                    ],
-                    'secondary_cta' => [
-                        'label' => 'View docs',
-                        'url' => 'https://tentapress.com/docs',
+                    'actions' => [
+                        [
+                            'label' => 'Admin logo',
+                            'url' => '/admin',
+                            'style' => 'primary',
+                        ],
+                        [
+                            'label' => 'View docs',
+                            'url' => 'https://tentapress.com/docs',
+                            'style' => 'outline',
+                        ],
                     ],
                 ],
             ],
@@ -451,14 +454,17 @@ if ($themeChoice !== 'none') {
                     'body' => 'Start with a polished theme and refine your blocks as you grow.',
                     'alignment' => 'left',
                     'background' => 'muted',
-                    'button' => [
-                        'label' => 'Admin logo',
-                        'url' => '/admin',
-                        'style' => 'primary',
-                    ],
-                    'secondary_button' => [
-                        'label' => 'View docs',
-                        'url' => 'https://tentapress.com/docs',
+                    'actions' => [
+                        [
+                            'label' => 'Admin logo',
+                            'url' => '/admin',
+                            'style' => 'primary',
+                        ],
+                        [
+                            'label' => 'View docs',
+                            'url' => 'https://tentapress.com/docs',
+                            'style' => 'outline',
+                        ],
                     ],
                 ],
             ],
