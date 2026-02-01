@@ -198,7 +198,10 @@
                                 <label class="tp-label">Blocks</label>
 
                                 <div
-                                    class="{{ $editorMode ? 'space-y-6 rounded-2xl border border-slate-200 bg-slate-50/60 p-6 shadow-sm' : 'tp-panel space-y-4' }}">
+                                    class="{{ $editorMode ? 'grid gap-6 lg:grid-cols-[minmax(0,1fr)_280px]' : '' }}">
+                                    <div class="{{ $editorMode ? 'space-y-4' : '' }}">
+                                        <div
+                                            class="{{ $editorMode ? 'space-y-6 rounded-2xl border border-slate-200 bg-slate-50/60 p-6 shadow-sm' : 'tp-panel space-y-4' }}">
                                     <div
                                         class="flex flex-col items-center justify-between gap-2 sm:flex-row sm:items-center">
                                         <div class="flex flex-wrap items-center gap-2">
@@ -262,7 +265,11 @@
                                                     :class="{
                                                     'opacity-60': dragIndex === index,
                                                     'ring-2 ring-black/10': dragOverIndex === index && dragIndex !== index,
+                                                    'outline outline-2 outline-slate-300': selectedIndex === index,
                                                 }"
+                                                    @if ($editorMode)
+                                                        @click="selectBlock(index)"
+                                                    @endif
                                                     @dragover.prevent="dragOver(index)"
                                                     @dragleave="dragLeave(index)"
                                                     @drop="dropOn(index)">
@@ -836,7 +843,109 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        </div>
                                     </div>
+                                    @if ($editorMode)
+                                        <aside class="space-y-4">
+                                            <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+                                                <div
+                                                    class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+                                                    Block details
+                                                </div>
+                                                <template x-if="selectedBlock()">
+                                                    <div class="mt-4 space-y-3">
+                                                        <div>
+                                                            <div
+                                                                class="text-sm font-semibold"
+                                                                x-text="titleFor(selectedBlock().type)"></div>
+                                                            <div
+                                                                class="mt-1 flex flex-wrap items-center gap-2 text-[11px] text-slate-500">
+                                                                <span
+                                                                    class="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 font-semibold uppercase tracking-[0.12em]"
+                                                                    x-text="selectedBlock().type"></span>
+                                                                <template x-if="selectedBlock().version">
+                                                                    <span
+                                                                        class="rounded-full border border-slate-200 bg-slate-100 px-2 py-0.5 font-semibold uppercase tracking-[0.12em]"
+                                                                        x-text="'v' + selectedBlock().version"></span>
+                                                                </template>
+                                                                <template x-if="selectedBlock().variant">
+                                                                    <span
+                                                                        class="rounded-full border border-slate-200 bg-slate-100 px-2 py-0.5 font-semibold uppercase tracking-[0.12em]"
+                                                                        x-text="selectedBlock().variant"></span>
+                                                                </template>
+                                                            </div>
+                                                        </div>
+                                                        <div
+                                                            class="text-xs text-slate-500"
+                                                            x-text="summaryFor(selectedBlock(), selectedIndex)"></div>
+                                                        <div class="flex flex-wrap items-center gap-2">
+                                                            <button
+                                                                type="button"
+                                                                class="tp-button-secondary"
+                                                                @click="toggleCollapse(selectedIndex)">
+                                                                <span
+                                                                    x-text="selectedBlock()._collapsed ? 'Expand' : 'Collapse'"></span>
+                                                            </button>
+                                                            <button
+                                                                type="button"
+                                                                class="tp-button-secondary"
+                                                                @click="duplicateBlock(selectedIndex)">
+                                                                Duplicate
+                                                            </button>
+                                                            <button
+                                                                type="button"
+                                                                class="tp-button-secondary"
+                                                                @click="insertIndex = selectedIndex; insertType = ''">
+                                                                Insert after
+                                                            </button>
+                                                            <button
+                                                                type="button"
+                                                                class="tp-button-link text-red-600 hover:text-red-700"
+                                                                @click="remove(selectedIndex)">
+                                                                Delete
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </template>
+                                                <template x-if="!selectedBlock()">
+                                                    <div class="mt-4 text-sm text-slate-500">
+                                                        Select a block to see details and quick actions.
+                                                    </div>
+                                                </template>
+                                            </div>
+                                            <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+                                                <div
+                                                    class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+                                                    Page outline
+                                                </div>
+                                                <div class="mt-4 space-y-2" x-show="blocks.length > 0">
+                                                    <template
+                                                        x-for="(block, index) in blocks"
+                                                        :key="block._key + '_outline'">
+                                                        <button
+                                                            type="button"
+                                                            class="flex w-full items-center gap-2 rounded-lg border px-3 py-2 text-left text-xs transition"
+                                                            :class="
+                                                            selectedIndex === index
+                                                                ? 'border-slate-300 bg-slate-100 text-slate-900'
+                                                                : 'border-transparent text-slate-500 hover:border-slate-200 hover:bg-white'
+                                                        "
+                                                            @click="selectBlock(index)">
+                                                            <span
+                                                                class="text-[10px] font-semibold uppercase text-slate-400"
+                                                                x-text="index + 1"></span>
+                                                            <span
+                                                                class="min-w-0 flex-1 truncate font-semibold"
+                                                                x-text="titleFor(block.type)"></span>
+                                                        </button>
+                                                    </template>
+                                                </div>
+                                                <div class="mt-4 text-sm text-slate-500" x-show="blocks.length === 0">
+                                                    No blocks yet.
+                                                </div>
+                                            </div>
+                                        </aside>
+                                    @endif
                                 </div>
 
                                 <script>
@@ -849,6 +958,7 @@
                                             addType: '',
                                             insertIndex: null,
                                             insertType: '',
+                                            selectedIndex: null,
                                             blocks: [],
                                             dragIndex: null,
                                             dragOverIndex: null,
@@ -871,6 +981,7 @@
                                                 const parsed = this.safeParseBlocks(this.advancedJson);
                                                 this.blocks = parsed.blocks.map((b) => this.decorateBlock(b));
                                                 this.jsonInvalid = !parsed.ok;
+                                                this.selectedIndex = this.blocks.length ? 0 : null;
 
                                                 this.sync();
 
@@ -982,6 +1093,13 @@
                                                 }
 
                                                 return parts.length ? parts.join(' | ') : '';
+                                            },
+
+                                            selectedBlock() {
+                                                if (!Number.isFinite(this.selectedIndex)) {
+                                                    return null;
+                                                }
+                                                return this.blocks[this.selectedIndex] || null;
                                             },
 
                                             fieldsFor(type) {
@@ -1253,11 +1371,18 @@
                                                 this.addType = '';
                                                 this.insertIndex = null;
                                                 this.insertType = '';
+                                                this.selectedIndex = this.blocks.length - 1;
                                             },
 
                                             addBlockType(type) {
                                                 this.addType = type;
                                                 this.addBlock();
+                                            },
+
+                                            selectBlock(index) {
+                                                if (!Number.isFinite(index)) return;
+                                                if (index < 0 || index >= this.blocks.length) return;
+                                                this.selectedIndex = index;
                                             },
 
                                             insertBlock(afterIndex) {
@@ -1277,6 +1402,7 @@
 
                                                 this.insertIndex = null;
                                                 this.insertType = '';
+                                                this.selectedIndex = clampedIndex;
                                             },
 
                                             duplicateBlock(index) {
@@ -1298,6 +1424,7 @@
                                                 if (!copy.props || typeof copy.props !== 'object') copy.props = {};
 
                                                 this.blocks.splice(index + 1, 0, this.decorateBlock(copy));
+                                                this.selectedIndex = index + 1;
                                             },
 
                                             toggleCollapse(index) {
@@ -1312,10 +1439,19 @@
                                                 const tmp = this.blocks[index];
                                                 this.blocks[index] = this.blocks[next];
                                                 this.blocks[next] = tmp;
+
+                                                if (this.selectedIndex === index) {
+                                                    this.selectedIndex = next;
+                                                } else if (this.selectedIndex === next) {
+                                                    this.selectedIndex = index;
+                                                }
                                             },
 
                                             dragStart(index, event) {
                                                 this.dragIndex = index;
+                                                if (Number.isFinite(index)) {
+                                                    this.selectedIndex = index;
+                                                }
                                                 if (event && event.dataTransfer) {
                                                     event.dataTransfer.effectAllowed = 'move';
                                                     event.dataTransfer.setData('text/plain', 'move');
@@ -1365,10 +1501,38 @@
                                                 if (index === target) return;
                                                 const item = this.blocks.splice(index, 1)[0];
                                                 this.blocks.splice(target, 0, item);
+
+                                                if (!Number.isFinite(this.selectedIndex)) {
+                                                    return;
+                                                }
+                                                if (this.selectedIndex === index) {
+                                                    this.selectedIndex = target;
+                                                    return;
+                                                }
+                                                if (index < target && this.selectedIndex > index && this.selectedIndex <= target) {
+                                                    this.selectedIndex -= 1;
+                                                    return;
+                                                }
+                                                if (index > target && this.selectedIndex < index && this.selectedIndex >= target) {
+                                                    this.selectedIndex += 1;
+                                                }
                                             },
 
                                             remove(index) {
                                                 this.blocks.splice(index, 1);
+
+                                                if (!Number.isFinite(this.selectedIndex)) {
+                                                    this.selectedIndex = this.blocks.length ? 0 : null;
+                                                    return;
+                                                }
+
+                                                if (this.selectedIndex === index) {
+                                                    this.selectedIndex = this.blocks.length
+                                                        ? Math.min(index, this.blocks.length - 1)
+                                                        : null;
+                                                } else if (this.selectedIndex > index) {
+                                                    this.selectedIndex -= 1;
+                                                }
                                             },
 
                                             expandAll() {
@@ -1505,6 +1669,14 @@
                                                 if (!parsed.ok) return;
 
                                                 this.blocks = parsed.blocks.map((b) => this.decorateBlock(b));
+                                                if (!this.blocks.length) {
+                                                    this.selectedIndex = null;
+                                                } else if (
+                                                    !Number.isFinite(this.selectedIndex) ||
+                                                    this.selectedIndex >= this.blocks.length
+                                                ) {
+                                                    this.selectedIndex = 0;
+                                                }
                                                 this.sync();
                                             },
                                         }));

@@ -26,7 +26,8 @@ first milestone.
   - 2026-02-01: Added full‑screen editor route and layout toggle for pages.
   - 2026-02-01: Styled full‑screen blocks list with card‑style rows and a cleaner editor toolbar.
   - 2026-02-01: Added inline block inserter controls and clearer block summaries in full‑screen mode.
-  - Next: Add a Notion‑style right‑side settings panel and a compact page outline view.
+  - 2026-02-01: Added a right‑side block details panel and page outline for quick navigation.
+  - Next: Refine inline editing focus (Notion‑style quick insert) and add keyboard shortcuts.
 
 2) Build a snazzy Tailwind base theme showcasing TentaPress
 
