@@ -4,6 +4,25 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.6.0](https://github.com/tentaplane/tentapress/compare/v0.5.1...v0.6.0) (2026-02-01)
+
+
+### Features
+
+* **setup:** guard theme assets and offer build ([2e3c28e](https://github.com/tentaplane/tentapress/commit/2e3c28e27f3024ac90e7c7b6ff818bbdb9799fac))
+* **setup:** prompt for asset build tool ([d844924](https://github.com/tentaplane/tentapress/commit/d844924d69d65d276e8a1726cf8f72e7e0e6ca38))
+
+
+### Bug Fixes
+
+* **setup:** resolve installed theme paths ([3f2ad60](https://github.com/tentaplane/tentapress/commit/3f2ad601100cca4e8861826a195137fada307eb4))
+* **themes:** support vendor namespaces and copy ([8ca2318](https://github.com/tentaplane/tentapress/commit/8ca2318eb642c962a137773636a28471cca80b4c))
+
+
+### Miscellaneous Chores
+
+* **setup:** add next-step guidance ([66929a8](https://github.com/tentaplane/tentapress/commit/66929a8dc8f41992fab9ce38056c50b58353e666))
+
 ## [0.5.1](https://github.com/tentaplane/tentapress/compare/v0.5.0...v0.5.1) (2026-02-01)
 
 
