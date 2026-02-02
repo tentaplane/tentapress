@@ -4,6 +4,11 @@
     $editorMode = (bool) ($editorMode ?? false);
 @endphp
 
+@if ($editorMode)
+    @section('shell_fullscreen', '1')
+    @section('body_class', 'bg-slate-100')
+@endif
+
 @section('title', $editorMode ? 'Blocks Editor' : ($mode === 'create' ? 'Add New Page' : 'Edit Page'))
 
 @section('content')
@@ -843,10 +848,11 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        </div>
                                     </div>
-                                    @if ($editorMode)
-                                        <aside class="space-y-4">
+                                </div>
+                            </div>
+                        @if ($editorMode)
+                            <aside class="space-y-4">
                                             <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
                                                 <div
                                                     class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
@@ -944,9 +950,9 @@
                                                     No blocks yet.
                                                 </div>
                                             </div>
-                                        </aside>
-                                    @endif
-                                </div>
+                            </aside>
+                        @endif
+                    </div>
 
                                 <script>
                                     document.addEventListener('alpine:init', () => {
