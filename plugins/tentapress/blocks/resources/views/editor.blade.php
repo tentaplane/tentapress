@@ -7,6 +7,29 @@
     $initialBlocksJson = old('blocks_json', $blocksJson);
     $initialBlocksJson = is_string($initialBlocksJson) ? $initialBlocksJson : '[]';
     $editorTitle = is_string($editorTitle ?? null) ? (string) $editorTitle : 'Blocks';
+
+    usort($blockDefinitions, static function (array $a, array $b): int {
+        $aType = is_string($a['type'] ?? null) ? (string) $a['type'] : '';
+        $bType = is_string($b['type'] ?? null) ? (string) $b['type'] : '';
+        $aFirstParty = $aType !== '' && str_starts_with($aType, 'blocks/');
+        $bFirstParty = $bType !== '' && str_starts_with($bType, 'blocks/');
+
+        if ($aFirstParty !== $bFirstParty) {
+            return $aFirstParty ? -1 : 1;
+        }
+
+        $aName = is_string($a['name'] ?? null) ? trim((string) $a['name']) : '';
+        $bName = is_string($b['name'] ?? null) ? trim((string) $b['name']) : '';
+        $aKey = $aName !== '' ? $aName : $aType;
+        $bKey = $bName !== '' ? $bName : $bType;
+        $cmp = strcasecmp($aKey, $bKey);
+
+        if ($cmp !== 0) {
+            return $cmp;
+        }
+
+        return strcasecmp($aType, $bType);
+    });
 @endphp
 
 
