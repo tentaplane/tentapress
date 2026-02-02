@@ -261,6 +261,7 @@
 
                                             <div
                                                 class="space-y-3"
+                                                x-ref="blocksList"
                                                 @dragover.prevent.self="dragOverEnd()"
                                                 @dragleave.self="dragLeaveEnd($event)"
                                                 @drop.self="dropOnEnd($event)">
@@ -1539,6 +1540,14 @@
 
                                             dragLeave(index, event) {
                                                 if (
+                                                    this.$refs.blocksList &&
+                                                    event &&
+                                                    event.relatedTarget &&
+                                                    this.$refs.blocksList.contains(event.relatedTarget)
+                                                ) {
+                                                    return;
+                                                }
+                                                if (
                                                     event &&
                                                     event.currentTarget &&
                                                     event.relatedTarget &&
@@ -1552,6 +1561,14 @@
                                             },
 
                                             dragLeaveEnd(event) {
+                                                if (
+                                                    this.$refs.blocksList &&
+                                                    event &&
+                                                    event.relatedTarget &&
+                                                    this.$refs.blocksList.contains(event.relatedTarget)
+                                                ) {
+                                                    return;
+                                                }
                                                 if (
                                                     event &&
                                                     event.currentTarget &&
