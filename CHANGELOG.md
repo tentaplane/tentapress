@@ -4,6 +4,41 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.10.0](https://github.com/tentaplane/tentapress/compare/v0.9.1...v0.10.0) (2026-02-02)
+
+
+### Features
+
+* **editor:** add posts full-screen mode ([3463493](https://github.com/tentaplane/tentapress/commit/346349344d2a4e543ea34e893a92e526c61c2c3c))
+* **editor:** style full-screen blocks ([965b97d](https://github.com/tentaplane/tentapress/commit/965b97d5e855b868ee6114af3f3c10b06151eacd))
+* **pages:** add draggable block palette ([ad9664f](https://github.com/tentaplane/tentapress/commit/ad9664f44a527622c3578a77f6b6ed36fe17ae4f))
+* **pages:** add editor sidebar outline ([64e0f34](https://github.com/tentaplane/tentapress/commit/64e0f343326768eb25eb330cd16363e6dd40c042))
+* **pages:** add full-screen blocks editor ([6f1013c](https://github.com/tentaplane/tentapress/commit/6f1013cdbb801d21989605efe7f2296d5d464411))
+* **pages:** enable true fullscreen editor ([e1ec142](https://github.com/tentaplane/tentapress/commit/e1ec1427fa717877f4d0bafda0536e73f0069a04))
+* **pages:** polish full-screen blocks editor ([6dedf8b](https://github.com/tentaplane/tentapress/commit/6dedf8bf6d07a8c8455321ea50b305338793d968))
+* **pages:** show drop markers while dragging ([93189e2](https://github.com/tentaplane/tentapress/commit/93189e22161f8b20c3e353ed4a22079555af76a5))
+* **plugin:** add acme events schedule block ([51820ac](https://github.com/tentaplane/tentapress/commit/51820ac53a5e8dfe77f53e51c3fee749a712eaa2))
+
+
+### Bug Fixes
+
+* **pages:** improve palette drag affordance ([b560036](https://github.com/tentaplane/tentapress/commit/b560036a13bac64bdcd40fdabbae47181646ba2b))
+* **pages:** reduce drop marker jitter ([85ddf9f](https://github.com/tentaplane/tentapress/commit/85ddf9f3407b4a226c9d1bb261798c90676dd32e))
+* **pages:** refine fullscreen gutters ([24e340d](https://github.com/tentaplane/tentapress/commit/24e340de72897708cf4e9a13aaf6a2c5d98e14e0))
+* **pages:** restore dropzones and end marker ([ad3637e](https://github.com/tentaplane/tentapress/commit/ad3637ecbf33ac162fa253453b7419b3bd683ab8))
+* **pages:** smooth drop marker behavior ([72b60ca](https://github.com/tentaplane/tentapress/commit/72b60ca55f0fa635aec38f8ce538ddb10294d288))
+* **pages:** stabilize drop marker ([71ad2f6](https://github.com/tentaplane/tentapress/commit/71ad2f6d2b5b10f31bf890c512f7f224d405634d))
+* **pages:** stack sticky block palette ([08454e0](https://github.com/tentaplane/tentapress/commit/08454e0b551ab52e4fad6139348bf8ff0b442db5))
+* **pages:** steady dropzone hover ([c285d19](https://github.com/tentaplane/tentapress/commit/c285d19a61912e7d2f701d3c8898f73a5a6341d7))
+* **pages:** tighten fullscreen editor spacing ([438030f](https://github.com/tentaplane/tentapress/commit/438030fb1a34d1cd8713c27c0891f2cc79f4f3e4))
+* **setup:** unintentional commit of test plugin ([b826847](https://github.com/tentaplane/tentapress/commit/b8268477194a20ee661d5d5cd04957cb62840ad2))
+
+
+### Miscellaneous Chores
+
+* **composer:** require acme events schedule ([536e721](https://github.com/tentaplane/tentapress/commit/536e72162f7c87acb7eb6d5d239249e49675238f))
+* **config:** allow acme plugin discovery ([1a8c081](https://github.com/tentaplane/tentapress/commit/1a8c0813c93e5581794b9d3bd692f976226c96e8))
+
 ## [0.9.1](https://github.com/tentaplane/tentapress/compare/v0.9.0...v0.9.1) (2026-02-01)
 
 
