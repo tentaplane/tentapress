@@ -4,6 +4,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "acme/events-schedule": "^0.1",
         "laravel/framework": "^12.0",
         "laravel/tinker": "^2.10.1",
         "tentapress/admin-shell": "<1.0",
