@@ -1,19 +1,52 @@
 # Posts
 
-Create and manage blog posts.
+Blog post management for TentaPress.
 
-## Plugin details
+## Plugin Details
 
-- ID: `tentapress/posts`
-- Version: `0.1.3`
-- Service provider: `TentaPress\Posts\PostsServiceProvider`
+| Field | Value |
+|-------|-------|
+| ID | `tentapress/posts` |
+| Version | 0.1.3 |
+| Provider | `TentaPress\Posts\PostsServiceProvider` |
 
-## Requirements
+## Features
+
+- Create, edit, and delete blog posts
+- Draft, scheduled, and published states
+- Author assignment
+- Featured image
+- Block-based content editor
+- Full-screen editing mode
+- SEO fields integration
+
+## Dependencies
 
 - `tentapress/users`
 - `tentapress/blocks`
 
+## Database
+
+| Table | Purpose |
+|-------|---------|
+| `tp_posts` | Post records |
+
+## Admin Menu
+
+| Label | Route | Capability | Icon | Position |
+|-------|-------|------------|------|----------|
+| Posts | `tp.posts.index` | `manage_posts` | file-text | 30 |
+
+## Public Routes
+
+| Route | Description |
+|-------|-------------|
+| `/blog` | Blog index |
+| `/blog/{slug}` | Single post |
+
 ## Development
 
-- Sync plugins: `php artisan tp:plugins sync`
-- Enable plugin: `php artisan tp:plugins enable tentapress/posts`
+```bash
+php artisan tp:plugins sync
+php artisan tp:plugins enable tentapress/posts
+```

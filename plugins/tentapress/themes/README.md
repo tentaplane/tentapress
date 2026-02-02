@@ -1,18 +1,35 @@
 # Themes
 
-Admin UI for managing themes.
+Theme management UI for TentaPress.
 
-## Plugin details
+## Plugin Details
 
-- ID: `tentapress/themes`
-- Version: `0.1.3`
-- Service provider: `TentaPress\Themes\ThemesServiceProvider`
+| Field | Value |
+|-------|-------|
+| ID | `tentapress/themes` |
+| Version | 0.1.3 |
+| Provider | `TentaPress\Themes\ThemesServiceProvider` |
 
-## Requirements
+## Features
+
+- List available themes
+- Activate/deactivate themes
+- View theme details (layouts, menu locations)
+- Theme screenshots
+
+## Dependencies
 
 None.
 
+## Admin Menu
+
+| Label | Route | Capability | Icon | Position | Parent |
+|-------|-------|------------|------|----------|--------|
+| Themes | `tp.themes.index` | `manage_themes` | paintbrush | 50 | Settings |
+
 ## Development
 
-- Sync plugins: `php artisan tp:plugins sync`
-- Enable plugin: `php artisan tp:plugins enable tentapress/themes`
+```bash
+php artisan tp:plugins sync
+php artisan tp:plugins enable tentapress/themes
+```

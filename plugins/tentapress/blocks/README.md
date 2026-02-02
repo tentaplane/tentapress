@@ -1,18 +1,50 @@
 # Blocks
 
-Block registry and rendering for TentaPress pages.
+Block registry and rendering system for TentaPress pages and posts.
 
-## Plugin details
+## Plugin Details
 
-- ID: `tentapress/blocks`
-- Version: `0.2.1`
-- Service provider: `TentaPress\Blocks\BlocksServiceProvider`
+| Field | Value |
+|-------|-------|
+| ID | `tentapress/blocks` |
+| Version | 0.2.2 |
+| Provider | `TentaPress\Blocks\BlocksServiceProvider` |
 
-## Requirements
+## Features
+
+- Block registry (type → schema + renderer)
+- Block validation on save
+- Full-screen block editor
+- Block list view with inline editing
+- Right-side details panel
+- Block inserter controls
+- Page outline navigation
+- Field types: text, textarea, richtext, select, image, repeater, link, actions
+
+## Dependencies
 
 None.
 
+## Available Blocks
+
+- Hero
+- Heading
+- Rich Text
+- Image
+- Gallery
+- CTA / Button group
+- Columns
+- FAQ (repeater)
+- Embed
+- Divider / Spacer
+
+## Extending
+
+Themes and plugins can register additional blocks via the block registry.
+
 ## Development
 
-- Sync plugins: `php artisan tp:plugins sync`
-- Enable plugin: `php artisan tp:plugins enable tentapress/blocks`
+```bash
+php artisan tp:plugins sync
+php artisan tp:plugins enable tentapress/blocks
+```

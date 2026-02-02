@@ -1,18 +1,35 @@
 # Import
 
-TentaPress plugin.
+Content import functionality for TentaPress.
 
-## Plugin details
+## Plugin Details
 
-- ID: `tentapress/import`
-- Version: `0.1.2`
-- Service provider: `TentaPress\Import\ImportServiceProvider`
+| Field | Value |
+|-------|-------|
+| ID | `tentapress/import` |
+| Version | 0.1.2 |
+| Provider | `TentaPress\Import\ImportServiceProvider` |
 
-## Requirements
+## Features
+
+- Import site content from JSON export
+- Handles pages, posts, media references, settings
+
+## Dependencies
 
 None.
 
+## Admin Menu
+
+| Label | Route | Capability | Parent |
+|-------|-------|------------|--------|
+| Import | `tp.import.index` | `import_site` | Settings |
+
 ## Development
 
-- Sync plugins: `php artisan tp:plugins sync`
-- Enable plugin: `php artisan tp:plugins enable tentapress/import`
+```bash
+php artisan tp:plugins sync
+php artisan tp:plugins enable tentapress/import
+```
+
+**Note:** This is an optional plugin. Not enabled by default.

@@ -1,18 +1,40 @@
 # Settings
 
-TentaPress plugin.
+Site settings management for TentaPress.
 
-## Plugin details
+## Plugin Details
 
-- ID: `tentapress/settings`
-- Version: `0.1.2`
-- Service provider: `TentaPress\Settings\SettingsServiceProvider`
+| Field | Value |
+|-------|-------|
+| ID | `tentapress/settings` |
+| Version | 0.1.2 |
+| Provider | `TentaPress\Settings\SettingsServiceProvider` |
 
-## Requirements
+## Features
+
+- Site name and tagline
+- Homepage and blog page settings
+- General site configuration
+
+## Dependencies
 
 None.
 
+## Database
+
+| Table | Purpose |
+|-------|---------|
+| `tp_settings` | Key-value settings storage |
+
+## Admin Menu
+
+| Label | Route | Capability | Position |
+|-------|-------|------------|----------|
+| Settings | `tp.settings.index` | `manage_settings` | 90 |
+
 ## Development
 
-- Sync plugins: `php artisan tp:plugins sync`
-- Enable plugin: `php artisan tp:plugins enable tentapress/settings`
+```bash
+php artisan tp:plugins sync
+php artisan tp:plugins enable tentapress/settings
+```

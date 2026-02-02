@@ -1,18 +1,37 @@
 # System Info
 
-Diagnostics and environment information for TentaPress.
+Diagnostics and plugin management for TentaPress.
 
-## Plugin details
+## Plugin Details
 
-- ID: `tentapress/system-info`
-- Version: `0.1.3`
-- Service provider: `TentaPress\SystemInfo\SystemInfoServiceProvider`
+| Field | Value |
+|-------|-------|
+| ID | `tentapress/system-info` |
+| Version | 0.1.3 |
+| Provider | `TentaPress\SystemInfo\SystemInfoServiceProvider` |
 
-## Requirements
+## Features
+
+- Environment information (PHP, Laravel, app versions)
+- Database driver and status
+- Storage status
+- Cache status
+- Plugin list with enable/disable controls
+
+## Dependencies
 
 None.
 
+## Admin Menu
+
+| Label | Route | Capability | Icon | Position | Parent |
+|-------|-------|------------|------|----------|--------|
+| System Info | `tp.system-info` | `view_system_info` | info | 95 | - |
+| Plugins | `tp.plugins.index` | `manage_plugins` | plug | 40 | Settings |
+
 ## Development
 
-- Sync plugins: `php artisan tp:plugins sync`
-- Enable plugin: `php artisan tp:plugins enable tentapress/system-info`
+```bash
+php artisan tp:plugins sync
+php artisan tp:plugins enable tentapress/system-info
+```

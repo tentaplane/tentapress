@@ -18,6 +18,58 @@ or
 This runs the full setup flow (composer install, migrations, plugins sync) and then prompts you to create your first
 super admin user.
 
+## Console Commands
+
+TentaPress provides several Artisan commands for managing your installation.
+
+### Plugin Management
+
+```bash
+php artisan tp:plugins sync              # Discover plugins and rebuild cache
+php artisan tp:plugins list              # List all plugins with status
+php artisan tp:plugins enable <id>       # Enable a plugin (e.g., tentapress/export)
+php artisan tp:plugins disable <id>      # Disable a plugin
+php artisan tp:plugins enable --all      # Enable all discovered plugins
+php artisan tp:plugins defaults          # Enable default plugins from config
+php artisan tp:plugins cache             # Rebuild plugin cache
+php artisan tp:plugins clear-cache       # Clear plugin cache
+```
+
+### Theme Management
+
+```bash
+php artisan tp:themes sync               # Discover themes and rebuild cache
+php artisan tp:themes list               # List all themes with status
+php artisan tp:themes activate <id>      # Activate a theme (e.g., tentapress/tailwind)
+php artisan tp:themes cache              # Rebuild theme cache
+php artisan tp:themes clear-cache        # Clear theme cache
+```
+
+### User Management
+
+```bash
+php artisan tp:users:make-admin          # Create an admin user interactively
+php artisan tp:permissions seed          # Seed default roles and capabilities
+```
+
+### Content Management
+
+```bash
+php artisan tp:posts                     # Publish scheduled posts whose date has passed
+```
+
+### Development
+
+```bash
+composer dev                             # Run PHP server + queue + logs + Vite
+bun run dev                              # Vite dev server only
+bun run build                            # Build frontend assets
+./vendor/bin/pint                        # Format PHP code
+./vendor/bin/pint --dirty                # Format only changed files
+```
+
+---
+
 ## Distribution notes
 
 Release source archives intentionally exclude development-only paths (plugins, themes, docs, vendor, node_modules, etc.)
