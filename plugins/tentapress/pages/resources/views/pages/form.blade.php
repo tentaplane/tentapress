@@ -78,8 +78,8 @@
 
         <div class="grid grid-cols-1 gap-6 {{ $editorMode ? 'lg:grid-cols-1' : 'lg:grid-cols-4' }}">
             <div class="space-y-6 {{ $editorMode ? 'lg:col-span-1' : 'lg:col-span-3' }}">
-                <div class="tp-metabox">
-                    <div class="tp-metabox__body space-y-4">
+                <div class="{{ $editorMode ? '' : 'tp-metabox' }}">
+                    <div class="{{ $editorMode ? 'space-y-4' : 'tp-metabox__body space-y-4' }}">
                         <form
                             method="POST"
                             action="{{ $mode === 'create' ? route('tp.pages.store') : route('tp.pages.update', ['page' => $page->id]) }}"
@@ -90,98 +90,104 @@
                                 @method('PUT')
                             @endif
 
-                            <div
-                                class="{{ $editorMode ? 'space-y-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm' : 'space-y-4' }}"
-                                x-data="{
-                                    title: @js(old('title', $page->title)),
-                                    slug: @js(old('slug', $page->slug)),
-                                    titleTouched: false,
-                                    slugTouched: false,
-                                    isSlugValid() {
-                                        return this.slug.trim() === '' || /^[a-z0-9-]+$/.test(this.slug)
-                                    },
-                                }">
-                                <div class="tp-field">
-                                    <label class="tp-label">Title</label>
-                                    <input
-                                        name="title"
-                                        class="tp-input"
-                                        value="{{ old('title', $page->title) }}"
-                                        x-model="title"
-                                        @blur="titleTouched = true"
-                                        required />
-                                    <div class="tp-help">Required.</div>
-                                    <div
-                                        class="tp-help text-red-600"
-                                        x-show="titleTouched && title.trim().length === 0"
-                                        x-cloak>
-                                        Title is required.
-                                    </div>
-                                </div>
-
-                                @php
-                                    $themeLayouts = is_array($themeLayouts ?? null) ? $themeLayouts : [];
-                                    $currentLayout = old('layout', $page->layout);
-                                    $currentLayout = is_string($currentLayout) ? $currentLayout : '';
-                                    $currentLayout = $currentLayout !== '' ? $currentLayout : 'default';
-                                @endphp
-
-                                <div class="grid gap-4 lg:grid-cols-2">
+                            @if ($editorMode)
+                                <input type="hidden" name="title" value="{{ old('title', $page->title) }}" />
+                                <input type="hidden" name="slug" value="{{ old('slug', $page->slug) }}" />
+                                <input type="hidden" name="layout" value="{{ old('layout', $page->layout) }}" />
+                            @else
+                                <div
+                                    class="space-y-4"
+                                    x-data="{
+                                        title: @js(old('title', $page->title)),
+                                        slug: @js(old('slug', $page->slug)),
+                                        titleTouched: false,
+                                        slugTouched: false,
+                                        isSlugValid() {
+                                            return this.slug.trim() === '' || /^[a-z0-9-]+$/.test(this.slug)
+                                        },
+                                    }">
                                     <div class="tp-field">
-                                        <label class="tp-label">Slug</label>
+                                        <label class="tp-label">Title</label>
                                         <input
-                                            name="slug"
+                                            name="title"
                                             class="tp-input"
-                                            value="{{ old('slug', $page->slug) }}"
-                                            x-model="slug"
-                                            @blur="slugTouched = true"
-                                            placeholder="auto-generated if blank (on create)"
-                                            pattern="[a-z0-9-]+"
-                                            title="Lowercase, numbers, and dashes only."
-                                            {{ $mode === 'create' ? '' : 'required' }} />
-                                        <div class="tp-help">Lowercase, numbers, and dashes only.</div>
+                                            value="{{ old('title', $page->title) }}"
+                                            x-model="title"
+                                            @blur="titleTouched = true"
+                                            required />
+                                        <div class="tp-help">Required.</div>
                                         <div
                                             class="tp-help text-red-600"
-                                            x-show="slugTouched && slug.trim() !== '' && ! isSlugValid()"
+                                            x-show="titleTouched && title.trim().length === 0"
                                             x-cloak>
-                                            Use only lowercase letters, numbers, and dashes.
+                                            Title is required.
                                         </div>
                                     </div>
 
-                                    <div class="tp-field">
-                                        <label class="tp-label">Layout</label>
+                                    @php
+                                        $themeLayouts = is_array($themeLayouts ?? null) ? $themeLayouts : [];
+                                        $currentLayout = old('layout', $page->layout);
+                                        $currentLayout = is_string($currentLayout) ? $currentLayout : '';
+                                        $currentLayout = $currentLayout !== '' ? $currentLayout : 'default';
+                                    @endphp
 
-                                        @if (count($themeLayouts) > 0)
-                                            <select name="layout" class="tp-select">
-                                                @foreach ($themeLayouts as $layout)
-                                                    @php
-                                                        $key = isset($layout['key']) ? (string) $layout['key'] : '';
-                                                        $label = isset($layout['label']) ? (string) $layout['label'] : $key;
-                                                    @endphp
-
-                                                    @if ($key !== '')
-                                                        <option value="{{ $key }}" @selected($currentLayout === $key)>
-                                                            {{ $label }}
-                                                        </option>
-                                                    @endif
-                                                @endforeach
-                                            </select>
-                                            <div class="tp-help">Layouts come from the active theme manifest.</div>
-                                        @else
+                                    <div class="grid gap-4 lg:grid-cols-2">
+                                        <div class="tp-field">
+                                            <label class="tp-label">Slug</label>
                                             <input
-                                                name="layout"
+                                                name="slug"
                                                 class="tp-input"
-                                                value="{{ $currentLayout }}"
-                                                placeholder="default" />
-                                            <div class="tp-help">
-                                                No theme layouts
-                                                found{{ ! empty($hasTheme) ? '' : ' (no active theme)' }} — using free
-                                                text key.
+                                                value="{{ old('slug', $page->slug) }}"
+                                                x-model="slug"
+                                                @blur="slugTouched = true"
+                                                placeholder="auto-generated if blank (on create)"
+                                                pattern="[a-z0-9-]+"
+                                                title="Lowercase, numbers, and dashes only."
+                                                {{ $mode === 'create' ? '' : 'required' }} />
+                                            <div class="tp-help">Lowercase, numbers, and dashes only.</div>
+                                            <div
+                                                class="tp-help text-red-600"
+                                                x-show="slugTouched && slug.trim() !== '' && ! isSlugValid()"
+                                                x-cloak>
+                                                Use only lowercase letters, numbers, and dashes.
                                             </div>
-                                        @endif
+                                        </div>
+
+                                        <div class="tp-field">
+                                            <label class="tp-label">Layout</label>
+
+                                            @if (count($themeLayouts) > 0)
+                                                <select name="layout" class="tp-select">
+                                                    @foreach ($themeLayouts as $layout)
+                                                        @php
+                                                            $key = isset($layout['key']) ? (string) $layout['key'] : '';
+                                                            $label = isset($layout['label']) ? (string) $layout['label'] : $key;
+                                                        @endphp
+
+                                                        @if ($key !== '')
+                                                            <option value="{{ $key }}" @selected($currentLayout === $key)>
+                                                                {{ $label }}
+                                                            </option>
+                                                        @endif
+                                                    @endforeach
+                                                </select>
+                                                <div class="tp-help">Layouts come from the active theme manifest.</div>
+                                            @else
+                                                <input
+                                                    name="layout"
+                                                    class="tp-input"
+                                                    value="{{ $currentLayout }}"
+                                                    placeholder="default" />
+                                                <div class="tp-help">
+                                                    No theme layouts
+                                                    found{{ ! empty($hasTheme) ? '' : ' (no active theme)' }} — using free
+                                                    text key.
+                                                </div>
+                                            @endif
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            @endif
 
                             @php
                                 $blockDefinitions = is_array($blockDefinitions ?? null) ? $blockDefinitions : [];
@@ -206,7 +212,7 @@
                                     class="{{ $editorMode ? 'grid gap-6 lg:grid-cols-[minmax(0,1fr)_280px]' : '' }}">
                                     <div class="{{ $editorMode ? 'space-y-4' : '' }}">
                                         <div
-                                            class="{{ $editorMode ? 'space-y-6 rounded-2xl border border-slate-200 bg-slate-50/60 p-6 shadow-sm' : 'tp-panel space-y-4' }}">
+                                            class="{{ $editorMode ? 'space-y-6 rounded-2xl border border-slate-200 bg-slate-50/60 p-4 shadow-sm sm:p-5 lg:p-6' : 'tp-panel space-y-4' }}">
                                     <div
                                         class="flex flex-col items-center justify-between gap-2 sm:flex-row sm:items-center">
                                         <div class="flex flex-wrap items-center gap-2">
@@ -694,7 +700,7 @@
                                                         </template>
                                                     </div>
                                                     @if ($editorMode)
-                                                        <div class="flex items-center gap-3 pl-12 pt-2">
+                                                        <div class="flex items-center gap-3 px-5 pt-3">
                                                             <button
                                                                 type="button"
                                                                 class="group inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-400 hover:text-slate-600"
