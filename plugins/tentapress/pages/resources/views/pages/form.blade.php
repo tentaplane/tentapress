@@ -261,9 +261,9 @@
 
                                             <div
                                                 class="space-y-3"
-                                                @dragover.prevent="dragOverEnd()"
-                                                @dragleave="dragLeaveEnd()"
-                                                @drop="dropOnEnd($event)">
+                                                @dragover.prevent.self="dragOverEnd()"
+                                                @dragleave.self="dragLeaveEnd()"
+                                                @drop.self="dropOnEnd($event)">
                                                 <template x-if="blocks.length === 0">
                                                     <div
                                                         class="{{ $editorMode ? 'rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-6 text-sm' : 'rounded-md border border-slate-200 bg-white p-4 text-sm' }}">
@@ -286,7 +286,7 @@
                                                 <template x-for="(block, index) in blocks" :key="block._key">
                                                     <div class="space-y-2">
                                                         <template x-if="dragOverIndex === index">
-                                                            <div class="flex items-center gap-3 px-4">
+                                                            <div class="pointer-events-none flex items-center gap-3 px-4">
                                                                 <div class="h-px flex-1 bg-slate-300"></div>
                                                                 <div
                                                                     class="rounded-full border border-slate-200 bg-white px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-400">
@@ -786,7 +786,7 @@
                                                     </div>
                                                 </template>
                                                 <template x-if="dragOverIndex === blocks.length">
-                                                    <div class="flex items-center gap-3 px-4">
+                                                    <div class="pointer-events-none flex items-center gap-3 px-4">
                                                         <div class="h-px flex-1 bg-slate-300"></div>
                                                         <div
                                                             class="rounded-full border border-slate-200 bg-white px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-400">
