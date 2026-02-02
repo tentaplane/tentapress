@@ -14,6 +14,15 @@
     "src": "plugins/tentapress/admin-shell/resources/js/admin.js",
     "isEntry": true
   },
+  "plugins/tentapress/block-markdown-editor/resources/js/markdown-editor.js": {
+    "file": "assets/markdown-editor-tkkv-5wL.js",
+    "name": "markdown-editor",
+    "src": "plugins/tentapress/block-markdown-editor/resources/js/markdown-editor.js",
+    "isEntry": true,
+    "css": [
+      "assets/markdown-editor-DveZXXPf.css"
+    ]
+  },
   "resources/css/fallback.css": {
     "file": "assets/fallback-CAQJyE01.css",
     "src": "resources/css/fallback.css",

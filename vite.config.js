@@ -9,6 +9,7 @@ export default defineConfig({
                 // Admin
                 'plugins/tentapress/admin-shell/resources/css/admin.css',
                 'plugins/tentapress/admin-shell/resources/js/admin.js',
+                'plugins/tentapress/block-markdown-editor/resources/js/markdown-editor.js',
 
                 // Theme fallback CSS
                 'resources/css/fallback.css',

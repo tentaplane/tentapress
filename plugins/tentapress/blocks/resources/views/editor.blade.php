@@ -7,6 +7,20 @@
     $initialBlocksJson = old('blocks_json', $blocksJson);
     $initialBlocksJson = is_string($initialBlocksJson) ? $initialBlocksJson : '[]';
     $editorTitle = is_string($editorTitle ?? null) ? (string) $editorTitle : 'Blocks';
+    $hasMarkdown = false;
+    foreach ($blockDefinitions as $definition) {
+        if (! is_array($definition)) {
+            continue;
+        }
+
+        $fields = is_array($definition['fields'] ?? null) ? $definition['fields'] : [];
+        foreach ($fields as $field) {
+            if (is_array($field) && ($field['type'] ?? null) === 'markdown') {
+                $hasMarkdown = true;
+                break 2;
+            }
+        }
+    }
 
     usort($blockDefinitions, static function (array $a, array $b): int {
         $aType = is_string($a['type'] ?? null) ? (string) $a['type'] : '';
@@ -43,6 +57,14 @@
             })"
     x-init="init()">
     <label class="tp-label">{{ $editorTitle }}</label>
+
+    @if ($hasMarkdown)
+        @once
+            @push('head')
+                @vite(['plugins/tentapress/block-markdown-editor/resources/js/markdown-editor.js'])
+            @endpush
+        @endonce
+    @endif
 
 @if (isset($header))
     {{ $header }}
@@ -292,6 +314,30 @@
                                                     <label
                                                         class="tp-label"
                                                         x-text="field.label"></label>
+
+                                                    <template
+                                                        x-if="field.type === 'markdown'">
+                                                        <div
+                                                            class="space-y-2"
+                                                            data-markdown-editor
+                                                            :data-markdown-key="block._key + ':' + field.key"
+                                                            :data-markdown-height="
+                                                                field.height
+                                                                    ? field.height
+                                                                    : field.rows
+                                                                      ? field.rows * 22 + 'px'
+                                                                      : ''
+                                                            ">
+                                                            <textarea
+                                                                class="tp-textarea font-mono text-xs"
+                                                                :rows="field.rows ? field.rows : 10"
+                                                                :placeholder="field.placeholder || 'Write in Markdown…'"
+                                                                :value="getProp(index, field.key)"
+                                                                data-markdown-textarea
+                                                                x-effect="markdownSync($el, block._key, field.key)"
+                                                                @input="setProp(index, field.key, $event.target.value)"></textarea>
+                                                        </div>
+                                                    </template>
 
                                                     <template
                                                         x-if="field.type === 'richtext'">
@@ -591,7 +637,8 @@
                                                 field.type !== 'number' &&
                                                 field.type !== 'range' &&
                                                 field.type !== 'color' &&
-                                                field.type !== 'richtext'
+                                                field.type !== 'richtext' &&
+                                                field.type !== 'markdown'
                                             ">
                                                         <input
                                                             class="tp-input"
@@ -969,6 +1016,9 @@
                         if (field.type === 'richtext') {
                             value = this.stripHtml(value);
                         }
+                        if (field.type === 'markdown') {
+                            value = this.stripMarkdown(value);
+                        }
                         if (value !== '') {
                             parts.push(`${field.label}: ${value}`);
                         }
@@ -994,6 +1044,14 @@
                 stripHtml(value) {
                     return String(value)
                         .replace(/<[^>]*>/g, ' ')
+                        .replace(/\s+/g, ' ')
+                        .trim();
+                },
+
+                stripMarkdown(value) {
+                    return String(value)
+                        .replace(/\[(.*?)\]\((.*?)\)/g, '$1')
+                        .replace(/[`*_>#~=-]/g, ' ')
                         .replace(/\s+/g, ' ')
                         .trim();
                 },
@@ -1049,6 +1107,22 @@
                     }
 
                     this.richTextCommand(event, index, key, 'createLink', url);
+                },
+
+                markdownSync(el, blockKey, key) {
+                    const index = this.indexForBlockKey(blockKey);
+                    if (index < 0) {
+                        return;
+                    }
+
+                    const value = this.getProp(index, key) || '';
+                    if (el.value !== value) {
+                        el.value = value;
+                    }
+
+                    if (typeof window.tpMarkdownSync === 'function') {
+                        window.tpMarkdownSync(`${blockKey}:${key}`, value);
+                    }
                 },
 
                 variantsFor(type) {
@@ -1708,6 +1782,14 @@
                         this.selectedIndex = 0;
                     }
                     this.sync();
+                },
+
+                indexForBlockKey(blockKey) {
+                    if (!blockKey) {
+                        return -1;
+                    }
+
+                    return this.blocks.findIndex((block) => block?._key === blockKey);
                 },
             }));
         });

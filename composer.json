@@ -22,7 +22,8 @@
     "suggest": {
         "tentapress/import": "Import tooling",
         "tentapress/export": "Export tooling",
-        "tentapress/static-deploy": "Static deployments"
+        "tentapress/static-deploy": "Static deployments",
+        "tentapress/block-markdown-editor": "Markdown based rich text editor block"
     },
     "repositories": [
         {
