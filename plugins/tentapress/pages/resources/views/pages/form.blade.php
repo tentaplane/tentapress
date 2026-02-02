@@ -864,13 +864,13 @@
                                 </div>
                             </div>
                         @if ($editorMode)
-                            <aside class="space-y-4">
+                            <aside class="space-y-4 lg:sticky lg:top-6">
                                 <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
                                     <div
                                         class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
                                         Block library
                                     </div>
-                                    <div class="mt-4 grid gap-2 sm:grid-cols-2">
+                                    <div class="mt-4 space-y-2">
                                         <template x-for="def in definitions" :key="def.type">
                                             <button
                                                 type="button"
