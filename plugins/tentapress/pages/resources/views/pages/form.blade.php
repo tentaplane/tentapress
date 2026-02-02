@@ -12,69 +12,24 @@
 @section('title', $editorMode ? 'Blocks Editor' : ($mode === 'create' ? 'Add New Page' : 'Edit Page'))
 
 @section('content')
-    <div class="tp-editor {{ $editorMode ? 'space-y-4' : 'space-y-6' }}">
-        <div class="tp-page-header">
-            <div class="{{ $editorMode ? 'space-y-1' : '' }}">
-                @if ($editorMode)
-                    <a
-                        href="{{ route('tp.pages.index') }}"
-                        class="inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-                        Pages
-                        <span class="text-slate-300">/</span>
-                        Editor
-                    </a>
-                @endif
-                <h1 class="tp-page-title">
-                    @if ($editorMode)
-                        Blocks Editor: {{ $page->title }}
-                    @else
+    <div class="tp-editor {{ $editorMode ? 'space-y-0 px-4 py-6 sm:px-6 lg:px-8' : 'space-y-6' }}">
+        @if (! $editorMode)
+            <div class="tp-page-header">
+                <div class="{{ $editorMode ? 'space-y-1' : '' }}">
+                    <h1 class="tp-page-title">
                         {{ $mode === 'create' ? 'Add New Page' : 'Edit Page' }}
-                    @endif
-                </h1>
-            </div>
+                    </h1>
+                </div>
 
-            @if ($mode === 'edit')
-                <div class="flex flex-wrap gap-2">
-                    @if ($editorMode)
-                        <span
-                            class="inline-flex items-center rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-600">
-                            {{ ucfirst($page->status) }}
-                        </span>
-                        <button type="submit" form="page-form" class="tp-button-primary">Save changes</button>
-                        <a
-                            class="tp-button-secondary"
-                            href="/{{ $page->slug }}"
-                            target="_blank"
-                            rel="noreferrer">
-                            View
-                        </a>
-                        @if ($page->status === 'draft')
-                            <form method="POST" action="{{ route('tp.pages.publish', ['page' => $page->id]) }}">
-                                @csrf
-                                <button class="tp-button-primary" type="submit">
-                                    Publish
-                                </button>
-                            </form>
-                        @endif
-                        @if ($page->status === 'published')
-                            <form method="POST" action="{{ route('tp.pages.unpublish', ['page' => $page->id]) }}">
-                                @csrf
-                                <button class="tp-button-secondary" type="submit">
-                                    Unpublish
-                                </button>
-                            </form>
-                        @endif
-                        <a href="{{ route('tp.pages.edit', ['page' => $page->id]) }}" class="tp-button-secondary">
-                            Exit full screen
-                        </a>
-                    @else
+                @if ($mode === 'edit')
+                    <div class="flex flex-wrap gap-2">
                         <a href="{{ route('tp.pages.editor', ['page' => $page->id]) }}" class="tp-button-secondary">
                             Full screen editor
                         </a>
-                    @endif
-                </div>
-            @endif
-        </div>
+                    </div>
+                @endif
+            </div>
+        @endif
 
         <div class="grid grid-cols-1 gap-6 {{ $editorMode ? 'lg:grid-cols-1' : 'lg:grid-cols-4' }}">
             <div class="space-y-6 {{ $editorMode ? 'lg:col-span-1' : 'lg:col-span-3' }}">
@@ -859,6 +814,56 @@
                             </div>
                         @if ($editorMode)
                             <aside class="space-y-4">
+                                @if ($mode === 'edit')
+                                    <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+                                        <div
+                                            class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+                                            Actions
+                                        </div>
+                                        <div class="mt-4 space-y-2">
+                                            <button
+                                                type="submit"
+                                                form="page-form"
+                                                class="tp-button-primary w-full justify-center">
+                                                Save changes
+                                            </button>
+                                            <a
+                                                class="tp-button-secondary w-full justify-center"
+                                                href="/{{ $page->slug }}"
+                                                target="_blank"
+                                                rel="noreferrer">
+                                                View
+                                            </a>
+                                            @if ($page->status === 'draft')
+                                                <form
+                                                    method="POST"
+                                                    action="{{ route('tp.pages.publish', ['page' => $page->id]) }}">
+                                                    @csrf
+                                                    <button class="tp-button-primary w-full justify-center" type="submit">
+                                                        Publish
+                                                    </button>
+                                                </form>
+                                            @endif
+                                            @if ($page->status === 'published')
+                                                <form
+                                                    method="POST"
+                                                    action="{{ route('tp.pages.unpublish', ['page' => $page->id]) }}">
+                                                    @csrf
+                                                    <button
+                                                        class="tp-button-secondary w-full justify-center"
+                                                        type="submit">
+                                                        Unpublish
+                                                    </button>
+                                                </form>
+                                            @endif
+                                            <a
+                                                href="{{ route('tp.pages.edit', ['page' => $page->id]) }}"
+                                                class="tp-button-secondary w-full justify-center">
+                                                Exit full screen
+                                            </a>
+                                        </div>
+                                    </div>
+                                @endif
                                             <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
                                                 <div
                                                     class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
