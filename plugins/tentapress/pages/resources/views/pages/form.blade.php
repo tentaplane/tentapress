@@ -262,9 +262,9 @@
                                             <div
                                                 class="space-y-3"
                                                 x-ref="blocksList"
-                                                @dragover.prevent.self="dragOverEnd()"
-                                                @dragleave.self="dragLeaveEnd($event)"
-                                                @drop.self="dropOnEnd($event)">
+                                                @dragover.prevent="dragOverList($event)"
+                                                @dragleave="dragLeaveEnd($event)"
+                                                @drop="dropOnList($event)">
                                                 <template x-if="blocks.length === 0">
                                                     <div
                                                         class="{{ $editorMode ? 'rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-6 text-sm' : 'rounded-md border border-slate-200 bg-white p-4 text-sm' }}">
@@ -304,6 +304,7 @@
                                                     'ring-2 ring-black/10': dragOverIndex === index && dragIndex !== index,
                                                     'outline outline-2 outline-slate-300': selectedIndex === index,
                                                 }"
+                                                            data-block-card
                                                             @if ($editorMode)
                                                                 @click="selectBlock(index)"
                                                             @endif
@@ -1532,6 +1533,18 @@
                                                 }
                                             },
 
+                                            dragOverList(event) {
+                                                if (
+                                                    event &&
+                                                    event.target &&
+                                                    event.target.closest &&
+                                                    event.target.closest('[data-block-card]')
+                                                ) {
+                                                    return;
+                                                }
+                                                this.dragOverEnd();
+                                            },
+
                                             dragOverEnd() {
                                                 if (this.dragOverIndex !== this.blocks.length) {
                                                     this.dragOverIndex = this.blocks.length;
@@ -1580,6 +1593,18 @@
                                                 if (this.dragOverIndex === this.blocks.length) {
                                                     this.dragOverIndex = null;
                                                 }
+                                            },
+
+                                            dropOnList(event) {
+                                                if (
+                                                    event &&
+                                                    event.target &&
+                                                    event.target.closest &&
+                                                    event.target.closest('[data-block-card]')
+                                                ) {
+                                                    return;
+                                                }
+                                                this.dropOnEnd(event);
                                             },
 
                                             dropOn(index, event) {
