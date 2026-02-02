@@ -219,7 +219,11 @@
                                         <div
                                             class="{{ $editorMode ? 'space-y-6 rounded-2xl border border-slate-200 bg-slate-50/60 p-4 shadow-sm sm:p-5 lg:p-6' : 'tp-panel space-y-4' }}">
                                             <div
-                                                class="flex flex-col items-center justify-between gap-2 pb-4 sm:flex-row sm:items-center">
+                                                class="flex flex-col items-center justify-between gap-2 rounded-2xl border border-transparent pb-4 sm:flex-row sm:items-center"
+                                                :class="paletteDragType && addSectionOver ? 'border-dashed border-slate-300 bg-white/70 p-3' : ''"
+                                                @dragover.prevent="dragOverAddSection($event)"
+                                                @dragleave="dragLeaveAddSection($event)"
+                                                @drop="dropOnAddSection($event)">
                                                 <div class="flex flex-wrap items-center gap-2">
                                                     <select class="tp-select w-full sm:w-72" x-model="addType">
                                                         <option value="">Add a block…</option>
@@ -259,12 +263,7 @@
                                                 The blocks JSON is invalid. Fix it in Advanced mode.
                                             </div>
 
-                                            <div
-                                                class="space-y-3"
-                                                x-ref="blocksList"
-                                                @dragover.prevent="dragOverList($event)"
-                                                @dragleave="dragLeaveEnd($event)"
-                                                @drop="dropOnList($event)">
+                                            <div class="space-y-3" x-ref="blocksList">
                                                 <template x-if="blocks.length === 0">
                                                     <div
                                                         class="{{ $editorMode ? 'rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-6 text-sm' : 'rounded-md border border-slate-200 bg-white p-4 text-sm' }}">
@@ -286,17 +285,6 @@
 
                                                 <template x-for="(block, index) in blocks" :key="block._key">
                                                     <div class="space-y-2">
-                                                        <template
-                                                            x-if="(paletteDragType || dragIndex !== null) && dragOverIndex === index">
-                                                            <div class="pointer-events-none flex items-center gap-3 px-4">
-                                                                <div class="h-px flex-1 bg-slate-300"></div>
-                                                                <div
-                                                                    class="rounded-full border border-slate-200 bg-white px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-400">
-                                                                    Drop here
-                                                                </div>
-                                                                <div class="h-px flex-1 bg-slate-300"></div>
-                                                            </div>
-                                                        </template>
                                                         <div
                                                             class="{{ $editorMode ? 'group rounded-2xl border border-slate-200 bg-white shadow-sm transition-shadow hover:border-slate-300 hover:shadow-md' : 'tp-metabox bg-zinc-50' }}"
                                                             :class="{
@@ -788,17 +776,6 @@
                                                         </div>
                                                     </div>
                                                 </template>
-                                                <template
-                                                    x-if="(paletteDragType || dragIndex !== null) && dragOverIndex === blocks.length">
-                                                    <div class="pointer-events-none flex items-center gap-3 px-4">
-                                                        <div class="h-px flex-1 bg-slate-300"></div>
-                                                        <div
-                                                            class="rounded-full border border-slate-200 bg-white px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-400">
-                                                            Drop here
-                                                        </div>
-                                                        <div class="h-px flex-1 bg-slate-300"></div>
-                                                    </div>
-                                                </template>
                                             </div>
 
                                             {{-- Single source of truth posted to backend --}}
@@ -964,6 +941,7 @@
                                             insertType: '',
                                             selectedIndex: null,
                                             paletteDragType: '',
+                                            addSectionOver: false,
                                             blocks: [],
                                             dragIndex: null,
                                             dragOverIndex: null,
@@ -1384,6 +1362,34 @@
                                                 this.addBlock();
                                             },
 
+                                            dragOverAddSection(event) {
+                                                if (!this.paletteDragType) {
+                                                    return;
+                                                }
+                                                this.addSectionOver = true;
+                                            },
+
+                                            dragLeaveAddSection(event) {
+                                                if (
+                                                    event &&
+                                                    event.currentTarget &&
+                                                    event.relatedTarget &&
+                                                    event.currentTarget.contains(event.relatedTarget)
+                                                ) {
+                                                    return;
+                                                }
+                                                this.addSectionOver = false;
+                                            },
+
+                                            dropOnAddSection(event) {
+                                                if (!this.paletteDragType) {
+                                                    return;
+                                                }
+                                                this.insertBlockAt(this.blocks.length, this.paletteDragType);
+                                                this.paletteDragType = '';
+                                                this.addSectionOver = false;
+                                            },
+
                                             startPaletteDrag(type, event) {
                                                 this.paletteDragType = String(type || '').trim();
                                                 if (event && event.dataTransfer) {
@@ -1399,6 +1405,7 @@
                                             endPaletteDrag() {
                                                 this.paletteDragType = '';
                                                 this.dragOverIndex = null;
+                                                this.addSectionOver = false;
                                             },
 
                                             draggedBlockType(event) {
@@ -1533,42 +1540,8 @@
                                                 }
                                             },
 
-                                            dragOverList(event) {
-                                                if (
-                                                    event &&
-                                                    event.target &&
-                                                    event.target.closest &&
-                                                    event.target.closest('[data-block-card]')
-                                                ) {
-                                                    return;
-                                                }
-                                                this.dragOverEnd();
-                                            },
-
-                                            dragOverEnd() {
-                                                if (this.dragOverIndex !== this.blocks.length) {
-                                                    this.dragOverIndex = this.blocks.length;
-                                                }
-                                            },
-
                                             dragLeave(index, event) {
                                                 return;
-                                            },
-
-                                            dragLeaveEnd(event) {
-                                                return;
-                                            },
-
-                                            dropOnList(event) {
-                                                if (
-                                                    event &&
-                                                    event.target &&
-                                                    event.target.closest &&
-                                                    event.target.closest('[data-block-card]')
-                                                ) {
-                                                    return;
-                                                }
-                                                this.dropOnEnd(event);
                                             },
 
                                             dropOn(index, event) {
@@ -1581,21 +1554,6 @@
                                                 }
                                                 if (this.dragIndex === null || this.dragIndex === undefined) return;
                                                 this.moveTo(this.dragIndex, index);
-                                                this.dragIndex = null;
-                                                this.dragOverIndex = null;
-                                            },
-
-                                            dropOnEnd(event) {
-                                                const paletteType = this.draggedBlockType(event);
-                                                if (paletteType) {
-                                                    this.insertBlockAt(this.blocks.length, paletteType);
-                                                    this.paletteDragType = '';
-                                                    this.dragOverIndex = null;
-                                                    return;
-                                                }
-                                                if (this.dragIndex === null || this.dragIndex === undefined) return;
-                                                const target = Math.max(this.blocks.length - 1, 0);
-                                                this.moveTo(this.dragIndex, target);
                                                 this.dragIndex = null;
                                                 this.dragOverIndex = null;
                                             },
