@@ -5,7 +5,7 @@ Block registry and rendering for TentaPress pages.
 ## Plugin details
 
 - ID: `tentapress/blocks`
-- Version: `0.2.0`
+- Version: `0.2.1`
 - Service provider: `TentaPress\Blocks\BlocksServiceProvider`
 
 ## Requirements

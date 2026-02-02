@@ -5,7 +5,7 @@ Create and manage blog posts.
 ## Plugin details
 
 - ID: `tentapress/posts`
-- Version: `0.1.2`
+- Version: `0.1.3`
 - Service provider: `TentaPress\Posts\PostsServiceProvider`
 
 ## Requirements

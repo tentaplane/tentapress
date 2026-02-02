@@ -5,7 +5,7 @@ Create and manage pages.
 ## Plugin details
 
 - ID: `tentapress/pages`
-- Version: `0.1.2`
+- Version: `0.1.3`
 - Service provider: `TentaPress\Pages\PagesServiceProvider`
 
 ## Requirements
