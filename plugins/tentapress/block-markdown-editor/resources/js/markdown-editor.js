@@ -41,6 +41,13 @@ const initEditor = (group) => {
         initialEditType: 'wysiwyg',
         previewStyle: 'tab',
         usageStatistics: false,
+        toolbarItems: [
+            ['heading', 'bold', 'italic', 'strike'],
+            ['hr', 'quote'],
+            ['ul', 'ol', 'task', 'indent', 'outdent'],
+            ['table', 'link'],
+            ['code', 'codeblock'],
+        ],
     });
 
     const syncFromEditor = () => {

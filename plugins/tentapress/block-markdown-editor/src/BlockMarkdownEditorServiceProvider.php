@@ -67,14 +67,14 @@ final class BlockMarkdownEditorServiceProvider extends ServiceProvider
                 ],
             ],
             defaults: [
-                'content' => "# Markdown block\n\nWrite your content here.",
+                'content' => "",
                 'width' => 'normal',
                 'alignment' => 'left',
                 'background' => 'white',
             ],
             example: [
                 'props' => [
-                    'content' => "# Markdown block\n\n- Visual editing\n- Markdown output\n- Safe rendering",
+                    'content' => "",
                     'width' => 'normal',
                     'alignment' => 'left',
                     'background' => 'white',
