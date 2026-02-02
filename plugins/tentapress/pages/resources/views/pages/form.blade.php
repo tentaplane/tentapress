@@ -147,7 +147,7 @@
                             @endif
 
                             @component('tentapress-blocks::editor', [
-                                'blocksEditorMode' => true,
+                                'blocksEditorMode' => $editorMode,
                                 'blocksJson' => $blocksJson,
                                 'blockDefinitions' => $blockDefinitions ?? [],
                                 'mediaOptions' => $mediaOptions ?? [],

@@ -1,21 +1,40 @@
 @extends('tentapress-admin::layouts.shell')
 
-@section('title', $mode === 'create' ? 'Add New Post' : 'Edit Post')
+@php
+    $editorMode = (bool) ($editorMode ?? false);
+@endphp
+
+@if ($editorMode)
+    @section('shell_fullscreen', '1')
+    @section('body_class', 'bg-slate-100')
+@endif
+
+@section('title', $editorMode ? 'Blocks Editor' : ($mode === 'create' ? 'Add New Post' : 'Edit Post'))
 
 @section('content')
-    <div class="tp-editor space-y-6">
-        <div class="tp-page-header">
-            <div>
-                <h1 class="tp-page-title">
-                    {{ $mode === 'create' ? 'Add New Post' : 'Edit Post' }}
-                </h1>
-            </div>
-        </div>
+    <div class="tp-editor {{ $editorMode ? 'space-y-0 px-4 py-6 sm:px-6 lg:px-8' : 'space-y-6' }}">
+        @if (! $editorMode)
+            <div class="tp-page-header">
+                <div>
+                    <h1 class="tp-page-title">
+                        {{ $mode === 'create' ? 'Add New Post' : 'Edit Post' }}
+                    </h1>
+                </div>
 
-        <div class="grid grid-cols-1 gap-6 lg:grid-cols-4">
-            <div class="space-y-6 lg:col-span-3">
-                <div class="tp-metabox">
-                    <div class="tp-metabox__body space-y-4">
+                @if ($mode === 'edit')
+                    <div class="flex flex-wrap gap-2">
+                        <a href="{{ route('tp.posts.editor', ['post' => $post->id]) }}" class="tp-button-secondary">
+                            Full screen editor
+                        </a>
+                    </div>
+                @endif
+            </div>
+        @endif
+
+        <div class="{{ $editorMode ? 'lg:grid-cols-1' : 'lg:grid-cols-4' }} grid grid-cols-1 gap-6">
+            <div class="{{ $editorMode ? 'lg:col-span-1' : 'lg:col-span-3' }} space-y-6">
+                <div class="{{ $editorMode ? '' : 'tp-metabox' }}">
+                    <div class="{{ $editorMode ? 'space-y-4' : 'tp-metabox__body space-y-4' }}">
                         <form
                             method="POST"
                             action="{{ $mode === 'create' ? route('tp.posts.store') : route('tp.posts.update', ['post' => $post->id]) }}"
@@ -26,17 +45,40 @@
                                 @method('PUT')
                             @endif
 
-                            <div
-                                class="space-y-4"
-                                x-data="{
-                                    title: @js(old('title', $post->title)),
-                                    slug: @js(old('slug', $post->slug)),
-                                    titleTouched: false,
-                                    slugTouched: false,
-                                    isSlugValid() {
-                                        return this.slug.trim() === '' || /^[a-z0-9-]+$/.test(this.slug)
-                                    },
-                                }">
+                            @php
+                                $themeLayouts = is_array($themeLayouts ?? null) ? $themeLayouts : [];
+                                $currentLayout = old('layout', $post->layout);
+                                $currentLayout = is_string($currentLayout) ? $currentLayout : '';
+                                $currentLayout = $currentLayout !== '' ? $currentLayout : 'default';
+                                $authors = is_array($authors ?? null) ? $authors : [];
+                                $authorId = (int) (old('author_id', $authorId ?? ($post->author_id ?? 0)) ?? 0);
+                                $publishedAt = old('published_at');
+                                if (! is_string($publishedAt) || $publishedAt === '') {
+                                    $publishedAt = $post->published_at?->format('Y-m-d\\TH:i') ?? '';
+                                }
+                            @endphp
+
+                            @if ($editorMode)
+                                <input type="hidden" name="title" value="{{ old('title', $post->title) }}" />
+                                <input type="hidden" name="slug" value="{{ old('slug', $post->slug) }}" />
+                                <input type="hidden" name="layout" value="{{ $currentLayout }}" />
+                                <input
+                                    type="hidden"
+                                    name="author_id"
+                                    value="{{ $authorId > 0 ? $authorId : '' }}" />
+                                <input type="hidden" name="published_at" value="{{ $publishedAt }}" />
+                            @else
+                                <div
+                                    class="space-y-4"
+                                    x-data="{
+                                        title: @js(old('title', $post->title)),
+                                        slug: @js(old('slug', $post->slug)),
+                                        titleTouched: false,
+                                        slugTouched: false,
+                                        isSlugValid() {
+                                            return this.slug.trim() === '' || /^[a-z0-9-]+$/.test(this.slug)
+                                        },
+                                    }">
                                 <div class="tp-field">
                                     <label class="tp-label">Title</label>
                                     <input
@@ -54,13 +96,6 @@
                                         Title is required.
                                     </div>
                                 </div>
-
-                                @php
-                                    $themeLayouts = is_array($themeLayouts ?? null) ? $themeLayouts : [];
-                                    $currentLayout = old('layout', $post->layout);
-                                    $currentLayout = is_string($currentLayout) ? $currentLayout : '';
-                                    $currentLayout = $currentLayout !== '' ? $currentLayout : 'default';
-                                @endphp
 
                                 <div class="grid gap-4 lg:grid-cols-2">
                                     <div class="tp-field">
@@ -118,15 +153,6 @@
                                     </div>
                                 </div>
 
-                                @php
-                                    $authors = is_array($authors ?? null) ? $authors : [];
-                                    $authorId = (int) (old('author_id', $authorId ?? ($post->author_id ?? 0)) ?? 0);
-                                    $publishedAt = old('published_at');
-                                    if (! is_string($publishedAt) || $publishedAt === '') {
-                                        $publishedAt = $post->published_at?->format('Y-m-d\\TH:i') ?? '';
-                                    }
-                                @endphp
-
                                 <div class="grid gap-4 lg:grid-cols-2">
                                     <div class="tp-field">
                                         <label class="tp-label">Author</label>
@@ -164,86 +190,149 @@
                                         <div class="tp-help">Optional; used for published timestamp.</div>
                                     </div>
                                 </div>
-                            </div>
+                                </div>
+                            @endif
 
                             @component('tentapress-blocks::editor', [
-                                'blocksEditorMode' => true,
+                                'blocksEditorMode' => $editorMode,
                                 'blocksJson' => $blocksJson,
                                 'blockDefinitions' => $blockDefinitions ?? [],
                                 'mediaOptions' => $mediaOptions ?? [],
                                 'mediaIndexUrl' => \Illuminate\Support\Facades\Route::has('tp.media.index') ? route('tp.media.index') : '',
                             ])
+                                @if ($editorMode && $mode === 'edit')
+                                    @slot('header')
+                                        <div
+                                            class="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+                                            <div class="flex flex-wrap items-center gap-2 text-xs text-slate-500">
+                                                <span
+                                                    class="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] font-semibold tracking-[0.12em] text-slate-500 uppercase">
+                                                    {{ ucfirst($post->status) }}
+                                                </span>
+                                                <span class="hidden text-slate-300 sm:inline">•</span>
+                                                <span class="hidden sm:inline">Editing blocks</span>
+                                            </div>
+                                            <div class="flex flex-wrap items-center gap-2">
+                                                <button type="submit" form="post-form" class="tp-button-primary">
+                                                    Save changes
+                                                </button>
+                                                @if (\Illuminate\Support\Facades\Route::has('tp.public.posts.show'))
+                                                    <a
+                                                        class="tp-button-secondary"
+                                                        href="{{ route('tp.public.posts.show', ['slug' => $post->slug]) }}"
+                                                        target="_blank"
+                                                        rel="noreferrer">
+                                                        View
+                                                    </a>
+                                                @endif
+                                                @if ($post->status === 'draft')
+                                                    <form
+                                                        method="POST"
+                                                        action="{{ route('tp.posts.publish', ['post' => $post->id]) }}">
+                                                        @csrf
+                                                        <button class="tp-button-primary" type="submit">
+                                                            Publish
+                                                        </button>
+                                                    </form>
+                                                @endif
+
+                                                @if ($post->status === 'published')
+                                                    <form
+                                                        method="POST"
+                                                        action="{{ route('tp.posts.unpublish', ['post' => $post->id]) }}">
+                                                        @csrf
+                                                        <button class="tp-button-secondary" type="submit">
+                                                            Unpublish
+                                                        </button>
+                                                    </form>
+                                                @endif
+
+                                                <a
+                                                    href="{{ route('tp.posts.edit', ['post' => $post->id]) }}"
+                                                    class="tp-button-secondary">
+                                                    Exit full screen
+                                                </a>
+                                            </div>
+                                        </div>
+                                    @endslot
+                                @endif
                             @endcomponent
                         </form>
                     </div>
                 </div>
             </div>
 
-            <div class="space-y-6 lg:sticky lg:top-6 lg:self-start">
-                <div class="tp-metabox">
-                    <div class="tp-metabox__title">Status</div>
-                    <div class="tp-metabox__body space-y-4 text-sm">
-                        <div class="space-y-2">
-                            <div>
-                                <span class="tp-muted">Status:</span>
-                                <span class="font-semibold">{{ ucfirst($post->status) }}</span>
+            @if (! $editorMode)
+                <div class="space-y-6 lg:sticky lg:top-6 lg:self-start">
+                    <div class="tp-metabox">
+                        <div class="tp-metabox__title">Status</div>
+                        <div class="tp-metabox__body space-y-4 text-sm">
+                            <div class="space-y-2">
+                                <div>
+                                    <span class="tp-muted">Status:</span>
+                                    <span class="font-semibold">{{ ucfirst($post->status) }}</span>
+                                </div>
+                                <div>
+                                    <span class="tp-muted">Published:</span>
+                                    <span class="tp-code">{{ $post->published_at?->toDateTimeString() ?? '—' }}</span>
+                                </div>
+                                <div>
+                                    <span class="tp-muted">Updated:</span>
+                                    <span class="tp-code">{{ $post->updated_at?->toDateTimeString() ?? '—' }}</span>
+                                </div>
                             </div>
-                            <div>
-                                <span class="tp-muted">Published:</span>
-                                <span class="tp-code">{{ $post->published_at?->toDateTimeString() ?? '—' }}</span>
+
+                            <div class="tp-divider"></div>
+
+                            <div class="space-y-2">
+                                <button type="submit" form="post-form" class="tp-button-primary w-full justify-center">
+                                    {{ $mode === 'create' ? 'Create Post' : 'Save Changes' }}
+                                </button>
+
+                                @if ($mode === 'edit' && $post->status === 'draft')
+                                    <form
+                                        method="POST"
+                                        action="{{ route('tp.posts.publish', ['post' => $post->id]) }}">
+                                        @csrf
+                                        <button class="tp-button-primary w-full justify-center" type="submit">
+                                            Publish
+                                        </button>
+                                    </form>
+                                @endif
+
+                                @if ($mode === 'edit' && $post->status === 'published')
+                                    <form
+                                        method="POST"
+                                        action="{{ route('tp.posts.unpublish', ['post' => $post->id]) }}">
+                                        @csrf
+                                        <button class="tp-button-secondary w-full justify-center" type="submit">
+                                            Unpublish
+                                        </button>
+                                    </form>
+                                @endif
+
+                                @if ($mode === 'edit')
+                                    <form
+                                        method="POST"
+                                        action="{{ route('tp.posts.destroy', ['post' => $post->id]) }}"
+                                        onsubmit="return confirm('Delete this post? This cannot be undone.');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button
+                                            type="submit"
+                                            class="tp-button-danger w-full justify-center"
+                                            aria-label="Delete post">
+                                            Delete
+                                        </button>
+                                    </form>
+                                @endif
                             </div>
-                            <div>
-                                <span class="tp-muted">Updated:</span>
-                                <span class="tp-code">{{ $post->updated_at?->toDateTimeString() ?? '—' }}</span>
-                            </div>
-                        </div>
-
-                        <div class="tp-divider"></div>
-
-                        <div class="space-y-2">
-                            <button type="submit" form="post-form" class="tp-button-primary w-full justify-center">
-                                {{ $mode === 'create' ? 'Create Post' : 'Save Changes' }}
-                            </button>
-
-                            @if ($mode === 'edit' && $post->status === 'draft')
-                                <form method="POST" action="{{ route('tp.posts.publish', ['post' => $post->id]) }}">
-                                    @csrf
-                                    <button class="tp-button-primary w-full justify-center" type="submit">
-                                        Publish
-                                    </button>
-                                </form>
-                            @endif
-
-                            @if ($mode === 'edit' && $post->status === 'published')
-                                <form method="POST" action="{{ route('tp.posts.unpublish', ['post' => $post->id]) }}">
-                                    @csrf
-                                    <button class="tp-button-secondary w-full justify-center" type="submit">
-                                        Unpublish
-                                    </button>
-                                </form>
-                            @endif
-
-                            @if ($mode === 'edit')
-                                <form
-                                    method="POST"
-                                    action="{{ route('tp.posts.destroy', ['post' => $post->id]) }}"
-                                    onsubmit="return confirm('Delete this post? This cannot be undone.');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button
-                                        type="submit"
-                                        class="tp-button-danger w-full justify-center"
-                                        aria-label="Delete post">
-                                        Delete
-                                    </button>
-                                </form>
-                            @endif
                         </div>
                     </div>
-                </div>
 
-                @includeIf('tentapress-seo::post-metabox', ['post' => $post, 'mode' => $mode])
-            </div>
+                    @includeIf('tentapress-seo::post-metabox', ['post' => $post, 'mode' => $mode])
+                </div>
+            @endif
         </div>
     </div>
 @endsection

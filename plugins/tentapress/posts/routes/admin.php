@@ -6,6 +6,7 @@ use TentaPress\Posts\Http\Admin\IndexController;
 use TentaPress\Posts\Http\Admin\CreateController;
 use TentaPress\Posts\Http\Admin\StoreController;
 use TentaPress\Posts\Http\Admin\EditController;
+use TentaPress\Posts\Http\Admin\EditorController;
 use TentaPress\Posts\Http\Admin\UpdateController;
 use TentaPress\Posts\Http\Admin\PublishController;
 use TentaPress\Posts\Http\Admin\UnpublishController;
@@ -20,6 +21,7 @@ AdminRoutes::group(function (): void {
         Route::post('/posts', StoreController::class)->name('posts.store');
 
         Route::get('/posts/{post}/edit', EditController::class)->name('posts.edit');
+        Route::get('/posts/{post}/editor', EditorController::class)->name('posts.editor');
         Route::put('/posts/{post}', UpdateController::class)->name('posts.update');
 
         Route::post('/posts/{post}/publish', PublishController::class)->name('posts.publish');
