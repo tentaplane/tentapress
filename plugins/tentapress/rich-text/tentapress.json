@@ -1,0 +1,10 @@
+{
+    "id": "tentapress/rich-text",
+    "name": "Rich Text",
+    "description": "Adds a rich text block for HTML content.",
+    "version": "0.1.0",
+    "provider": "TentaPress\\RichText\\RichTextServiceProvider",
+    "requires": [
+        "tentapress/blocks"
+    ]
+}

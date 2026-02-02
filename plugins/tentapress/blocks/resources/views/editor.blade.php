@@ -294,6 +294,65 @@
                                                         x-text="field.label"></label>
 
                                                     <template
+                                                        x-if="field.type === 'richtext'">
+                                                        <div class="space-y-2" data-richtext-group>
+                                                            <div
+                                                                class="flex flex-wrap items-center gap-2 text-xs">
+                                                                <button
+                                                                    type="button"
+                                                                    class="tp-button-secondary px-2 py-1 text-xs"
+                                                                    @click="richTextCommand($event, index, field.key, 'bold')">
+                                                                    Bold
+                                                                </button>
+                                                                <button
+                                                                    type="button"
+                                                                    class="tp-button-secondary px-2 py-1 text-xs"
+                                                                    @click="richTextCommand($event, index, field.key, 'italic')">
+                                                                    Italic
+                                                                </button>
+                                                                <button
+                                                                    type="button"
+                                                                    class="tp-button-secondary px-2 py-1 text-xs"
+                                                                    @click="richTextCommand($event, index, field.key, 'underline')">
+                                                                    Underline
+                                                                </button>
+                                                                <button
+                                                                    type="button"
+                                                                    class="tp-button-secondary px-2 py-1 text-xs"
+                                                                    @click="richTextPromptLink($event, index, field.key)">
+                                                                    Link
+                                                                </button>
+                                                                <button
+                                                                    type="button"
+                                                                    class="tp-button-secondary px-2 py-1 text-xs"
+                                                                    @click="richTextCommand($event, index, field.key, 'insertUnorderedList')">
+                                                                    Bullets
+                                                                </button>
+                                                                <button
+                                                                    type="button"
+                                                                    class="tp-button-secondary px-2 py-1 text-xs"
+                                                                    @click="richTextCommand($event, index, field.key, 'insertOrderedList')">
+                                                                    Numbered
+                                                                </button>
+                                                                <button
+                                                                    type="button"
+                                                                    class="tp-button-secondary px-2 py-1 text-xs"
+                                                                    @click="richTextCommand($event, index, field.key, 'removeFormat')">
+                                                                    Clear
+                                                                </button>
+                                                            </div>
+                                                            <div
+                                                                class="tp-textarea min-h-[140px] leading-relaxed"
+                                                                contenteditable="true"
+                                                                data-richtext-editor
+                                                                @focus="richTextFocus(index, field.key)"
+                                                                @blur="richTextBlur(index, field.key, $event)"
+                                                                @input="richTextInput(index, field.key, $event)"
+                                                                x-effect="richTextSync($el, index, field.key)"></div>
+                                                        </div>
+                                                    </template>
+
+                                                    <template
                                                         x-if="field.type === 'textarea'">
                                                         <textarea
                                                             class="tp-textarea"
@@ -531,7 +590,8 @@
                                                 field.type !== 'toggle' &&
                                                 field.type !== 'number' &&
                                                 field.type !== 'range' &&
-                                                field.type !== 'color'
+                                                field.type !== 'color' &&
+                                                field.type !== 'richtext'
                                             ">
                                                         <input
                                                             class="tp-input"
@@ -777,6 +837,7 @@
                 selectedIndex: null,
                 paletteDragType: '',
                 addSectionOver: false,
+                richTextFocusKey: null,
                 blocks: [],
                 dragIndex: null,
                 dragOverIndex: null,
@@ -903,8 +964,11 @@
                         if (raw && typeof raw === 'object') {
                             continue;
                         }
-                        const value =
+                        let value =
                             raw === null || raw === undefined ? '' : String(raw).trim();
+                        if (field.type === 'richtext') {
+                            value = this.stripHtml(value);
+                        }
                         if (value !== '') {
                             parts.push(`${field.label}: ${value}`);
                         }
@@ -925,6 +989,66 @@
                     const fields = d && Array.isArray(d.fields) ? d.fields : [];
                     // Only accept {key,label,type,help?}
                     return fields.filter((f) => f && f.key && f.label && f.type);
+                },
+
+                stripHtml(value) {
+                    return String(value)
+                        .replace(/<[^>]*>/g, ' ')
+                        .replace(/\s+/g, ' ')
+                        .trim();
+                },
+
+                richTextKey(index, key) {
+                    return `${index}:${key}`;
+                },
+
+                richTextFocus(index, key) {
+                    this.richTextFocusKey = this.richTextKey(index, key);
+                },
+
+                richTextBlur(index, key, event) {
+                    this.richTextFocusKey = null;
+                    this.richTextInput(index, key, event);
+                },
+
+                richTextInput(index, key, event) {
+                    this.setProp(index, key, event.target.innerHTML);
+                },
+
+                richTextSync(el, index, key) {
+                    if (this.richTextFocusKey === this.richTextKey(index, key)) {
+                        return;
+                    }
+
+                    const value = this.getProp(index, key) || '';
+                    if (el.innerHTML !== value) {
+                        el.innerHTML = value;
+                    }
+                },
+
+                richTextCommand(event, index, key, command, value = null) {
+                    const group = event.currentTarget.closest('[data-richtext-group]');
+                    if (!group) {
+                        return;
+                    }
+
+                    const editor = group.querySelector('[data-richtext-editor]');
+                    if (!editor) {
+                        return;
+                    }
+
+                    editor.focus();
+                    document.execCommand(command, false, value);
+                    this.setProp(index, key, editor.innerHTML);
+                },
+
+                richTextPromptLink(event, index, key) {
+                    const url = window.prompt('Enter URL');
+                    if (!url) {
+                        return;
+                    }
+
+                    this.richTextCommand(event, index, key, 'createLink', url);
                 },
 
                 variantsFor(type) {
