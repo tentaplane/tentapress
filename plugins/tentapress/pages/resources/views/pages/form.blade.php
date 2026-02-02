@@ -262,7 +262,7 @@
                                             <div
                                                 class="space-y-3"
                                                 @dragover.prevent.self="dragOverEnd()"
-                                                @dragleave.self="dragLeaveEnd()"
+                                                @dragleave.self="dragLeaveEnd($event)"
                                                 @drop.self="dropOnEnd($event)">
                                                 <template x-if="blocks.length === 0">
                                                     <div
@@ -285,7 +285,8 @@
 
                                                 <template x-for="(block, index) in blocks" :key="block._key">
                                                     <div class="space-y-2">
-                                                        <template x-if="dragOverIndex === index">
+                                                        <template
+                                                            x-if="(paletteDragType || dragIndex !== null) && dragOverIndex === index">
                                                             <div class="pointer-events-none flex items-center gap-3 px-4">
                                                                 <div class="h-px flex-1 bg-slate-300"></div>
                                                                 <div
@@ -306,7 +307,7 @@
                                                                 @click="selectBlock(index)"
                                                             @endif
                                                             @dragover.prevent.stop="dragOver(index)"
-                                                            @dragleave.stop="dragLeave(index)"
+                                                            @dragleave.stop="dragLeave(index, $event)"
                                                             @drop.stop="dropOn(index, $event)">
                                                             <div
                                                                 class="{{ $editorMode ? 'flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-4 py-3' : 'tp-metabox__title flex flex-wrap items-center justify-between gap-3' }}">
@@ -785,7 +786,8 @@
                                                         </div>
                                                     </div>
                                                 </template>
-                                                <template x-if="dragOverIndex === blocks.length">
+                                                <template
+                                                    x-if="(paletteDragType || dragIndex !== null) && dragOverIndex === blocks.length">
                                                     <div class="pointer-events-none flex items-center gap-3 px-4">
                                                         <div class="h-px flex-1 bg-slate-300"></div>
                                                         <div
@@ -1524,20 +1526,40 @@
                                             },
 
                                             dragOver(index) {
-                                                this.dragOverIndex = index;
+                                                if (this.dragOverIndex !== index) {
+                                                    this.dragOverIndex = index;
+                                                }
                                             },
 
                                             dragOverEnd() {
-                                                this.dragOverIndex = this.blocks.length;
+                                                if (this.dragOverIndex !== this.blocks.length) {
+                                                    this.dragOverIndex = this.blocks.length;
+                                                }
                                             },
 
-                                            dragLeave(index) {
+                                            dragLeave(index, event) {
+                                                if (
+                                                    event &&
+                                                    event.currentTarget &&
+                                                    event.relatedTarget &&
+                                                    event.currentTarget.contains(event.relatedTarget)
+                                                ) {
+                                                    return;
+                                                }
                                                 if (this.dragOverIndex === index) {
                                                     this.dragOverIndex = null;
                                                 }
                                             },
 
-                                            dragLeaveEnd() {
+                                            dragLeaveEnd(event) {
+                                                if (
+                                                    event &&
+                                                    event.currentTarget &&
+                                                    event.relatedTarget &&
+                                                    event.currentTarget.contains(event.relatedTarget)
+                                                ) {
+                                                    return;
+                                                }
                                                 if (this.dragOverIndex === this.blocks.length) {
                                                     this.dragOverIndex = null;
                                                 }
