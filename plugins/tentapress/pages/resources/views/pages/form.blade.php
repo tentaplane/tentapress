@@ -163,13 +163,64 @@
                                 x-init="init()">
                                 <label class="tp-label">Blocks</label>
 
+                                @if ($editorMode && $mode === 'edit')
+                                    <div
+                                        class="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+                                        <div class="flex flex-wrap items-center gap-2 text-xs text-slate-500">
+                                            <span
+                                                class="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500">
+                                                {{ ucfirst($page->status) }}
+                                            </span>
+                                            <span class="hidden text-slate-300 sm:inline">•</span>
+                                            <span class="hidden sm:inline">Editing blocks</span>
+                                        </div>
+                                        <div class="flex flex-wrap items-center gap-2">
+                                            <button type="submit" form="page-form" class="tp-button-primary">
+                                                Save changes
+                                            </button>
+                                            <a
+                                                class="tp-button-secondary"
+                                                href="/{{ $page->slug }}"
+                                                target="_blank"
+                                                rel="noreferrer">
+                                                View
+                                            </a>
+                                            @if ($page->status === 'draft')
+                                                <form
+                                                    method="POST"
+                                                    action="{{ route('tp.pages.publish', ['page' => $page->id]) }}">
+                                                    @csrf
+                                                    <button class="tp-button-primary" type="submit">
+                                                        Publish
+                                                    </button>
+                                                </form>
+                                            @endif
+                                            @if ($page->status === 'published')
+                                                <form
+                                                    method="POST"
+                                                    action="{{ route('tp.pages.unpublish', ['page' => $page->id]) }}">
+                                                    @csrf
+                                                    <button class="tp-button-secondary" type="submit">
+                                                        Unpublish
+                                                    </button>
+                                                </form>
+                                            @endif
+                                            <a
+                                                href="{{ route('tp.pages.edit', ['page' => $page->id]) }}"
+                                                class="tp-button-secondary">
+                                                Exit full screen
+                                            </a>
+                                        </div>
+                                    </div>
+                                @endif
+
                                 <div
                                     class="{{ $editorMode ? 'grid gap-6 lg:grid-cols-[minmax(0,1fr)_280px]' : '' }}">
                                     <div class="{{ $editorMode ? 'space-y-4' : '' }}">
                                         <div
                                             class="{{ $editorMode ? 'space-y-6 rounded-2xl border border-slate-200 bg-slate-50/60 p-4 shadow-sm sm:p-5 lg:p-6' : 'tp-panel space-y-4' }}">
                                     <div
-                                        class="flex flex-col items-center justify-between gap-2 sm:flex-row sm:items-center">
+                                        class="flex flex-col items-center justify-between gap-2 pb-2 sm:flex-row sm:items-center">
                                         <div class="flex flex-wrap items-center gap-2">
                                             <select class="tp-select w-full sm:w-72" x-model="addType">
                                                 <option value="">Add a block…</option>
@@ -204,7 +255,7 @@
                                         The blocks JSON is invalid. Fix it in Advanced mode.
                                     </div>
 
-                                    <div class="space-y-3">
+                                    <div class="space-y-3" @dragover.prevent @drop="dropOnEnd($event)">
                                         <template x-if="blocks.length === 0">
                                             <div
                                                 class="{{ $editorMode ? 'rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-6 text-sm' : 'rounded-md border border-slate-200 bg-white p-4 text-sm' }}">
@@ -238,7 +289,7 @@
                                                     @endif
                                                     @dragover.prevent="dragOver(index)"
                                                     @dragleave="dragLeave(index)"
-                                                    @drop="dropOn(index)">
+                                                    @drop="dropOn(index, $event)">
                                                     <div
                                                         class="{{ $editorMode ? 'flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-4 py-3' : 'tp-metabox__title flex flex-wrap items-center justify-between gap-3' }}">
                                                         <div class="flex min-w-0 items-center gap-3">
@@ -814,153 +865,29 @@
                             </div>
                         @if ($editorMode)
                             <aside class="space-y-4">
-                                @if ($mode === 'edit')
-                                    <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-                                        <div
-                                            class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-                                            Actions
-                                        </div>
-                                        <div class="mt-4 space-y-2">
-                                            <button
-                                                type="submit"
-                                                form="page-form"
-                                                class="tp-button-primary w-full justify-center">
-                                                Save changes
-                                            </button>
-                                            <a
-                                                class="tp-button-secondary w-full justify-center"
-                                                href="/{{ $page->slug }}"
-                                                target="_blank"
-                                                rel="noreferrer">
-                                                View
-                                            </a>
-                                            @if ($page->status === 'draft')
-                                                <form
-                                                    method="POST"
-                                                    action="{{ route('tp.pages.publish', ['page' => $page->id]) }}">
-                                                    @csrf
-                                                    <button class="tp-button-primary w-full justify-center" type="submit">
-                                                        Publish
-                                                    </button>
-                                                </form>
-                                            @endif
-                                            @if ($page->status === 'published')
-                                                <form
-                                                    method="POST"
-                                                    action="{{ route('tp.pages.unpublish', ['page' => $page->id]) }}">
-                                                    @csrf
-                                                    <button
-                                                        class="tp-button-secondary w-full justify-center"
-                                                        type="submit">
-                                                        Unpublish
-                                                    </button>
-                                                </form>
-                                            @endif
-                                            <a
-                                                href="{{ route('tp.pages.edit', ['page' => $page->id]) }}"
-                                                class="tp-button-secondary w-full justify-center">
-                                                Exit full screen
-                                            </a>
-                                        </div>
+                                <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+                                    <div
+                                        class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+                                        Block library
                                     </div>
-                                @endif
-                                            <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-                                                <div
-                                                    class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-                                                    Block details
-                                                </div>
-                                                <template x-if="selectedBlock()">
-                                                    <div class="mt-4 space-y-3">
-                                                        <div>
-                                                            <div
-                                                                class="text-sm font-semibold"
-                                                                x-text="titleFor(selectedBlock().type)"></div>
-                                                            <div
-                                                                class="mt-1 flex flex-wrap items-center gap-2 text-[11px] text-slate-500">
-                                                                <span
-                                                                    class="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 font-semibold uppercase tracking-[0.12em]"
-                                                                    x-text="selectedBlock().type"></span>
-                                                                <template x-if="selectedBlock().version">
-                                                                    <span
-                                                                        class="rounded-full border border-slate-200 bg-slate-100 px-2 py-0.5 font-semibold uppercase tracking-[0.12em]"
-                                                                        x-text="'v' + selectedBlock().version"></span>
-                                                                </template>
-                                                                <template x-if="selectedBlock().variant">
-                                                                    <span
-                                                                        class="rounded-full border border-slate-200 bg-slate-100 px-2 py-0.5 font-semibold uppercase tracking-[0.12em]"
-                                                                        x-text="selectedBlock().variant"></span>
-                                                                </template>
-                                                            </div>
-                                                        </div>
-                                                        <div
-                                                            class="text-xs text-slate-500"
-                                                            x-text="summaryFor(selectedBlock(), selectedIndex)"></div>
-                                                        <div class="flex flex-wrap items-center gap-2">
-                                                            <button
-                                                                type="button"
-                                                                class="tp-button-secondary"
-                                                                @click="toggleCollapse(selectedIndex)">
-                                                                <span
-                                                                    x-text="selectedBlock()._collapsed ? 'Expand' : 'Collapse'"></span>
-                                                            </button>
-                                                            <button
-                                                                type="button"
-                                                                class="tp-button-secondary"
-                                                                @click="duplicateBlock(selectedIndex)">
-                                                                Duplicate
-                                                            </button>
-                                                            <button
-                                                                type="button"
-                                                                class="tp-button-secondary"
-                                                                @click="insertIndex = selectedIndex; insertType = ''">
-                                                                Insert after
-                                                            </button>
-                                                            <button
-                                                                type="button"
-                                                                class="tp-button-link text-red-600 hover:text-red-700"
-                                                                @click="remove(selectedIndex)">
-                                                                Delete
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                </template>
-                                                <template x-if="!selectedBlock()">
-                                                    <div class="mt-4 text-sm text-slate-500">
-                                                        Select a block to see details and quick actions.
-                                                    </div>
-                                                </template>
-                                            </div>
-                                            <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-                                                <div
-                                                    class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-                                                    Page outline
-                                                </div>
-                                                <div class="mt-4 space-y-2" x-show="blocks.length > 0">
-                                                    <template
-                                                        x-for="(block, index) in blocks"
-                                                        :key="block._key + '_outline'">
-                                                        <button
-                                                            type="button"
-                                                            class="flex w-full items-center gap-2 rounded-lg border px-3 py-2 text-left text-xs transition"
-                                                            :class="
-                                                            selectedIndex === index
-                                                                ? 'border-slate-300 bg-slate-100 text-slate-900'
-                                                                : 'border-transparent text-slate-500 hover:border-slate-200 hover:bg-white'
-                                                        "
-                                                            @click="selectBlock(index)">
-                                                            <span
-                                                                class="text-[10px] font-semibold uppercase text-slate-400"
-                                                                x-text="index + 1"></span>
-                                                            <span
-                                                                class="min-w-0 flex-1 truncate font-semibold"
-                                                                x-text="titleFor(block.type)"></span>
-                                                        </button>
-                                                    </template>
-                                                </div>
-                                                <div class="mt-4 text-sm text-slate-500" x-show="blocks.length === 0">
-                                                    No blocks yet.
-                                                </div>
-                                            </div>
+                                    <div class="mt-4 grid gap-2 sm:grid-cols-2">
+                                        <template x-for="def in definitions" :key="def.type">
+                                            <button
+                                                type="button"
+                                                class="flex items-center justify-between gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-left text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
+                                                draggable="true"
+                                                @dragstart="startPaletteDrag(def.type, $event)"
+                                                @dragend="endPaletteDrag()"
+                                                @click="addBlockType(def.type)">
+                                                <span class="truncate" x-text="def.name || def.type"></span>
+                                                <span
+                                                    class="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">
+                                                    Drag
+                                                </span>
+                                            </button>
+                                        </template>
+                                    </div>
+                                </div>
                             </aside>
                         @endif
                     </div>
@@ -976,6 +903,7 @@
                                             insertIndex: null,
                                             insertType: '',
                                             selectedIndex: null,
+                                            paletteDragType: '',
                                             blocks: [],
                                             dragIndex: null,
                                             dragOverIndex: null,
@@ -1396,6 +1324,49 @@
                                                 this.addBlock();
                                             },
 
+                                            startPaletteDrag(type, event) {
+                                                this.paletteDragType = String(type || '').trim();
+                                                if (event && event.dataTransfer) {
+                                                    event.dataTransfer.effectAllowed = 'copy';
+                                                    event.dataTransfer.setData(
+                                                        'application/x-tentapress-block',
+                                                        this.paletteDragType,
+                                                    );
+                                                    event.dataTransfer.setData('text/plain', this.paletteDragType);
+                                                }
+                                            },
+
+                                            endPaletteDrag() {
+                                                this.paletteDragType = '';
+                                            },
+
+                                            draggedBlockType(event) {
+                                                if (!event || !event.dataTransfer) return '';
+                                                const byType = event.dataTransfer.getData(
+                                                    'application/x-tentapress-block',
+                                                );
+                                                if (byType) return String(byType || '').trim();
+                                                const byText = event.dataTransfer.getData('text/plain');
+                                                return String(byText || '').trim();
+                                            },
+
+                                            insertBlockAt(index, type) {
+                                                const cleanType = String(type || '').trim();
+                                                if (!cleanType) return;
+
+                                                const nextIndex = Number.isFinite(index)
+                                                    ? Math.min(Math.max(index, 0), this.blocks.length)
+                                                    : this.blocks.length;
+
+                                                this.blocks.splice(
+                                                    nextIndex,
+                                                    0,
+                                                    this.decorateBlock(this.exampleBlock(cleanType)),
+                                                );
+
+                                                this.selectedIndex = nextIndex;
+                                            },
+
                                             selectBlock(index) {
                                                 if (!Number.isFinite(index)) return;
                                                 if (index < 0 || index >= this.blocks.length) return;
@@ -1505,9 +1476,31 @@
                                                 }
                                             },
 
-                                            dropOn(index) {
+                                            dropOn(index, event) {
+                                                const paletteType = this.draggedBlockType(event);
+                                                if (paletteType) {
+                                                    this.insertBlockAt(index, paletteType);
+                                                    this.paletteDragType = '';
+                                                    this.dragOverIndex = null;
+                                                    return;
+                                                }
                                                 if (this.dragIndex === null || this.dragIndex === undefined) return;
                                                 this.moveTo(this.dragIndex, index);
+                                                this.dragIndex = null;
+                                                this.dragOverIndex = null;
+                                            },
+
+                                            dropOnEnd(event) {
+                                                const paletteType = this.draggedBlockType(event);
+                                                if (paletteType) {
+                                                    this.insertBlockAt(this.blocks.length, paletteType);
+                                                    this.paletteDragType = '';
+                                                    this.dragOverIndex = null;
+                                                    return;
+                                                }
+                                                if (this.dragIndex === null || this.dragIndex === undefined) return;
+                                                const target = Math.max(this.blocks.length - 1, 0);
+                                                this.moveTo(this.dragIndex, target);
                                                 this.dragIndex = null;
                                                 this.dragOverIndex = null;
                                             },
