@@ -6,6 +6,7 @@
     $blocksJson = $blocksJson ?? '[]';
     $initialBlocksJson = old('blocks_json', $blocksJson);
     $initialBlocksJson = is_string($initialBlocksJson) ? $initialBlocksJson : '[]';
+    $editorTitle = is_string($editorTitle ?? null) ? (string) $editorTitle : 'Blocks';
 @endphp
 
 
@@ -18,7 +19,7 @@
                 mediaIndexUrl: @js($mediaIndexUrl),
             })"
     x-init="init()">
-    <label class="tp-label">Blocks</label>
+    <label class="tp-label">{{ $editorTitle }}</label>
 
 @if (isset($header))
     {{ $header }}

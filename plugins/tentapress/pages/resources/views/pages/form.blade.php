@@ -148,6 +148,7 @@
 
                             @component('tentapress-blocks::editor', [
                                 'blocksEditorMode' => $editorMode,
+                                'editorTitle' => $editorMode ? (trim((string) ($page->title ?? '')) !== '' ? $page->title : 'Untitled Page') : null,
                                 'blocksJson' => $blocksJson,
                                 'blockDefinitions' => $blockDefinitions ?? [],
                                 'mediaOptions' => $mediaOptions ?? [],
