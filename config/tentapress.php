@@ -52,6 +52,7 @@ return [
     */
     'plugin_vendor_namespaces' => [
         'tentapress',
+        'acme',
     ],
 
     /*
