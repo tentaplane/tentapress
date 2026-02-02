@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.10.1](https://github.com/tentaplane/tentapress/compare/v0.10.0...v0.10.1) (2026-02-02)
+
+
+### Miscellaneous Chores
+
+* **plugins:** bump blocks/pages/posts versions ([1e81089](https://github.com/tentaplane/tentapress/commit/1e8108920ba3c094f2c069e510a2c1c158e0a615))
+
 ## [0.10.0](https://github.com/tentaplane/tentapress/compare/v0.9.1...v0.10.0) (2026-02-02)
 
 
