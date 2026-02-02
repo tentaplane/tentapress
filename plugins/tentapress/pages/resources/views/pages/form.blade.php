@@ -1552,47 +1552,11 @@
                                             },
 
                                             dragLeave(index, event) {
-                                                if (
-                                                    this.$refs.blocksList &&
-                                                    event &&
-                                                    event.relatedTarget &&
-                                                    this.$refs.blocksList.contains(event.relatedTarget)
-                                                ) {
-                                                    return;
-                                                }
-                                                if (
-                                                    event &&
-                                                    event.currentTarget &&
-                                                    event.relatedTarget &&
-                                                    event.currentTarget.contains(event.relatedTarget)
-                                                ) {
-                                                    return;
-                                                }
-                                                if (this.dragOverIndex === index) {
-                                                    this.dragOverIndex = null;
-                                                }
+                                                return;
                                             },
 
                                             dragLeaveEnd(event) {
-                                                if (
-                                                    this.$refs.blocksList &&
-                                                    event &&
-                                                    event.relatedTarget &&
-                                                    this.$refs.blocksList.contains(event.relatedTarget)
-                                                ) {
-                                                    return;
-                                                }
-                                                if (
-                                                    event &&
-                                                    event.currentTarget &&
-                                                    event.relatedTarget &&
-                                                    event.currentTarget.contains(event.relatedTarget)
-                                                ) {
-                                                    return;
-                                                }
-                                                if (this.dragOverIndex === this.blocks.length) {
-                                                    this.dragOverIndex = null;
-                                                }
+                                                return;
                                             },
 
                                             dropOnList(event) {

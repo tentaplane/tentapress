@@ -1,6 +1,6 @@
 {
   "plugins/tentapress/admin-shell/resources/css/admin.css": {
-    "file": "assets/admin-D-LaEmCk.css",
+    "file": "assets/admin-gAFmJceS.css",
     "src": "plugins/tentapress/admin-shell/resources/css/admin.css",
     "isEntry": true,
     "name": "admin",
@@ -15,7 +15,7 @@
     "isEntry": true
   },
   "resources/css/fallback.css": {
-    "file": "assets/fallback-D8XwSqWz.css",
+    "file": "assets/fallback-Bk0z5Hzc.css",
     "src": "resources/css/fallback.css",
     "isEntry": true,
     "name": "fallback",
