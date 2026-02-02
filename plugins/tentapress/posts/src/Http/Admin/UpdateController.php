@@ -51,6 +51,13 @@ final readonly class UpdateController
 
         $post->save();
 
+        $returnTo = $request->string('return_to')->toString();
+
+        if ($returnTo === 'editor') {
+            return to_route('tp.posts.editor', ['post' => $post->id])
+                ->with('tp_notice_success', 'Post updated.');
+        }
+
         return to_route('tp.posts.edit', ['post' => $post->id])
             ->with('tp_notice_success', 'Post updated.');
     }

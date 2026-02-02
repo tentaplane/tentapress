@@ -49,6 +49,7 @@
                                 <input type="hidden" name="title" value="{{ old('title', $page->title) }}" />
                                 <input type="hidden" name="slug" value="{{ old('slug', $page->slug) }}" />
                                 <input type="hidden" name="layout" value="{{ old('layout', $page->layout) }}" />
+                                <input type="hidden" name="return_to" value="editor" />
                             @else
                                 <div
                                     class="space-y-4"

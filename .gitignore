@@ -33,9 +33,9 @@ CLAUDE.md
 .claude
 .codex
 .junie
+.planning
+.opencode
 /themes/**/node_modules
-/plugins/acme
-/.planning
 /docs/blocks-structure-proposal.md
 /docs/current-state-vs-plan.md
 /docs/oss-distribution.md

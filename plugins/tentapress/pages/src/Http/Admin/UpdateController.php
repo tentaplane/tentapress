@@ -44,6 +44,13 @@ final readonly class UpdateController
 
         $page->save();
 
+        $returnTo = $request->string('return_to')->toString();
+
+        if ($returnTo === 'editor') {
+            return to_route('tp.pages.editor', ['page' => $page->id])
+                ->with('tp_notice_success', 'Page updated.');
+        }
+
         return to_route('tp.pages.edit', ['page' => $page->id])
             ->with('tp_notice_success', 'Page updated.');
     }

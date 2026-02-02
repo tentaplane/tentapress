@@ -67,6 +67,7 @@
                                     name="author_id"
                                     value="{{ $authorId > 0 ? $authorId : '' }}" />
                                 <input type="hidden" name="published_at" value="{{ $publishedAt }}" />
+                                <input type="hidden" name="return_to" value="editor" />
                             @else
                                 <div
                                     class="space-y-4"
