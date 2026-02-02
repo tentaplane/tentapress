@@ -259,13 +259,11 @@
                                                 The blocks JSON is invalid. Fix it in Advanced mode.
                                             </div>
 
-                                            <div class="space-y-3" @dragover.prevent @drop="dropOnEnd($event)">
-                                                <template x-if="paletteDragType">
-                                                    <div
-                                                        class="rounded-2xl border-2 border-dashed border-slate-300 bg-white/70 p-4 text-center text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-                                                        Drop to add block
-                                                    </div>
-                                                </template>
+                                            <div
+                                                class="space-y-3"
+                                                @dragover.prevent="dragOverEnd()"
+                                                @dragleave="dragLeaveEnd()"
+                                                @drop="dropOnEnd($event)">
                                                 <template x-if="blocks.length === 0">
                                                     <div
                                                         class="{{ $editorMode ? 'rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-6 text-sm' : 'rounded-md border border-slate-200 bg-white p-4 text-sm' }}">
@@ -287,6 +285,16 @@
 
                                                 <template x-for="(block, index) in blocks" :key="block._key">
                                                     <div class="space-y-2">
+                                                        <template x-if="dragOverIndex === index">
+                                                            <div class="flex items-center gap-3 px-4">
+                                                                <div class="h-px flex-1 bg-slate-300"></div>
+                                                                <div
+                                                                    class="rounded-full border border-slate-200 bg-white px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-400">
+                                                                    Drop here
+                                                                </div>
+                                                                <div class="h-px flex-1 bg-slate-300"></div>
+                                                            </div>
+                                                        </template>
                                                         <div
                                                             class="{{ $editorMode ? 'group rounded-2xl border border-slate-200 bg-white shadow-sm transition-shadow hover:border-slate-300 hover:shadow-md' : 'tp-metabox bg-zinc-50' }}"
                                                             :class="{
@@ -297,9 +305,9 @@
                                                             @if ($editorMode)
                                                                 @click="selectBlock(index)"
                                                             @endif
-                                                            @dragover.prevent="dragOver(index)"
-                                                            @dragleave="dragLeave(index)"
-                                                            @drop="dropOn(index, $event)">
+                                                            @dragover.prevent.stop="dragOver(index)"
+                                                            @dragleave.stop="dragLeave(index)"
+                                                            @drop.stop="dropOn(index, $event)">
                                                             <div
                                                                 class="{{ $editorMode ? 'flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-4 py-3' : 'tp-metabox__title flex flex-wrap items-center justify-between gap-3' }}">
                                                                 <div class="flex min-w-0 items-center gap-3">
@@ -775,6 +783,16 @@
                                                                 </div>
                                                             @endif
                                                         </div>
+                                                    </div>
+                                                </template>
+                                                <template x-if="dragOverIndex === blocks.length">
+                                                    <div class="flex items-center gap-3 px-4">
+                                                        <div class="h-px flex-1 bg-slate-300"></div>
+                                                        <div
+                                                            class="rounded-full border border-slate-200 bg-white px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-400">
+                                                            Drop here
+                                                        </div>
+                                                        <div class="h-px flex-1 bg-slate-300"></div>
                                                     </div>
                                                 </template>
                                             </div>
@@ -1376,6 +1394,7 @@
 
                                             endPaletteDrag() {
                                                 this.paletteDragType = '';
+                                                this.dragOverIndex = null;
                                             },
 
                                             draggedBlockType(event) {
@@ -1508,8 +1527,18 @@
                                                 this.dragOverIndex = index;
                                             },
 
+                                            dragOverEnd() {
+                                                this.dragOverIndex = this.blocks.length;
+                                            },
+
                                             dragLeave(index) {
                                                 if (this.dragOverIndex === index) {
+                                                    this.dragOverIndex = null;
+                                                }
+                                            },
+
+                                            dragLeaveEnd() {
+                                                if (this.dragOverIndex === this.blocks.length) {
                                                     this.dragOverIndex = null;
                                                 }
                                             },
