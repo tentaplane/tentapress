@@ -99,7 +99,7 @@ sites - quickly, safely, and with minimal operational overhead.
 - **Easy to extend** - modular by design, plugins as packages
 - **Easy to leave** - exports and offboarding are first-class
 
-Read the guiding principles in `MANIFESTO.md` and the longer-term direction in `VISION.md`.
+Read the guiding principles in [`docs/vision/MANIFESTO.md`](docs/vision/MANIFESTO.md) and the longer-term direction in [`docs/vision/VISION.md`](docs/vision/VISION.md).
 
 ## What this is not
 
