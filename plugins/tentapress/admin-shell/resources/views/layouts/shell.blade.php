@@ -6,6 +6,7 @@
         <title>@yield('title', 'Admin') - TentaPress</title>
 
         @vite(['plugins/tentapress/admin-shell/resources/css/admin.css', 'plugins/tentapress/admin-shell/resources/js/admin.js'])
+        @stack('head')
     </head>
     @php
         $fullscreen = trim($__env->yieldContent('shell_fullscreen')) === '1';
@@ -40,5 +41,6 @@
                 </main>
             </div>
         </div>
+        @stack('scripts')
     </body>
 </html>
