@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.13.0](https://github.com/tentaplane/tentapress/compare/v0.12.0...v0.13.0) (2026-02-03)
+
+
+### Features
+
+* **setup:** significantly updated and refined setup script ([ca08a51](https://github.com/tentaplane/tentapress/commit/ca08a51bdfb25976a25dbda5e938fd314439425d))
+
 ## [0.12.0](https://github.com/tentaplane/tentapress/compare/v0.11.0...v0.12.0) (2026-02-03)
 
 
