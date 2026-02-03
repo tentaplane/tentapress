@@ -1,6 +1,6 @@
 {
     "name": "tentaplane/tentapress",
-    "version": "0.13.1",
+    "version": "0.14.0",
     "license": "MIT",
     "require": {
         "php": "^8.2",

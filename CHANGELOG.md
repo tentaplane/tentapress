@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.14.0](https://github.com/tentaplane/tentapress/compare/v0.13.1...v0.14.0) (2026-02-03)
+
+
+### Features
+
+* improved default theme ([e7d4b22](https://github.com/tentaplane/tentapress/commit/e7d4b2293f2b8daf67cd6ee7d4d7c540e15edfd0))
+
+
+### Bug Fixes
+
+* **setup:** fixes block editor display ([0098641](https://github.com/tentaplane/tentapress/commit/0098641997e924b38d4b7ab318a8f7e6153942bf))
+
 ## [0.13.1](https://github.com/tentaplane/tentapress/compare/v0.13.0...v0.13.1) (2026-02-03)
 
 
