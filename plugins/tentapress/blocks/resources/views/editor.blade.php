@@ -293,12 +293,13 @@
                                             <label class="tp-label">Variant</label>
                                             <select
                                                 class="tp-select"
-                                                x-model="block.variant">
+                                                :value="block.variant"
+                                                @change="block.variant = String($event.target.value || '')">
                                                 <template
                                                     x-for="variant in variantsFor(block.type)"
                                                     :key="variant.key">
                                                     <option
-                                                        :value="variant.key"
+                                                        :value="String(variant.key)"
                                                         x-text="variant.label || variant.key"></option>
                                                 </template>
                                             </select>
