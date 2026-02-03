@@ -1,10 +1,8 @@
 {
     "id": "tentapress/block-markdown-editor",
-    "name": "Block Markdown Editor",
+    "name": "Block - Markdown Editor",
     "description": "Adds a Markdown block with a visual editor.",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "provider": "TentaPress\\BlockMarkdownEditor\\BlockMarkdownEditorServiceProvider",
-    "requires": [
-        "tentapress/blocks"
-    ]
+    "requires": ["tentapress/blocks"]
 }
