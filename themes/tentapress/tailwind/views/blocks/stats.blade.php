@@ -46,28 +46,28 @@
 @endphp
 
 @if ($items !== [])
-    <section class="py-14 sm:py-20">
-        <div class="mx-auto max-w-6xl space-y-8 px-6">
+    <section class="py-20 sm:py-24">
+        <div class="mx-auto max-w-7xl space-y-10 px-6">
             @if ($title !== '')
-                <h2 class="font-display text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">
+                <h2 class="font-display text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl">
                     {{ $title }}
                 </h2>
             @endif
 
-            <div class="grid gap-6 {{ $gridClass }}">
+            <div class="grid gap-8 {{ $gridClass }}">
                 @foreach ($items as $item)
                     @php
                         $value = (string) ($item['value'] ?? '');
                         $label = (string) ($item['label'] ?? '');
-                        $cardClass = 'rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm';
+                        $cardClass = 'rounded-3xl border border-slate-200/80 bg-white p-8 shadow-lg shadow-slate-200/60';
                         if ($dividers && $loop->index > 0) {
                             $cardClass .= ' lg:border-l-4 lg:border-l-brand-100 lg:pl-8';
                         }
                     @endphp
                     <div class="{{ $cardClass }}">
-                        <div class="font-display text-3xl font-semibold text-slate-900">{{ $value }}</div>
+                        <div class="font-display text-4xl font-semibold text-slate-900">{{ $value }}</div>
                         @if ($label !== '')
-                            <div class="mt-2 text-sm text-slate-500">{{ $label }}</div>
+                            <div class="mt-2 text-base text-slate-500">{{ $label }}</div>
                         @endif
                     </div>
                 @endforeach

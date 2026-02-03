@@ -8,7 +8,7 @@
         { "key": "image", "label": "Image", "type": "media" },
         { "key": "alt", "label": "Alt text", "type": "text" },
         { "key": "caption", "label": "Caption", "type": "textarea", "rows": 3 },
-        { "key": "link.url", "label": "Link URL", "type": "url" },
+        { "key": "link.url", "label": "Link URL", "type": "text" },
         { "key": "link.label", "label": "Link Label", "type": "text" },
         {
             "key": "alignment",

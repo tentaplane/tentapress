@@ -33,15 +33,15 @@
 @endphp
 
 @if ($items !== [])
-    <section class="py-14 sm:py-20">
-        <div class="mx-auto max-w-5xl space-y-8 px-6">
+    <section class="py-20 sm:py-24">
+        <div class="mx-auto max-w-6xl space-y-10 px-6">
             @if ($title !== '')
-                <h2 class="font-display text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">
+                <h2 class="font-display text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl">
                     {{ $title }}
                 </h2>
             @endif
 
-            <div class="space-y-8 border-l border-slate-200 pl-6">
+            <div class="space-y-10 border-l border-slate-200 pl-6">
                 @foreach ($items as $item)
                     @php
                         $date = (string) ($item['date'] ?? '');
@@ -50,17 +50,17 @@
                     @endphp
                     <div class="relative">
                         <div class="absolute -left-[18px] top-1 h-4 w-4 rounded-full border border-brand-200 bg-white shadow-sm"></div>
-                        <div class="space-y-2">
+                        <div class="space-y-3">
                             @if ($date !== '')
                                 <div class="text-xs font-semibold uppercase tracking-[0.3em] text-brand-600">
                                     {{ $date }}
                                 </div>
                             @endif
                             @if ($itemTitle !== '')
-                                <div class="text-lg font-semibold text-slate-900">{{ $itemTitle }}</div>
+                                <div class="text-xl font-semibold text-slate-900">{{ $itemTitle }}</div>
                             @endif
                             @if ($body !== '')
-                                <div class="text-sm text-slate-600">{{ $body }}</div>
+                                <div class="text-base text-slate-600">{{ $body }}</div>
                             @endif
                         </div>
                     </div>

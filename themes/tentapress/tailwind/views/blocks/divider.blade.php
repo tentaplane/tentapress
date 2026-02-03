@@ -17,8 +17,8 @@
     };
 @endphp
 
-<section class="py-6">
-    <div class="mx-auto max-w-6xl px-6">
+<section class="py-8">
+    <div class="mx-auto max-w-7xl px-6">
         <div style="height: {{ $height }}px" class="flex items-center justify-center">
             @if ($style !== 'none')
                 <div class="w-full {{ $lineClass }}"></div>

@@ -4,12 +4,12 @@
 ])
 
 <footer class="border-t border-slate-200/80 bg-white">
-    <div class="mx-auto w-full max-w-6xl px-6 py-12">
+    <div class="mx-auto w-full max-w-7xl px-6 py-14">
         <div class="grid gap-10 lg:grid-cols-[1.2fr_repeat(3,1fr)]">
             <div class="space-y-4">
                 <div class="flex items-center gap-3">
-                    <span class="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-slate-900 text-xs font-semibold text-white">TP</span>
-                    <span class="font-display text-base font-semibold text-slate-900">{{ $title }}</span>
+                    <span class="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-900 text-xs font-semibold text-white">TP</span>
+                    <span class="font-display text-lg font-semibold text-slate-900">{{ $title }}</span>
                 </div>
                 <p class="text-sm text-slate-500">{{ $tagline }}</p>
                 <div class="flex flex-wrap items-center gap-3 text-sm text-slate-500">
@@ -47,7 +47,7 @@
             </div>
         </div>
 
-        <div class="mt-10 flex flex-wrap items-center justify-between gap-4 border-t border-slate-200/70 pt-6 text-xs text-slate-500">
+        <div class="mt-12 flex flex-wrap items-center justify-between gap-4 border-t border-slate-200/70 pt-6 text-xs text-slate-500">
             <span>&copy; {{ date('Y') }} {{ $title }}. All rights reserved.</span>
             <div class="flex flex-wrap gap-4">
                 <a class="hover:text-slate-900" href="#">Privacy</a>

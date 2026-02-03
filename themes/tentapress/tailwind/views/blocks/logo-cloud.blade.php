@@ -38,24 +38,24 @@
 @endphp
 
 @if ($logos !== [])
-    <section class="py-12 sm:py-16">
-        <div class="mx-auto max-w-6xl space-y-6 px-6">
+    <section class="py-16 sm:py-20">
+        <div class="mx-auto max-w-7xl space-y-8 px-6">
             @if ($title !== '' || $subtitle !== '')
                 <div class="space-y-3 text-center">
                     @if ($title !== '')
-                        <h2 class="font-display text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">
+                        <h2 class="font-display text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">
                             {{ $title }}
                         </h2>
                     @endif
                     @if ($subtitle !== '')
-                        <p class="text-pretty text-sm text-slate-500">{{ $subtitle }}</p>
+                        <p class="text-pretty text-base text-slate-500">{{ $subtitle }}</p>
                     @endif
                 </div>
             @endif
 
             <div class="grid items-center gap-6 {{ $gridClass }}">
                 @foreach ($logos as $logo)
-                    <div class="flex items-center justify-center rounded-2xl border border-slate-200/70 bg-white/80 px-6 py-4 shadow-sm">
+                    <div class="flex items-center justify-center rounded-3xl border border-slate-200/70 bg-white/80 px-6 py-5 shadow-lg shadow-slate-200/60">
                         <img
                             src="{{ $logo }}"
                             alt=""

@@ -17,19 +17,19 @@
     $metaClass = $alignment === 'center' ? 'flex-col items-center text-center' : 'items-center';
     $panelClass = $style === 'simple'
         ? 'bg-transparent'
-        : 'rounded-3xl border border-slate-200/80 bg-white p-8 shadow-sm sm:p-10';
+        : 'rounded-[2.5rem] border border-slate-200/80 bg-white p-10 shadow-lg shadow-slate-200/60 sm:p-12';
 @endphp
 
-<section class="py-14 sm:py-20">
-    <div class="mx-auto max-w-6xl px-6">
+<section class="py-20 sm:py-24">
+    <div class="mx-auto max-w-7xl px-6">
         <div class="relative overflow-hidden {{ $panelClass }} {{ $alignClass }}">
             @if ($style !== 'simple')
-                <div class="pointer-events-none absolute -left-10 top-4 h-28 w-28 rounded-full bg-brand-100/70 blur-[90px]"></div>
+                <div class="pointer-events-none absolute -left-12 top-6 h-32 w-32 rounded-full bg-brand-100/80 blur-[100px]"></div>
             @endif
 
             <div class="relative flex flex-col gap-5">
                 @if ($quote !== '')
-                    <blockquote class="text-pretty text-lg font-medium text-slate-700 sm:text-xl">
+                    <blockquote class="text-pretty text-xl font-medium text-slate-700 sm:text-2xl">
                         “{{ $quote }}”
                     </blockquote>
                 @endif

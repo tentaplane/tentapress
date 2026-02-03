@@ -16,30 +16,30 @@
     </head>
     <body class="bg-slate-50 font-sans text-slate-900 antialiased">
         <div class="relative flex min-h-screen flex-col overflow-hidden">
-            <div class="pointer-events-none absolute -top-40 left-1/2 h-96 w-[54rem] -translate-x-1/2 rounded-full bg-brand-500/15 blur-[120px]"></div>
-            <div class="pointer-events-none absolute left-0 top-40 h-72 w-72 rounded-full bg-indigo-400/10 blur-[100px]"></div>
-            <div class="pointer-events-none absolute right-0 top-10 h-64 w-64 rounded-full bg-sky-400/10 blur-[90px]"></div>
+            <div class="pointer-events-none absolute -top-40 left-1/2 h-[28rem] w-[60rem] -translate-x-1/2 rounded-full bg-brand-500/20 blur-[140px]"></div>
+            <div class="pointer-events-none absolute left-0 top-32 h-80 w-80 rounded-full bg-indigo-400/15 blur-[120px]"></div>
+            <div class="pointer-events-none absolute right-0 top-0 h-72 w-72 rounded-full bg-sky-400/15 blur-[110px]"></div>
 
             <x-tp-theme::header />
 
-            <main class="relative z-10 mx-auto w-full max-w-5xl flex-1 space-y-10 px-6 pb-20 pt-12">
+            <main class="relative z-10 mx-auto w-full max-w-6xl flex-1 space-y-12 px-6 pb-24 pt-14">
                 <div class="space-y-3">
                     <div class="text-xs font-semibold uppercase tracking-[0.3em] text-brand-600">Blog</div>
-                    <h1 class="font-display text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Latest posts</h1>
-                    <p class="text-sm text-slate-500">Agency updates, product notes, and helpful guides.</p>
+                    <h1 class="font-display text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl">Latest posts</h1>
+                    <p class="text-base text-slate-500">Agency updates, product notes, and helpful guides.</p>
                 </div>
 
                 @if ($posts->count() === 0)
                     <p class="text-sm text-slate-500">No posts yet.</p>
                 @else
-                    <div class="space-y-6">
+                    <div class="space-y-8">
                         @foreach ($posts as $post)
                             @php
                                 $publishedAt = $post->published_at ?? $post->created_at;
                                 $publishedLabel = $publishedAt?->format('F j, Y') ?? '';
                             @endphp
 
-                            <article class="space-y-3 rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm">
+                            <article class="space-y-3 rounded-3xl border border-slate-200/80 bg-white p-8 shadow-lg shadow-slate-200/60">
                                 <h2 class="text-2xl font-semibold text-slate-900">
                                     <a
                                         class="hover:text-brand-600"

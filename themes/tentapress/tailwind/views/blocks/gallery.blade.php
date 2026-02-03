@@ -43,8 +43,8 @@
 @endphp
 
 @if ($images !== [])
-    <section class="py-14 sm:py-20">
-        <div class="mx-auto max-w-6xl px-6">
+    <section class="py-16 sm:py-24">
+        <div class="mx-auto max-w-7xl px-6">
             <div class="grid {{ $gapClass }} {{ $gridClass }}">
                 @foreach ($images as $url)
                     @php

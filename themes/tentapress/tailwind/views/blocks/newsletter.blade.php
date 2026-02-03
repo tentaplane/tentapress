@@ -41,29 +41,29 @@
     $formClass = $alignment === 'center' ? 'justify-center' : 'justify-start';
 @endphp
 
-<section class="py-14 sm:py-20">
-    <div class="mx-auto max-w-5xl px-6">
-        <div class="relative overflow-hidden rounded-3xl border border-slate-200/80 bg-white p-8 shadow-sm sm:p-10">
-            <div class="pointer-events-none absolute -left-16 top-0 h-32 w-32 rounded-full bg-brand-100/70 blur-[90px]"></div>
-            <div class="pointer-events-none absolute -right-10 top-6 h-36 w-36 rounded-full bg-indigo-200/40 blur-[100px]"></div>
+<section class="py-20 sm:py-24">
+    <div class="mx-auto max-w-6xl px-6">
+        <div class="relative overflow-hidden rounded-[2.5rem] border border-slate-200/80 bg-white p-10 shadow-lg shadow-slate-200/60 sm:p-12">
+            <div class="pointer-events-none absolute -left-16 top-0 h-36 w-36 rounded-full bg-brand-100/80 blur-[100px]"></div>
+            <div class="pointer-events-none absolute -right-12 top-6 h-40 w-40 rounded-full bg-indigo-200/50 blur-[120px]"></div>
 
             <div class="relative flex flex-col gap-4 {{ $alignClass }}">
                 @if ($title !== '')
-                    <h2 class="text-balance font-display text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">
+                    <h2 class="text-balance font-display text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl">
                         {{ $title }}
                     </h2>
                 @endif
                 @if ($body !== '')
-                    <p class="text-pretty text-base text-slate-500">{{ $body }}</p>
+                    <p class="text-pretty text-lg text-slate-500">{{ $body }}</p>
                 @endif
 
                 <form action="{{ $action !== '' ? $action : '#' }}" method="post" class="flex flex-wrap gap-3 {{ $formClass }}">
                     <input
                         type="email"
                         name="email"
-                        class="min-w-[220px] flex-1 rounded-full border border-slate-200 px-4 py-2.5 text-sm text-slate-700 placeholder:text-slate-400"
+                        class="min-w-[240px] flex-1 rounded-full border border-slate-200 px-5 py-3 text-sm text-slate-700 placeholder:text-slate-400"
                         placeholder="{{ $placeholder }}" />
-                    <button type="submit" class="rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-brand-600/30">
+                    <button type="submit" class="rounded-full bg-brand-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-brand-600/30">
                         {{ $buttonLabel }}
                     </button>
                 </form>

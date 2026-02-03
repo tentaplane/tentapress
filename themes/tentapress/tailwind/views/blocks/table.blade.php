@@ -23,14 +23,14 @@
 @endphp
 
 @if ($headers !== [])
-    <section class="py-12 sm:py-16">
-        <div class="mx-auto max-w-6xl space-y-4 px-6">
+    <section class="py-16 sm:py-20">
+        <div class="mx-auto max-w-7xl space-y-5 px-6">
             @if ($title !== '')
-                <h2 class="font-display text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">
+                <h2 class="font-display text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">
                     {{ $title }}
                 </h2>
             @endif
-            <div class="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm">
+            <div class="overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-lg shadow-slate-200/60">
                 <table class="w-full text-left text-sm">
                     <thead class="bg-slate-50 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
                         <tr>

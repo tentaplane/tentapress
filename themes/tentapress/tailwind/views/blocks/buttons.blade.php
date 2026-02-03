@@ -47,8 +47,8 @@
 @endphp
 
 @if ($buttons !== [])
-    <section class="py-10 sm:py-12">
-        <div class="mx-auto max-w-6xl px-6">
+    <section class="py-12 sm:py-16">
+        <div class="mx-auto max-w-7xl px-6">
             <div class="flex flex-wrap gap-3 {{ $alignClass }}">
                 @foreach ($buttons as $button)
                     @php

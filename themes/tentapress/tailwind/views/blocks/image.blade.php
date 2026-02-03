@@ -11,9 +11,9 @@
 
     $widthClass = match ($width) {
         'narrow' => 'max-w-3xl',
-        'wide' => 'max-w-6xl',
+        'wide' => 'max-w-7xl',
         'full' => 'max-w-none',
-        default => 'max-w-5xl',
+        default => 'max-w-6xl',
     };
 
     $alignClass = match ($alignment) {
@@ -32,7 +32,7 @@
 @endphp
 
 @if ($image !== '')
-    <section class="py-12 sm:py-16">
+<section class="py-16 sm:py-20">
         <div class="mx-auto px-6 {{ $widthClass }} {{ $alignClass }}">
             <figure class="{{ $figureClass }}">
                 @if ($linkUrl !== '')

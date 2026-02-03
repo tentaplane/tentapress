@@ -13,13 +13,13 @@
     </head>
     <body class="bg-slate-50 font-sans text-slate-900 antialiased">
         <div class="relative flex min-h-screen flex-col overflow-hidden">
-            <div class="pointer-events-none absolute -top-40 left-1/2 h-96 w-[54rem] -translate-x-1/2 rounded-full bg-brand-500/15 blur-[120px]"></div>
-            <div class="pointer-events-none absolute left-0 top-40 h-72 w-72 rounded-full bg-indigo-400/10 blur-[100px]"></div>
-            <div class="pointer-events-none absolute right-0 top-10 h-64 w-64 rounded-full bg-sky-400/10 blur-[90px]"></div>
+            <div class="pointer-events-none absolute -top-40 left-1/2 h-[28rem] w-[60rem] -translate-x-1/2 rounded-full bg-brand-500/20 blur-[140px]"></div>
+            <div class="pointer-events-none absolute left-0 top-32 h-80 w-80 rounded-full bg-indigo-400/15 blur-[120px]"></div>
+            <div class="pointer-events-none absolute right-0 top-0 h-72 w-72 rounded-full bg-sky-400/15 blur-[110px]"></div>
 
             <x-tp-theme::header />
 
-            <main class="relative z-10 mx-auto w-full max-w-6xl flex-1 px-6 pb-20 pt-10">
+            <main class="relative z-10 mx-auto w-full max-w-7xl flex-1 px-6 pb-24 pt-12">
                 @include('tentapress-pages::partials.blocks', [
                     'blocks' => $page->blocks,
                 ])
