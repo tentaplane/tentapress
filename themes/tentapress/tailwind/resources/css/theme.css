@@ -1,4 +1,4 @@
-@import url("https://fonts.bunny.net/css?family=space-grotesk:700|fira-sans:400,500,600");
+@import url("https://fonts.bunny.net/css?family=space-grotesk:500,600,700|fira-sans:400,500,600");
 
 @import "tailwindcss";
 
@@ -15,19 +15,54 @@
 @source '../../../../../plugins/**/resources/js/**/*.js';
 
 @theme {
+	/* Typography - Space Grotesk for display, Fira Sans for body */
 	--font-sans: 'Fira Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
 		'Segoe UI Symbol', 'Noto Color Emoji';
 	--font-display: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
 		'Segoe UI Symbol', 'Noto Color Emoji';
 
-	--color-brand-50: var(--color-sky-50);
-	--color-brand-100: var(--color-sky-100);
-	--color-brand-200: var(--color-sky-200);
-	--color-brand-300: var(--color-sky-300);
-	--color-brand-400: var(--color-sky-400);
-	--color-brand-500: var(--color-sky-500);
-	--color-brand-600: var(--color-sky-600);
-	--color-brand-700: var(--color-sky-700);
-	--color-brand-800: var(--color-sky-800);
-	--color-brand-900: var(--color-sky-900);
+	/* Brand Primary - Warm indigo for confidence and professionalism */
+	--color-brand-50: oklch(0.97 0.02 275);
+	--color-brand-100: oklch(0.94 0.04 275);
+	--color-brand-200: oklch(0.88 0.08 275);
+	--color-brand-300: oklch(0.78 0.12 275);
+	--color-brand-400: oklch(0.68 0.16 275);
+	--color-brand-500: oklch(0.58 0.18 275);
+	--color-brand-600: oklch(0.50 0.18 275);
+	--color-brand-700: oklch(0.43 0.16 275);
+	--color-brand-800: oklch(0.36 0.12 275);
+	--color-brand-900: oklch(0.30 0.08 275);
+	--color-brand-950: oklch(0.22 0.06 275);
+
+	/* Accent - Warm coral for energy and calls-to-action */
+	--color-accent-50: oklch(0.98 0.02 25);
+	--color-accent-100: oklch(0.95 0.04 25);
+	--color-accent-200: oklch(0.90 0.08 25);
+	--color-accent-300: oklch(0.82 0.12 25);
+	--color-accent-400: oklch(0.72 0.14 25);
+	--color-accent-500: oklch(0.64 0.16 25);
+	--color-accent-600: oklch(0.56 0.15 25);
+
+	/* Surface - Warm stone grays for approachable neutrals */
+	--color-surface-50: oklch(0.985 0.002 75);
+	--color-surface-100: oklch(0.97 0.004 75);
+	--color-surface-200: oklch(0.93 0.006 75);
+	--color-surface-300: oklch(0.87 0.008 75);
+	--color-surface-400: oklch(0.70 0.01 75);
+	--color-surface-500: oklch(0.55 0.01 75);
+	--color-surface-600: oklch(0.45 0.01 75);
+	--color-surface-700: oklch(0.37 0.01 75);
+	--color-surface-800: oklch(0.27 0.008 75);
+	--color-surface-900: oklch(0.20 0.006 75);
+	--color-surface-950: oklch(0.14 0.004 75);
+
+	/* Shadows - Warmer, more natural shadow colors */
+	--shadow-color: 75 6% 20%;
+	--shadow-sm: 0 1px 2px oklch(0.20 0.01 75 / 0.06);
+	--shadow-md: 0 4px 6px -1px oklch(0.20 0.01 75 / 0.08), 0 2px 4px -2px oklch(0.20 0.01 75 / 0.06);
+	--shadow-lg: 0 10px 15px -3px oklch(0.20 0.01 75 / 0.10), 0 4px 6px -4px oklch(0.20 0.01 75 / 0.08);
+	--shadow-xl: 0 20px 25px -5px oklch(0.20 0.01 75 / 0.12), 0 8px 10px -6px oklch(0.20 0.01 75 / 0.08);
+
+	/* Brand-tinted shadows for primary elements */
+	--shadow-brand: 0 10px 20px -4px oklch(0.50 0.18 275 / 0.25);
 }

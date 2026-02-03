@@ -4,26 +4,26 @@ A Tailwind CSS v4 theme for TentaPress.
 
 ## Theme Details
 
-| Field | Value |
-|-------|-------|
-| ID | `tentapress/tailwind` |
-| Version | 0.1.3 |
-| CSS Framework | Tailwind CSS v4 |
+| Field         | Value                 |
+|---------------|-----------------------|
+| ID            | `tentapress/tailwind` |
+| Version       | 0.1.4                 |
+| CSS Framework | Tailwind CSS v4       |
 
 ## Layouts
 
-| Key | Label | Description |
-|-----|-------|-------------|
-| default | Default | Standard page layout |
+| Key     | Label   | Description             |
+|---------|---------|-------------------------|
+| default | Default | Standard page layout    |
 | landing | Landing | Full-width landing page |
-| post | Post | Blog post layout |
+| post    | Post    | Blog post layout        |
 
 ## Menu Locations
 
-| Key | Label |
-|-----|-------|
+| Key     | Label              |
+|---------|--------------------|
 | primary | Primary Navigation |
-| footer | Footer Navigation |
+| footer  | Footer Navigation  |
 
 ## Assets
 
@@ -77,7 +77,7 @@ Tailwind v4 uses CSS-first configuration with `@theme`:
 @import "tailwindcss";
 
 @theme {
-  /* Custom theme variables */
+	/* Custom theme variables */
 }
 ```
 

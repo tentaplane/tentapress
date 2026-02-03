@@ -50,35 +50,35 @@
     $splitLayout = $variant === 'split' || $imagePosition === 'right';
     $layoutClass = $splitLayout ? 'grid gap-14 lg:grid-cols-2 lg:items-center' : 'space-y-6';
     $hasBackground = $bg !== '' && ! $splitLayout;
-    $titleClass = $hasBackground ? 'text-white' : 'text-slate-900';
-    $subClass = $hasBackground ? 'text-white/80' : 'text-slate-500';
+    $titleClass = $hasBackground ? 'text-white' : 'text-surface-900';
+    $subClass = $hasBackground ? 'text-white/85' : 'text-surface-600';
     $eyebrowClass = $hasBackground ? 'text-white/70' : 'text-brand-600';
     $contentWidthClass = $splitLayout ? '' : 'max-w-3xl';
     $contentAlignClass = $alignment === 'center' && ! $splitLayout ? 'mx-auto' : '';
 
     $ctaClass = match ($ctaStyle) {
-        'outline' => $hasBackground ? 'border border-white/40 text-white' : 'border border-slate-200 text-slate-700',
-        'ghost' => $hasBackground ? 'text-white/70 hover:text-white' : 'text-slate-500 hover:text-slate-900',
-        default => 'bg-brand-600 text-white shadow-lg shadow-brand-600/30',
+        'outline' => $hasBackground ? 'border border-white/40 text-white hover:bg-white/10' : 'border border-surface-300 text-surface-700 hover:border-surface-400 hover:bg-surface-50',
+        'ghost' => $hasBackground ? 'text-white/70 hover:text-white' : 'text-surface-600 hover:text-surface-900',
+        default => 'bg-brand-600 text-white shadow-brand hover:bg-brand-700 hover:shadow-xl',
     };
 @endphp
 
-<section class="relative overflow-hidden py-24 sm:py-32">
+<section class="relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] w-screen overflow-hidden py-24 sm:py-32">
     @if ($hasBackground)
         <div class="absolute inset-0">
             <img src="{{ $bg }}" alt="" class="h-full w-full object-cover" />
-            <div class="absolute inset-0 bg-gradient-to-br from-slate-950/80 via-slate-950/55 to-slate-900/30"></div>
+            <div class="absolute inset-0 bg-gradient-to-br from-surface-950/85 via-surface-950/60 to-surface-900/40"></div>
         </div>
     @else
-        <div class="pointer-events-none absolute -top-40 left-1/2 h-[30rem] w-[64rem] -translate-x-1/2 rounded-full bg-brand-300/40 blur-[160px]"></div>
-        <div class="pointer-events-none absolute right-0 top-24 h-80 w-80 rounded-full bg-indigo-200/50 blur-[120px]"></div>
+        <div class="pointer-events-none absolute -top-48 left-1/2 h-[32rem] w-[72rem] -translate-x-1/2 rounded-full bg-brand-200/50 blur-[180px]"></div>
+        <div class="pointer-events-none absolute right-0 top-32 h-72 w-72 rounded-full bg-accent-200/40 blur-[120px]"></div>
     @endif
 
     <div class="relative mx-auto max-w-7xl px-6">
         <div class="{{ $layoutClass }} {{ $alignClass }}">
-            <div class="space-y-5 {{ $contentWidthClass }} {{ $contentAlignClass }}">
+            <div class="space-y-6 {{ $contentWidthClass }} {{ $contentAlignClass }}">
                 @if ($eyebrow !== '')
-                    <div class="text-xs font-semibold uppercase tracking-[0.3em] {{ $eyebrowClass }}">
+                    <div class="text-xs font-semibold uppercase tracking-[0.25em] {{ $eyebrowClass }}">
                         {{ $eyebrow }}
                     </div>
                 @endif
@@ -90,15 +90,15 @@
                 @endif
 
                 @if ($sub !== '')
-                    <p class="text-pretty text-lg sm:text-xl {{ $subClass }}">{{ $sub }}</p>
+                    <p class="text-pretty text-lg leading-relaxed sm:text-xl {{ $subClass }}">{{ $sub }}</p>
                 @endif
 
                 @if (($ctaLabel !== '' && $ctaUrl !== '') || ($secondaryLabel !== '' && $secondaryUrl !== ''))
-                    <div class="mt-2 flex flex-wrap gap-3 {{ $actionsClass }}">
+                    <div class="flex flex-wrap gap-4 pt-2 {{ $actionsClass }}">
                         @if ($ctaLabel !== '' && $ctaUrl !== '')
                             <a
                                 href="{{ $ctaUrl }}"
-                                class="inline-flex items-center rounded-full px-6 py-3 text-sm font-semibold {{ $ctaClass }}">
+                                class="inline-flex items-center rounded-full px-7 py-3.5 text-sm font-semibold transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 {{ $ctaClass }}">
                                 {{ $ctaLabel }}
                             </a>
                         @endif
@@ -106,7 +106,7 @@
                         @if ($secondaryLabel !== '' && $secondaryUrl !== '')
                             <a
                                 href="{{ $secondaryUrl }}"
-                                class="inline-flex items-center rounded-full border px-6 py-3 text-sm font-semibold {{ $hasBackground ? 'border-white/40 text-white/80 hover:text-white' : 'border-slate-200 text-slate-600 hover:text-slate-900' }}">
+                                class="inline-flex items-center rounded-full border px-7 py-3.5 text-sm font-semibold transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 {{ $hasBackground ? 'border-white/40 text-white/90 hover:bg-white/10 hover:text-white' : 'border-surface-300 text-surface-700 hover:border-surface-400 hover:bg-surface-50' }}">
                                 {{ $secondaryLabel }}
                             </a>
                         @endif
@@ -115,7 +115,7 @@
             </div>
 
             @if ($bg !== '' && $splitLayout)
-                <div class="overflow-hidden rounded-3xl border border-slate-200/80 bg-slate-100 shadow-lg shadow-slate-200/60">
+                <div class="overflow-hidden rounded-2xl border border-surface-200/80 bg-surface-100 shadow-lg">
                     <img src="{{ $bg }}" alt="" class="h-full w-full object-cover" />
                 </div>
             @endif
