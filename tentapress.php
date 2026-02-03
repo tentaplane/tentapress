@@ -366,7 +366,28 @@ if ($themeChoice !== 'none') {
             . DIRECTORY_SEPARATOR
             . 'blocks';
         $targetBlocksPath = $themePath . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR . 'blocks';
-        $demoBlockViews = ['hero', 'logo-cloud', 'features', 'stats', 'testimonial', 'cta'];
+        $demoBlockViews = [
+            'hero',
+            'hero/default',
+            'hero/split',
+            'logo-cloud',
+            'features',
+            'content',
+            'stats',
+            'quote',
+            'testimonial',
+            'gallery',
+            'image',
+            'timeline',
+            'table',
+            'faq',
+            'buttons',
+            'newsletter',
+            'embed',
+            'map',
+            'divider',
+            'cta',
+        ];
 
         if (is_dir($sourceBlocksPath)) {
             if (! is_dir($targetBlocksPath)) {
@@ -374,10 +395,17 @@ if ($themeChoice !== 'none') {
             }
 
             foreach ($demoBlockViews as $blockView) {
-                $sourceFile = $sourceBlocksPath . DIRECTORY_SEPARATOR . $blockView . '.blade.php';
-                $targetFile = $targetBlocksPath . DIRECTORY_SEPARATOR . $blockView . '.blade.php';
+                $relativeView = str_replace('/', DIRECTORY_SEPARATOR, $blockView) . '.blade.php';
+                $sourceFile = $sourceBlocksPath . DIRECTORY_SEPARATOR . $relativeView;
+                $targetFile = $targetBlocksPath . DIRECTORY_SEPARATOR . $relativeView;
 
                 if (is_file($sourceFile) && ! is_file($targetFile)) {
+                    $targetDir = dirname($targetFile);
+
+                    if (! is_dir($targetDir)) {
+                        mkdir($targetDir, 0755, true);
+                    }
+
                     copy($sourceFile, $targetFile);
                 }
             }
@@ -388,14 +416,15 @@ if ($themeChoice !== 'none') {
                 'type' => 'blocks/hero',
                 'variant' => 'split',
                 'props' => [
-                    'eyebrow' => 'Introducing TentaPress',
-                    'headline' => "Launch standout websites in days, not weeks.",
-                    'subheadline' => 'A modern block editor with a clean admin and a fast publishing workflow.',
+                    'eyebrow' => 'TentaPress for agencies',
+                    'headline' => 'Launch client sites in days, not weeks.',
+                    'subheadline' => 'A modern block editor with structured content, fast previews, and clean deployment.',
                     'alignment' => 'left',
                     'image_position' => 'right',
+                    'background_image' => 'https://placehold.co/720x520?text=Hero+Preview',
                     'actions' => [
                         [
-                            'label' => 'Admin logo',
+                            'label' => 'Open admin',
                             'url' => '/admin',
                             'style' => 'primary',
                         ],
@@ -408,10 +437,28 @@ if ($themeChoice !== 'none') {
                 ],
             ],
             [
+                'type' => 'blocks/logo-cloud',
+                'props' => [
+                    'title' => 'Trusted by modern studios',
+                    'subtitle' => 'Placeholder client logos for your next launch.',
+                    'logos' => [
+                        'https://placehold.co/160x48?text=Studio+1',
+                        'https://placehold.co/160x48?text=Studio+2',
+                        'https://placehold.co/160x48?text=Studio+3',
+                        'https://placehold.co/160x48?text=Studio+4',
+                        'https://placehold.co/160x48?text=Studio+5',
+                        'https://placehold.co/160x48?text=Studio+6',
+                    ],
+                    'columns' => '5',
+                    'grayscale' => true,
+                    'size' => 'md',
+                ],
+            ],
+            [
                 'type' => 'blocks/features',
                 'props' => [
                     'title' => 'Everything you need to launch',
-                    'subtitle' => 'Compose pages fast with clean blocks, predictable layouts, and powerful settings.',
+                    'subtitle' => 'Compose pages fast with clean blocks, predictable layouts, and agency-ready workflows.',
                     'items' => [
                         ['title' => 'Instant layout system', 'body' => 'Stack blocks and ship without touching code.', 'icon' => '⚡'],
                         ['title' => 'Theme-ready styling', 'body' => 'Utilities that keep the design consistent.', 'icon' => '🎨'],
@@ -424,44 +471,182 @@ if ($themeChoice !== 'none') {
                 ],
             ],
             [
+                'type' => 'blocks/content',
+                'props' => [
+                    'content' => "Add rich, structured content without losing control of the layout.\n\nUse blocks to keep your pages consistent and easy to evolve. This placeholder copy is here to show the flow.",
+                    'width' => 'normal',
+                    'alignment' => 'left',
+                    'background' => 'muted',
+                ],
+            ],
+            [
                 'type' => 'blocks/stats',
                 'props' => [
                     'title' => 'By the numbers',
                     'items' => [
-                        ['value' => '10 x', 'label' => 'Faster publishing'],
-                        ['value' => '99.9%', 'label' => 'Uptime target'],
-                        ['value' => '5 mins', 'label' => 'Average page creation'],
+                        ['value' => '10×', 'label' => 'Faster publishing'],
+                        ['value' => '4 days', 'label' => 'Average turnaround'],
+                        ['value' => '24/7', 'label' => 'Client-ready uptime'],
                     ],
                     'columns' => '3',
                     'dividers' => true,
                 ],
             ],
             [
+                'type' => 'blocks/quote',
+                'props' => [
+                    'quote' => 'TentaPress gives our team one place to build, edit, and ship every client site.',
+                    'name' => 'Jordan Lee',
+                    'role' => 'Creative Director',
+                    'alignment' => 'left',
+                    'style' => 'simple',
+                ],
+            ],
+            [
                 'type' => 'blocks/testimonial',
                 'props' => [
-                    'quote' => 'We replaced three tools with TentaPress and shipped our new website in a week!',
-                    'name' => 'Test User',
-                    'role' => 'Head of Growth, Demo Company',
+                    'quote' => 'We replaced three tools with TentaPress and shipped a full site in a single sprint.',
+                    'name' => 'Taylor Rivers',
+                    'role' => 'Head of Growth, Demo Studio',
                     'rating' => 5,
                     'alignment' => 'left',
                     'style' => 'card',
                 ],
             ],
             [
+                'type' => 'blocks/gallery',
+                'props' => [
+                    'images' => [
+                        'https://placehold.co/640x480?text=Gallery+01',
+                        'https://placehold.co/640x480?text=Gallery+02',
+                        'https://placehold.co/640x480?text=Gallery+03',
+                        'https://placehold.co/640x480?text=Gallery+04',
+                        'https://placehold.co/640x480?text=Gallery+05',
+                        'https://placehold.co/640x480?text=Gallery+06',
+                    ],
+                    'columns' => '3',
+                    'gap' => 'md',
+                    'aspect' => '4:3',
+                    'rounded' => true,
+                ],
+            ],
+            [
+                'type' => 'blocks/image',
+                'props' => [
+                    'image' => 'https://placehold.co/960x540?text=Case+Study+Hero',
+                    'alt' => 'Placeholder project preview',
+                    'caption' => 'Placeholder project hero for a client launch.',
+                    'link' => [
+                        'url' => '#',
+                        'label' => 'View case study',
+                    ],
+                    'alignment' => 'center',
+                    'width' => 'wide',
+                    'rounded' => true,
+                    'shadow' => true,
+                ],
+            ],
+            [
+                'type' => 'blocks/timeline',
+                'props' => [
+                    'title' => 'Launch timeline',
+                    'items' => [
+                        ['date' => 'Week 1', 'title' => 'Discovery', 'body' => 'Scope, content, and site map.'],
+                        ['date' => 'Week 2', 'title' => 'Build', 'body' => 'Compose pages and approve copy.'],
+                        ['date' => 'Week 3', 'title' => 'Launch', 'body' => 'Go live with hosting and analytics.'],
+                    ],
+                ],
+            ],
+            [
+                'type' => 'blocks/table',
+                'props' => [
+                    'title' => 'Sample pricing',
+                    'data' => "Plan,Price,Pages\nStarter,$49,3\nAgency,$149,10\nStudio,$299,Unlimited",
+                    'striped' => true,
+                ],
+            ],
+            [
+                'type' => 'blocks/faq',
+                'props' => [
+                    'title' => 'Frequently asked',
+                    'subtitle' => 'Answers to common questions from agencies.',
+                    'items' => [
+                        ['question' => 'Can we customize the theme?', 'answer' => 'Yes, copy the theme into your installation and adjust the blocks.'],
+                        ['question' => 'Do clients need training?', 'answer' => 'No, the block editor keeps content structured and predictable.'],
+                        ['question' => 'Is hosting included?', 'answer' => 'Connect your preferred hosting provider and deploy anywhere.'],
+                    ],
+                    'open_first' => true,
+                ],
+            ],
+            [
+                'type' => 'blocks/buttons',
+                'props' => [
+                    'actions' => [
+                        ['label' => 'Download brochure', 'url' => '#', 'style' => 'outline'],
+                        ['label' => 'Book a demo', 'url' => '#', 'style' => 'primary'],
+                        ['label' => 'Contact sales', 'url' => '#', 'style' => 'ghost'],
+                    ],
+                    'alignment' => 'left',
+                    'size' => 'md',
+                ],
+            ],
+            [
+                'type' => 'blocks/newsletter',
+                'props' => [
+                    'title' => 'Keep the launch list updated',
+                    'body' => 'Monthly product notes and agency tips.',
+                    'actions' => [
+                        ['label' => 'Subscribe', 'url' => '#', 'style' => 'primary'],
+                    ],
+                    'email_placeholder' => 'hello@agency.com',
+                    'disclaimer' => 'Placeholder only. Unsubscribe anytime.',
+                    'alignment' => 'left',
+                ],
+            ],
+            [
+                'type' => 'blocks/embed',
+                'props' => [
+                    'title' => 'Product walkthrough',
+                    'url' => 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+                    'aspect' => '16:9',
+                    'height' => 480,
+                    'allow_fullscreen' => true,
+                    'caption' => 'Placeholder video embed.',
+                ],
+            ],
+            [
+                'type' => 'blocks/map',
+                'props' => [
+                    'title' => 'Where we work',
+                    'embed_url' => 'https://maps.google.com/maps?q=New%20York&output=embed',
+                    'height' => 420,
+                    'caption' => 'Placeholder map embed.',
+                    'border' => true,
+                ],
+            ],
+            [
+                'type' => 'blocks/divider',
+                'props' => [
+                    'height' => 32,
+                    'label' => '',
+                    'style' => 'line',
+                ],
+            ],
+            [
                 'type' => 'blocks/cta',
                 'props' => [
-                    'title' => 'Launch your next site today',
-                    'body' => 'Start with a polished theme and refine your blocks as you grow.',
+                    'title' => 'Ready to build your next launch?',
+                    'body' => 'Start with the base theme and tailor it to your clients.',
                     'alignment' => 'left',
                     'background' => 'muted',
                     'actions' => [
                         [
-                            'label' => 'Admin logo',
+                            'label' => 'Open admin',
                             'url' => '/admin',
                             'style' => 'primary',
                         ],
                         [
-                            'label' => 'View docs',
+                            'label' => 'Explore docs',
                             'url' => 'https://tentapress.com/docs',
                             'style' => 'outline',
                         ],
