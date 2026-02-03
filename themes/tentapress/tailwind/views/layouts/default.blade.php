@@ -11,46 +11,21 @@
             @vite(['resources/css/theme.css', 'resources/js/theme.js'], 'themes/tentapress/tailwind/build')
         @endif
     </head>
-    <body class="bg-slate-50 text-slate-900 antialiased">
-        <div class="relative overflow-hidden">
-            <div class="pointer-events-none absolute -top-32 left-1/2 h-96 w-[48rem] -translate-x-1/2 rounded-full bg-blue-500/10 blur-[120px]"></div>
-            <div class="pointer-events-none absolute right-0 top-24 h-72 w-72 rounded-full bg-indigo-500/10 blur-[100px]"></div>
+    <body class="bg-slate-50 font-sans text-slate-900 antialiased">
+        <div class="relative flex min-h-screen flex-col overflow-hidden">
+            <div class="pointer-events-none absolute -top-40 left-1/2 h-96 w-[54rem] -translate-x-1/2 rounded-full bg-brand-500/15 blur-[120px]"></div>
+            <div class="pointer-events-none absolute left-0 top-40 h-72 w-72 rounded-full bg-indigo-400/10 blur-[100px]"></div>
+            <div class="pointer-events-none absolute right-0 top-10 h-64 w-64 rounded-full bg-sky-400/10 blur-[90px]"></div>
 
-            <header class="sticky top-0 z-30 border-b border-slate-200/70 bg-white/80 backdrop-blur">
-                <div class="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-                    <a href="/" class="flex items-center gap-2 text-base font-semibold tracking-tight text-slate-900">
-                        <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900 text-white">TP</span>
-                        TentaPress
-                    </a>
-                    <div class="hidden items-center gap-6 md:flex">
-                        <x-tp-theme::menu location="primary" class="text-sm text-slate-600">
-                            <a href="/" class="hover:text-slate-900">Home</a>
-                        </x-tp-theme::menu>
-                        <a
-                            href="/admin"
-                            class="inline-flex items-center rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-slate-900/20 transition hover:-translate-y-0.5 hover:bg-slate-800">
-                            Start free
-                        </a>
-                    </div>
-                </div>
-            </header>
+            <x-tp-theme::header />
 
-            <main class="mx-auto max-w-6xl px-6 pb-20 pt-6">
+            <main class="relative z-10 mx-auto w-full max-w-6xl flex-1 px-6 pb-20 pt-10">
                 @include('tentapress-pages::partials.blocks', [
                     'blocks' => $page->blocks,
                 ])
             </main>
 
-            <footer class="border-t border-slate-200/70 bg-white/70">
-                <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-6 py-8 text-sm text-slate-500">
-                    <div>&copy; {{ date('Y') }} TentaPress. All rights reserved.</div>
-                    <div class="flex gap-4">
-                        <a href="/admin" class="hover:text-slate-900">Admin</a>
-                        <a href="#" class="hover:text-slate-900">Privacy</a>
-                        <a href="#" class="hover:text-slate-900">Terms</a>
-                    </div>
-                </div>
-            </footer>
+            <x-tp-theme::footer />
         </div>
     </body>
 </html>

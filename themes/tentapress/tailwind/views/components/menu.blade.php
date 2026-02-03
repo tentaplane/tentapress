@@ -7,7 +7,7 @@
     $menuItems = is_array($items) ? $items : (isset($tpMenus) ? $tpMenus->itemsForLocation($location) : []);
 @endphp
 
-<nav {{ $attributes->merge(['class' => 'flex gap-4 text-sm text-black/70']) }}>
+<nav {{ $attributes->merge(['class' => 'flex flex-wrap items-center gap-5 text-sm font-medium text-slate-600']) }}>
     @if ($menuItems !== [])
         @foreach ($menuItems as $item)
             @php
@@ -18,11 +18,11 @@
             @endphp
 
             <div class="flex flex-col gap-1">
-                <a href="{{ $url }}" class="hover:underline" @if ($target) target="{{ $target }}" rel="noopener" @endif>
+                <a href="{{ $url }}" class="hover:text-slate-900" @if ($target) target="{{ $target }}" rel="noopener" @endif>
                     {{ $title }}
                 </a>
                 @if ($children !== [])
-                    <div class="flex flex-wrap gap-3 text-xs text-black/60">
+                    <div class="flex flex-wrap gap-3 text-xs text-slate-400">
                         @foreach ($children as $child)
                             @php
                                 $childUrl = (string) ($child['url'] ?? '#');
@@ -30,7 +30,7 @@
                                 $childTarget = isset($child['target']) && is_string($child['target']) ? $child['target'] : null;
                             @endphp
 
-                            <a href="{{ $childUrl }}" class="hover:text-black" @if ($childTarget) target="{{ $childTarget }}" rel="noopener" @endif>
+                            <a href="{{ $childUrl }}" class="hover:text-slate-900" @if ($childTarget) target="{{ $childTarget }}" rel="noopener" @endif>
                                 {{ $childTitle }}
                             </a>
                         @endforeach

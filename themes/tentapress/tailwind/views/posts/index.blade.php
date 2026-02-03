@@ -14,68 +14,66 @@
             @vite(['resources/css/theme.css', 'resources/js/theme.js'], 'themes/tentapress/tailwind/build')
         @endif
     </head>
-    <body class="bg-green-50 text-zinc-900">
-        <header class="border-b border-black/10">
-            <div class="mx-auto flex max-w-5xl items-center justify-between p-6">
-                <div class="font-semibold">Tailwind Theme - TentaPress</div>
-                <x-tp-theme::menu location="primary">
-                    <a href="/" class="hover:underline">Home</a>
-                </x-tp-theme::menu>
-            </div>
-        </header>
+    <body class="bg-slate-50 font-sans text-slate-900 antialiased">
+        <div class="relative flex min-h-screen flex-col overflow-hidden">
+            <div class="pointer-events-none absolute -top-40 left-1/2 h-96 w-[54rem] -translate-x-1/2 rounded-full bg-brand-500/15 blur-[120px]"></div>
+            <div class="pointer-events-none absolute left-0 top-40 h-72 w-72 rounded-full bg-indigo-400/10 blur-[100px]"></div>
+            <div class="pointer-events-none absolute right-0 top-10 h-64 w-64 rounded-full bg-sky-400/10 blur-[90px]"></div>
 
-        <main class="mx-auto max-w-5xl space-y-8 p-6">
-            <div class="space-y-2">
-                <div class="text-xs font-semibold tracking-[0.2em] text-black/50 uppercase">Blog</div>
-                <h1 class="text-3xl font-semibold tracking-tight">Latest posts</h1>
-            </div>
+            <x-tp-theme::header />
 
-            @if ($posts->count() === 0)
-                <p class="text-sm text-black/60">No posts yet.</p>
-            @else
-                <div class="space-y-6">
-                    @foreach ($posts as $post)
-                        @php
-                            $publishedAt = $post->published_at ?? $post->created_at;
-                            $publishedLabel = $publishedAt?->format('F j, Y') ?? '';
-                        @endphp
-
-                        <article class="space-y-2 border-b border-black/10 pb-6">
-                            <h2 class="text-2xl font-semibold">
-                                <a
-                                    class="hover:underline"
-                                    href="{{ route('tp.public.posts.show', ['slug' => $post->slug]) }}">
-                                    {{ $post->title }}
-                                </a>
-                            </h2>
-                            <div class="flex flex-wrap gap-x-4 text-sm text-black/60">
-                                @if ($publishedLabel !== '')
-                                    <span>{{ $publishedLabel }}</span>
-                                @endif
-
-                                @if ($post->author)
-                                    <span>By {{ $post->author->name ?: 'Author #' . $post->author->id }}</span>
-                                @endif
-                            </div>
-                            <div>
-                                <a
-                                    class="text-sm font-medium text-black/70 hover:text-black"
-                                    href="{{ route('tp.public.posts.show', ['slug' => $post->slug]) }}">
-                                    Read post
-                                </a>
-                            </div>
-                        </article>
-                    @endforeach
+            <main class="relative z-10 mx-auto w-full max-w-5xl flex-1 space-y-10 px-6 pb-20 pt-12">
+                <div class="space-y-3">
+                    <div class="text-xs font-semibold uppercase tracking-[0.3em] text-brand-600">Blog</div>
+                    <h1 class="font-display text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Latest posts</h1>
+                    <p class="text-sm text-slate-500">Agency updates, product notes, and helpful guides.</p>
                 </div>
 
-                <div>
-                    {{ $posts->links() }}
-                </div>
-            @endif
-        </main>
+                @if ($posts->count() === 0)
+                    <p class="text-sm text-slate-500">No posts yet.</p>
+                @else
+                    <div class="space-y-6">
+                        @foreach ($posts as $post)
+                            @php
+                                $publishedAt = $post->published_at ?? $post->created_at;
+                                $publishedLabel = $publishedAt?->format('F j, Y') ?? '';
+                            @endphp
 
-        <footer class="border-t border-black/10">
-            <div class="mx-auto max-w-5xl p-6 text-sm text-black/60">&copy; {{ date('Y') }} TentaPress</div>
-        </footer>
+                            <article class="space-y-3 rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm">
+                                <h2 class="text-2xl font-semibold text-slate-900">
+                                    <a
+                                        class="hover:text-brand-600"
+                                        href="{{ route('tp.public.posts.show', ['slug' => $post->slug]) }}">
+                                        {{ $post->title }}
+                                    </a>
+                                </h2>
+                                <div class="flex flex-wrap gap-x-4 text-sm text-slate-500">
+                                    @if ($publishedLabel !== '')
+                                        <span>{{ $publishedLabel }}</span>
+                                    @endif
+
+                                    @if ($post->author)
+                                        <span>By {{ $post->author->name ?: 'Author #' . $post->author->id }}</span>
+                                    @endif
+                                </div>
+                                <div>
+                                    <a
+                                        class="text-sm font-semibold text-brand-600"
+                                        href="{{ route('tp.public.posts.show', ['slug' => $post->slug]) }}">
+                                        Read post
+                                    </a>
+                                </div>
+                            </article>
+                        @endforeach
+                    </div>
+
+                    <div class="text-sm text-slate-500">
+                        {{ $posts->links() }}
+                    </div>
+                @endif
+            </main>
+
+            <x-tp-theme::footer />
+        </div>
     </body>
 </html>
