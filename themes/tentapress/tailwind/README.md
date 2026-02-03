@@ -37,10 +37,9 @@ bun install --cwd themes/tentapress/tailwind
 
 # Build assets
 bun run --cwd themes/tentapress/tailwind build
-
-# Development with HMR
-bun run --cwd themes/tentapress/tailwind dev
 ```
+
+Note: this theme currently supports build-only workflows (no HMR/dev server).
 
 ### Entrypoints
 
