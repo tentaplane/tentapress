@@ -4,10 +4,10 @@ Admin UI shell providing the base layout, navigation, and shared components for 
 
 ## Plugin Details
 
-| Field | Value |
-|-------|-------|
-| ID | `tentapress/admin-shell` |
-| Version | 0.1.4 |
+| Field    | Value                                             |
+|----------|---------------------------------------------------|
+| ID       | `tentapress/admin-shell`                          |
+| Version  | 0.1.5                                             |
 | Provider | `TentaPress\AdminShell\AdminShellServiceProvider` |
 
 ## Features
@@ -24,19 +24,21 @@ None.
 
 ## Admin Routes
 
-| Route | Name | Description |
-|-------|------|-------------|
+| Route    | Name                 | Description     |
+|----------|----------------------|-----------------|
 | `/admin` | `tp.admin.dashboard` | Admin dashboard |
 
 ## Assets
 
 ### Goal
+
 Keep admin CSS/JS owned by the `admin-shell` plugin while allowing the root Vite build to compile them for the app.
 
 ### Source and build
+
 - Admin assets live in this plugin:
-  - `resources/css/admin.css` - Tailwind CSS with `tp-*` utilities
-  - `resources/js/admin.js` - Alpine.js components
+    - `resources/css/admin.css` - Tailwind CSS with `tp-*` utilities
+    - `resources/js/admin.js` - Alpine.js components
 - Root `vite.config.js` compiles admin assets + a public fallback stylesheet.
 - Admin layouts reference plugin assets via `@vite([...])`.
 - Themes compile their own assets within theme folders (theme assets are excluded from the root build).

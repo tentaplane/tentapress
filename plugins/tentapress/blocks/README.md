@@ -4,10 +4,10 @@ Block registry and rendering system for TentaPress pages and posts.
 
 ## Plugin Details
 
-| Field | Value |
-|-------|-------|
-| ID | `tentapress/blocks` |
-| Version | 0.2.3 |
+| Field    | Value                                     |
+|----------|-------------------------------------------|
+| ID       | `tentapress/blocks`                       |
+| Version  | 0.2.4                                     |
 | Provider | `TentaPress\Blocks\BlocksServiceProvider` |
 
 ## Features

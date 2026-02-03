@@ -737,10 +737,16 @@
                     class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
                     x-show="mediaModalOpen"
                     x-cloak
+                    x-bind:hidden="!mediaModalOpen"
+                    hidden
+                    style="display: none;"
                     @keydown.escape.window="closeMediaModal()"
                     @click.self="closeMediaModal()">
                     <div
-                        class="flex max-h-[85vh] w-full max-w-6xl flex-col overflow-hidden rounded-lg border border-black/10 bg-white shadow-xl">
+                        class="flex max-h-[85vh] w-full max-w-6xl flex-col overflow-hidden rounded-lg border border-black/10 bg-white shadow-xl"
+                        x-bind:hidden="!mediaModalOpen"
+                        hidden
+                        style="display: none;">
                         <div
                             class="flex flex-wrap items-center gap-2 border-b border-black/10 px-4 py-3">
                             <div class="min-w-0 flex-1">
@@ -915,6 +921,7 @@
                     this.blocks = parsed.blocks.map((b) => this.decorateBlock(b));
                     this.jsonInvalid = !parsed.ok;
                     this.selectedIndex = this.blocks.length ? 0 : null;
+                    this.applyStoredCollapseState();
 
                     this.sync();
 
@@ -1450,6 +1457,10 @@
 
                 draggedBlockType(event) {
                     if (!event || !event.dataTransfer) return '';
+                    const isMove = event.dataTransfer.getData(
+                        'application/x-tentapress-move',
+                    );
+                    if (isMove === '1') return '';
                     const byType = event.dataTransfer.getData(
                         'application/x-tentapress-block',
                     );
@@ -1550,6 +1561,7 @@
                     }
                     if (event && event.dataTransfer) {
                         event.dataTransfer.effectAllowed = 'move';
+                        event.dataTransfer.setData('application/x-tentapress-move', '1');
                         event.dataTransfer.setData('text/plain', 'move');
 
                         const row = event.target?.closest('.tp-metabox');
@@ -1650,12 +1662,55 @@
                     this.blocks.forEach((block) => {
                         block._collapsed = false;
                     });
+                    this.storeCollapseState('expanded');
                 },
 
                 collapseAll() {
                     this.blocks.forEach((block) => {
                         block._collapsed = true;
                     });
+                    this.storeCollapseState('collapsed');
+                },
+
+                collapseStateKey() {
+                    const path =
+                        typeof window !== 'undefined' && window.location
+                            ? window.location.pathname
+                            : 'unknown';
+                    return `tp.blocks.collapseState:${path}`;
+                },
+
+                applyStoredCollapseState() {
+                    if (typeof window === 'undefined' || !window.localStorage) {
+                        return;
+                    }
+                    try {
+                        const state = window.localStorage.getItem(
+                            this.collapseStateKey(),
+                        );
+                        if (state === 'collapsed') {
+                            this.blocks.forEach((block) => {
+                                block._collapsed = true;
+                            });
+                        } else if (state === 'expanded') {
+                            this.blocks.forEach((block) => {
+                                block._collapsed = false;
+                            });
+                        }
+                    } catch (e) {
+                        return;
+                    }
+                },
+
+                storeCollapseState(state) {
+                    if (typeof window === 'undefined' || !window.localStorage) {
+                        return;
+                    }
+                    try {
+                        window.localStorage.setItem(this.collapseStateKey(), state);
+                    } catch (e) {
+                        return;
+                    }
                 },
 
                 getPropRaw(index, path) {

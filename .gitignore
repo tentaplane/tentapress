@@ -14,6 +14,7 @@
 /auth.json
 /docs/planning
 /node_modules
+/plugins/acme
 /public/hot
 /public/storage
 /public/themes
@@ -36,3 +37,4 @@ CLAUDE.md
 .codex
 .junie
 .opencode
+config.json
