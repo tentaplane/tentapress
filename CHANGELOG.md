@@ -4,6 +4,37 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.12.0](https://github.com/tentaplane/tentapress/compare/v0.11.0...v0.12.0) (2026-02-03)
+
+
+### Features
+
+* **blocks:** restyle hero content features ([b0fbd1c](https://github.com/tentaplane/tentapress/commit/b0fbd1c231e5819cbe73cdbce19608a058497e76))
+* **setup:** seed full demo page ([8ffd317](https://github.com/tentaplane/tentapress/commit/8ffd317a64a3c1e9684439b62f55ee43319ba363))
+* **theme:** amplify base theme ([5fc7aa1](https://github.com/tentaplane/tentapress/commit/5fc7aa127db175e3df5e71464840df830cecd46e))
+* **theme:** make hero full width ([2a9f643](https://github.com/tentaplane/tentapress/commit/2a9f6437cbba55da6fb7162e8084f9c6511215c0))
+* **theme:** refresh base theme shell ([0a1258a](https://github.com/tentaplane/tentapress/commit/0a1258a2463fc4db10688c0ded1e9e9e599a94a1))
+* **theme:** restyle cta testimonial logo-cloud ([838b552](https://github.com/tentaplane/tentapress/commit/838b552db34b068e655d726a467f835f10c17efc))
+* **theme:** restyle gallery image buttons newsletter ([75b450c](https://github.com/tentaplane/tentapress/commit/75b450c19279a0f37b775f4241093170d343905d))
+* **theme:** restyle stats faq quote ([f7448dc](https://github.com/tentaplane/tentapress/commit/f7448dc872060e94bc6cbd6619a8d9b982d5cb15))
+* **theme:** restyle timeline table embed map divider ([6cf5dc0](https://github.com/tentaplane/tentapress/commit/6cf5dc0eaf840aebe904e93d3c604458980592b4))
+
+
+### Bug Fixes
+
+* **blocks:** show variant selection ([b903d87](https://github.com/tentaplane/tentapress/commit/b903d8749c56de0aa71a3b203e220506e6fe9b23))
+* **blocks:** sync select values ([9c995b4](https://github.com/tentaplane/tentapress/commit/9c995b41b0c71b45e8df3e912c093c9aea4ddd6e))
+* **theme:** align vite dev server urls ([a92f886](https://github.com/tentaplane/tentapress/commit/a92f886e3139b65ddf194d291395f6380ac9273b))
+* **theme:** load vite dev assets ([8b7e9bd](https://github.com/tentaplane/tentapress/commit/8b7e9bddaa99ac030b6f66fc4813c4bd6560e349))
+* **theme:** move block overrides into theme ([1c7ef30](https://github.com/tentaplane/tentapress/commit/1c7ef30b41a60c35c76af6150ed9351c5e531f52))
+* **theme:** read custom hot file ([e69fe57](https://github.com/tentaplane/tentapress/commit/e69fe5796cceafaad38243869364a5ad867e8062))
+* **theme:** skip hot reload assets ([9e527b8](https://github.com/tentaplane/tentapress/commit/9e527b8446ac5c9349286d34d46591f60acf5b22))
+
+
+### Miscellaneous Chores
+
+* **theme:** remove dev script ([1439b48](https://github.com/tentaplane/tentapress/commit/1439b4809b01149baf777ddd6419e1b395f0fe2b))
+
 ## [0.11.0](https://github.com/tentaplane/tentapress/compare/v0.10.1...v0.11.0) (2026-02-03)
 
 
