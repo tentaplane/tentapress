@@ -82,11 +82,14 @@
                     @dragleave="dragLeaveAddSection($event)"
                     @drop="dropOnAddSection($event)">
                     <div class="flex flex-wrap items-center gap-2">
-                        <select class="tp-select w-full sm:w-72" x-model="addType">
+                        <select
+                            class="tp-select w-full sm:w-72"
+                            :value="addType"
+                            @change="addType = String($event.target.value || '')">
                             <option value="">Add a block…</option>
                             <template x-for="def in definitions" :key="def.type">
                                 <option
-                                    :value="def.type"
+                                    :value="String(def.type)"
                                     x-text="def.name || def.type"></option>
                             </template>
                         </select>
@@ -300,6 +303,7 @@
                                                     :key="variant.key">
                                                     <option
                                                         :value="String(variant.key)"
+                                                        :selected="String(block.variant || '') === String(variant.key)"
                                                         x-text="variant.label || variant.key"></option>
                                                 </template>
                                             </select>
@@ -413,13 +417,14 @@
                                                         x-if="field.type === 'select'">
                                                         <select
                                                             class="tp-select"
-                                                            @change="setProp(index, field.key, $event.target.value)">
+                                                            :value="String(getProp(index, field.key) ?? '')"
+                                                            @change="setProp(index, field.key, String($event.target.value || ''))">
                                                             <template
                                                                 x-for="opt in selectOptions(field)"
                                                                 :key="opt.value">
                                                                 <option
-                                                                    :value="opt.value"
-                                                                    :selected="getProp(index, field.key) === opt.value"
+                                                                    :value="String(opt.value)"
+                                                                    :selected="String(getProp(index, field.key) ?? '') === String(opt.value)"
                                                                     x-text="opt.label"></option>
                                                             </template>
                                                         </select>
@@ -691,13 +696,14 @@
                                             x-cloak>
                                             <select
                                                 class="tp-select w-full sm:w-64"
-                                                x-model="insertType">
+                                                :value="insertType"
+                                                @change="insertType = String($event.target.value || '')">
                                                 <option value="">Select block…</option>
                                                 <template
                                                     x-for="def in definitions"
                                                     :key="def.type">
                                                     <option
-                                                        :value="def.type"
+                                                        :value="String(def.type)"
                                                         x-text="def.name || def.type"></option>
                                                 </template>
                                             </select>
