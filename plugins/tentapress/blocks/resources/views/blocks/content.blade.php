@@ -14,20 +14,20 @@
 
     $panelClass = match ($background) {
         'none' => 'bg-transparent',
-        'muted' => 'bg-slate-50 border border-black/5',
-        default => 'bg-white border border-black/10',
+        'muted' => 'bg-slate-100/70 border border-slate-200/70',
+        default => 'bg-white border border-slate-200/80 shadow-sm',
     };
 
-    $panelPadding = $background === 'none' ? '' : 'p-8';
+    $panelPadding = $background === 'none' ? '' : 'p-6 sm:p-8';
 @endphp
 
-<section class="py-10">
+<section class="py-12 sm:py-16">
     <div class="mx-auto px-6 {{ $widthClass }}">
-        <div class="rounded-xl {{ $panelClass }} {{ $panelPadding }} {{ $alignClass }}">
+        <div class="rounded-2xl {{ $panelClass }} {{ $panelPadding }} {{ $alignClass }}">
             @if ($content !== '')
-                <div class="prose max-w-none whitespace-pre-wrap">{!! nl2br(e($content)) !!}</div>
+                <div class="prose max-w-none whitespace-pre-wrap text-slate-600">{!! nl2br(e($content)) !!}</div>
             @else
-                <div class="text-black/50">No content.</div>
+                <div class="text-sm text-slate-400">No content.</div>
             @endif
         </div>
     </div>

@@ -13,7 +13,9 @@
             $items = [];
             foreach ($lines as $line) {
                 $line = trim($line);
-                if ($line === '') continue;
+                if ($line === '') {
+                    continue;
+                }
                 $parts = array_map('trim', explode('|', $line));
                 $items[] = [
                     'title' => $parts[0] ?? $line,
@@ -44,15 +46,17 @@
 @endphp
 
 @if ($items !== [])
-    <section class="py-12">
-        <div class="mx-auto max-w-6xl space-y-8 px-6">
+    <section class="py-16 sm:py-20">
+        <div class="mx-auto max-w-6xl space-y-10 px-6">
             @if ($title !== '' || $subtitle !== '')
-                <div class="space-y-2">
+                <div class="space-y-3">
                     @if ($title !== '')
-                        <h2 class="text-2xl font-semibold">{{ $title }}</h2>
+                        <h2 class="font-display text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">
+                            {{ $title }}
+                        </h2>
                     @endif
                     @if ($subtitle !== '')
-                        <p class="text-black/60">{{ $subtitle }}</p>
+                        <p class="text-pretty text-base text-slate-500">{{ $subtitle }}</p>
                     @endif
                 </div>
             @endif
@@ -64,15 +68,18 @@
                         $itemBody = (string) ($item['body'] ?? '');
                         $icon = (string) ($item['icon'] ?? '');
                     @endphp
-                    <div class="rounded-xl border border-black/10 bg-white p-6">
+                    <div class="group relative rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm">
+                        <div class="pointer-events-none absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-brand-200 to-transparent"></div>
                         @if ($icon !== '')
-                            <div class="text-2xl">{{ $icon }}</div>
+                            <div class="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-brand-50 text-xl text-brand-600">
+                                {{ $icon }}
+                            </div>
                         @endif
                         @if ($itemTitle !== '')
-                            <div class="mt-3 text-lg font-semibold">{{ $itemTitle }}</div>
+                            <div class="mt-4 text-lg font-semibold text-slate-900">{{ $itemTitle }}</div>
                         @endif
                         @if ($itemBody !== '')
-                            <p class="mt-2 text-sm text-black/70">{{ $itemBody }}</p>
+                            <p class="mt-2 text-sm text-slate-600">{{ $itemBody }}</p>
                         @endif
                     </div>
                 @endforeach
