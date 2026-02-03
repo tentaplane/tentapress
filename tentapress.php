@@ -18,29 +18,231 @@ if (! is_file($artisanPath)) {
 
 $command = $argv[1] ?? '';
 $skipUser = in_array('--no-user', $argv, true);
+$verbose = in_array('--verbose', $argv, true);
+$quiet = in_array('--quiet', $argv, true);
+$assumeDefaults = in_array('--yes', $argv, true) || in_array('--defaults', $argv, true);
+$logOverride = null;
+$adminEmailOverride = null;
+$adminNameOverride = null;
+$adminPasswordOverride = null;
+$usePasswordStdin = in_array('--password-stdin', $argv, true);
+
+foreach ($argv as $arg) {
+    if (str_starts_with($arg, '--log=')) {
+        $logOverride = substr($arg, 6);
+        break;
+    }
+}
+
+foreach ($argv as $arg) {
+    if (str_starts_with($arg, '--email=')) {
+        $adminEmailOverride = trim(substr($arg, 8));
+        break;
+    }
+}
+
+foreach ($argv as $arg) {
+    if (str_starts_with($arg, '--name=')) {
+        $adminNameOverride = trim(substr($arg, 7));
+        break;
+    }
+}
+
+foreach ($argv as $arg) {
+    if (str_starts_with($arg, '--password=')) {
+        $adminPasswordOverride = substr($arg, 11);
+        break;
+    }
+}
 
 fwrite(
     STDOUT,
-    '  _______         _        _____
- |__   __|       | |      |  __ \
-    | | ___ _ __ | |_ __ _| |__) | __ ___  ___ ___
-    | |/ _ \ \'_ \| __/ _` |  ___/ \'__/ _ \/ __/ __|
-    | |  __/ | | | || (_| | |   | | |  __/\__ \__ \
-    |_|\___|_| |_|\__\__,_|_|   |_|  \___||___/___/' . "\n\n"
+    "TentaPress setup\n" .
+    "We'll walk you through a few quick steps.\n\n"
 );
 
 if ($command !== 'setup') {
-    fwrite(STDOUT, "Usage: php tentapress.php setup [--no-user]\n");
+    fwrite(STDOUT, "Usage: php tentapress.php setup [--no-user] [--email=address] [--name=display] [--password=secret|--password-stdin] [--yes] [--verbose] [--quiet] [--log=path]\n");
     exit($command === '' ? 0 : 1);
 }
 
-$run = static function (string $shellCommand, string $label): void {
-    fwrite(STDOUT, "\n{$label}\n");
-    passthru($shellCommand, $status);
+$logPath = $logOverride;
+
+if ($logPath !== null && $logPath !== '' && ! str_starts_with($logPath, DIRECTORY_SEPARATOR)) {
+    $logPath = $root . DIRECTORY_SEPARATOR . $logPath;
+}
+
+if ($logPath === null || $logPath === '') {
+    $logPath = $root . DIRECTORY_SEPARATOR . 'storage' . DIRECTORY_SEPARATOR . 'logs' . DIRECTORY_SEPARATOR . 'setup-' . date('Ymd-His') . '.log';
+}
+
+$logDir = dirname($logPath);
+
+if (! is_dir($logDir)) {
+    mkdir($logDir, 0755, true);
+}
+
+if (! is_dir($logDir)) {
+    fwrite(STDERR, "Unable to create log directory at {$logDir}.\n");
+    exit(1);
+}
+
+$logHeader = "Setup started at " . date('c');
+file_put_contents($logPath, $logHeader . PHP_EOL);
+
+$writeLog = static function (string $message) use ($logPath): void {
+    file_put_contents($logPath, $message . PHP_EOL, FILE_APPEND);
+};
+
+$stepStart = static function (string $label) use ($quiet, $writeLog): void {
+    $writeLog("== {$label} ==");
+    if (! $quiet) {
+        fwrite(STDOUT, "- {$label}... ");
+    }
+};
+
+$stepSuccess = static function () use ($quiet, $writeLog): void {
+    $writeLog("Status: OK");
+    if (! $quiet) {
+        fwrite(STDOUT, "OK\n");
+    }
+};
+
+$stepFail = static function (string $label, int $status, string $logPath, bool $quiet) use ($writeLog): void {
+    $writeLog("Status: FAIL ({$status})");
+    if (! $quiet) {
+        fwrite(STDOUT, "FAIL\n");
+    }
+    fwrite(STDERR, "Error: {$label} failed. See log: {$logPath}.\n");
+};
+
+$info = static function (string $message) use ($quiet, $writeLog): void {
+    $writeLog($message);
+    if (! $quiet) {
+        fwrite(STDOUT, $message . "\n");
+    }
+};
+
+if ($usePasswordStdin) {
+    if ($adminPasswordOverride !== null) {
+        $info('Warning: --password-stdin overrides --password.');
+    }
+
+    $stdinPassword = fgets(STDIN);
+    $adminPasswordOverride = $stdinPassword === false ? '' : rtrim($stdinPassword, "\r\n");
+}
+
+if ($adminPasswordOverride !== null && $adminPasswordOverride !== '' && ! $usePasswordStdin) {
+    $info('Warning: --password is visible in shell history. Consider leaving it blank to auto-generate.');
+}
+
+$info("Setup log: {$logPath}");
+
+$run = static function (string $shellCommand, string $label) use ($logPath, $quiet, $verbose, $root, $stepStart, $stepSuccess, $stepFail, $writeLog): void {
+    $stepStart($label);
+    $writeLog('$ ' . $shellCommand);
+
+    $descriptorSpec = [
+        1 => ['pipe', 'w'],
+        2 => ['pipe', 'w'],
+    ];
+
+    $process = proc_open($shellCommand, $descriptorSpec, $pipes, $root);
+
+    if (! is_resource($process)) {
+        $stepFail($label, 1, $logPath, $quiet);
+        exit(1);
+    }
+
+    $stdout = stream_get_contents($pipes[1]);
+    $stderr = stream_get_contents($pipes[2]);
+
+    fclose($pipes[1]);
+    fclose($pipes[2]);
+
+    if ($stdout !== false && $stdout !== '') {
+        $writeLog($stdout);
+        if ($verbose && ! $quiet) {
+            fwrite(STDOUT, $stdout);
+        }
+    }
+
+    if ($stderr !== false && $stderr !== '') {
+        $writeLog($stderr);
+        if ($verbose && ! $quiet) {
+            fwrite(STDERR, $stderr);
+        }
+    }
+
+    $status = proc_close($process);
 
     if ($status !== 0) {
+        $stepFail($label, (int) $status, $logPath, $quiet);
         exit((int) $status);
     }
+
+    $stepSuccess();
+};
+
+$runWithOutput = static function (string $shellCommand, string $label, bool $redactPassword) use ($logPath, $quiet, $verbose, $root, $stepStart, $stepSuccess, $stepFail, $writeLog): array {
+    $stepStart($label);
+    $writeLog('$ ' . $shellCommand);
+
+    $descriptorSpec = [
+        1 => ['pipe', 'w'],
+        2 => ['pipe', 'w'],
+    ];
+
+    $process = proc_open($shellCommand, $descriptorSpec, $pipes, $root);
+
+    if (! is_resource($process)) {
+        $stepFail($label, 1, $logPath, $quiet);
+        exit(1);
+    }
+
+    $stdout = stream_get_contents($pipes[1]);
+    $stderr = stream_get_contents($pipes[2]);
+
+    fclose($pipes[1]);
+    fclose($pipes[2]);
+
+    if ($redactPassword) {
+        if ($stdout !== false) {
+            $stdout = (string) preg_replace('/Password:\s*.+/i', 'Password: (hidden)', $stdout);
+        }
+
+        if ($stderr !== false) {
+            $stderr = (string) preg_replace('/Password:\s*.+/i', 'Password: (hidden)', $stderr);
+        }
+    }
+
+    if ($stdout !== false && $stdout !== '') {
+        $writeLog($stdout);
+        if ($verbose && ! $quiet) {
+            fwrite(STDOUT, $stdout);
+        }
+    }
+
+    if ($stderr !== false && $stderr !== '') {
+        $writeLog($stderr);
+        if ($verbose && ! $quiet) {
+            fwrite(STDERR, $stderr);
+        }
+    }
+
+    $status = proc_close($process);
+
+    if ($status !== 0) {
+        $stepFail($label, (int) $status, $logPath, $quiet);
+        exit((int) $status);
+    }
+
+    $stepSuccess();
+
+    return [
+        'stdout' => $stdout === false ? '' : $stdout,
+        'stderr' => $stderr === false ? '' : $stderr,
+    ];
 };
 
 $prompt = static function (string $label): string {
@@ -51,7 +253,10 @@ $prompt = static function (string $label): string {
     return $line === false ? '' : trim($line);
 };
 
-$promptChoice = static function (string $label, array $choices, string $default) use ($prompt): string {
+$promptChoice = static function (string $label, array $choices, string $default) use ($prompt, $assumeDefaults): string {
+    if ($assumeDefaults) {
+        return $default;
+    }
     while (true) {
         $choice = strtolower($prompt($label));
 
@@ -146,7 +351,21 @@ $resolvePackagePath = static function (string $packageName) use ($loadInstalledP
     return null;
 };
 
-$copyThemeFromVendor = static function (string $packageName) use ($prompt, $resolvePackagePath, $root): ?array {
+$confirm = static function (string $label, bool $defaultYes) use ($prompt, $assumeDefaults): bool {
+    if ($assumeDefaults) {
+        return $defaultYes;
+    }
+
+    $choice = strtolower($prompt($label));
+
+    if ($choice === '') {
+        return $defaultYes;
+    }
+
+    return in_array($choice, ['y', 'yes'], true);
+};
+
+$copyThemeFromVendor = static function (string $packageName) use ($prompt, $resolvePackagePath, $root): array|string|null {
     $installPath = $resolvePackagePath($packageName);
 
     if ($installPath === null) {
@@ -194,7 +413,7 @@ $copyThemeFromVendor = static function (string $packageName) use ($prompt, $reso
     );
 
     foreach ($iterator as $item) {
-        $relative = $iterator->getSubPathName();
+        $relative = ltrim(str_replace($installPath . DIRECTORY_SEPARATOR, '', $item->getPathname()), DIRECTORY_SEPARATOR);
         $parts = explode(DIRECTORY_SEPARATOR, $relative);
 
         if ($parts !== [] && in_array($parts[0], $skip, true)) {
@@ -265,7 +484,7 @@ if (! $hasComposerLock && ! $hasVendorFolder) {
     if (! file_exists($envFile) && file_exists($exampleEnvFile)) {
         $run(
             escapeshellarg(PHP_BINARY) . ' -r ' . escapeshellarg("file_exists('.env') || copy('.env.example', '.env');"),
-            'Creating .env...'
+            'Preparing environment (.env)'
         );
     }
 
@@ -274,34 +493,33 @@ if (! $hasComposerLock && ! $hasVendorFolder) {
     if (! file_exists($sqlitePath)) {
         $run(
             escapeshellarg(PHP_BINARY) . ' -r ' . escapeshellarg("file_exists('database/database.sqlite') || touch('database/database.sqlite');"),
-            'Creating SQLite database file...'
+            'Preparing database (SQLite)'
         );
     }
 
     $run(
         $composerCommand . ' install --no-dev --no-interaction --optimize-autoloader --no-scripts',
-        'Installing Composer dependencies...'
+        'Installing dependencies'
     );
 
-    $run($composerCommand . ' run post-autoload-dump', 'Running Composer post-autoload-dump scripts...');
-    $run(escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($artisanPath) . ' key:generate', 'Generating app key...');
-    $run(escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($artisanPath) . ' migrate --force', 'Running initial migrations...');
-    $run($composerCommand . ' run post-update-cmd', 'Running Composer post-update-cmd scripts...');
-    $run(escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($artisanPath) . ' storage:link', 'Linking your local storage files...');
-    $run(escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($artisanPath) . ' tp:plugins defaults --no-interaction', 'Applying default plugins...');
-    $run(escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($artisanPath) . ' migrate --force', 'Running migrations (post plugins installation)...');
-    $run(escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($artisanPath) . ' tp:plugins enable --all', 'Enabling all default plugins...');
-    $run(escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($artisanPath) . ' tp:permissions seed', 'Seeding permissions...');
+    $run($composerCommand . ' run post-autoload-dump', 'Initializing app (Composer scripts)');
+    $run(escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($artisanPath) . ' key:generate', 'Initializing app (app key)');
+    $run(escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($artisanPath) . ' migrate --force', 'Initializing app (database)');
+    $run($composerCommand . ' run post-update-cmd', 'Initializing app (post-update scripts)');
+    $run(escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($artisanPath) . ' storage:link', 'Linking storage');
+    $run(escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($artisanPath) . ' tp:plugins defaults --no-interaction', 'Activating default plugins');
+    $run(escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($artisanPath) . ' migrate --force', 'Finalizing database');
+    $run(escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($artisanPath) . ' tp:plugins enable --all', 'Enabling plugins');
+    $run(escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($artisanPath) . ' tp:permissions seed', 'Seeding permissions');
 } else {
-    fwrite(
-        STDOUT,
-        "Detected existing Composer install (composer.lock or vendor/ present).\n" .
-        "Skipping Composer install and setup steps, proceeding to admin creation.\n\n"
+    $info(
+        "Detected existing install files (composer.lock or vendor/ present).\n" .
+        "Skipping dependency install and core setup steps."
     );
 }
 
 $themeChoice = $promptChoice(
-    "Install a theme? [tailwind/none] (default: tailwind): ",
+    "Install a starter theme? [tailwind/none] (default: tailwind): ",
     [
         'tailwind' => 'tentaplane/theme-tailwind',
         'none' => 'none',
@@ -312,7 +530,7 @@ $themeChoice = $promptChoice(
 if ($themeChoice !== 'none') {
     $run(
         $composerCommand . ' require ' . escapeshellarg($themeChoice) . ' --no-interaction --no-scripts',
-        "Installing theme package {$themeChoice}..."
+        "Installing theme package"
     );
     $themeCopy = $copyThemeFromVendor($themeChoice);
     $themeId = is_array($themeCopy) ? (string) ($themeCopy['id'] ?? $themeChoice) : $themeChoice;
@@ -320,22 +538,22 @@ if ($themeChoice !== 'none') {
     $themePath = $root . DIRECTORY_SEPARATOR . 'themes' . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $themeId);
     $buildTool = null;
     $shouldBuildAssets = false;
-    $run($composerCommand . ' run post-autoload-dump', 'Running Composer post-autoload-dump scripts...');
-    $run($composerCommand . ' run post-update-cmd', 'Running Composer post-update-cmd scripts...');
-    $run(escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($artisanPath) . ' tp:themes sync', 'Syncing themes...');
+    $run($composerCommand . ' run post-autoload-dump', 'Refreshing Composer autoload');
+    $run($composerCommand . ' run post-update-cmd', 'Finalizing theme install');
+    $run(escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($artisanPath) . ' tp:themes sync', 'Syncing themes');
     $run(
         escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($artisanPath) . ' tp:themes activate ' . escapeshellarg($themeId),
-        "Activating theme {$themeId}..."
+        "Activating theme"
     );
 
-    $buildAssets = strtolower($prompt('Build theme assets now? [Y/n]: '));
+    $buildAssets = $confirm('Build theme assets now? [Y/n]: ', true);
 
-    if (in_array($buildAssets, ['y', 'yes'], true)) {
+    if ($buildAssets) {
         $shouldBuildAssets = true;
         $availableTools = $resolveCommands(['bun', 'pnpm', 'npm']);
 
         if ($availableTools === []) {
-            fwrite(STDOUT, "No bun/pnpm/npm detected. Skipping theme asset build.\n");
+            $info('No bun/pnpm/npm detected. Skipping theme asset build.');
             $shouldBuildAssets = false;
         } else {
             $buildTool = $availableTools[0];
@@ -349,9 +567,9 @@ if ($themeChoice !== 'none') {
         }
     }
 
-    $seedDemo = strtolower($prompt('Create a demo home page with sample blocks? [Y/n]: '));
+    $seedDemo = $confirm('Create a demo homepage with sample blocks? [Y/n]: ', true);
 
-    if ($seedDemo === '' || in_array($seedDemo, ['y', 'yes'], true)) {
+    if ($seedDemo) {
         $sourceBlocksPath = $root
             . DIRECTORY_SEPARATOR
             . 'vendor'
@@ -685,7 +903,7 @@ PHP;
 
         $run(
             escapeshellarg(PHP_BINARY) . ' -r ' . escapeshellarg($demoScript),
-            'Creating demo home page...'
+            'Creating demo homepage'
         );
     }
 
@@ -694,49 +912,52 @@ PHP;
             $nodeModulesPath = $themePath . DIRECTORY_SEPARATOR . 'node_modules';
 
             if (! is_dir($nodeModulesPath)) {
-                $installDeps = strtolower($prompt("Install theme dependencies with {$buildTool}? [Y/n]: "));
+                $installDeps = $confirm("Install theme dependencies with {$buildTool}? [Y/n]: ", true);
 
-                if ($installDeps === '' || in_array($installDeps, ['y', 'yes'], true)) {
+                if ($installDeps) {
                     $run(
                         escapeshellarg($buildTool) . ' install --cwd ' . escapeshellarg($themePath),
-                        "Installing theme dependencies with {$buildTool}..."
+                        "Installing theme dependencies"
                     );
                 }
             }
 
             $run(
                 escapeshellarg($buildTool) . ' run --cwd ' . escapeshellarg($themePath) . ' build',
-                "Building theme assets with {$buildTool}..."
+                "Building theme assets"
             );
         } else {
-            fwrite(STDOUT, "Theme not found at {$themePath}. Skipping asset build.\n");
+            $info("Theme not found at {$themePath}. Skipping asset build.");
         }
     }
 }
 
-$email = '';
+$email = $adminEmailOverride ?? '';
 
 if ($skipUser) {
-    fwrite(STDOUT, "Skipping admin user creation (--no-user).\n\n");
+    $info('Skipping admin user creation (--no-user).');
 } else {
     fwrite(
         STDOUT,
-        "Create a super admin user.\n" .
-        "If you leave the password blank, a secure password will be generated for you.\n\n"
+        "Create your admin login.\n" .
+        "Leave the password blank to generate a secure one.\n\n"
     );
 }
 
 if (! $skipUser) {
-    while ($email === '') {
-        $email = $prompt('Admin email address: ');
+    if ($email === '') {
+        while ($email === '') {
+            $email = $prompt('Admin email address: ');
 
-        if ($email === '') {
-            fwrite(STDOUT, "Email address is required.\n");
+            if ($email === '') {
+                fwrite(STDOUT, "Email address is required.\n");
+            }
         }
     }
 
-    $name = $prompt('Admin display name (default: Admin): ');
-    $password = $prompt('Admin password (leave blank to generate): ');
+    $name = $adminNameOverride ?? $prompt('Admin display name (default: Admin): ');
+    $password = $adminPasswordOverride ?? $prompt('Admin password (leave blank to generate): ');
+    $passwordHidden = $password !== '';
 
     $artisanCommand = [
         PHP_BINARY,
@@ -756,7 +977,26 @@ if (! $skipUser) {
 
     $artisanShell = implode(' ', array_map('escapeshellarg', $artisanCommand));
 
-    $run($artisanShell, 'Creating your super admin user...');
+    $result = $runWithOutput($artisanShell, 'Creating admin user', $passwordHidden);
+
+    $info('Admin user created:');
+    $info("- Email: {$email}");
+    $info('- Name: ' . ($name !== '' ? $name : 'Admin'));
+
+    if (! $passwordHidden) {
+        $output = $result['stdout'] . "\n" . $result['stderr'];
+        $generatedPassword = '';
+
+        if (preg_match('/Password:\s*(.+)/', $output, $matches)) {
+            $generatedPassword = trim($matches[1]);
+        }
+
+        if ($generatedPassword !== '') {
+            $info("- Password: {$generatedPassword}");
+        } else {
+            $info('- Password: (see setup log)');
+        }
+    }
 }
 
 fwrite(STDOUT, "\nSetup complete.\n");
@@ -766,5 +1006,5 @@ fwrite(
     "\nNext steps:\n" .
     "- If using Laravel Herd, visit https://tentapress.test/admin\n" .
     "- Otherwise run: php artisan serve, then visit the printed URL + /admin\n" .
-    "- Log in with the admin email/password you just created.\n"
+    "- Log in with the admin email and the password you set (or generated).\n"
 );
