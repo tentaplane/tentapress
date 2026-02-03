@@ -9,16 +9,9 @@
 
         @include('tentapress-seo::head', ['seo' => $seo])
 
-        @php
-            $manifest = public_path('themes/tentapress/tailwind/build/manifest.json');
-            $hotFile = public_path('themes/tentapress/tailwind/hot');
-        @endphp
-        @if (is_file($manifest) || is_file($hotFile))
-            {{
-                \Illuminate\Support\Facades\Vite::useHotFile($hotFile)
-                    ->useBuildDirectory('themes/tentapress/tailwind/build')
-                    ->withEntryPoints(['resources/css/theme.css', 'resources/js/theme.js'])
-            }}
+        @php($manifest = public_path('themes/tentapress/tailwind/build/manifest.json'))
+        @if (is_file($manifest))
+            @vite(['resources/css/theme.css', 'resources/js/theme.js'], 'themes/tentapress/tailwind/build')
         @endif
     </head>
     <body class="bg-slate-50 font-sans text-slate-900 antialiased">
