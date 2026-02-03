@@ -36,6 +36,8 @@ Admin CSS and JS entrypoints live in this plugin:
 
 Built by root Vite config, output to `public/build/`.
 
+More details: `docs/admin-assets.md`.
+
 ## Development
 
 ```bash
