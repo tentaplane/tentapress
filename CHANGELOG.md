@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.11.0](https://github.com/tentaplane/tentapress/compare/v0.10.1...v0.11.0) (2026-02-03)
+
+
+### Features
+
+* **admin:** add asset stacks ([576475e](https://github.com/tentaplane/tentapress/commit/576475e4aadd62a1aa7c026c4817f69ab5147ec7))
+* **blocks:** add markdown editor plugin ([b8ae3d9](https://github.com/tentaplane/tentapress/commit/b8ae3d946086d4dbb2c15787063ce1178e0290c8))
+* **blocks:** add rich text block plugin ([68345ca](https://github.com/tentaplane/tentapress/commit/68345ca312b93054079d87a445d522b51ec4db8d))
+* **editor:** order blocks by origin ([289f8ed](https://github.com/tentaplane/tentapress/commit/289f8edb2e7f3410be2677a65a0503d63df8c0d3))
+
+
+### Bug Fixes
+
+* **editor:** keep fullscreen on save ([52164d6](https://github.com/tentaplane/tentapress/commit/52164d67dc29ba88b187870798636a19ed93d4b3))
+* **markdown-editor:** remove image toolbar ([4e318c0](https://github.com/tentaplane/tentapress/commit/4e318c01fa01f5e43dfb393b908def71918ba7a3))
+* **setup:** removing rich text block, needs a different approach ([8e49646](https://github.com/tentaplane/tentapress/commit/8e496464bb8934c8bcc1dd7f549a6d3f748c495a))
+* **setup:** Updated documentation ([79c9b86](https://github.com/tentaplane/tentapress/commit/79c9b863d524d52f8d185c73031fcefe0a355b36))
+
 ## [0.10.1](https://github.com/tentaplane/tentapress/compare/v0.10.0...v0.10.1) (2026-02-02)
 
 
