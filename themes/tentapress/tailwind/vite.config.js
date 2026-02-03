@@ -11,8 +11,11 @@ export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, appRoot, '');
     const appUrl = env.APP_URL || 'http://localhost';
     const url = new URL(appUrl);
-    const hmrHost = env.VITE_HMR_HOST || url.hostname;
-    const hmrProtocol = env.VITE_HMR_PROTOCOL || url.protocol.replace(':', '');
+    const appProtocol = url.protocol.replace(':', '');
+    const devHost = env.VITE_DEV_SERVER_HOST || url.hostname;
+    const devProtocol = env.VITE_DEV_SERVER_PROTOCOL || appProtocol;
+    const hmrHost = env.VITE_HMR_HOST || devHost;
+    const hmrProtocol = env.VITE_HMR_PROTOCOL || (devProtocol === 'https' ? 'wss' : 'ws');
     const hmrPort = env.VITE_HMR_PORT ? Number(env.VITE_HMR_PORT) : 5173;
 
     return {
@@ -37,8 +40,9 @@ export default defineConfig(({ mode }) => {
             manifest: 'manifest.json',
         },
         server: {
-            host: env.VITE_DEV_SERVER_HOST || 'localhost',
-            origin: `${url.protocol}//${hmrHost}:${hmrPort}`,
+            host: devHost,
+            https: devProtocol === 'https',
+            origin: `${devProtocol}://${devHost}:${hmrPort}`,
             hmr: {
                 host: hmrHost,
                 protocol: hmrProtocol,
