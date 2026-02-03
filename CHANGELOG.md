@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.13.1](https://github.com/tentaplane/tentapress/compare/v0.13.0...v0.13.1) (2026-02-03)
+
+
+### Bug Fixes
+
+* **setup:** minor update to markdown editor release notes ([937da36](https://github.com/tentaplane/tentapress/commit/937da363d68c8dcfa7e169f2d9abe3bbc5710d81))
+
 ## [0.13.0](https://github.com/tentaplane/tentapress/compare/v0.12.0...v0.13.0) (2026-02-03)
 
 
