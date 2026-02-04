@@ -1,6 +1,6 @@
 {
   "plugins/tentapress/admin-shell/resources/css/admin.css": {
-    "file": "assets/admin-CQXpL30L.css",
+    "file": "assets/admin-dVzIkWt2.css",
     "src": "plugins/tentapress/admin-shell/resources/css/admin.css",
     "isEntry": true,
     "name": "admin",
@@ -13,23 +13,5 @@
     "name": "admin",
     "src": "plugins/tentapress/admin-shell/resources/js/admin.js",
     "isEntry": true
-  },
-  "plugins/tentapress/block-markdown-editor/resources/js/markdown-editor.js": {
-    "file": "assets/markdown-editor-l61MpZ2A.js",
-    "name": "markdown-editor",
-    "src": "plugins/tentapress/block-markdown-editor/resources/js/markdown-editor.js",
-    "isEntry": true,
-    "css": [
-      "assets/markdown-editor-DveZXXPf.css"
-    ]
-  },
-  "resources/css/fallback.css": {
-    "file": "assets/fallback-D6h9X-XE.css",
-    "src": "resources/css/fallback.css",
-    "isEntry": true,
-    "name": "fallback",
-    "names": [
-      "fallback.css"
-    ]
   }
 }
