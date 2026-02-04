@@ -6,6 +6,7 @@ namespace TentaPress\Posts\Http\Admin;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\Rule;
 use TentaPress\Posts\Models\TpPost;
 use TentaPress\Posts\Services\PostSlugger;
@@ -43,16 +44,21 @@ final readonly class UpdateController
         $authorId = (int) ($data['author_id'] ?? 0);
         $authorId = $authorId > 0 ? $authorId : null;
 
-        $post->fill([
+        $payload = [
             'title' => (string) $data['title'],
             'slug' => $slug,
             'layout' => $data['layout'] ?? null,
             'blocks' => $blocks,
-            'content' => $pageDoc,
             'author_id' => $authorId,
             'published_at' => $data['published_at'] ?? $post->published_at,
             'updated_by' => $nowUserId ?: null,
-        ]);
+        ];
+
+        if (Schema::hasColumn('tp_posts', 'content')) {
+            $payload['content'] = $pageDoc;
+        }
+
+        $post->fill($payload);
 
         $post->save();
 

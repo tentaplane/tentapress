@@ -6,6 +6,7 @@ namespace TentaPress\Posts\Http\Admin;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\Rule;
 use TentaPress\Posts\Models\TpPost;
 use TentaPress\Posts\Services\PostSlugger;
@@ -48,18 +49,23 @@ final readonly class StoreController
             $authorId = $nowUserId ?: 0;
         }
 
-        $post = TpPost::query()->create([
+        $payload = [
             'title' => $title,
             'slug' => $slug,
             'status' => 'draft',
             'layout' => $data['layout'] ?? null,
             'blocks' => $blocks,
-            'content' => $pageDoc,
             'author_id' => $authorId > 0 ? $authorId : null,
             'created_by' => $nowUserId ?: null,
             'updated_by' => $nowUserId ?: null,
             'published_at' => $data['published_at'] ?? null,
-        ]);
+        ];
+
+        if (Schema::hasColumn('tp_posts', 'content')) {
+            $payload['content'] = $pageDoc;
+        }
+
+        $post = TpPost::query()->create($payload);
 
         return to_route('tp.posts.edit', ['post' => $post->id])
             ->with('tp_notice_success', 'Post created.');
