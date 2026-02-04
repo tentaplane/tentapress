@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.15.2](https://github.com/tentaplane/tentapress/compare/v0.15.1...v0.15.2) (2026-02-04)
+
+
+### Bug Fixes
+
+* **themes:** added a theme sync button to the admin UI ([015c805](https://github.com/tentaplane/tentapress/commit/015c80508c7441688a27a8f4ffed9bac9ca9ab4e))
+
+
+### Miscellaneous Chores
+
+* **themes:** updated base tailwind screenshot ([e8a4cc6](https://github.com/tentaplane/tentapress/commit/e8a4cc64c9afd466e8dd037e7ffccfd45ae80f5a))
+
 ## [0.15.1](https://github.com/tentaplane/tentapress/compare/v0.15.0...v0.15.1) (2026-02-04)
 
 
