@@ -4,10 +4,10 @@ Page management for TentaPress.
 
 ## Plugin Details
 
-| Field | Value |
-|-------|-------|
-| ID | `tentapress/pages` |
-| Version | 0.1.4 |
+| Field    | Value                                   |
+|----------|-----------------------------------------|
+| ID       | `tentapress/pages`                      |
+| Version  | 0.1.5                                   |
 | Provider | `TentaPress\Pages\PagesServiceProvider` |
 
 ## Features
@@ -26,20 +26,20 @@ None.
 
 ## Database
 
-| Table | Purpose |
-|-------|---------|
+| Table      | Purpose      |
+|------------|--------------|
 | `tp_pages` | Page records |
 
 ## Admin Menu
 
-| Label | Route | Capability | Icon | Position |
-|-------|-------|------------|------|----------|
-| Pages | `tp.pages.index` | `manage_pages` | file | 20 |
+| Label | Route            | Capability     | Icon | Position |
+|-------|------------------|----------------|------|----------|
+| Pages | `tp.pages.index` | `manage_pages` | file | 20       |
 
 ## Public Routes
 
-| Route | Description |
-|-------|-------------|
+| Route     | Description         |
+|-----------|---------------------|
 | `/{slug}` | Render page by slug |
 
 ## Development

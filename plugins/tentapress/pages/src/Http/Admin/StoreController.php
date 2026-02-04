@@ -6,6 +6,7 @@ namespace TentaPress\Pages\Http\Admin;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\Rule;
 use TentaPress\Pages\Models\TpPage;
 use TentaPress\Pages\Services\PageSlugger;
@@ -41,17 +42,22 @@ final readonly class StoreController
 
         $nowUserId = Auth::check() && is_object(Auth::user()) ? (int) (Auth::user()->id ?? 0) : null;
 
-        $page = TpPage::query()->create([
+        $payload = [
             'title' => $title,
             'slug' => $slug,
             'status' => 'draft',
             'layout' => $data['layout'] ?? null,
             'blocks' => $blocks,
-            'content' => $pageDoc,
             'created_by' => $nowUserId ?: null,
             'updated_by' => $nowUserId ?: null,
             'published_at' => null,
-        ]);
+        ];
+
+        if (Schema::hasColumn('tp_pages', 'content')) {
+            $payload['content'] = $pageDoc;
+        }
+
+        $page = TpPage::query()->create($payload);
 
         return to_route('tp.pages.edit', ['page' => $page->id])
             ->with('tp_notice_success', 'Page created.');

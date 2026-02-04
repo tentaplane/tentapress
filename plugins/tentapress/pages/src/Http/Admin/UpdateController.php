@@ -6,6 +6,7 @@ namespace TentaPress\Pages\Http\Admin;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\Rule;
 use TentaPress\Pages\Models\TpPage;
 use TentaPress\Pages\Services\PageSlugger;
@@ -38,14 +39,19 @@ final readonly class UpdateController
 
         $nowUserId = Auth::check() && is_object(Auth::user()) ? (int) (Auth::user()->id ?? 0) : null;
 
-        $page->fill([
+        $payload = [
             'title' => (string) $data['title'],
             'slug' => $slug,
             'layout' => $data['layout'] ?? null,
             'blocks' => $blocks,
-            'content' => $pageDoc,
             'updated_by' => $nowUserId ?: null,
-        ]);
+        ];
+
+        if (Schema::hasColumn('tp_pages', 'content')) {
+            $payload['content'] = $pageDoc;
+        }
+
+        $page->fill($payload);
 
         $page->save();
 
