@@ -4,4 +4,6 @@ vendor/
 public/
 .git
 composer.lock
-bun.locl
+package.lock
+bun.lock
+pnpm-lock.yaml
