@@ -15,7 +15,7 @@
 @section('title', $editorMode ? $editorLabel : ($mode === 'create' ? 'Add New Post' : 'Edit Post'))
 
 @section('content')
-    <div class="tp-editor {{ $editorMode ? 'space-y-0 px-4 py-6 sm:px-6 lg:px-8' : 'space-y-6' }}">
+    <div class="tp-editor {{ $editorMode ? 'space-y-0 px-4 pt-0 pb-6 sm:px-6 lg:px-8' : 'space-y-6' }}">
         @if (! $editorMode)
             <div class="tp-page-header">
                 <div>
@@ -217,14 +217,19 @@
                                     @if ($editorMode && $mode === 'edit')
                                         @slot('header')
                                             <div
-                                                class="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
-                                                <div class="flex flex-wrap items-center gap-2 text-xs text-slate-500">
+                                                class="sticky top-0 z-30 -mx-4 flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 bg-white/95 px-4 py-3 shadow-sm backdrop-blur sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
+                                                <div class="min-w-0">
+                                                    <div class="truncate text-base font-semibold text-slate-900">
+                                                        {{ trim((string) ($post->title ?? '')) !== '' ? $post->title : 'Untitled Post' }}
+                                                    </div>
+                                                    <div class="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-slate-500">
                                                     <span
                                                         class="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] font-semibold tracking-[0.12em] text-slate-500 uppercase">
                                                         {{ ucfirst($post->status) }}
                                                     </span>
                                                     <span class="hidden text-slate-300 sm:inline">•</span>
                                                     <span class="hidden sm:inline">Editing blocks</span>
+                                                    </div>
                                                 </div>
                                                 <div class="flex flex-wrap items-center gap-2">
                                                     <button type="submit" form="post-form" class="tp-button-primary">

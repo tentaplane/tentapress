@@ -8,12 +8,14 @@
     $initialBlocksJson = is_string($initialBlocksJson) ? $initialBlocksJson : '[]';
     $editorTitle = is_string($editorTitle ?? null) ? (string) $editorTitle : 'Blocks';
     $hasMarkdown = false;
+	
     foreach ($blockDefinitions as $definition) {
         if (! is_array($definition)) {
             continue;
         }
 
         $fields = is_array($definition['fields'] ?? null) ? $definition['fields'] : [];
+		
         foreach ($fields as $field) {
             if (is_array($field) && ($field['type'] ?? null) === 'markdown') {
                 $hasMarkdown = true;
@@ -56,8 +58,6 @@
                 mediaIndexUrl: @js($mediaIndexUrl),
             })"
     x-init="init()">
-    <label class="tp-label">{{ $editorTitle }}</label>
-
     @if ($hasMarkdown)
         @once
             @push('head')
@@ -71,10 +71,9 @@
         @endonce
     @endif
 
-@if (isset($header))
-    {{ $header }}
-@endif
-
+    @if (isset($header))
+        {{ $header }}
+    @endif
 
     <div class="{{ $blocksEditorMode ? 'grid gap-6 lg:grid-cols-[minmax(0,1fr)_280px]' : '' }}">
         <div class="{{ $blocksEditorMode ? 'space-y-4' : '' }}">
@@ -246,12 +245,11 @@
                                             :aria-label="block._collapsed ? 'Expand block' : 'Collapse block'"
                                             @click="toggleCollapse(index)">
                                             <span class="sr-only" x-text="block._collapsed ? 'Expand' : 'Collapse'"></span>
-                                            <svg
-                                                x-show="block._collapsed" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                                            <svg x-show="block._collapsed" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" />
                                             </svg>
-                                            <svg x-show="!block._collapsed"  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14" />
+                                            <svg x-show="!block._collapsed" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 9V4.5M9 9H4.5M9 9 3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5 5.25 5.25" />
                                             </svg>
                                         </button>
                                         <button
