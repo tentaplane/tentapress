@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.15.5](https://github.com/tentaplane/tentapress/compare/v0.15.4...v0.15.5) (2026-02-04)
+
+
+### Bug Fixes
+
+* **blocks:** better full-screen editor UI ([df80b4c](https://github.com/tentaplane/tentapress/commit/df80b4c5deb122a1fa4d3a9a637617adc2cc7d02))
+* **setup:** seed demo settings ([8691585](https://github.com/tentaplane/tentapress/commit/869158588c1a0ded114b20f46e1b3bff6436e216))
+* **setup:** updating homepage ID setting not required ([fb9262d](https://github.com/tentaplane/tentapress/commit/fb9262d8db33e0113a978c522741e0fd135a6ad8))
+* **theme-tailwind:** simplify the stats block ([9524f2a](https://github.com/tentaplane/tentapress/commit/9524f2af6551c58479310fa8df1a89f617db8116))
+
 ## [0.15.4](https://github.com/tentaplane/tentapress/compare/v0.15.3...v0.15.4) (2026-02-04)
 
 
