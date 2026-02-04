@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.15.6](https://github.com/tentaplane/tentapress/compare/v0.15.5...v0.15.6) (2026-02-04)
+
+
+### Bug Fixes
+
+* **blocks:** improved UX, includes save keyboard command ([c4b6439](https://github.com/tentaplane/tentapress/commit/c4b6439280a77c7fe738809254d298a894ec38d1))
+* **theme-tailwind:** UI improves to theme blocks ([f6e0787](https://github.com/tentaplane/tentapress/commit/f6e078765a16ab5ca6a5aaafcea71318924fa851))
+
 ## [0.15.5](https://github.com/tentaplane/tentapress/compare/v0.15.4...v0.15.5) (2026-02-04)
 
 
