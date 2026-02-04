@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>@yield('title', 'Admin') - TentaPress</title>
 
+        @stack('head-prepend')
         @vite(['plugins/tentapress/admin-shell/resources/css/admin.css', 'plugins/tentapress/admin-shell/resources/js/admin.js'])
         @stack('head')
     </head>
