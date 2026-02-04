@@ -59,12 +59,9 @@
                     @php
                         $value = (string) ($item['value'] ?? '');
                         $label = (string) ($item['label'] ?? '');
-                        $cardClass = 'rounded-[2.5rem] border border-black/[0.08] bg-white p-8';
-                        if ($dividers && $loop->index > 0) {
-                            $cardClass .= ' md:border-l-2 md:border-l-surface-200 md:rounded-l-none';
-                        }
+                        $cardClass = '';
                     @endphp
-                    <div class="{{ $cardClass }}">
+                    <div class="rounded-[2.5rem] border border-black/8 bg-white p-8 md:border-l-2 md:border-l-surface-200 md:rounded-l-none">
                         <div class="font-display text-5xl font-semibold text-surface-900">{{ $value }}</div>
                         @if ($label !== '')
                             <div class="mt-3 text-sm font-medium text-surface-500">{{ $label }}</div>
