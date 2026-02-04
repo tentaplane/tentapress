@@ -6,6 +6,7 @@ namespace TentaPress\System;
 
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Blade;
 use TentaPress\System\Console\PluginsCommand;
 use TentaPress\System\Console\ThemesCommand;
 use TentaPress\System\Http\AdminAuthMiddleware;
@@ -14,6 +15,7 @@ use TentaPress\System\Http\AdminMiddleware;
 use TentaPress\System\Http\CanMiddleware;
 use TentaPress\System\Plugin\PluginManager;
 use TentaPress\System\Plugin\PluginRegistry;
+use TentaPress\System\Plugin\PluginAssetRegistry;
 use TentaPress\System\Theme\ThemeManager;
 use TentaPress\System\Theme\ThemeRegistry;
 
@@ -23,6 +25,7 @@ final class SystemServiceProvider extends ServiceProvider
     {
         $this->app->singleton(PluginRegistry::class);
         $this->app->singleton(PluginManager::class);
+        $this->app->singleton(PluginAssetRegistry::class);
         $this->app->singleton(AdminMiddleware::class);
 
         $this->app->singleton(ThemeRegistry::class);
@@ -36,6 +39,18 @@ final class SystemServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
+
+        Blade::directive('tpPluginAssets', function ($expression): string {
+            return "<?php echo app('".PluginAssetRegistry::class."')->tags({$expression}); ?>";
+        });
+
+        Blade::directive('tpPluginStyles', function ($expression): string {
+            return "<?php echo app('".PluginAssetRegistry::class."')->styleTags({$expression}); ?>";
+        });
+
+        Blade::directive('tpPluginScripts', function ($expression): string {
+            return "<?php echo app('".PluginAssetRegistry::class."')->scriptTags({$expression}); ?>";
+        });
 
         $this->app->make(Router::class)->aliasMiddleware('tp.auth', AdminAuthMiddleware::class);
         $this->app->make(Router::class)->aliasMiddleware('tp.can', CanMiddleware::class);
