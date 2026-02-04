@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.15.1](https://github.com/tentaplane/tentapress/compare/v0.15.0...v0.15.1) (2026-02-04)
+
+
+### Bug Fixes
+
+* **export:** plugins weren’t exported correctly ([8d48b4d](https://github.com/tentaplane/tentapress/commit/8d48b4d2cb62eab7f9230d01ed2c64ac2145f629))
+* **pages:** caveat if page editor isn’t installed ([adc6737](https://github.com/tentaplane/tentapress/commit/adc673777bf51083e0319305210ef4ce6bc1e229))
+* **posts:** caveat if page editor isn’t installed ([6c639c7](https://github.com/tentaplane/tentapress/commit/6c639c7b2b8180ff9c1e6b73676490ea22796655))
+
+
+### Miscellaneous Chores
+
+* **setup:** gitignore restructured ([8bc478f](https://github.com/tentaplane/tentapress/commit/8bc478f45736d7978001d8f62640941ed47e2a29))
+
 ## [0.15.0](https://github.com/tentaplane/tentapress/compare/v0.14.0...v0.15.0) (2026-02-04)
 
 
