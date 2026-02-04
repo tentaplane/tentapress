@@ -4,6 +4,27 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.15.0](https://github.com/tentaplane/tentapress/compare/v0.14.0...v0.15.0) (2026-02-04)
+
+
+### Features
+
+* **block-markdown-editor:** update assets ([3d28578](https://github.com/tentaplane/tentapress/commit/3d28578024cac35f23b79e9635bbde68e87b062f))
+* **blocks:** update editor ([77298d2](https://github.com/tentaplane/tentapress/commit/77298d2eb3bf0ed525ba64ce5ccce955fc9b50ae))
+* **page-editor:** add plugin ([837ef6b](https://github.com/tentaplane/tentapress/commit/837ef6bc046245f58c05ccb6fa3f3f5ef9703260))
+* **pages:** update editor flow ([51ac7c6](https://github.com/tentaplane/tentapress/commit/51ac7c67dad663cffa4fda1236d029d1367bc790))
+* **posts:** update editor flow ([0cc1c2f](https://github.com/tentaplane/tentapress/commit/0cc1c2f512df707820da21ca0465f8d46ea5ece5))
+* **system:** publish plugin assets ([ec1b565](https://github.com/tentaplane/tentapress/commit/ec1b5654d880310b524e6465caa352ac631ea183))
+* **theme-tailwind:** refresh blocks ([f042be2](https://github.com/tentaplane/tentapress/commit/f042be2e769fa175791b109cb230057870a821c2))
+
+
+### Miscellaneous Chores
+
+* **build:** refresh public assets ([b0f4813](https://github.com/tentaplane/tentapress/commit/b0f48133ebf04f8bc8a55745955864cbb7388549))
+* **core:** update tooling and docs ([a43ea00](https://github.com/tentaplane/tentapress/commit/a43ea00ee7421d66e6a6beaa10e1225e0260dc0d))
+* **setup:** better plugin asset management ([4ee0696](https://github.com/tentaplane/tentapress/commit/4ee0696e0133ff5669347eeb4b9e94235b03d943))
+* **theme-bootstrap:** remove bootstrap theme ([6826593](https://github.com/tentaplane/tentapress/commit/682659398e8b8d7e1e761e87306f33d6fc1e2e13))
+
 ## [0.14.0](https://github.com/tentaplane/tentapress/compare/v0.13.1...v0.14.0) (2026-02-03)
 
 
