@@ -6,17 +6,21 @@
     if (is_string($raw)) {
         $trim = trim($raw);
         $decoded = $trim !== '' ? json_decode($trim, true) : null;
+		
         if (is_array($decoded)) {
             $items = $decoded;
         } else {
             $lines = preg_split('/\r?\n/', $trim) ?: [];
             $items = [];
+        
             foreach ($lines as $line) {
                 $line = trim($line);
+				
                 if ($line === '') {
                     continue;
                 }
-                $parts = array_map('trim', explode('|', $line, 2));
+                
+				$parts = array_map('trim', explode('|', $line, 2));
                 $items[] = [
                     'question' => $parts[0] ?? $line,
                     'answer' => $parts[1] ?? '',
@@ -36,7 +40,7 @@
 
 @if ($items !== [])
     <section class="py-16 sm:py-20">
-        <div class="mx-auto max-w-6xl space-y-10 px-6">
+        <div class="mx-auto max-w-4xl space-y-10 px-6">
             @if ($title !== '' || $subtitle !== '')
                 <div class="max-w-2xl space-y-4">
                     @if ($title !== '')

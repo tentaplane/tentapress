@@ -4,20 +4,25 @@
     $alignment = (string) ($props['alignment'] ?? 'left');
     $background = (string) ($props['background'] ?? 'white');
     $rawActions = $props['actions'] ?? [];
+	
     if (is_string($rawActions)) {
         $trim = trim($rawActions);
         $decoded = $trim !== '' ? json_decode($trim, true) : null;
+		
         if (is_array($decoded)) {
             $actions = $decoded;
         } else {
             $lines = preg_split('/\r?\n/', $trim) ?: [];
             $actions = [];
+			
             foreach ($lines as $line) {
                 $line = trim($line);
+				
                 if ($line === '') {
                     continue;
                 }
-                $parts = array_map('trim', explode('|', $line));
+                
+				$parts = array_map('trim', explode('|', $line));
                 $actions[] = [
                     'label' => $parts[0] ?? $line,
                     'url' => $parts[1] ?? '',
@@ -59,8 +64,8 @@
 @endphp
 
 <section class="py-16 sm:py-20">
-    <div class="mx-auto max-w-7xl px-6">
-        <div class="overflow-hidden rounded-[2.5rem] border {{ $panelClass }} p-10 sm:p-16">
+    <div class="mx-auto max-w-5xl px-6">
+        <div class="overflow-hidden rounded-[2.5rem] border {{ $panelClass }} p-10 sm:p-16 bg-white">
             <div class="flex flex-col gap-5 {{ $alignClass }}">
                 @if ($title !== '')
                     <h2 class="text-balance font-display text-4xl font-semibold text-surface-900 sm:text-5xl">
@@ -85,7 +90,7 @@
                         @if ($secondaryLabel !== '' && $secondaryUrl !== '')
                             <a
                                 href="{{ $secondaryUrl }}"
-                                class="inline-flex items-center rounded-lg border border-black/[0.08] px-7 py-3.5 text-sm font-semibold text-surface-700 transition-all hover:bg-surface-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-surface-900 focus-visible:ring-offset-2">
+                                class="inline-flex items-center rounded-lg border border-black/8 px-7 py-3.5 text-sm font-semibold text-surface-700 transition-all hover:bg-surface-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-surface-900 focus-visible:ring-offset-2">
                                 {{ $secondaryLabel }}
                             </a>
                         @endif
