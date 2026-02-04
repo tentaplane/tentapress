@@ -10,7 +10,7 @@ showcase Tailwind base theme. Distribution is via split repos and Packagist-read
 
 ## Decisions (Implemented)
 - Plugin and theme discovery is filesystem-based via `tentapress.json`.
-- Admin assets live in `admin-shell` and are compiled by the root Vite build.
+- Admin assets live in `admin-shell` and are compiled by the admin-shell Vite build.
 - Themes own their own build toolchain and are compiled per theme.
 - Theme installs are copied from `vendor/` into `themes/<vendor>/<theme>` for local edits.
 - Split-publish workflow pushes plugins/themes to separate GitHub repos and tags/releases on version changes.

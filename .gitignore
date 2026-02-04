@@ -39,5 +39,6 @@ CLAUDE.md
 .junie
 .opencode
 config.json
+/public/plugins
 
 /scripts

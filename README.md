@@ -62,8 +62,8 @@ php artisan tp:posts                     # Publish scheduled posts whose date ha
 
 ```bash
 composer dev                             # Run PHP server + queue + logs + Vite
-bun run dev                              # Vite dev server only
-bun run build                            # Build frontend assets
+bun --cwd plugins/tentapress/admin-shell run dev   # Vite dev server only
+bun --cwd plugins/tentapress/admin-shell run build # Build frontend assets
 ./vendor/bin/pint                        # Format PHP code
 ./vendor/bin/pint --dirty                # Format only changed files
 ```
