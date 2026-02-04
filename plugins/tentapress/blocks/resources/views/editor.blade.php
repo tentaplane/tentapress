@@ -165,8 +165,8 @@
                                 @dragleave.stop="dragLeave(index, $event)"
                                 @drop.stop="dropOn(index, $event)">
                                 <div
-                                    class="{{ $blocksEditorMode ? 'flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-4 py-3' : 'tp-metabox__title flex flex-wrap items-center justify-between gap-3' }}">
-                                    <div class="flex min-w-0 items-center gap-3">
+                                    class="{{ $blocksEditorMode ? 'flex flex-nowrap items-center justify-between gap-3 border-b border-slate-200 px-4 py-3 min-h-12' : 'tp-metabox__title flex flex-nowrap items-center justify-between gap-3 min-h-12' }}">
+                                    <div class="flex min-w-0 flex-1 items-center gap-3">
                                         @if ($blocksEditorMode)
                                             <div
                                                 class="flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 text-xs font-semibold text-slate-500">
@@ -217,37 +217,23 @@
                                             </button>
                                         @endif
 
-                                        <div class="min-w-0">
-                                            <div class="flex flex-wrap items-center gap-2">
-                                                @if (! $blocksEditorMode)
-                                                    <span class="tp-muted text-xs">
-                                                        #
-                                                        <span x-text="index + 1"></span>
-                                                    </span>
-                                                @endif
-
+                                        <div class="flex min-w-0 items-center gap-4">
                                                 <span
-                                                    class="font-semibold"
+                                                    class="shrink-0 font-semibold text-sm"
                                                     x-text="titleFor(block.type)"></span>
                                                 <span
-                                                    class="{{ $blocksEditorMode ? 'rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] font-semibold tracking-[0.12em] text-slate-500 uppercase' : 'tp-muted text-xs font-normal' }}"
+                                                    class="{{ $blocksEditorMode ? 'shrink-0 rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] font-semibold tracking-[0.12em] text-slate-500 uppercase' : 'tp-muted text-xs font-normal' }}"
                                                     x-text="block.type"></span>
-                                                <template x-if="block.version">
-                                                    <span
-                                                        class="{{ $blocksEditorMode ? 'rounded-full border border-slate-200 bg-slate-100 px-2 py-0.5 text-[10px] font-semibold tracking-[0.12em] text-slate-500 uppercase' : 'tp-muted text-xs font-normal' }}"
-                                                        x-text="'v' + block.version"></span>
-                                                </template>
                                                 <template x-if="block.variant">
                                                     <span
-                                                        class="{{ $blocksEditorMode ? 'rounded-full border border-slate-200 bg-slate-100 px-2 py-0.5 text-[10px] font-semibold tracking-[0.12em] text-slate-500 uppercase' : 'tp-muted text-xs font-normal' }}"
+                                                        class="{{ $blocksEditorMode ? 'shrink-0 rounded-full border border-slate-200 bg-slate-100 px-2 py-0.5 text-[10px] font-semibold tracking-[0.12em] text-slate-500 uppercase' : 'tp-muted text-xs font-normal' }}"
                                                         x-text="block.variant"></span>
                                                 </template>
-                                            </div>
                                             <template
                                                 x-if="block._collapsed && summaryFor(block, index)">
-                                                <div
-                                                    class="mt-1 text-xs text-slate-500"
-                                                    x-text="summaryFor(block, index)"></div>
+                                                <span
+                                                    class="ml-1 max-w-[160px] truncate text-xs text-slate-500 font-normal"
+                                                    x-text="summaryFor(block, index)"></span>
                                             </template>
                                         </div>
                                     </div>
@@ -255,39 +241,62 @@
                                     <div class="flex flex-wrap items-center gap-2 text-xs">
                                         <button
                                             type="button"
-                                            class="tp-button-link"
+                                            class="tp-button-link inline-flex items-center justify-center rounded-full p-1 text-slate-500 hover:text-slate-700"
+                                            :title="block._collapsed ? 'Expand' : 'Collapse'"
+                                            :aria-label="block._collapsed ? 'Expand block' : 'Collapse block'"
                                             @click="toggleCollapse(index)">
-                                            <span
-                                                x-text="block._collapsed ? 'Expand' : 'Collapse'"></span>
+                                            <span class="sr-only" x-text="block._collapsed ? 'Expand' : 'Collapse'"></span>
+                                            <svg
+                                                x-show="block._collapsed" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                                            </svg>
+                                            <svg x-show="!block._collapsed"  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14" />
+                                            </svg>
                                         </button>
-                                        <span class="text-slate-300">|</span>
                                         <button
                                             type="button"
-                                            class="tp-button-link"
+                                            class="tp-button-link inline-flex items-center justify-center rounded-full p-1 text-slate-500 hover:text-slate-700"
+                                            title="Duplicate"
+                                            aria-label="Duplicate block"
                                             @click="duplicateBlock(index)">
-                                            Duplicate
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H9.75" />
+                                            </svg>
                                         </button>
-                                        <span class="text-slate-300">|</span>
                                         <button
                                             type="button"
-                                            class="tp-button-link"
+                                            class="tp-button-link inline-flex items-center justify-center rounded-full p-1 text-slate-500 hover:text-slate-700"
+                                            title="Move up"
+                                            aria-label="Move block up"
                                             @click="move(index, -1)"
-                                            :disabled="index === 0">
-                                            Move up
+                                            :disabled="index === 0"
+                                            :class="index === 0 ? 'opacity-30 cursor-not-allowed' : ''">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 10.5 12 3m0 0 7.5 7.5M12 3v18" />
+                                            </svg>
                                         </button>
                                         <button
                                             type="button"
-                                            class="tp-button-link"
+                                            class="tp-button-link inline-flex items-center justify-center rounded-full p-1 text-slate-500 hover:text-slate-700"
+                                            title="Move down"
+                                            aria-label="Move block down"
                                             @click="move(index, +1)"
-                                            :disabled="index === blocks.length - 1">
-                                            Move down
+                                            :disabled="index === blocks.length - 1"
+                                            :class="index === blocks.length - 1 ? 'opacity-30 cursor-not-allowed' : ''">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3" />
+                                            </svg>
                                         </button>
-                                        <span class="text-slate-300">|</span>
                                         <button
                                             type="button"
-                                            class="tp-button-link text-red-600 hover:text-red-700"
+                                            class="tp-button-link inline-flex items-center justify-center rounded-full p-1 text-red-600 hover:text-red-700"
+                                            title="Delete"
+                                            aria-label="Delete block"
                                             @click="remove(index)">
-                                            Delete
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                            </svg>
                                         </button>
                                     </div>
                                 </div>
