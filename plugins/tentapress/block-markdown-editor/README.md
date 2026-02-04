@@ -1,33 +1,41 @@
-# Block - Markdown Editor
+# Block Markdown Editor Plugin
 
-Provides a Markdown editor block for the TentaPress blocks system.
+Markdown block editor for TentaPress with precompiled assets and per-plugin build.
 
-## Plugin Details
+## Build Assets (Bun)
 
-| Field    | Value                                                               |
-|----------|---------------------------------------------------------------------|
-| ID       | `tentapress/block-markdown-editor`                                  |
-| Version  | 0.1.2                                                               |
-| Provider | `TentaPress\BlockMarkdownEditor\BlockMarkdownEditorServiceProvider` |
-
-## Requirements
-
-- `tentapress/blocks`
-
-## Installation
-
-Enable the plugin:
+From the plugin folder:
 
 ```bash
-php artisan tp:plugins enable tentapress/block-markdown-editor
+bun install
+bun run build
 ```
 
-## Block
+Or run the helper script:
 
-- **Type**: `blocks/markdown`
-- **View**: `blocks.markdown`
+```bash
+plugins/tentapress/block-markdown-editor/bin/build.sh
+```
 
-## Notes
+## Build Assets (npm)
 
-- The block stores Markdown content in its `content` prop.
-- Rendering is handled by the registered block view.
+If you are not using Bun:
+
+```bash
+npm install
+npm run build
+```
+
+## Output
+
+Compiled assets are written to:
+
+```
+plugins/tentapress/block-markdown-editor/build/
+```
+
+On plugin enable/cache rebuild, assets are copied into:
+
+```
+public/plugins/tentapress/block-markdown-editor/build/
+```

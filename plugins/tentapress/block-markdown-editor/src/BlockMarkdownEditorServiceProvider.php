@@ -7,11 +7,16 @@ namespace TentaPress\BlockMarkdownEditor;
 use Illuminate\Support\ServiceProvider;
 use TentaPress\Blocks\Registry\BlockDefinition;
 use TentaPress\Blocks\Registry\BlockRegistry;
+use TentaPress\System\Plugin\PluginRegistry;
 
 final class BlockMarkdownEditorServiceProvider extends ServiceProvider
 {
     public function boot(): void
     {
+        if (! $this->isPluginEnabled()) {
+            return;
+        }
+
         if (! class_exists(BlockRegistry::class)) {
             return;
         }
@@ -84,5 +89,25 @@ final class BlockMarkdownEditorServiceProvider extends ServiceProvider
         ));
 
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'tentapress-blocks');
+    }
+
+    private function isPluginEnabled(): bool
+    {
+        if (! class_exists(PluginRegistry::class) || ! $this->app->bound(PluginRegistry::class)) {
+            return true;
+        }
+
+        $registry = $this->app->make(PluginRegistry::class);
+        if (! method_exists($registry, 'readCache')) {
+            return true;
+        }
+
+        $enabled = $registry->readCache();
+
+        if ($enabled === []) {
+            return true;
+        }
+
+        return isset($enabled['tentapress/block-markdown-editor']);
     }
 }

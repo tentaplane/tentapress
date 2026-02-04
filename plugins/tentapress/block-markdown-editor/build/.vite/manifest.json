@@ -1,0 +1,11 @@
+{
+  "resources/js/markdown-editor.js": {
+    "file": "markdown-editor-y7nyT2m-.js",
+    "name": "markdown-editor",
+    "src": "resources/js/markdown-editor.js",
+    "isEntry": true,
+    "css": [
+      "markdown-editor-DveZXXPf.css"
+    ]
+  }
+}

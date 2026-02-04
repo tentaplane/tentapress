@@ -1,0 +1,13 @@
+{
+    "name": "@tentapress/block-markdown-editor",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "build": "vite build",
+        "dev": "vite"
+    },
+    "devDependencies": {
+        "@toast-ui/editor": "^3.2.2",
+        "vite": "^7.3.1"
+    }
+}
