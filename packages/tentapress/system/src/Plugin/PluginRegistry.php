@@ -310,6 +310,17 @@ final class PluginRegistry
             ];
         }
 
+        if (app()->bound(PluginAssetPublisher::class)) {
+            $publisher = app()->make(PluginAssetPublisher::class);
+            foreach ($enabled as $p) {
+                $id = (string) ($p['id'] ?? '');
+                $path = (string) ($p['path'] ?? '');
+                if ($id !== '' && $path !== '') {
+                    $publisher->publish($id, $path);
+                }
+            }
+        }
+
         $path = Paths::pluginCachePath();
         $dir = dirname($path);
 

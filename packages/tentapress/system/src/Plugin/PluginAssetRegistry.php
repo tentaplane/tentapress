@@ -121,6 +121,25 @@ final class PluginAssetRegistry
         return implode("\n", $tags);
     }
 
+    /**
+     * @return array{enabled:bool,manifest_path:?string,manifest_found:bool,assets:array{scripts:array<int,string>,styles:array<int,string>}}
+     */
+    public function debugInfo(string $pluginId, string $context = 'admin'): array
+    {
+        $this->ensurePublicAssets($pluginId);
+        $enabled = $this->plugins->readCache();
+        $pluginPath = is_array($enabled[$pluginId] ?? null) ? (string) ($enabled[$pluginId]['path'] ?? '') : '';
+        $manifestPath = $this->manifestPath($pluginId, $pluginPath);
+        $manifestFound = $manifestPath !== null && is_file($manifestPath);
+
+        return [
+            'enabled' => $this->isEnabled($pluginId),
+            'manifest_path' => $manifestPath,
+            'manifest_found' => $manifestFound,
+            'assets' => $this->assets($pluginId, $context),
+        ];
+    }
+
     private function isEnabled(string $pluginId): bool
     {
         $enabled = $this->plugins->readCache();
@@ -137,7 +156,11 @@ final class PluginAssetRegistry
             return $this->manifestCache[$pluginId];
         }
 
-        $path = $this->manifestPath($pluginId);
+        $this->ensurePublicAssets($pluginId);
+
+        $enabled = $this->plugins->readCache();
+        $pluginPath = is_array($enabled[$pluginId] ?? null) ? (string) ($enabled[$pluginId]['path'] ?? '') : '';
+        $path = $this->manifestPath($pluginId, $pluginPath);
         if ($path === null || ! is_file($path)) {
             $this->manifestCache[$pluginId] = null;
 
@@ -193,7 +216,7 @@ final class PluginAssetRegistry
         ];
     }
 
-    private function manifestPath(string $pluginId): ?string
+    private function manifestPath(string $pluginId, string $pluginPath = ''): ?string
     {
         $parts = array_values(array_filter(explode('/', $pluginId)));
         if (count($parts) !== 2) {
@@ -202,7 +225,31 @@ final class PluginAssetRegistry
 
         [$vendor, $name] = $parts;
 
-        return public_path('plugins/'.$vendor.'/'.$name.'/build/manifest.json');
+        if ($pluginPath !== '') {
+            $pluginBuild = rtrim($pluginPath, '/').'/build';
+            $pluginManifest = $pluginBuild.'/manifest.json';
+            if (is_file($pluginManifest)) {
+                return $pluginManifest;
+            }
+
+            $pluginViteManifest = $pluginBuild.'/.vite/manifest.json';
+            if (is_file($pluginViteManifest)) {
+                return $pluginViteManifest;
+            }
+        }
+
+        $root = public_path('plugins/'.$vendor.'/'.$name.'/build');
+        $primary = $root.'/manifest.json';
+        if (is_file($primary)) {
+            return $primary;
+        }
+
+        $viteManifest = $root.'/.vite/manifest.json';
+        if (is_file($viteManifest)) {
+            return $viteManifest;
+        }
+
+        return $primary;
     }
 
     private function assetUrl(string $pluginId, string $file): string
@@ -211,5 +258,31 @@ final class PluginAssetRegistry
         [$vendor, $name] = $parts;
 
         return asset('plugins/'.$vendor.'/'.$name.'/build/'.$file);
+    }
+
+    private function ensurePublicAssets(string $pluginId): void
+    {
+        $parts = array_values(array_filter(explode('/', $pluginId)));
+        if (count($parts) !== 2) {
+            return;
+        }
+
+        [$vendor, $name] = $parts;
+
+        $publicRoot = public_path('plugins/'.$vendor.'/'.$name.'/build');
+        if (is_file($publicRoot.'/manifest.json') || is_file($publicRoot.'/.vite/manifest.json')) {
+            return;
+        }
+
+        $enabled = $this->plugins->readCache();
+        $pluginPath = $enabled[$pluginId]['path'] ?? null;
+        if (! is_string($pluginPath) || $pluginPath === '') {
+            return;
+        }
+
+        if (app()->bound(PluginAssetPublisher::class)) {
+            $publisher = app()->make(PluginAssetPublisher::class);
+            $publisher->publish($pluginId, $pluginPath);
+        }
     }
 }
