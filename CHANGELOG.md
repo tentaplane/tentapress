@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.15.4](https://github.com/tentaplane/tentapress/compare/v0.15.3...v0.15.4) (2026-02-04)
+
+
+### Bug Fixes
+
+* **blocks:** media modal was missing from editors ([096a1e7](https://github.com/tentaplane/tentapress/commit/096a1e778fed462f66b9888db7a0089856d1e688))
+* **blocks:** UI improvements to the expanded/collapsed blocks ([77fe2b6](https://github.com/tentaplane/tentapress/commit/77fe2b67a85d0796ce19306dc4ef2b6bb80dc8ed))
+* **setup:** cleaning up output scripts ([354c608](https://github.com/tentaplane/tentapress/commit/354c60844a4a3eb1288b5cf4f51b1e3d1c580aac))
+* **tailwind-theme:** full width hero improvements ([e139415](https://github.com/tentaplane/tentapress/commit/e1394156dd4b66b45a63227e8949a606e6cfe815))
+
 ## [0.15.3](https://github.com/tentaplane/tentapress/compare/v0.15.2...v0.15.3) (2026-02-04)
 
 
