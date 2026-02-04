@@ -906,7 +906,6 @@ PHP;
         );
     }
 
-    $setHomePageId = $seedDemo ? 'true' : 'false';
     $demoTitle = 'TentaPress Demo Install';
     $demoTagline = 'Build with clarity. Publish with confidence.';
     $demoTitleExport = var_export($demoTitle, true);
@@ -940,13 +939,6 @@ if (!Schema::hasTable('tp_settings')) {
 
 \$upsert('site.title', {$demoTitleExport}, true);
 \$upsert('site.tagline', {$demoTaglineExport}, true);
-
-if ({$setHomePageId} && class_exists(TpPage::class) && Schema::hasTable('tp_pages')) {
-    \$home = TpPage::query()->where('slug', 'home')->first();
-    if (\$home) {
-        \$upsert('site.home_page_id', (string) \$home->id, false);
-    }
-}
 PHP;
 
     $run(
