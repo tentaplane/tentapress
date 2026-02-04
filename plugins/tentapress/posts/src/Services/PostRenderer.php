@@ -14,7 +14,8 @@ final class PostRenderer
     {
         $layoutKey = (string) ($post->layout ?: 'default');
         $blocks = is_array($post->blocks) ? $post->blocks : [];
-        $blocksHtml = $this->renderBlocks($blocks);
+        $content = is_array($post->content) ? $post->content : null;
+        $blocksHtml = $this->renderPageContent($content, $blocks);
         $view = $this->resolveLayoutView($layoutKey);
 
         return response()->view($view, [
@@ -44,6 +45,26 @@ final class PostRenderer
         return (string) view('tentapress-posts::blocks.fallback-list', [
             'blocks' => $blocks,
         ]);
+    }
+
+    /**
+     * @param  array<string,mixed>|null  $content
+     * @param  array<int,mixed>  $blocks
+     */
+    private function renderPageContent(?array $content, array $blocks): string
+    {
+        if (is_array($content) && app()->bound('tp.page_editor.render')) {
+            $renderer = resolve('tp.page_editor.render');
+
+            if (is_callable($renderer)) {
+                $html = $renderer($content);
+                if (is_string($html)) {
+                    return $html;
+                }
+            }
+        }
+
+        return $this->renderBlocks($blocks);
     }
 
     private function resolveLayoutView(string $layoutKey): string

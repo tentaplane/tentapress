@@ -19,6 +19,7 @@ final class TpPost extends Model
         'status',
         'layout',
         'blocks',
+        'content',
         'published_at',
         'author_id',
         'created_by',
@@ -27,6 +28,7 @@ final class TpPost extends Model
 
     protected $casts = [
         'blocks' => 'array',
+        'content' => 'array',
         'published_at' => 'datetime',
     ];
 

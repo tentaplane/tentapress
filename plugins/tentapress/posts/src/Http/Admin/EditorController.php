@@ -29,10 +29,17 @@ final class EditorController
             $blocksJson = '[]';
         }
 
+        $pageDoc = is_array($post->content) ? $post->content : ['type' => 'page', 'content' => []];
+        $pageDocJson = json_encode($pageDoc, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        if ($pageDocJson === false) {
+            $pageDocJson = '{"type":"page","content":[]}';
+        }
+
         return view('tentapress-posts::posts.form', [
             'mode' => 'edit',
             'post' => $post,
             'blocksJson' => $blocksJson,
+            'pageDocJson' => $pageDocJson,
             'themeLayouts' => $themes->activeLayouts(),
             'hasTheme' => $themes->hasActiveTheme(),
             'blockDefinitions' => $this->blockDefinitions(),
