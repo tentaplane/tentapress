@@ -2,7 +2,7 @@
     "id": "tentapress/themes",
     "name": "Themes",
     "description": "Admin UI for managing themes.",
-    "version": "0.1.3",
+    "version": "0.1.4",
     "provider": "TentaPress\\Themes\\ThemesServiceProvider",
     "requires": [],
     "admin": {

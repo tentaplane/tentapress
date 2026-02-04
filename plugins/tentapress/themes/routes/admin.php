@@ -6,6 +6,7 @@ use TentaPress\Themes\Http\Admin\IndexController;
 use TentaPress\Themes\Http\Admin\ScreenshotController;
 use TentaPress\Themes\Http\Admin\ShowController;
 use TentaPress\Themes\Http\Admin\ActivateController;
+use TentaPress\Themes\Http\Admin\SyncController;
 use Illuminate\Support\Facades\Route;
 use TentaPress\System\Support\AdminRoutes;
 
@@ -23,6 +24,7 @@ AdminRoutes::group(function (): void {
             ->where('themePath', '.*')
             ->name('themes.show');
 
+        Route::post('/themes/sync', SyncController::class)->name('themes.sync');
         Route::post('/themes/activate', ActivateController::class)->name('themes.activate');
     });
 });

@@ -4,10 +4,10 @@ Theme management UI for TentaPress.
 
 ## Plugin Details
 
-| Field | Value |
-|-------|-------|
-| ID | `tentapress/themes` |
-| Version | 0.1.3 |
+| Field    | Value                                     |
+|----------|-------------------------------------------|
+| ID       | `tentapress/themes`                       |
+| Version  | 0.1.4                                     |
 | Provider | `TentaPress\Themes\ThemesServiceProvider` |
 
 ## Features
@@ -23,9 +23,9 @@ None.
 
 ## Admin Menu
 
-| Label | Route | Capability | Icon | Position | Parent |
-|-------|-------|------------|------|----------|--------|
-| Themes | `tp.themes.index` | `manage_themes` | paintbrush | 50 | Settings |
+| Label  | Route             | Capability      | Icon       | Position | Parent   |
+|--------|-------------------|-----------------|------------|----------|----------|
+| Themes | `tp.themes.index` | `manage_themes` | paintbrush | 50       | Settings |
 
 ## Development
 

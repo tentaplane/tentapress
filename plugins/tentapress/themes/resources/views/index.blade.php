@@ -8,6 +8,13 @@
             <h1 class="tp-page-title">Themes</h1>
             <p class="tp-description">One theme can be active at a time.</p>
         </div>
+
+        <div class="flex gap-2">
+            <form method="POST" action="{{ route('tp.themes.sync') }}">
+                @csrf
+                <button type="submit" class="tp-button-secondary">Sync themes</button>
+            </form>
+        </div>
     </div>
 
     <div class="tp-metabox">
