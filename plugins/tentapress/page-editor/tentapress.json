@@ -1,0 +1,14 @@
+{
+    "id": "tentapress/page-editor",
+    "name": "Page Editor",
+    "description": "Notion-style page editor with slash commands and inline formatting.",
+    "version": "0.1.1",
+    "provider": "TentaPress\\PageEditor\\PageEditorServiceProvider",
+    "requires": ["tentapress/pages", "tentapress/posts"],
+    "assets": {
+        "admin": {
+            "scripts": ["resources/js/page-editor.js"],
+            "styles": ["resources/css/page-editor.css"]
+        }
+    }
+}

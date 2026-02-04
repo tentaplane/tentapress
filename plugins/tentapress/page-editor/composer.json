@@ -1,0 +1,23 @@
+{
+    "name": "tentapress/page-editor",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "php": "^8.2",
+        "tentapress/pages": "<1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "TentaPress\\PageEditor\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "TentaPress\\PageEditor\\PageEditorServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

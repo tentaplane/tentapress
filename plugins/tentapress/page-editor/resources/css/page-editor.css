@@ -1,0 +1,102 @@
+.tp-page-editor {
+    min-height: 240px;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    background: #fff;
+    padding: 16px;
+    position: relative;
+}
+
+.tp-page-editor__placeholder {
+    color: #94a3b8;
+    font-size: 0.95rem;
+    pointer-events: none;
+    position: absolute;
+    top: 16px;
+    left: 16px;
+}
+
+.tp-page-editor__surface {
+    min-height: 200px;
+    outline: none;
+}
+
+.tp-page-editor__surface p {
+    margin: 0 0 0.75rem;
+}
+
+.tp-page-editor__slash {
+    display: none;
+    position: absolute;
+    z-index: 40;
+    width: 260px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    background: #fff;
+    box-shadow: 0 16px 40px rgba(15, 23, 42, 0.18);
+    padding: 6px;
+}
+
+.tp-page-editor__slash-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.tp-page-editor__slash-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 8px 10px;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    background: #fff;
+    text-align: left;
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+
+.tp-page-editor__slash-item:hover {
+    border-color: #e2e8f0;
+    background: #f8fafc;
+}
+
+.tp-page-editor__slash-title {
+    font-weight: 600;
+    color: #0f172a;
+}
+
+.tp-page-editor__slash-desc {
+    color: #64748b;
+    font-size: 0.75rem;
+}
+
+.tp-page-editor__slash-empty {
+    padding: 10px;
+    color: #94a3b8;
+    font-size: 0.8rem;
+}
+
+.tp-page-editor__bubble {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    background: #0f172a;
+    color: #fff;
+    border-radius: 999px;
+    padding: 6px;
+}
+
+.tp-page-editor__bubble-btn {
+    border: none;
+    background: transparent;
+    color: inherit;
+    padding: 4px 8px;
+    font-size: 0.8rem;
+    border-radius: 999px;
+    cursor: pointer;
+}
+
+.tp-page-editor__bubble-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
