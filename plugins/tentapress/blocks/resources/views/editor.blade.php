@@ -61,7 +61,12 @@
     @if ($hasMarkdown)
         @once
             @push('head')
-                @vite(['plugins/tentapress/block-markdown-editor/resources/js/markdown-editor.js'])
+                @tpPluginStyles('tentapress/block-markdown-editor')
+            @endpush
+        @endonce
+        @once
+            @push('scripts')
+                @tpPluginScripts('tentapress/block-markdown-editor')
             @endpush
         @endonce
     @endif
