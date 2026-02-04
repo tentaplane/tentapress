@@ -45,77 +45,128 @@
     $secondaryLabel = (string) ($secondary['label'] ?? '');
     $secondaryUrl = (string) ($secondary['url'] ?? '');
 
+    $splitLayout = $variant === 'split';
+    $hasBackground = $bg !== '' && ! $splitLayout;
+
     $alignClass = $alignment === 'center' ? 'text-center items-center' : 'text-left items-start';
     $actionsClass = $alignment === 'center' ? 'justify-center' : 'justify-start';
-    $splitLayout = $variant === 'split' || $imagePosition === 'right';
-    $layoutClass = $splitLayout ? 'grid gap-14 lg:grid-cols-2 lg:items-center' : 'space-y-6';
-    $hasBackground = $bg !== '' && ! $splitLayout;
-    $titleClass = $hasBackground ? 'text-white' : 'text-surface-900';
-    $subClass = $hasBackground ? 'text-white/85' : 'text-surface-600';
-    $eyebrowClass = $hasBackground ? 'text-white/70' : 'text-surface-500';
-    $contentWidthClass = $splitLayout ? '' : 'max-w-3xl';
-    $contentAlignClass = $alignment === 'center' && ! $splitLayout ? 'mx-auto' : '';
-
-    $ctaClass = match ($ctaStyle) {
-        'outline' => $hasBackground ? 'border border-white/40 text-white hover:bg-white/10' : 'border border-black/[0.08] text-surface-700 hover:bg-surface-50',
-        'ghost' => $hasBackground ? 'text-white/70 hover:text-white' : 'text-surface-600 hover:text-surface-900',
-        default => 'bg-surface-900 text-white hover:opacity-80',
-    };
 @endphp
 
-<section class="relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] w-screen overflow-hidden py-20 sm:py-28">
-    @if ($hasBackground)
-        <div class="absolute inset-0">
-            <img src="{{ $bg }}" alt="" class="h-full w-full object-cover" />
-            <div class="absolute inset-0 bg-gradient-to-br from-surface-950/85 via-surface-950/60 to-surface-900/40"></div>
-        </div>
-    @endif
+@if ($splitLayout)
+    {{-- Split variant: two-column text + image --}}
+    <section class="relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] w-screen overflow-hidden py-20 sm:py-28">
+        <div class="relative mx-auto max-w-7xl px-6">
+            <div class="grid gap-14 lg:grid-cols-2 lg:items-center {{ $alignClass }}">
+                <div class="space-y-6">
+                    @if ($eyebrow !== '')
+                        <div class="text-xs font-semibold uppercase tracking-[0.25em] text-surface-500">
+                            {{ $eyebrow }}
+                        </div>
+                    @endif
 
-    <div class="relative mx-auto max-w-7xl px-6">
-        <div class="{{ $layoutClass }} {{ $alignClass }}">
-            <div class="space-y-6 {{ $contentWidthClass }} {{ $contentAlignClass }}">
-                @if ($eyebrow !== '')
-                    <div class="text-xs font-semibold uppercase tracking-[0.25em] {{ $eyebrowClass }}">
-                        {{ $eyebrow }}
-                    </div>
-                @endif
+                    @if ($headline !== '')
+                        <h1 class="text-balance font-display text-5xl font-semibold tracking-tight text-surface-900 sm:text-6xl lg:text-7xl">
+                            {{ $headline }}
+                        </h1>
+                    @endif
 
-                @if ($headline !== '')
-                    <h1 class="text-balance font-display text-5xl font-semibold tracking-tight sm:text-6xl lg:text-7xl {{ $titleClass }}">
-                        {{ $headline }}
-                    </h1>
-                @endif
+                    @if ($sub !== '')
+                        <p class="text-pretty text-lg leading-relaxed text-surface-600 sm:text-xl">{{ $sub }}</p>
+                    @endif
 
-                @if ($sub !== '')
-                    <p class="text-pretty text-lg leading-relaxed sm:text-xl {{ $subClass }}">{{ $sub }}</p>
-                @endif
+                    @if (($ctaLabel !== '' && $ctaUrl !== '') || ($secondaryLabel !== '' && $secondaryUrl !== ''))
+                        <div class="flex flex-wrap gap-4 pt-2 {{ $actionsClass }}">
+                            @if ($ctaLabel !== '' && $ctaUrl !== '')
+                                @php
+                                    $ctaClass = match ($ctaStyle) {
+                                        'outline' => 'border border-black/[0.08] text-surface-700 hover:bg-surface-50',
+                                        'ghost' => 'text-surface-600 hover:text-surface-900',
+                                        default => 'bg-surface-900 text-white hover:opacity-80',
+                                    };
+                                @endphp
+                                <a
+                                    href="{{ $ctaUrl }}"
+                                    class="inline-flex items-center rounded-lg px-7 py-3.5 text-sm font-semibold transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-surface-900 focus-visible:ring-offset-2 {{ $ctaClass }}">
+                                    {{ $ctaLabel }}
+                                </a>
+                            @endif
 
-                @if (($ctaLabel !== '' && $ctaUrl !== '') || ($secondaryLabel !== '' && $secondaryUrl !== ''))
-                    <div class="flex flex-wrap gap-4 pt-2 {{ $actionsClass }}">
-                        @if ($ctaLabel !== '' && $ctaUrl !== '')
-                            <a
-                                href="{{ $ctaUrl }}"
-                                class="inline-flex items-center rounded-lg px-7 py-3.5 text-sm font-semibold transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-surface-900 focus-visible:ring-offset-2 {{ $ctaClass }}">
-                                {{ $ctaLabel }}
-                            </a>
-                        @endif
+                            @if ($secondaryLabel !== '' && $secondaryUrl !== '')
+                                <a
+                                    href="{{ $secondaryUrl }}"
+                                    class="inline-flex items-center rounded-lg border border-black/[0.08] px-7 py-3.5 text-sm font-semibold text-surface-700 transition-all hover:bg-surface-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-surface-900 focus-visible:ring-offset-2">
+                                    {{ $secondaryLabel }}
+                                </a>
+                            @endif
+                        </div>
+                    @endif
+                </div>
 
-                        @if ($secondaryLabel !== '' && $secondaryUrl !== '')
-                            <a
-                                href="{{ $secondaryUrl }}"
-                                class="inline-flex items-center rounded-lg border px-7 py-3.5 text-sm font-semibold transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-surface-900 focus-visible:ring-offset-2 {{ $hasBackground ? 'border-white/40 text-white/90 hover:bg-white/10 hover:text-white' : 'border-black/[0.08] text-surface-700 hover:bg-surface-50' }}">
-                                {{ $secondaryLabel }}
-                            </a>
-                        @endif
+                @if ($bg !== '')
+                    <div class="overflow-hidden rounded-[2.5rem] border border-black/[0.08] bg-surface-100">
+                        <img src="{{ $bg }}" alt="" class="h-full w-full object-cover" />
                     </div>
                 @endif
             </div>
-
-            @if ($bg !== '' && $splitLayout)
-                <div class="overflow-hidden rounded-[2.5rem] border border-black/[0.08] bg-surface-100">
-                    <img src="{{ $bg }}" alt="" class="h-full w-full object-cover" />
-                </div>
-            @endif
         </div>
-    </div>
-</section>
+    </section>
+@else
+    {{-- Default variant: full-bleed background image with overlaid text --}}
+    <section class="relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] w-screen overflow-hidden {{ $hasBackground ? 'min-h-[70vh] flex items-center py-24 sm:py-32' : 'py-20 sm:py-28' }}">
+        @if ($hasBackground)
+            <div class="absolute inset-0">
+                <img src="{{ $bg }}" alt="" class="h-full w-full object-cover" />
+                <div class="absolute inset-0 bg-gradient-to-br from-surface-950/85 via-surface-950/60 to-surface-900/40"></div>
+            </div>
+        @endif
+
+        <div class="relative mx-auto w-full max-w-7xl px-6">
+            <div class="flex flex-col space-y-6 {{ $alignClass }}">
+                <div class="space-y-6 max-w-3xl {{ $alignment === 'center' ? 'mx-auto' : '' }}">
+                    @if ($eyebrow !== '')
+                        <div class="text-xs font-semibold uppercase tracking-[0.25em] {{ $hasBackground ? 'text-white/70' : 'text-surface-500' }}">
+                            {{ $eyebrow }}
+                        </div>
+                    @endif
+
+                    @if ($headline !== '')
+                        <h1 class="text-balance font-display text-5xl font-semibold tracking-tight sm:text-6xl lg:text-7xl {{ $hasBackground ? 'text-white' : 'text-surface-900' }}">
+                            {{ $headline }}
+                        </h1>
+                    @endif
+
+                    @if ($sub !== '')
+                        <p class="text-pretty text-lg leading-relaxed sm:text-xl {{ $hasBackground ? 'text-white/85' : 'text-surface-600' }}">{{ $sub }}</p>
+                    @endif
+
+                    @if (($ctaLabel !== '' && $ctaUrl !== '') || ($secondaryLabel !== '' && $secondaryUrl !== ''))
+                        <div class="flex flex-wrap gap-4 pt-2 {{ $actionsClass }}">
+                            @if ($ctaLabel !== '' && $ctaUrl !== '')
+                                @php
+                                    $ctaClass = match ($ctaStyle) {
+                                        'outline' => $hasBackground ? 'border border-white/40 text-white hover:bg-white/10' : 'border border-black/[0.08] text-surface-700 hover:bg-surface-50',
+                                        'ghost' => $hasBackground ? 'text-white/70 hover:text-white' : 'text-surface-600 hover:text-surface-900',
+                                        default => $hasBackground ? 'bg-white text-surface-900 hover:bg-white/90' : 'bg-surface-900 text-white hover:opacity-80',
+                                    };
+                                @endphp
+                                <a
+                                    href="{{ $ctaUrl }}"
+                                    class="inline-flex items-center rounded-lg px-7 py-3.5 text-sm font-semibold transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-offset-2 {{ $ctaClass }}">
+                                    {{ $ctaLabel }}
+                                </a>
+                            @endif
+
+                            @if ($secondaryLabel !== '' && $secondaryUrl !== '')
+                                <a
+                                    href="{{ $secondaryUrl }}"
+                                    class="inline-flex items-center rounded-lg border px-7 py-3.5 text-sm font-semibold transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-offset-2 {{ $hasBackground ? 'border-white/40 text-white/90 hover:bg-white/10 hover:text-white' : 'border-black/[0.08] text-surface-700 hover:bg-surface-50' }}">
+                                    {{ $secondaryLabel }}
+                                </a>
+                            @endif
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </section>
+@endif
