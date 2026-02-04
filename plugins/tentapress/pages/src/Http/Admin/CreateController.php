@@ -20,12 +20,19 @@ final class CreateController
             'status' => 'draft',
             'layout' => null,
             'blocks' => [],
+            'content' => ['type' => 'page', 'content' => []],
         ]);
+
+        $pageDocJson = json_encode($page->content, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        if ($pageDocJson === false) {
+            $pageDocJson = '{"type":"page","content":[]}';
+        }
 
         return view('tentapress-pages::pages.form', [
             'mode' => 'create',
             'page' => $page,
             'blocksJson' => '[]',
+            'pageDocJson' => $pageDocJson,
             'themeLayouts' => $themes->activeLayouts(),
             'hasTheme' => $themes->hasActiveTheme(),
             'blockDefinitions' => $this->blockDefinitions(),

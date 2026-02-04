@@ -25,12 +25,16 @@ final readonly class UpdateController
             'slug' => ['required', 'string', 'max:255', 'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/', Rule::unique('tp_pages', 'slug')->ignore($page->id)],
             'layout' => ['nullable', 'string', 'max:255'],
             'blocks_json' => ['nullable', 'string'],
+            'page_doc_json' => ['nullable', 'string'],
         ]);
 
         $slug = $slugger->unique((string) $data['slug'], ignoreId: (int) $page->id);
 
-        $blocksRaw = json_decode((string) $data['blocks_json'], true);
+        $blocksRaw = json_decode((string) ($data['blocks_json'] ?? ''), true);
         $blocks = $this->normalizer->normalize($blocksRaw);
+
+        $pageDocRaw = json_decode((string) ($data['page_doc_json'] ?? ''), true);
+        $pageDoc = is_array($pageDocRaw) ? $pageDocRaw : $page->content;
 
         $nowUserId = Auth::check() && is_object(Auth::user()) ? (int) (Auth::user()->id ?? 0) : null;
 
@@ -39,6 +43,7 @@ final readonly class UpdateController
             'slug' => $slug,
             'layout' => $data['layout'] ?? null,
             'blocks' => $blocks,
+            'content' => $pageDoc,
             'updated_by' => $nowUserId ?: null,
         ]);
 

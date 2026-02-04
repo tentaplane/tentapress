@@ -4,8 +4,6 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>Fallback - {{ $page->title }}</title>
-
-        @vite(['resources/css/fallback.css'])
     </head>
 
     <body class="bg-white text-green-400">

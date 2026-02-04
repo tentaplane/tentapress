@@ -17,6 +17,7 @@ final class TpPage extends Model
         'status',
         'layout',
         'blocks',
+        'content',
         'published_at',
         'created_by',
         'updated_by',
@@ -24,6 +25,7 @@ final class TpPage extends Model
 
     protected $casts = [
         'blocks' => 'array',
+        'content' => 'array',
         'published_at' => 'datetime',
     ];
 

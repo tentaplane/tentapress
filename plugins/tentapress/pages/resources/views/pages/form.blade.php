@@ -2,6 +2,9 @@
 
 @php
     $editorMode = (bool) ($editorMode ?? false);
+    $customEditorView = app()->bound('tp.pages.editor.view') ? resolve('tp.pages.editor.view') : null;
+    $customEditorView = is_string($customEditorView) && view()->exists($customEditorView) ? $customEditorView : null;
+    $editorLabel = $customEditorView ? 'Page Editor' : 'Blocks Editor';
 @endphp
 
 @if ($editorMode)
@@ -9,7 +12,7 @@
     @section('body_class', 'bg-slate-100')
 @endif
 
-@section('title', $editorMode ? 'Blocks Editor' : ($mode === 'create' ? 'Add New Page' : 'Edit Page'))
+@section('title', $editorMode ? $editorLabel : ($mode === 'create' ? 'Add New Page' : 'Edit Page'))
 
 @section('content')
     <div class="tp-editor {{ $editorMode ? 'space-y-0 px-4 py-6 sm:px-6 lg:px-8' : 'space-y-6' }}">
@@ -147,65 +150,75 @@
                                 </div>
                             @endif
 
-                            @component('tentapress-blocks::editor', [
-                                'blocksEditorMode' => $editorMode,
-                                'editorTitle' => $editorMode ? (trim((string) ($page->title ?? '')) !== '' ? $page->title : 'Untitled Page') : null,
-                                'blocksJson' => $blocksJson,
-                                'blockDefinitions' => $blockDefinitions ?? [],
-                                'mediaOptions' => $mediaOptions ?? [],
-                                'mediaIndexUrl' => \Illuminate\Support\Facades\Route::has('tp.media.index') ? route('tp.media.index') : '',
-                            ])
-                                @if ($editorMode && $mode === 'edit')
-                                    @slot('header')
-                                        <div
-                                            class="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
-                                            <div class="flex flex-wrap items-center gap-2 text-xs text-slate-500">
-                                                <span
-                                                    class="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] font-semibold tracking-[0.12em] text-slate-500 uppercase">
-                                                    {{ ucfirst($page->status) }}
-                                                </span>
-                                                <span class="hidden text-slate-300 sm:inline">•</span>
-                                                <span class="hidden sm:inline">Editing blocks</span>
+                            @if ($customEditorView)
+                                @include($customEditorView, [
+                                    'page' => $page,
+                                    'editorTitle' => $editorMode ? (trim((string) ($page->title ?? '')) !== '' ? $page->title : 'Untitled Page') : null,
+                                    'pageDocJson' => $pageDocJson ?? null,
+                                    'editorMode' => $editorMode,
+                                    'mode' => $mode,
+                                ])
+                            @else
+                                @component('tentapress-blocks::editor', [
+                                    'blocksEditorMode' => $editorMode,
+                                    'editorTitle' => $editorMode ? (trim((string) ($page->title ?? '')) !== '' ? $page->title : 'Untitled Page') : null,
+                                    'blocksJson' => $blocksJson,
+                                    'blockDefinitions' => $blockDefinitions ?? [],
+                                    'mediaOptions' => $mediaOptions ?? [],
+                                    'mediaIndexUrl' => \Illuminate\Support\Facades\Route::has('tp.media.index') ? route('tp.media.index') : '',
+                                ])
+                                    @if ($editorMode && $mode === 'edit')
+                                        @slot('header')
+                                            <div
+                                                class="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+                                                <div class="flex flex-wrap items-center gap-2 text-xs text-slate-500">
+                                                    <span
+                                                        class="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] font-semibold tracking-[0.12em] text-slate-500 uppercase">
+                                                        {{ ucfirst($page->status) }}
+                                                    </span>
+                                                    <span class="hidden text-slate-300 sm:inline">•</span>
+                                                    <span class="hidden sm:inline">Editing blocks</span>
+                                                </div>
+                                                <div class="flex flex-wrap items-center gap-2">
+                                                    <button type="submit" form="page-form" class="tp-button-primary">
+                                                        Save changes
+                                                    </button>
+                                                    <a
+                                                        class="tp-button-secondary"
+                                                        href="/{{ $page->slug }}"
+                                                        target="_blank"
+                                                        rel="noreferrer">
+                                                        View
+                                                    </a>
+                                                    @if ($page->status === 'draft')
+                                                        <form
+                                                            method="POST"
+                                                            action="{{ route('tp.pages.publish', ['page' => $page->id]) }}">
+                                                            @csrf
+                                                            <button class="tp-button-primary" type="submit">Publish</button>
+                                                        </form>
+                                                    @endif
+                                
+                                                    @if ($page->status === 'published')
+                                                        <form
+                                                            method="POST"
+                                                            action="{{ route('tp.pages.unpublish', ['page' => $page->id]) }}">
+                                                            @csrf
+                                                            <button class="tp-button-secondary" type="submit">Unpublish</button>
+                                                        </form>
+                                                    @endif
+                                
+                                                    <a
+                                                        href="{{ route('tp.pages.edit', ['page' => $page->id]) }}"
+                                                        class="tp-button-secondary">
+                                                        Exit full screen
+                                                    </a>
+                                                </div>
                                             </div>
-                                            <div class="flex flex-wrap items-center gap-2">
-                                                <button type="submit" form="page-form" class="tp-button-primary">
-                                                    Save changes
-                                                </button>
-                                                <a
-                                                    class="tp-button-secondary"
-                                                    href="/{{ $page->slug }}"
-                                                    target="_blank"
-                                                    rel="noreferrer">
-                                                    View
-                                                </a>
-                                                @if ($page->status === 'draft')
-                                                    <form
-                                                        method="POST"
-                                                        action="{{ route('tp.pages.publish', ['page' => $page->id]) }}">
-                                                        @csrf
-                                                        <button class="tp-button-primary" type="submit">Publish</button>
-                                                    </form>
-                                                @endif
-                            
-                                                @if ($page->status === 'published')
-                                                    <form
-                                                        method="POST"
-                                                        action="{{ route('tp.pages.unpublish', ['page' => $page->id]) }}">
-                                                        @csrf
-                                                        <button class="tp-button-secondary" type="submit">Unpublish</button>
-                                                    </form>
-                                                @endif
-                            
-                                                <a
-                                                    href="{{ route('tp.pages.edit', ['page' => $page->id]) }}"
-                                                    class="tp-button-secondary">
-                                                    Exit full screen
-                                                </a>
-                                            </div>
-                                        </div>
-                                    @endslot
-                                @endif
-                            @endcomponent
+                                        @endslot
+                                    @endif
+                                @endcomponent
+                            @endif
                         </form>
                     </div>
                 </div>
