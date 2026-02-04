@@ -665,7 +665,6 @@ if ($themeChoice !== 'none') {
                         'https://placehold.co/160x48?text=Studio+3',
                         'https://placehold.co/160x48?text=Studio+4',
                         'https://placehold.co/160x48?text=Studio+5',
-                        'https://placehold.co/160x48?text=Studio+6',
                     ],
                     'columns' => '5',
                     'grayscale' => true,
@@ -715,7 +714,7 @@ if ($themeChoice !== 'none') {
                 'props' => [
                     'quote' => 'TentaPress gives our team one place to build, edit, and ship every client site.',
                     'name' => 'Jordan Lee',
-                    'role' => 'Creative Director',
+                    'role' => 'Creative Director, Demo Agency',
                     'alignment' => 'left',
                     'style' => 'simple',
                 ],
@@ -723,7 +722,7 @@ if ($themeChoice !== 'none') {
             [
                 'type' => 'blocks/testimonial',
                 'props' => [
-                    'quote' => 'We replaced three tools with TentaPress and shipped a full site in a single sprint.',
+                    'quote' => 'We replaced three tools with TentaPress and shipped a full site in a single day.',
                     'name' => 'Taylor Rivers',
                     'role' => 'Head of Growth, Demo Studio',
                     'rating' => 5,
@@ -907,6 +906,54 @@ PHP;
         );
     }
 
+    $setHomePageId = $seedDemo ? 'true' : 'false';
+    $demoTitle = 'TentaPress Demo Install';
+    $demoTagline = 'Build with clarity. Publish with confidence.';
+    $demoTitleExport = var_export($demoTitle, true);
+    $demoTaglineExport = var_export($demoTagline, true);
+    $settingsScript = <<<PHP
+require __DIR__ . '/vendor/autoload.php';
+
+\$app = require __DIR__ . '/bootstrap/app.php';
+\$app->make(Illuminate\\Contracts\\Console\\Kernel::class)->bootstrap();
+
+use Illuminate\\Support\\Facades\\DB;
+use Illuminate\\Support\\Facades\\Schema;
+use TentaPress\\Pages\\Models\\TpPage;
+
+if (!Schema::hasTable('tp_settings')) {
+    return;
+}
+
+\$now = now();
+\$upsert = static function (string \$key, string \$value, bool \$autoload) use (\$now): void {
+    DB::table('tp_settings')->updateOrInsert(
+        ['key' => \$key],
+        [
+            'value' => \$value,
+            'autoload' => \$autoload,
+            'created_at' => \$now,
+            'updated_at' => \$now,
+        ]
+    );
+};
+
+\$upsert('site.title', {$demoTitleExport}, true);
+\$upsert('site.tagline', {$demoTaglineExport}, true);
+
+if ({$setHomePageId} && class_exists(TpPage::class) && Schema::hasTable('tp_pages')) {
+    \$home = TpPage::query()->where('slug', 'home')->first();
+    if (\$home) {
+        \$upsert('site.home_page_id', (string) \$home->id, false);
+    }
+}
+PHP;
+
+    $run(
+        escapeshellarg(PHP_BINARY) . ' -r ' . escapeshellarg($settingsScript),
+        'Populating demo settings'
+    );
+
     if ($shouldBuildAssets && $buildTool !== null) {
         if (is_dir($themePath)) {
             $nodeModulesPath = $themePath . DIRECTORY_SEPARATOR . 'node_modules';
@@ -915,15 +962,27 @@ PHP;
                 $installDeps = $confirm("Install theme dependencies with {$buildTool}? [Y/n]: ", true);
 
                 if ($installDeps) {
+                    $installCommand = match ($buildTool) {
+                        'npm' => escapeshellarg($buildTool) . ' install --prefix ' . escapeshellarg($themePath),
+                        'pnpm' => escapeshellarg($buildTool) . ' install --dir ' . escapeshellarg($themePath),
+                        default => escapeshellarg($buildTool) . ' install --cwd ' . escapeshellarg($themePath),
+                    };
+
                     $run(
-                        escapeshellarg($buildTool) . ' install --cwd ' . escapeshellarg($themePath),
+                        $installCommand,
                         "Installing theme dependencies"
                     );
                 }
             }
 
+            $buildCommand = match ($buildTool) {
+                'npm' => escapeshellarg($buildTool) . ' --prefix ' . escapeshellarg($themePath) . ' run build',
+                'pnpm' => escapeshellarg($buildTool) . ' --dir ' . escapeshellarg($themePath) . ' run build',
+                default => escapeshellarg($buildTool) . ' run --cwd ' . escapeshellarg($themePath) . ' build',
+            };
+
             $run(
-                escapeshellarg($buildTool) . ' run --cwd ' . escapeshellarg($themePath) . ' build',
+                $buildCommand,
                 "Building theme assets"
             );
         } else {
