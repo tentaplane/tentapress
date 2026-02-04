@@ -47,40 +47,37 @@
 
     $panelClass = match ($background) {
         'none' => 'bg-transparent border-transparent',
-        'muted' => 'bg-slate-100/80 border-slate-200/70',
-        default => 'bg-white border-slate-200/80 shadow-sm',
+        'muted' => 'bg-surface-100 border-black/[0.08]',
+        default => 'bg-white border-black/[0.08]',
     };
 
     $btnClass = match ($btnStyle) {
-        'outline' => 'border border-slate-200 text-slate-700',
-        'ghost' => 'text-slate-500 hover:text-slate-900',
-        default => 'bg-brand-600 text-white shadow-lg shadow-brand-600/30',
+        'outline' => 'border border-black/[0.08] text-surface-700 hover:bg-surface-50',
+        'ghost' => 'text-surface-600 hover:text-surface-900',
+        default => 'bg-surface-900 text-white hover:opacity-80',
     };
 @endphp
 
-<section class="py-20 sm:py-24">
+<section class="py-16 sm:py-20">
     <div class="mx-auto max-w-7xl px-6">
-        <div class="relative overflow-hidden rounded-[2.5rem] border {{ $panelClass }} p-10 sm:p-14">
-            <div class="pointer-events-none absolute -left-16 top-0 h-36 w-36 rounded-full bg-brand-100/80 blur-[100px]"></div>
-            <div class="pointer-events-none absolute -right-16 top-8 h-44 w-44 rounded-full bg-indigo-200/50 blur-[120px]"></div>
-
-            <div class="relative flex flex-col gap-4 {{ $alignClass }}">
+        <div class="overflow-hidden rounded-[2.5rem] border {{ $panelClass }} p-10 sm:p-16">
+            <div class="flex flex-col gap-5 {{ $alignClass }}">
                 @if ($title !== '')
-                    <h2 class="text-balance font-display text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl">
+                    <h2 class="text-balance font-display text-4xl font-semibold text-surface-900 sm:text-5xl">
                         {{ $title }}
                     </h2>
                 @endif
 
                 @if ($body !== '')
-                    <p class="text-pretty whitespace-pre-wrap text-lg text-slate-500">{{ $body }}</p>
+                    <p class="max-w-2xl text-pretty whitespace-pre-wrap text-lg leading-relaxed text-surface-600">{{ $body }}</p>
                 @endif
 
                 @if (($btnLabel !== '' && $btnUrl !== '') || ($secondaryLabel !== '' && $secondaryUrl !== ''))
-                    <div class="mt-2 flex flex-wrap gap-3 {{ $actionsClass }}">
+                    <div class="mt-2 flex flex-wrap gap-4 {{ $actionsClass }}">
                         @if ($btnLabel !== '' && $btnUrl !== '')
                             <a
                                 href="{{ $btnUrl }}"
-                                class="inline-flex items-center rounded-full px-6 py-3 text-sm font-semibold {{ $btnClass }}">
+                                class="inline-flex items-center rounded-lg px-7 py-3.5 text-sm font-semibold transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-surface-900 focus-visible:ring-offset-2 {{ $btnClass }}">
                                 {{ $btnLabel }}
                             </a>
                         @endif
@@ -88,7 +85,7 @@
                         @if ($secondaryLabel !== '' && $secondaryUrl !== '')
                             <a
                                 href="{{ $secondaryUrl }}"
-                                class="inline-flex items-center rounded-full border border-slate-200 px-6 py-3 text-sm font-semibold text-slate-600 hover:text-slate-900">
+                                class="inline-flex items-center rounded-lg border border-black/[0.08] px-7 py-3.5 text-sm font-semibold text-surface-700 transition-all hover:bg-surface-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-surface-900 focus-visible:ring-offset-2">
                                 {{ $secondaryLabel }}
                             </a>
                         @endif

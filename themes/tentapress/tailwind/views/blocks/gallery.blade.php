@@ -43,7 +43,7 @@
 @endphp
 
 @if ($images !== [])
-    <section class="py-16 sm:py-24">
+    <section class="py-16 sm:py-20">
         <div class="mx-auto max-w-7xl px-6">
             <div class="grid {{ $gapClass }} {{ $gridClass }}">
                 @foreach ($images as $url)
@@ -51,13 +51,13 @@
                         $path = parse_url($url, PHP_URL_PATH);
                         $filename = is_string($path) ? pathinfo($path, PATHINFO_FILENAME) : '';
                         $alt = $filename !== '' ? str_replace(['-', '_'], ' ', $filename) : '';
-                        $frameClass = 'overflow-hidden border border-slate-200/80 bg-white shadow-sm';
+                        $frameClass = 'overflow-hidden border border-black/[0.08] bg-white';
                         if ($rounded) {
-                            $frameClass .= ' rounded-2xl';
+                            $frameClass .= ' rounded-[2.5rem]';
                         }
                     @endphp
                     <figure class="{{ $frameClass }}">
-                        <div class="overflow-hidden bg-slate-100 {{ $aspectClass }}">
+                        <div class="overflow-hidden bg-surface-100 {{ $aspectClass }}">
                             <img
                                 src="{{ $url }}"
                                 alt="{{ $alt }}"

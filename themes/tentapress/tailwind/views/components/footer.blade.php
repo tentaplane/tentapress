@@ -3,7 +3,7 @@
     'tagline' => 'The fastest way for agencies to ship small sites.',
 ])
 
-<footer class="border-t border-surface-200/80 bg-surface-50/50">
+<footer class="border-t border-black/[0.08] bg-page">
     <div class="mx-auto w-full max-w-7xl px-6 py-16">
         <div class="grid gap-12 lg:grid-cols-[1.4fr_repeat(3,1fr)] lg:gap-8">
             <div class="space-y-5">
@@ -22,37 +22,37 @@
             <div>
                 <div class="text-sm font-semibold text-surface-900">Product</div>
                 <nav class="mt-4 flex flex-col gap-2.5 text-sm text-surface-600">
-                    <a class="w-fit rounded transition-colors hover:text-brand-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500" href="#">Features</a>
-                    <a class="w-fit rounded transition-colors hover:text-brand-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500" href="#">Blocks library</a>
-                    <a class="w-fit rounded transition-colors hover:text-brand-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500" href="#">Themes</a>
+                    <a class="w-fit rounded transition-colors hover:text-surface-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-surface-900" href="#">Features</a>
+                    <a class="w-fit rounded transition-colors hover:text-surface-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-surface-900" href="#">Blocks library</a>
+                    <a class="w-fit rounded transition-colors hover:text-surface-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-surface-900" href="#">Themes</a>
                 </nav>
             </div>
 
             <div>
                 <div class="text-sm font-semibold text-surface-900">Resources</div>
                 <nav class="mt-4 flex flex-col gap-2.5 text-sm text-surface-600">
-                    <a class="w-fit rounded transition-colors hover:text-brand-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500" href="#">Documentation</a>
-                    <a class="w-fit rounded transition-colors hover:text-brand-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500" href="#">Starter kit</a>
-                    <a class="w-fit rounded transition-colors hover:text-brand-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500" href="#">Community</a>
+                    <a class="w-fit rounded transition-colors hover:text-surface-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-surface-900" href="#">Documentation</a>
+                    <a class="w-fit rounded transition-colors hover:text-surface-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-surface-900" href="#">Starter kit</a>
+                    <a class="w-fit rounded transition-colors hover:text-surface-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-surface-900" href="#">Community</a>
                 </nav>
             </div>
 
             <div>
                 <div class="text-sm font-semibold text-surface-900">Company</div>
                 <nav class="mt-4 flex flex-col gap-2.5 text-sm text-surface-600">
-                    <a class="w-fit rounded transition-colors hover:text-brand-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500" href="#">About</a>
-                    <a class="w-fit rounded transition-colors hover:text-brand-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500" href="#">Press</a>
-                    <a class="w-fit rounded transition-colors hover:text-brand-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500" href="#">Careers</a>
+                    <a class="w-fit rounded transition-colors hover:text-surface-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-surface-900" href="#">About</a>
+                    <a class="w-fit rounded transition-colors hover:text-surface-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-surface-900" href="#">Press</a>
+                    <a class="w-fit rounded transition-colors hover:text-surface-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-surface-900" href="#">Careers</a>
                 </nav>
             </div>
         </div>
 
-        <div class="mt-14 flex flex-wrap items-center justify-between gap-4 border-t border-surface-200 pt-8 text-sm text-surface-500">
+        <div class="mt-14 flex flex-wrap items-center justify-between gap-4 border-t border-black/[0.08] pt-8 text-sm text-surface-500">
             <span>&copy; {{ date('Y') }} {{ $title }}. All rights reserved.</span>
             <div class="flex flex-wrap gap-6">
-                <a class="rounded transition-colors hover:text-surface-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500" href="#">Privacy</a>
-                <a class="rounded transition-colors hover:text-surface-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500" href="#">Terms</a>
-                <a class="rounded transition-colors hover:text-surface-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500" href="/admin">Admin</a>
+                <a class="rounded transition-colors hover:text-surface-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-surface-900" href="#">Privacy</a>
+                <a class="rounded transition-colors hover:text-surface-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-surface-900" href="#">Terms</a>
+                <a class="rounded transition-colors hover:text-surface-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-surface-900" href="/admin">Admin</a>
             </div>
         </div>
     </div>

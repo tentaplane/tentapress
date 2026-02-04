@@ -18,11 +18,11 @@
     <section class="py-16 sm:py-20">
         <div class="mx-auto max-w-7xl space-y-5 px-6">
             @if ($title !== '')
-                <h2 class="font-display text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">
+                <h2 class="font-display text-3xl font-semibold text-surface-900 sm:text-4xl">
                     {{ $title }}
                 </h2>
             @endif
-            <div class="overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-lg shadow-slate-200/60">
+            <div class="overflow-hidden rounded-[2.5rem] border border-black/[0.08] bg-white">
                 <div class="w-full {{ $aspectClass }}" @if ($aspect === 'auto') style="height: {{ $height }}px" @endif>
                     <iframe
                         src="{{ $url }}"
@@ -32,7 +32,7 @@
                 </div>
             </div>
             @if ($caption !== '')
-                <div class="text-sm text-slate-500">{{ $caption }}</div>
+                <div class="text-sm text-surface-500">{{ $caption }}</div>
             @endif
         </div>
     </section>

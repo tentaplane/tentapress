@@ -26,24 +26,24 @@
     <section class="py-16 sm:py-20">
         <div class="mx-auto max-w-7xl space-y-5 px-6">
             @if ($title !== '')
-                <h2 class="font-display text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">
+                <h2 class="font-display text-3xl font-semibold text-surface-900 sm:text-4xl">
                     {{ $title }}
                 </h2>
             @endif
-            <div class="overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-lg shadow-slate-200/60">
+            <div class="overflow-hidden rounded-[2.5rem] border border-black/[0.08] bg-white">
                 <table class="w-full text-left text-sm">
-                    <thead class="bg-slate-50 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+                    <thead class="border-b border-black/[0.08] bg-surface-50 text-xs font-semibold uppercase tracking-[0.15em] text-surface-500">
                         <tr>
                             @foreach ($headers as $head)
-                                <th class="px-5 py-3">{{ trim((string) $head) }}</th>
+                                <th class="px-6 py-3.5">{{ trim((string) $head) }}</th>
                             @endforeach
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="divide-y divide-surface-100">
                         @foreach ($rows as $row)
-                            <tr class="{{ $striped && $loop->odd ? 'bg-slate-50/60' : '' }}">
+                            <tr class="{{ $striped && $loop->odd ? 'bg-surface-50/50' : '' }}">
                                 @foreach ($headers as $i => $head)
-                                    <td class="px-5 py-3 text-slate-600">
+                                    <td class="px-6 py-3.5 text-surface-700">
                                         {{ isset($row[$i]) ? trim((string) $row[$i]) : '' }}
                                     </td>
                                 @endforeach

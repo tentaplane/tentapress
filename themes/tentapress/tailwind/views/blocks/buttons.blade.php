@@ -47,7 +47,7 @@
 @endphp
 
 @if ($buttons !== [])
-    <section class="py-12 sm:py-16">
+    <section class="py-8 sm:py-10">
         <div class="mx-auto max-w-7xl px-6">
             <div class="flex flex-wrap gap-3 {{ $alignClass }}">
                 @foreach ($buttons as $button)
@@ -57,12 +57,12 @@
                         $style = (string) ($button['style'] ?? 'primary');
 
                         $class = match ($style) {
-                            'outline' => 'border border-slate-200 text-slate-700',
-                            'ghost' => 'text-slate-500 hover:text-slate-900',
-                            default => 'bg-brand-600 text-white shadow-lg shadow-brand-600/30',
+                            'outline' => 'border border-black/[0.08] text-surface-700 hover:bg-surface-50',
+                            'ghost' => 'text-surface-600 hover:text-surface-900',
+                            default => 'bg-surface-900 text-white hover:opacity-80',
                         };
                     @endphp
-                    <a href="{{ $url }}" class="inline-flex items-center rounded-full font-semibold {{ $sizeClass }} {{ $class }}">
+                    <a href="{{ $url }}" class="inline-flex items-center rounded-lg font-semibold transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-surface-900 focus-visible:ring-offset-2 {{ $sizeClass }} {{ $class }}">
                         {{ $label }}
                     </a>
                 @endforeach

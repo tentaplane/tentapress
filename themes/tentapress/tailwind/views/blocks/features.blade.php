@@ -46,7 +46,7 @@
 @endphp
 
 @if ($items !== [])
-    <section class="py-20 sm:py-24">
+    <section class="py-16 sm:py-20">
         <div class="mx-auto max-w-7xl space-y-14 px-6">
             @if ($title !== '' || $subtitle !== '')
                 <div class="max-w-2xl space-y-4">
@@ -68,10 +68,9 @@
                         $itemBody = (string) ($item['body'] ?? '');
                         $icon = (string) ($item['icon'] ?? '');
                     @endphp
-                    <div class="group relative rounded-2xl border border-surface-200 bg-white p-7 shadow-md transition-shadow hover:shadow-lg">
-                        <div class="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand-300/60 to-transparent"></div>
+                    <div class="rounded-[2.5rem] border border-black/[0.08] bg-white p-8">
                         @if ($icon !== '')
-                            <div class="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-brand-50 text-xl text-brand-600">
+                            <div class="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-surface-100 text-xl text-surface-900">
                                 {{ $icon }}
                             </div>
                         @endif

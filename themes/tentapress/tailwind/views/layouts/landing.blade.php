@@ -10,7 +10,7 @@
             @vite(['resources/css/theme.css', 'resources/js/theme.js'], 'themes/tentapress/tailwind/build')
         @endif
     </head>
-    <body class="bg-white font-sans text-surface-900 antialiased">
+    <body class="bg-page font-sans text-surface-900 antialiased">
         <div class="relative flex min-h-screen flex-col">
             <x-tp-theme::header />
 

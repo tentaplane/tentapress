@@ -35,33 +35,33 @@
 @endphp
 
 @if ($items !== [])
-    <section class="py-20 sm:py-24">
+    <section class="py-16 sm:py-20">
         <div class="mx-auto max-w-6xl space-y-10 px-6">
             @if ($title !== '' || $subtitle !== '')
-                <div class="space-y-3">
+                <div class="max-w-2xl space-y-4">
                     @if ($title !== '')
-                        <h2 class="font-display text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl">
+                        <h2 class="font-display text-4xl font-semibold text-surface-900 sm:text-5xl">
                             {{ $title }}
                         </h2>
                     @endif
                     @if ($subtitle !== '')
-                        <p class="text-pretty text-lg text-slate-500">{{ $subtitle }}</p>
+                        <p class="text-pretty text-lg leading-relaxed text-surface-600">{{ $subtitle }}</p>
                     @endif
                 </div>
             @endif
 
-            <div class="space-y-5">
+            <div class="space-y-4">
                 @foreach ($items as $index => $item)
                     @php
                         $question = (string) ($item['question'] ?? '');
                         $answer = (string) ($item['answer'] ?? '');
                     @endphp
-                    <details class="rounded-3xl border border-slate-200/80 bg-white p-7 shadow-lg shadow-slate-200/60" @if ($openFirst && $index === 0) open @endif>
-                        <summary class="cursor-pointer text-base font-semibold text-slate-900">
+                    <details class="group rounded-[2.5rem] border border-black/[0.08] bg-white px-7 py-6" @if ($openFirst && $index === 0) open @endif>
+                        <summary class="cursor-pointer text-base font-semibold text-surface-900 marker:text-surface-400">
                             {{ $question }}
                         </summary>
                         @if ($answer !== '')
-                            <div class="mt-3 text-sm text-slate-600">
+                            <div class="mt-4 text-[0.9375rem] leading-relaxed text-surface-600">
                                 {{ $answer }}
                             </div>
                         @endif

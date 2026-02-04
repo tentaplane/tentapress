@@ -52,26 +52,23 @@
     $hasBackground = $bg !== '' && ! $splitLayout;
     $titleClass = $hasBackground ? 'text-white' : 'text-surface-900';
     $subClass = $hasBackground ? 'text-white/85' : 'text-surface-600';
-    $eyebrowClass = $hasBackground ? 'text-white/70' : 'text-brand-600';
+    $eyebrowClass = $hasBackground ? 'text-white/70' : 'text-surface-500';
     $contentWidthClass = $splitLayout ? '' : 'max-w-3xl';
     $contentAlignClass = $alignment === 'center' && ! $splitLayout ? 'mx-auto' : '';
 
     $ctaClass = match ($ctaStyle) {
-        'outline' => $hasBackground ? 'border border-white/40 text-white hover:bg-white/10' : 'border border-surface-300 text-surface-700 hover:border-surface-400 hover:bg-surface-50',
+        'outline' => $hasBackground ? 'border border-white/40 text-white hover:bg-white/10' : 'border border-black/[0.08] text-surface-700 hover:bg-surface-50',
         'ghost' => $hasBackground ? 'text-white/70 hover:text-white' : 'text-surface-600 hover:text-surface-900',
-        default => 'bg-brand-600 text-white shadow-brand hover:bg-brand-700 hover:shadow-xl',
+        default => 'bg-surface-900 text-white hover:opacity-80',
     };
 @endphp
 
-<section class="relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] w-screen overflow-hidden py-24 sm:py-32">
+<section class="relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] w-screen overflow-hidden py-20 sm:py-28">
     @if ($hasBackground)
         <div class="absolute inset-0">
             <img src="{{ $bg }}" alt="" class="h-full w-full object-cover" />
             <div class="absolute inset-0 bg-gradient-to-br from-surface-950/85 via-surface-950/60 to-surface-900/40"></div>
         </div>
-    @else
-        <div class="pointer-events-none absolute -top-48 left-1/2 h-[32rem] w-[72rem] -translate-x-1/2 rounded-full bg-brand-200/50 blur-[180px]"></div>
-        <div class="pointer-events-none absolute right-0 top-32 h-72 w-72 rounded-full bg-accent-200/40 blur-[120px]"></div>
     @endif
 
     <div class="relative mx-auto max-w-7xl px-6">
@@ -98,7 +95,7 @@
                         @if ($ctaLabel !== '' && $ctaUrl !== '')
                             <a
                                 href="{{ $ctaUrl }}"
-                                class="inline-flex items-center rounded-full px-7 py-3.5 text-sm font-semibold transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 {{ $ctaClass }}">
+                                class="inline-flex items-center rounded-lg px-7 py-3.5 text-sm font-semibold transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-surface-900 focus-visible:ring-offset-2 {{ $ctaClass }}">
                                 {{ $ctaLabel }}
                             </a>
                         @endif
@@ -106,7 +103,7 @@
                         @if ($secondaryLabel !== '' && $secondaryUrl !== '')
                             <a
                                 href="{{ $secondaryUrl }}"
-                                class="inline-flex items-center rounded-full border px-7 py-3.5 text-sm font-semibold transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 {{ $hasBackground ? 'border-white/40 text-white/90 hover:bg-white/10 hover:text-white' : 'border-surface-300 text-surface-700 hover:border-surface-400 hover:bg-surface-50' }}">
+                                class="inline-flex items-center rounded-lg border px-7 py-3.5 text-sm font-semibold transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-surface-900 focus-visible:ring-offset-2 {{ $hasBackground ? 'border-white/40 text-white/90 hover:bg-white/10 hover:text-white' : 'border-black/[0.08] text-surface-700 hover:bg-surface-50' }}">
                                 {{ $secondaryLabel }}
                             </a>
                         @endif
@@ -115,7 +112,7 @@
             </div>
 
             @if ($bg !== '' && $splitLayout)
-                <div class="overflow-hidden rounded-2xl border border-surface-200/80 bg-surface-100 shadow-lg">
+                <div class="overflow-hidden rounded-[2.5rem] border border-black/[0.08] bg-surface-100">
                     <img src="{{ $bg }}" alt="" class="h-full w-full object-cover" />
                 </div>
             @endif

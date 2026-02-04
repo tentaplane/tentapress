@@ -22,12 +22,12 @@
         default => 'mx-auto',
     };
 
-    $figureClass = 'overflow-hidden border border-slate-200/80 bg-white shadow-sm';
+    $figureClass = 'overflow-hidden border border-black/[0.08] bg-white';
     if ($rounded) {
-        $figureClass .= ' rounded-2xl';
+        $figureClass .= ' rounded-[2.5rem]';
     }
     if ($shadow) {
-        $figureClass .= ' shadow-md';
+        $figureClass .= ' shadow-lg';
     }
 @endphp
 
@@ -44,7 +44,7 @@
                 @endif
 
                 @if ($caption !== '')
-                    <figcaption class="border-t border-slate-200/80 px-5 py-4 text-sm text-slate-500">
+                    <figcaption class="border-t border-black/[0.08] px-6 py-4 text-sm text-surface-500">
                         {{ $caption }}
                     </figcaption>
                 @endif

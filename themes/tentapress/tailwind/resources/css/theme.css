@@ -1,4 +1,4 @@
-@import url("https://fonts.bunny.net/css?family=space-grotesk:500,600,700|fira-sans:400,500,600");
+@import url("https://fonts.bunny.net/css?family=inter:400,500,600,700|general-sans:500,600,700");
 
 @import "tailwindcss";
 
@@ -15,54 +15,59 @@
 @source '../../../../../plugins/**/resources/js/**/*.js';
 
 @theme {
-	/* Typography - Space Grotesk for display, Fira Sans for body */
-	--font-sans: 'Fira Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+	/* Typography - General Sans for display, Inter for body */
+	--font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
 		'Segoe UI Symbol', 'Noto Color Emoji';
-	--font-display: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+	--font-display: 'General Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
 		'Segoe UI Symbol', 'Noto Color Emoji';
 
-	/* Brand Primary - Warm indigo for confidence and professionalism */
-	--color-brand-50: oklch(0.97 0.02 275);
-	--color-brand-100: oklch(0.94 0.04 275);
-	--color-brand-200: oklch(0.88 0.08 275);
-	--color-brand-300: oklch(0.78 0.12 275);
-	--color-brand-400: oklch(0.68 0.16 275);
-	--color-brand-500: oklch(0.58 0.18 275);
-	--color-brand-600: oklch(0.50 0.18 275);
-	--color-brand-700: oklch(0.43 0.16 275);
-	--color-brand-800: oklch(0.36 0.12 275);
-	--color-brand-900: oklch(0.30 0.08 275);
-	--color-brand-950: oklch(0.22 0.06 275);
+	/* Brand Primary - Pure black tones + blue accent (#3042e6) */
+	--color-brand-50: oklch(0.97 0.01 264);
+	--color-brand-100: oklch(0.94 0.03 264);
+	--color-brand-200: oklch(0.88 0.06 264);
+	--color-brand-300: oklch(0.76 0.10 264);
+	--color-brand-400: oklch(0.62 0.16 264);
+	--color-brand-500: oklch(0.50 0.20 264);
+	--color-brand-600: oklch(0.44 0.20 264);
+	--color-brand-700: oklch(0.38 0.18 264);
+	--color-brand-800: oklch(0.32 0.14 264);
+	--color-brand-900: oklch(0.26 0.10 264);
+	--color-brand-950: oklch(0.20 0.06 264);
 
-	/* Accent - Warm coral for energy and calls-to-action */
-	--color-accent-50: oklch(0.98 0.02 25);
-	--color-accent-100: oklch(0.95 0.04 25);
-	--color-accent-200: oklch(0.90 0.08 25);
-	--color-accent-300: oklch(0.82 0.12 25);
-	--color-accent-400: oklch(0.72 0.14 25);
-	--color-accent-500: oklch(0.64 0.16 25);
-	--color-accent-600: oklch(0.56 0.15 25);
+	/* Accent - Teal (#1ec79a) */
+	--color-accent-50: oklch(0.97 0.02 170);
+	--color-accent-100: oklch(0.94 0.04 170);
+	--color-accent-200: oklch(0.88 0.08 170);
+	--color-accent-300: oklch(0.80 0.12 170);
+	--color-accent-400: oklch(0.72 0.14 170);
+	--color-accent-500: oklch(0.64 0.14 170);
+	--color-accent-600: oklch(0.56 0.12 170);
 
-	/* Surface - Warm stone grays for approachable neutrals */
-	--color-surface-50: oklch(0.985 0.002 75);
-	--color-surface-100: oklch(0.97 0.004 75);
-	--color-surface-200: oklch(0.93 0.006 75);
-	--color-surface-300: oklch(0.87 0.008 75);
-	--color-surface-400: oklch(0.70 0.01 75);
-	--color-surface-500: oklch(0.55 0.01 75);
-	--color-surface-600: oklch(0.45 0.01 75);
-	--color-surface-700: oklch(0.37 0.01 75);
-	--color-surface-800: oklch(0.27 0.008 75);
-	--color-surface-900: oklch(0.20 0.006 75);
-	--color-surface-950: oklch(0.14 0.004 75);
+	/* Surface - Cool neutral grays (no warm hue) */
+	--color-surface-50: oklch(0.985 0 0);
+	--color-surface-100: oklch(0.965 0 0);
+	--color-surface-200: oklch(0.925 0 0);
+	--color-surface-300: oklch(0.87 0 0);
+	--color-surface-400: oklch(0.70 0 0);
+	--color-surface-500: oklch(0.55 0 0);
+	--color-surface-600: oklch(0.45 0 0);
+	--color-surface-700: oklch(0.37 0 0);
+	--color-surface-800: oklch(0.27 0 0);
+	--color-surface-900: oklch(0.15 0 0);
+	--color-surface-950: oklch(0.10 0 0);
 
-	/* Shadows - Warmer, more natural shadow colors */
-	--shadow-color: 75 6% 20%;
-	--shadow-sm: 0 1px 2px oklch(0.20 0.01 75 / 0.06);
-	--shadow-md: 0 4px 6px -1px oklch(0.20 0.01 75 / 0.08), 0 2px 4px -2px oklch(0.20 0.01 75 / 0.06);
-	--shadow-lg: 0 10px 15px -3px oklch(0.20 0.01 75 / 0.10), 0 4px 6px -4px oklch(0.20 0.01 75 / 0.08);
-	--shadow-xl: 0 20px 25px -5px oklch(0.20 0.01 75 / 0.12), 0 8px 10px -6px oklch(0.20 0.01 75 / 0.08);
+	/* Page background */
+	--color-page: #f3f3f3;
 
-	/* Brand-tinted shadows for primary elements */
-	--shadow-brand: 0 10px 20px -4px oklch(0.50 0.18 275 / 0.25);
+	/* Shadows - Minimal flat style */
+	--shadow-sm: 0 1px 2px rgb(0 0 0 / 0.04);
+	--shadow-md: 0 2px 8px rgb(0 0 0 / 0.06);
+	--shadow-lg: 0 4px 16px rgb(0 0 0 / 0.08);
+	--shadow-xl: 0 8px 24px rgb(0 0 0 / 0.10);
+}
+
+/* Tighten display font headings globally */
+.font-display {
+	letter-spacing: -0.04em;
+	line-height: 1.0;
 }

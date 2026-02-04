@@ -43,23 +43,23 @@
             @if ($title !== '' || $subtitle !== '')
                 <div class="space-y-3 text-center">
                     @if ($title !== '')
-                        <h2 class="font-display text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">
+                        <h2 class="text-sm font-semibold uppercase tracking-[0.2em] text-surface-500">
                             {{ $title }}
                         </h2>
                     @endif
                     @if ($subtitle !== '')
-                        <p class="text-pretty text-base text-slate-500">{{ $subtitle }}</p>
+                        <p class="text-pretty text-base text-surface-500">{{ $subtitle }}</p>
                     @endif
                 </div>
             @endif
 
-            <div class="grid items-center gap-6 {{ $gridClass }}">
+            <div class="grid items-center gap-4 {{ $gridClass }}">
                 @foreach ($logos as $logo)
-                    <div class="flex items-center justify-center rounded-3xl border border-slate-200/70 bg-white/80 px-6 py-5 shadow-lg shadow-slate-200/60">
+                    <div class="flex items-center justify-center rounded-[2.5rem] border border-black/[0.08] bg-white px-6 py-5">
                         <img
                             src="{{ $logo }}"
                             alt=""
-                            class="{{ $logoClass }} w-auto {{ $grayscale ? 'grayscale opacity-70' : '' }}" />
+                            class="{{ $logoClass }} w-auto {{ $grayscale ? 'grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all' : '' }}" />
                     </div>
                 @endforeach
             </div>

@@ -11,20 +11,20 @@
     $style = (string) ($props['style'] ?? 'line');
 
     $lineClass = match ($style) {
-        'dashed' => 'border-t border-dashed border-slate-200',
+        'dashed' => 'border-t border-dashed border-black/[0.08]',
         'none' => '',
-        default => 'border-t border-slate-200',
+        default => 'border-t border-black/[0.08]',
     };
 @endphp
 
-<section class="py-8">
+<section class="py-4">
     <div class="mx-auto max-w-7xl px-6">
         <div style="height: {{ $height }}px" class="flex items-center justify-center">
             @if ($style !== 'none')
                 <div class="w-full {{ $lineClass }}"></div>
             @endif
             @if ($label !== '')
-                <span class="mx-4 text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">{{ $label }}</span>
+                <span class="mx-4 text-xs font-semibold uppercase tracking-[0.2em] text-surface-400">{{ $label }}</span>
             @endif
         </div>
     </div>
