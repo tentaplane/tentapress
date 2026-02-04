@@ -2,7 +2,7 @@
     "id": "tentapress/blocks",
     "name": "Blocks",
     "description": "Block registry and rendering for TentaPress pages.",
-    "version": "0.2.8",
+    "version": "0.2.9",
     "provider": "TentaPress\\Blocks\\BlocksServiceProvider",
     "requires": []
 }

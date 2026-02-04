@@ -56,8 +56,16 @@
                 definitions: @js($blockDefinitions),
                 mediaOptions: @js($mediaOptions),
                 mediaIndexUrl: @js($mediaIndexUrl),
+                editorMode: @js($blocksEditorMode),
             })"
     x-init="init()">
+    <div
+        class="pointer-events-none fixed left-1/2 top-3 z-50 -translate-x-1/2"
+        x-show="editorMode && saveToastVisible"
+        x-transition.opacity
+        x-cloak>
+        <div class="tp-notice-info mb-0 shadow-sm">Saving…</div>
+    </div>
     @if ($hasMarkdown)
         @once
             @push('head')
@@ -898,6 +906,11 @@
                 mediaOptions: Array.isArray(opts.mediaOptions) ? opts.mediaOptions : [],
                 mediaIndexUrl:
                     typeof opts.mediaIndexUrl === 'string' ? opts.mediaIndexUrl : '',
+                editorMode: !!opts.editorMode,
+                saveToastVisible: false,
+                saveToastTimer: null,
+                savePending: false,
+                boundEditorKeydown: null,
                 addType: '',
                 insertIndex: null,
                 insertType: '',
@@ -921,6 +934,21 @@
                 mediaModalSelection: {},
 
                 init() {
+                    if (this.editorMode) {
+                        this.boundEditorKeydown = this.onEditorKeydown.bind(this);
+                        document.addEventListener('keydown', this.boundEditorKeydown);
+                        this.$el.addEventListener('alpine:destroy', () => {
+                            if (this.boundEditorKeydown) {
+                                document.removeEventListener(
+                                    'keydown',
+                                    this.boundEditorKeydown,
+                                );
+                            }
+                            if (this.saveToastTimer) {
+                                clearTimeout(this.saveToastTimer);
+                            }
+                        });
+                    }
                     this.advancedJson =
                         typeof opts.initialJson === 'string' ? opts.initialJson : '[]';
 
@@ -939,6 +967,56 @@
                         },
                         { deep: true },
                     );
+                },
+
+                onEditorKeydown(event) {
+                    const key = event.key ? event.key.toLowerCase() : '';
+                    if (!((event.metaKey || event.ctrlKey) && key === 's')) {
+                        return;
+                    }
+
+                    const target = event.target;
+                    if (
+                        target &&
+                        ((target.tagName &&
+                            ['input', 'textarea', 'select'].includes(
+                                target.tagName.toLowerCase(),
+                            )) ||
+                            target.isContentEditable ||
+                            target.closest?.('[contenteditable=\"true\"]'))
+                    ) {
+                        return;
+                    }
+
+                    event.preventDefault();
+                    event.stopPropagation();
+
+                    const form =
+                        this.$root &&
+                        this.$root.closest &&
+                        this.$root.closest('form');
+                    if (form) {
+                        this.showSaveToast();
+                        if (this.savePending) {
+                            return;
+                        }
+                        this.savePending = true;
+                        setTimeout(() => {
+                            form.requestSubmit();
+                        }, 150);
+                    }
+                },
+
+                showSaveToast() {
+                    this.saveToastVisible = true;
+                    if (this.saveToastTimer) {
+                        clearTimeout(this.saveToastTimer);
+                    }
+                    this.saveToastTimer = setTimeout(() => {
+                        this.saveToastVisible = false;
+                        this.saveToastTimer = null;
+                        this.savePending = false;
+                    }, 1600);
                 },
 
                 decorateBlock(block) {
