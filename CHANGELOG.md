@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.15.3](https://github.com/tentaplane/tentapress/compare/v0.15.2...v0.15.3) (2026-02-04)
+
+
+### Miscellaneous Chores
+
+* **setup:** clean up zip archive outputs ([4ce4196](https://github.com/tentaplane/tentapress/commit/4ce419667ac8de6bc8a8b6e0cd1889d38bff8c35))
+
 ## [0.15.2](https://github.com/tentaplane/tentapress/compare/v0.15.1...v0.15.2) (2026-02-04)
 
 
