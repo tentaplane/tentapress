@@ -742,16 +742,11 @@
                     class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
                     x-show="mediaModalOpen"
                     x-cloak
-                    x-bind:hidden="!mediaModalOpen"
-                    hidden
-                    style="display: none;"
                     @keydown.escape.window="closeMediaModal()"
                     @click.self="closeMediaModal()">
                     <div
                         class="flex max-h-[85vh] w-full max-w-6xl flex-col overflow-hidden rounded-lg border border-black/10 bg-white shadow-xl"
-                        x-bind:hidden="!mediaModalOpen"
-                        hidden
-                        style="display: none;">
+                        >
                         <div
                             class="flex flex-wrap items-center gap-2 border-b border-black/10 px-4 py-3">
                             <div class="min-w-0 flex-1">
