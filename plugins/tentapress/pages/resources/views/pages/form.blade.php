@@ -4,7 +4,13 @@
     $editorMode = (bool) ($editorMode ?? false);
     $customEditorView = app()->bound('tp.pages.editor.view') ? resolve('tp.pages.editor.view') : null;
     $customEditorView = is_string($customEditorView) && view()->exists($customEditorView) ? $customEditorView : null;
-    $editorLabel = $customEditorView ? 'Page Editor' : 'Blocks Editor';
+    $editorDriver = old('editor_driver', $page->editor_driver ?? ($customEditorView ? 'page' : 'blocks'));
+    $editorDriver = is_string($editorDriver) && in_array($editorDriver, ['blocks', 'page'], true) ? $editorDriver : 'blocks';
+    if (! $customEditorView) {
+        $editorDriver = 'blocks';
+    }
+    $usePageEditor = $customEditorView && $editorDriver === 'page';
+    $editorLabel = $usePageEditor ? 'Page Editor' : 'Blocks Editor';
 @endphp
 
 @if ($editorMode)
@@ -52,6 +58,7 @@
                                 <input type="hidden" name="title" value="{{ old('title', $page->title) }}" />
                                 <input type="hidden" name="slug" value="{{ old('slug', $page->slug) }}" />
                                 <input type="hidden" name="layout" value="{{ old('layout', $page->layout) }}" />
+                                <input type="hidden" name="editor_driver" value="{{ $editorDriver }}" />
                                 <input type="hidden" name="return_to" value="editor" />
                             @else
                                 <div
@@ -147,14 +154,39 @@
                                             @endif
                                         </div>
                                     </div>
+
+                                    @if ($customEditorView)
+                                        <div class="tp-field">
+                                            <label class="tp-label">Editor</label>
+                                            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                                <label class="cursor-pointer">
+                                                    <input type="radio" name="editor_driver" value="blocks" class="sr-only peer" @checked($editorDriver === 'blocks') />
+                                                    <div class="rounded-xl border border-slate-200 bg-white p-3 transition peer-checked:border-slate-900 peer-checked:ring-2 peer-checked:ring-slate-200">
+                                                        <div class="text-sm font-semibold text-slate-900">Blocks Builder</div>
+                                                        <div class="mt-1 text-xs text-slate-500">Structured sections and fields.</div>
+                                                    </div>
+                                                </label>
+                                                <label class="cursor-pointer">
+                                                    <input type="radio" name="editor_driver" value="page" class="sr-only peer" @checked($editorDriver === 'page') />
+                                                    <div class="rounded-xl border border-slate-200 bg-white p-3 transition peer-checked:border-slate-900 peer-checked:ring-2 peer-checked:ring-slate-200">
+                                                        <div class="text-sm font-semibold text-slate-900">Page Editor</div>
+                                                        <div class="mt-1 text-xs text-slate-500">Continuous writing surface.</div>
+                                                    </div>
+                                                </label>
+                                            </div>
+                                            <div class="tp-help">Choose the editing experience for this page.</div>
+                                        </div>
+                                    @endif
                                 </div>
                             @endif
 
-                            @if ($customEditorView)
+                            @if ($usePageEditor)
                                 @include($customEditorView, [
                                     'page' => $page,
                                     'editorTitle' => $editorMode ? (trim((string) ($page->title ?? '')) !== '' ? $page->title : 'Untitled Page') : null,
                                     'pageDocJson' => $pageDocJson ?? null,
+                                    'mediaOptions' => $mediaOptions ?? [],
+                                    'mediaIndexUrl' => \Illuminate\Support\Facades\Route::has('tp.media.index') ? route('tp.media.index') : '',
                                     'editorMode' => $editorMode,
                                     'mode' => $mode,
                                 ])

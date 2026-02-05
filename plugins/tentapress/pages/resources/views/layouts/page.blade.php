@@ -3,14 +3,20 @@
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>Fallback - {{ $page->title }}</title>
+        <title>{{ $page->title }}</title>
     </head>
 
-    <body class="bg-white text-green-400">
-        <main class="mx-auto max-w-4xl p-6">
-            @include('tentapress-pages::partials.blocks', [
-            'blocks' => $page->blocks,
-            ])
+    <body class="bg-white text-slate-900">
+        <main class="mx-auto max-w-4xl space-y-8 px-6 py-12">
+            <header class="space-y-2">
+                <h1 class="text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">
+                    {{ $page->title }}
+                </h1>
+            </header>
+
+            <article class="prose prose-slate max-w-none">
+                {!! $blocksHtml !!}
+            </article>
         </main>
     </body>
 </html>
