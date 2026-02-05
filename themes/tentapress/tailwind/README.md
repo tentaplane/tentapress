@@ -7,7 +7,7 @@ A Tailwind CSS v4 theme for TentaPress.
 | Field         | Value                 |
 |---------------|-----------------------|
 | ID            | `tentapress/tailwind` |
-| Version       | 0.1.6                 |
+| Version       | 0.1.7                 |
 | CSS Framework | Tailwind CSS v4       |
 
 ## Layouts

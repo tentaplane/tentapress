@@ -1,9 +1,9 @@
 @props([
     'title' => 'TentaPress',
-    'tagline' => 'The fastest way for agencies to ship small sites.',
+    'tagline' => 'Launch client sites in days, not weeks.',
 ])
 
-<footer class="border-t border-black/[0.08] bg-page">
+<footer class="border-t border-black/8 bg-page">
     <div class="mx-auto w-full max-w-7xl px-6 py-16">
         <div class="grid gap-12 lg:grid-cols-[1.4fr_repeat(3,1fr)] lg:gap-8">
             <div class="space-y-5">
@@ -47,7 +47,7 @@
             </div>
         </div>
 
-        <div class="mt-14 flex flex-wrap items-center justify-between gap-4 border-t border-black/[0.08] pt-8 text-sm text-surface-500">
+        <div class="mt-14 flex flex-wrap items-center justify-between gap-4 border-t border-black/8 pt-8 text-sm text-surface-500">
             <span>&copy; {{ date('Y') }} {{ $title }}. All rights reserved.</span>
             <div class="flex flex-wrap gap-6">
                 <a class="rounded transition-colors hover:text-surface-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-surface-900" href="#">Privacy</a>
