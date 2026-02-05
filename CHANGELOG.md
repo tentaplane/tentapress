@@ -4,6 +4,36 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.18.0](https://github.com/tentaplane/tentapress/compare/v0.17.0...v0.18.0) (2026-02-05)
+
+
+### Features
+
+* **theme:** example custom blocks ([bd57eab](https://github.com/tentaplane/tentapress/commit/bd57eabad7ade72de8f39094cd5808e3f8232bba))
+
+
+### Bug Fixes
+
+* **admin-shell:** switching to toasts for flash messages ([7430067](https://github.com/tentaplane/tentapress/commit/7430067c4af7ee5f035ee43d08b08db62257c251))
+* **blocks:** UI improvements for full screen editing and JSON editing ([3c62dd3](https://github.com/tentaplane/tentapress/commit/3c62dd3d740a130f4e2c7f993073571e38a29f79))
+* **page-editor:** UI cleanup ([04121ed](https://github.com/tentaplane/tentapress/commit/04121ed24b32e1c8ad2302ff6b9a88dd7563cc3e))
+* **pages:** improved admin UI ([b176d99](https://github.com/tentaplane/tentapress/commit/b176d99c95af3d27455d77dfaadec1e2de0f2b7a))
+* **pages:** minor UI improvements ([8d606fa](https://github.com/tentaplane/tentapress/commit/8d606fa854837fdea8096e8ca81f3cf9fdf35f8e))
+* **posts:** improved admin UI ([762c302](https://github.com/tentaplane/tentapress/commit/762c3028aead5feffa9c84b31fcf7ca902365851))
+* **posts:** minor UI improvements ([126cf7c](https://github.com/tentaplane/tentapress/commit/126cf7c88c54ed8347c32ece9170003e16cdfd0d))
+* **themes:** Theme UI improvements ([8d1d46b](https://github.com/tentaplane/tentapress/commit/8d1d46b291dbf961db2681f223d58499efd7b0cf))
+
+
+### Miscellaneous Chores
+
+* **custom-blocks:** PHP code linting ([535196b](https://github.com/tentaplane/tentapress/commit/535196bb2ad42e17a2c2406c3629baf6904f85cf))
+* **export:** PHP code linting ([9bf7641](https://github.com/tentaplane/tentapress/commit/9bf7641de87a32fdb26fd16121868f174667064f))
+* **import:** PHP code linting ([0276a7a](https://github.com/tentaplane/tentapress/commit/0276a7a85ab0c99d8a101c6db599e80c5cdf7863))
+* **page-editor:** PHP code linting ([2ab3fd6](https://github.com/tentaplane/tentapress/commit/2ab3fd658803e9abbe9035332cd7fec953dfe3e8))
+* **seo:** PHP code linting ([53c1c3f](https://github.com/tentaplane/tentapress/commit/53c1c3f32a5edbfc7500784b6f7d6d92f1b7b4e6))
+* **system:** Admin UI assets ([e8cbc97](https://github.com/tentaplane/tentapress/commit/e8cbc97be0696ce0631f76cc5d0683d378b2a88f))
+* **system:** PHP code linting ([2e33ec4](https://github.com/tentaplane/tentapress/commit/2e33ec47af5fa9c6630b49787a2c49b8796efd5e))
+
 ## [0.17.0](https://github.com/tentaplane/tentapress/compare/v0.16.1...v0.17.0) (2026-02-05)
 
 
