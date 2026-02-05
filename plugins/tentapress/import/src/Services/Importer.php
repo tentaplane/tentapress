@@ -15,9 +15,9 @@ use TentaPress\Posts\Models\TpPost;
 use TentaPress\System\Support\JsonPayload;
 use ZipArchive;
 
-final class Importer
+final readonly class Importer
 {
-    public function __construct(private readonly JsonPayload $jsonPayload)
+    public function __construct(private JsonPayload $jsonPayload)
     {
     }
 

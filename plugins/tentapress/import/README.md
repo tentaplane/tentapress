@@ -4,10 +4,10 @@ Content import functionality for TentaPress.
 
 ## Plugin Details
 
-| Field | Value |
-|-------|-------|
-| ID | `tentapress/import` |
-| Version | 0.1.2 |
+| Field    | Value                                     |
+|----------|-------------------------------------------|
+| ID       | `tentapress/import`                       |
+| Version  | 0.1.3                                     |
 | Provider | `TentaPress\Import\ImportServiceProvider` |
 
 ## Features
@@ -21,8 +21,8 @@ None.
 
 ## Admin Menu
 
-| Label | Route | Capability | Parent |
-|-------|-------|------------|--------|
+| Label  | Route             | Capability    | Parent   |
+|--------|-------------------|---------------|----------|
 | Import | `tp.import.index` | `import_site` | Settings |
 
 ## Development
