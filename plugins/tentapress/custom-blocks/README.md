@@ -4,10 +4,10 @@ Single-file block discovery for active TentaPress themes.
 
 ## Plugin Details
 
-| Field | Value |
-|---|---|
-| ID | `tentapress/custom-blocks` |
-| Version | `0.1.0` |
+| Field    | Value                                                   |
+|----------|---------------------------------------------------------|
+| ID       | `tentapress/custom-blocks`                              |
+| Version  | `0.1.1`                                                 |
 | Provider | `TentaPress\\CustomBlocks\\CustomBlocksServiceProvider` |
 
 ## What It Does

@@ -66,7 +66,7 @@ final readonly class ThemeSingleFileBlockKit
 
             $path = $item->getPathname();
 
-            if (! str_ends_with($path, '.blade.php')) {
+            if (! str_ends_with((string) $path, '.blade.php')) {
                 continue;
             }
 
