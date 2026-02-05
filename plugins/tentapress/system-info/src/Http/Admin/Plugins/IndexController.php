@@ -69,6 +69,15 @@ final class IndexController
             ];
         }
 
+        usort($plugins, static function (array $a, array $b): int {
+            $nameCompare = strcasecmp((string) ($a['name'] ?? ''), (string) ($b['name'] ?? ''));
+            if ($nameCompare !== 0) {
+                return $nameCompare;
+            }
+
+            return strcasecmp((string) ($a['id'] ?? ''), (string) ($b['id'] ?? ''));
+        });
+
         return $plugins;
     }
 

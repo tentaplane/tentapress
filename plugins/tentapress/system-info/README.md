@@ -4,10 +4,10 @@ Diagnostics and plugin management for TentaPress.
 
 ## Plugin Details
 
-| Field | Value |
-|-------|-------|
-| ID | `tentapress/system-info` |
-| Version | 0.1.3 |
+| Field    | Value                                             |
+|----------|---------------------------------------------------|
+| ID       | `tentapress/system-info`                          |
+| Version  | 0.1.4                                             |
 | Provider | `TentaPress\SystemInfo\SystemInfoServiceProvider` |
 
 ## Features
@@ -24,10 +24,10 @@ None.
 
 ## Admin Menu
 
-| Label | Route | Capability | Icon | Position | Parent |
-|-------|-------|------------|------|----------|--------|
-| System Info | `tp.system-info` | `view_system_info` | info | 95 | - |
-| Plugins | `tp.plugins.index` | `manage_plugins` | plug | 40 | Settings |
+| Label       | Route              | Capability         | Icon | Position | Parent   |
+|-------------|--------------------|--------------------|------|----------|----------|
+| System Info | `tp.system-info`   | `view_system_info` | info | 95       | -        |
+| Plugins     | `tp.plugins.index` | `manage_plugins`   | plug | 40       | Settings |
 
 ## Development
 
