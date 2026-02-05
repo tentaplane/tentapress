@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.16.1](https://github.com/tentaplane/tentapress/compare/v0.16.0...v0.16.1) (2026-02-05)
+
+
+### Bug Fixes
+
+* **system:** minor changes to the demo homepage seeder ([4ad1b79](https://github.com/tentaplane/tentapress/commit/4ad1b7999091401d7bb7e04204d2ada7a22aa38d))
+* **theme-tailwind:** improved layouts ([0e2c03d](https://github.com/tentaplane/tentapress/commit/0e2c03d6eb2b4f2e02baf8c9b5615f3ed3984a67))
+
 ## [0.16.0](https://github.com/tentaplane/tentapress/compare/v0.15.6...v0.16.0) (2026-02-05)
 
 
