@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.17.0](https://github.com/tentaplane/tentapress/compare/v0.16.1...v0.17.0) (2026-02-05)
+
+
+### Features
+
+* **admin-shell:** new improved stats and shortcuts on the dashboard ([ce7b145](https://github.com/tentaplane/tentapress/commit/ce7b1457245714b36318a2f7209e69355194d255))
+* **custom-blocks:** single-file block discovery for active themes ([8c63ccc](https://github.com/tentaplane/tentapress/commit/8c63cccf520d55b1410c317690012ffd77326136))
+
+
+### Bug Fixes
+
+* **theme-tailwind:** small tweaks to header/footer ([392c1fc](https://github.com/tentaplane/tentapress/commit/392c1fc6e3725944bb9a83ad1c06329e133a5092))
+
+
+### Miscellaneous Chores
+
+* **system:** new first-party plugin suggestions ([108b437](https://github.com/tentaplane/tentapress/commit/108b437f25db95ab1291f401e4b51bfad8f73ded))
+
 ## [0.16.1](https://github.com/tentaplane/tentapress/compare/v0.16.0...v0.16.1) (2026-02-05)
 
 
