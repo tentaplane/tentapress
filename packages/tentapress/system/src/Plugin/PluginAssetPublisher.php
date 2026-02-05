@@ -24,8 +24,22 @@ final class PluginAssetPublisher
         $this->copyDirectory($source, $destination);
     }
 
+    public function unpublish(string $pluginId): void
+    {
+        $parts = array_values(array_filter(explode('/', $pluginId)));
+        if (count($parts) !== 2) {
+            return;
+        }
+
+        [$vendor, $name] = $parts;
+        $destination = public_path('plugins/'.$vendor.'/'.$name.'/build');
+        $this->deleteDirectory($destination);
+    }
+
     private function resolveSourcePath(string $pluginPath, string $vendor, string $name): ?string
     {
+        $pluginPath = $this->normalizePath($pluginPath);
+
         $candidates = [
             rtrim($pluginPath, '/').'/build',
             rtrim($pluginPath, '/').'/public/plugins/'.$vendor.'/'.$name.'/build',
@@ -40,8 +54,29 @@ final class PluginAssetPublisher
         return null;
     }
 
+    private function normalizePath(string $path): string
+    {
+        $trimmed = rtrim(str_replace('\\', '/', $path), '/');
+        if ($trimmed === '') {
+            return $trimmed;
+        }
+
+        if ($this->isAbsolutePath($trimmed)) {
+            return $trimmed;
+        }
+
+        return str_replace('\\', '/', base_path($trimmed));
+    }
+
+    private function isAbsolutePath(string $path): bool
+    {
+        return str_starts_with($path, '/') || (bool) preg_match('/^[A-Za-z]:\//', $path);
+    }
+
     private function copyDirectory(string $source, string $destination): void
     {
+        $this->deleteDirectory($destination);
+
         if (! is_dir($destination) && ! mkdir($destination, 0755, true) && ! is_dir($destination)) {
             return;
         }
@@ -62,5 +97,28 @@ final class PluginAssetPublisher
 
             @copy($item->getPathname(), $target);
         }
+    }
+
+    private function deleteDirectory(string $path): void
+    {
+        if (! is_dir($path)) {
+            return;
+        }
+
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($path, \FilesystemIterator::SKIP_DOTS),
+            \RecursiveIteratorIterator::CHILD_FIRST
+        );
+
+        foreach ($iterator as $item) {
+            if ($item->isDir()) {
+                @rmdir($item->getPathname());
+                continue;
+            }
+
+            @unlink($item->getPathname());
+        }
+
+        @rmdir($path);
     }
 }

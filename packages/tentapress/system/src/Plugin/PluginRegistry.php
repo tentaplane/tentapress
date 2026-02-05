@@ -134,6 +134,8 @@ final class PluginRegistry
             ->update(['enabled' => 1, 'updated_at' => now()]);
 
         throw_if($updated === 0, RuntimeException::class, "Plugin not found in tp_plugins: {$id}. Did you run `php artisan tp:plugins sync`?");
+
+        $this->publishAssetsFor($id);
     }
 
     public function disable(string $id, bool $force = false): void
@@ -147,6 +149,8 @@ final class PluginRegistry
             ->update(['enabled' => 0, 'updated_at' => now()]);
 
         throw_if($updated === 0, RuntimeException::class, "Plugin not found in tp_plugins: {$id}. Did you run `php artisan tp:plugins sync`?");
+
+        $this->unpublishAssetsFor($id);
     }
 
     public function enableAll(): int
@@ -176,9 +180,15 @@ final class PluginRegistry
             return 0;
         }
 
-        return DB::table('tp_plugins')
+        $updated = DB::table('tp_plugins')
             ->whereIn('id', $enableIds)
             ->update(['enabled' => 1, 'updated_at' => now()]);
+
+        foreach ($enableIds as $id) {
+            $this->publishAssetsFor((string) $id);
+        }
+
+        return $updated;
     }
 
     /**
@@ -226,6 +236,10 @@ final class PluginRegistry
             $enabled = DB::table('tp_plugins')
                 ->whereIn('id', $enableIds)
                 ->update(['enabled' => 1, 'updated_at' => now()]);
+
+            foreach ($enableIds as $id) {
+                $this->publishAssetsFor((string) $id);
+            }
         }
 
         return [
@@ -233,6 +247,40 @@ final class PluginRegistry
             'skipped' => count($skippedIds),
             'skipped_ids' => $skippedIds,
         ];
+    }
+
+    private function publishAssetsFor(string $id): void
+    {
+        if (! app()->bound(PluginAssetPublisher::class)) {
+            return;
+        }
+
+        $row = DB::table('tp_plugins')
+            ->where('id', $id)
+            ->first(['id', 'path']);
+
+        if (! is_object($row)) {
+            return;
+        }
+
+        $pluginId = (string) ($row->id ?? '');
+        $path = (string) ($row->path ?? '');
+        if ($pluginId === '' || $path === '') {
+            return;
+        }
+
+        $publisher = app()->make(PluginAssetPublisher::class);
+        $publisher->publish($pluginId, $path);
+    }
+
+    private function unpublishAssetsFor(string $id): void
+    {
+        if (! app()->bound(PluginAssetPublisher::class)) {
+            return;
+        }
+
+        $publisher = app()->make(PluginAssetPublisher::class);
+        $publisher->unpublish($id);
     }
 
     public function disableAll(bool $force = false): int
@@ -243,7 +291,20 @@ final class PluginRegistry
             $q->whereNotIn('id', self::PROTECTED_PLUGIN_IDS);
         }
 
-        return $q->update(['enabled' => 0, 'updated_at' => now()]);
+        $ids = $q->pluck('id')->map(strval(...))->all();
+        if ($ids === []) {
+            return 0;
+        }
+
+        $updated = DB::table('tp_plugins')
+            ->whereIn('id', $ids)
+            ->update(['enabled' => 0, 'updated_at' => now()]);
+
+        foreach ($ids as $id) {
+            $this->unpublishAssetsFor((string) $id);
+        }
+
+        return $updated;
     }
 
     /**
