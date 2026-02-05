@@ -10,9 +10,16 @@
         </div>
 
         <div class="flex gap-2">
-            <form method="POST" action="{{ route('tp.themes.sync') }}">
+            <form
+                method="POST"
+                action="{{ route('tp.themes.sync') }}"
+                x-data="{ submitting: false }"
+                @submit="submitting = true">
                 @csrf
-                <button type="submit" class="tp-button-secondary">Sync themes</button>
+                <button type="submit" class="tp-button-secondary" :disabled="submitting">
+                    <span x-show="!submitting">Sync themes</span>
+                    <span x-show="submitting" x-cloak>Syncing themes…</span>
+                </button>
             </form>
         </div>
     </div>
@@ -131,13 +138,19 @@
                                         </a>
 
                                         @if (!$isActive)
-                                            <form method="POST" action="{{ route('tp.themes.activate') }}">
+                                            <form
+                                                method="POST"
+                                                action="{{ route('tp.themes.activate') }}"
+                                                x-data="{ submitting: false }"
+                                                @submit="submitting = true">
                                                 @csrf
                                                 <input type="hidden" name="theme_id" value="{{ $id }}" />
                                                 <button
                                                     type="submit"
-                                                    class="tp-button-link text-green-600 hover:text-green-700">
-                                                    Activate
+                                                    class="tp-button-link text-green-600 hover:text-green-700"
+                                                    :disabled="submitting">
+                                                    <span x-show="!submitting">Activate</span>
+                                                    <span x-show="submitting" x-cloak>Activating…</span>
                                                 </button>
                                             </form>
                                         @endif

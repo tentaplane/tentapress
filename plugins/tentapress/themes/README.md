@@ -7,7 +7,7 @@ Theme management UI for TentaPress.
 | Field    | Value                                     |
 |----------|-------------------------------------------|
 | ID       | `tentapress/themes`                       |
-| Version  | 0.1.4                                     |
+| Version  | 0.1.5                                     |
 | Provider | `TentaPress\Themes\ThemesServiceProvider` |
 
 ## Features
