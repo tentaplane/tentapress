@@ -31,7 +31,7 @@
                     </div>
                 </header>
 
-                <div class="space-y-6">
+                <div class="prose prose-slate max-w-none">
                     {!! $blocksHtml !!}
                 </div>
             </article>

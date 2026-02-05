@@ -15,7 +15,8 @@ final class PostRenderer
         $layoutKey = (string) ($post->layout ?: 'default');
         $blocks = is_array($post->blocks) ? $post->blocks : [];
         $content = is_array($post->content) ? $post->content : null;
-        $blocksHtml = $this->renderPageContent($content, $blocks);
+        $editorDriver = (string) ($post->editor_driver ?? '');
+        $blocksHtml = $this->renderPageContent($content, $blocks, $editorDriver);
         $view = $this->resolveLayoutView($layoutKey);
 
         return response()->view($view, [
@@ -51,14 +52,18 @@ final class PostRenderer
      * @param  array<string,mixed>|null  $content
      * @param  array<int,mixed>  $blocks
      */
-    private function renderPageContent(?array $content, array $blocks): string
+    private function renderPageContent(?array $content, array $blocks, string $editorDriver): string
     {
+        if ($editorDriver === 'blocks') {
+            return $this->renderBlocks($blocks);
+        }
+
         if (is_array($content) && app()->bound('tp.page_editor.render')) {
             $renderer = resolve('tp.page_editor.render');
 
             if (is_callable($renderer)) {
                 $html = $renderer($content);
-                if (is_string($html)) {
+                if (is_string($html) && trim($html) !== '') {
                     return $html;
                 }
             }

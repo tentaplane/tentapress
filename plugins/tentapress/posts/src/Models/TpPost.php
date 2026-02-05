@@ -18,6 +18,7 @@ final class TpPost extends Model
         'slug',
         'status',
         'layout',
+        'editor_driver',
         'blocks',
         'content',
         'published_at',

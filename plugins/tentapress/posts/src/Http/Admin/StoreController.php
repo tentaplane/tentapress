@@ -25,6 +25,7 @@ final readonly class StoreController
             'title' => ['required', 'string', 'max:255'],
             'slug' => ['nullable', 'string', 'max:255', 'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/', Rule::unique('tp_posts', 'slug')],
             'layout' => ['nullable', 'string', 'max:255'],
+            'editor_driver' => ['nullable', Rule::in(['blocks', 'page'])],
             'blocks_json' => ['nullable', 'string'],
             'page_doc_json' => ['nullable', 'string'],
             'author_id' => ['nullable', 'integer', Rule::exists('tp_users', 'id')],
@@ -63,6 +64,9 @@ final readonly class StoreController
 
         if (Schema::hasColumn('tp_posts', 'content')) {
             $payload['content'] = $pageDoc;
+        }
+        if (Schema::hasColumn('tp_posts', 'editor_driver')) {
+            $payload['editor_driver'] = (string) ($data['editor_driver'] ?? 'blocks');
         }
 
         $post = TpPost::query()->create($payload);

@@ -7,6 +7,7 @@ namespace TentaPress\Posts\Http\Admin;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
 use TentaPress\Blocks\Registry\BlockRegistry;
+use TentaPress\System\Plugin\PluginRegistry;
 use TentaPress\Media\Models\TpMedia;
 use TentaPress\Posts\Models\TpPost;
 use TentaPress\System\Theme\ThemeManager;
@@ -23,14 +24,15 @@ final class CreateController
             'slug' => '',
             'status' => 'draft',
             'layout' => null,
+            'editor_driver' => 'blocks',
             'blocks' => [],
-            'content' => ['type' => 'page', 'content' => []],
+            'content' => ['time' => 0, 'blocks' => [], 'version' => '2.28.0'],
             'author_id' => $nowUserId ?: null,
         ]);
 
         $pageDocJson = json_encode($post->content, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         if ($pageDocJson === false) {
-            $pageDocJson = '{"type":"page","content":[]}';
+            $pageDocJson = '{"time":0,"blocks":[],"version":"2.28.0"}';
         }
 
         return view('tentapress-posts::posts.form', [
@@ -87,7 +89,53 @@ final class CreateController
             ];
         }
 
-        return array_values(array_filter($out, static fn ($d) => ($d['type'] ?? '') !== ''));
+        $enabledPluginIds = $this->enabledPluginIds();
+
+        return array_values(array_filter($out, static function (array $definition) use ($enabledPluginIds): bool {
+            $type = trim((string) ($definition['type'] ?? ''));
+            if ($type === '') {
+                return false;
+            }
+
+            if ($enabledPluginIds === null || str_starts_with($type, 'blocks/')) {
+                return true;
+            }
+
+            $segments = explode('/', $type, 3);
+            if (count($segments) < 2) {
+                return true;
+            }
+
+            $pluginId = $segments[0].'/'.$segments[1];
+
+            return in_array($pluginId, $enabledPluginIds, true);
+        }));
+    }
+
+    /**
+     * @return array<int,string>|null
+     */
+    private function enabledPluginIds(): ?array
+    {
+        $registryClass = PluginRegistry::class;
+
+        if (! class_exists($registryClass) || ! app()->bound($registryClass)) {
+            return null;
+        }
+
+        $registry = resolve($registryClass);
+        if (! is_object($registry) || ! method_exists($registry, 'readCache')) {
+            return null;
+        }
+
+        $cache = $registry->readCache();
+        if (! is_array($cache) || $cache === []) {
+            return null;
+        }
+
+        $ids = array_values(array_filter(array_map(static fn ($id): string => trim((string) $id), array_keys($cache))));
+
+        return $ids === [] ? null : $ids;
     }
 
     /**
