@@ -97,8 +97,6 @@
         </div>
     @endif
 
-    <label class="tp-label">Page Editor</label>
-
     <div class="tp-page-editor" x-ref="editor" data-storage-key="{{ $storageKey }}">
         <div class="tp-page-editor__surface" x-ref="surface"></div>
     </div>

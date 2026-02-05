@@ -2,7 +2,7 @@
     "id": "tentapress/page-editor",
     "name": "Page Editor",
     "description": "Notion-style page editor with slash commands and inline formatting.",
-    "version": "0.2.1",
+    "version": "0.2.2",
     "provider": "TentaPress\\PageEditor\\PageEditorServiceProvider",
     "requires": ["tentapress/pages", "tentapress/posts"],
     "assets": {

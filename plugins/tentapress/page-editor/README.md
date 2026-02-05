@@ -7,7 +7,7 @@ Notion-style continuous page editor for TentaPress.
 | Field    | Value                                               |
 |----------|-----------------------------------------------------|
 | ID       | `tentapress/page-editor`                            |
-| Version  | 0.2.1                                               |
+| Version  | 0.2.2                                               |
 | Provider | `TentaPress\\PageEditor\\PageEditorServiceProvider` |
 
 ## Features
