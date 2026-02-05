@@ -13,8 +13,24 @@ final class IndexController
     {
         $status = (string) $request->query('status', 'all');
         $search = trim((string) $request->query('s', ''));
+        $sort = (string) $request->query('sort', 'updated');
+        $requestedDirection = strtolower((string) $request->query('direction', ''));
 
-        $query = TpPost::query()->latest('updated_at');
+        $sortColumns = [
+            'title' => 'title',
+            'slug' => 'slug',
+            'status' => 'status',
+            'published' => 'published_at',
+            'updated' => 'updated_at',
+        ];
+        $sort = array_key_exists($sort, $sortColumns) ? $sort : 'updated';
+
+        $defaultDirection = in_array($sort, ['title', 'slug', 'status'], true) ? 'asc' : 'desc';
+        $direction = in_array($requestedDirection, ['asc', 'desc'], true) ? $requestedDirection : $defaultDirection;
+
+        $query = TpPost::query()
+            ->orderBy($sortColumns[$sort], $direction)
+            ->orderBy('id');
 
         if ($status === 'draft' || $status === 'published') {
             $query->where('status', $status);
@@ -33,6 +49,8 @@ final class IndexController
             'posts' => $posts,
             'status' => $status,
             'search' => $search,
+            'sort' => $sort,
+            'direction' => $direction,
         ]);
     }
 }
