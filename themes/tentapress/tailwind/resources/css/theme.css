@@ -71,3 +71,106 @@
 	letter-spacing: -0.04em;
 	line-height: 1.0;
 }
+
+/* Page Editor frontend content styling */
+.tp-page-content--page {
+	@apply space-y-6;
+}
+
+.tp-page-content--page h1 {
+	@apply font-display text-4xl font-bold text-surface-900 sm:text-5xl;
+}
+
+.tp-page-content--page h2 {
+	@apply font-display text-3xl font-semibold text-surface-900 sm:text-4xl;
+}
+
+.tp-page-content--page h3 {
+	@apply text-2xl font-semibold text-surface-900 sm:text-3xl;
+}
+
+.tp-page-content--page p {
+	@apply text-base leading-8 text-surface-800;
+}
+
+.tp-page-content--page ul {
+	@apply list-disc space-y-2 pl-6;
+}
+
+.tp-page-content--page ol {
+	@apply list-decimal space-y-2 pl-6;
+}
+
+.tp-page-content--page blockquote {
+	@apply border-l-4 border-surface-300 pl-5 italic text-surface-700;
+}
+
+.tp-page-content--page hr {
+	@apply my-10 border-surface-300;
+}
+
+.tp-page-content--page figure {
+	@apply my-8 space-y-3;
+}
+
+.tp-page-content--page img {
+	@apply w-full rounded-2xl border border-surface-200;
+}
+
+.tp-page-content--page figcaption {
+	@apply text-sm leading-6 text-surface-600;
+}
+
+.tp-page-content--page .tp-embed {
+	@apply my-8;
+}
+
+.tp-page-content--page .tp-embed-caption {
+	@apply mt-3 text-sm leading-6 text-surface-600;
+}
+
+.tp-page-content--page .tp-checklist {
+	@apply my-6 space-y-3 pl-0;
+	list-style: none;
+}
+
+.tp-page-content--page .tp-checklist-item {
+	@apply flex items-start gap-3;
+}
+
+.tp-page-content--page .tp-checklist-item input {
+	@apply mt-1 h-4 w-4 rounded border-surface-300;
+}
+
+.tp-page-content--page .tp-checklist-item input:checked + span {
+	@apply text-surface-500 line-through;
+}
+
+.tp-page-content--page .tp-code-block {
+	@apply my-8 overflow-x-auto rounded-2xl border border-surface-800 bg-surface-900 p-4 text-sm text-surface-100;
+}
+
+.tp-page-content--page .tp-code-language {
+	@apply mb-2 text-xs font-semibold uppercase tracking-[0.12em] text-surface-400;
+}
+
+.tp-page-content--page .tp-code-block code {
+	@apply font-mono;
+	white-space: pre;
+}
+
+.tp-page-content--page .tp-callout {
+	@apply my-6 rounded-2xl border p-4;
+}
+
+.tp-page-content--page .tp-callout-info {
+	@apply border-brand-200 bg-brand-50 text-brand-900;
+}
+
+.tp-page-content--page .tp-callout-warning {
+	@apply border-amber-200 bg-amber-50 text-amber-900;
+}
+
+.tp-page-content--page .tp-callout-success {
+	@apply border-emerald-200 bg-emerald-50 text-emerald-900;
+}

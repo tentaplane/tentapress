@@ -3,16 +3,8 @@
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        @php
-            $seo = app(\TentaPress\Seo\Services\SeoManager::class)->forBlogIndex();
-        @endphp
-
-        @include('tentapress-seo::head', ['seo' => $seo])
-
-        @php($manifest = public_path('themes/tentapress/tailwind/build/manifest.json'))
-        @if (is_file($manifest))
-            @vite(['resources/css/theme.css', 'resources/js/theme.js'], 'themes/tentapress/tailwind/build')
-        @endif
+        
+        @vite(['resources/css/theme.css', 'resources/js/theme.js'], 'themes/tentapress/tailwind/build')
     </head>
     <body class="bg-page font-sans text-surface-900 antialiased">
         <div class="relative flex min-h-screen flex-col">
@@ -35,7 +27,7 @@
                                 $publishedLabel = $publishedAt?->format('F j, Y') ?? '';
                             @endphp
 
-                            <article class="space-y-3 rounded-[2.5rem] border border-black/[0.08] bg-white p-8">
+                            <article class="space-y-3 rounded-[2.5rem] border border-black/8 bg-white p-8">
                                 <h2 class="font-display text-2xl font-semibold text-surface-900">
                                     <a
                                         class="transition-colors hover:text-surface-600"

@@ -5,20 +5,16 @@
         <meta name="viewport" content="width=device-width, initial-scale=1" />
 
         @include('tentapress-seo::head', ['page' => $page])
-
-        @php($manifest = public_path('themes/tentapress/tailwind/build/manifest.json'))
-        @if (is_file($manifest))
-            @vite(['resources/css/theme.css', 'resources/js/theme.js'], 'themes/tentapress/tailwind/build')
-        @endif
+        @vite(['resources/css/theme.css', 'resources/js/theme.js'], 'themes/tentapress/tailwind/build')
     </head>
     <body class="bg-page font-sans text-surface-900 antialiased">
         <div class="relative flex min-h-screen flex-col">
             <x-tp-theme::header />
 
-            <main class="relative z-10 mx-auto w-full max-w-7xl flex-1 px-6 pb-24 pt-10">
-                @include('tentapress-pages::partials.blocks', [
-                    'blocks' => $page->blocks,
-                ])
+            <main class="relative z-10 mx-auto w-full max-w-7xl flex-1 px-6">
+                <article class="tp-page-content {{ ! empty($isPageEditorContent) ? 'tp-page-content--page' : '' }}">
+                    {!! $blocksHtml !!}
+                </article>
             </main>
 
             <x-tp-theme::footer />
