@@ -4,10 +4,10 @@ Notion-style continuous page editor for TentaPress.
 
 ## Plugin Details
 
-| Field | Value |
-|-------|-------|
-| ID | `tentapress/page-editor` |
-| Version | 0.2.0 |
+| Field    | Value                                               |
+|----------|-----------------------------------------------------|
+| ID       | `tentapress/page-editor`                            |
+| Version  | 0.2.1                                               |
 | Provider | `TentaPress\\PageEditor\\PageEditorServiceProvider` |
 
 ## Features

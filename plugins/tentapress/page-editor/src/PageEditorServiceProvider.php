@@ -18,12 +18,10 @@ final class PageEditorServiceProvider extends ServiceProvider
 
         $this->app->singleton(PageDocumentRenderer::class);
 
-        $this->app->bind('tp.page_editor.render', function (): callable {
-            return function (array $document): string {
-                $renderer = $this->app->make(PageDocumentRenderer::class);
+        $this->app->bind('tp.page_editor.render', fn (): callable => function (array $document): string {
+            $renderer = $this->app->make(PageDocumentRenderer::class);
 
-                return $renderer->render($document);
-            };
+            return $renderer->render($document);
         });
 
         $this->app->bind('tp.pages.editor.view', fn () => 'tentapress-page-editor::editor');
