@@ -8,6 +8,7 @@ use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Blade;
 use TentaPress\System\Console\PluginsCommand;
+use TentaPress\System\Console\SeedDemoHomeCommand;
 use TentaPress\System\Console\ThemesCommand;
 use TentaPress\System\Http\AdminAuthMiddleware;
 use TentaPress\System\Http\AdminErrorPagesMiddleware;
@@ -68,6 +69,7 @@ final class SystemServiceProvider extends ServiceProvider
             $this->commands([
                 PluginsCommand::class,
                 ThemesCommand::class,
+                SeedDemoHomeCommand::class,
             ]);
         }
     }
