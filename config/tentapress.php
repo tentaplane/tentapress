@@ -39,6 +39,10 @@ return [
         'tentapress/import' => 'Import tooling',
         'tentapress/export' => 'Export tooling',
         'tentapress/static-deploy' => 'Static deployments',
+        'tentapress/custom-blocks' => 'Theme single-file custom block discovery',
+        'tentapress/block-markdown-editor' => 'Markdown based rich text editor block',
+        'tentapress/page-editor' => 'Notion-style page editor'
+
     ],
 
     /*
