@@ -23,7 +23,7 @@ final class EditController
             $authorId = $nowUserId;
         }
 
-        $blocks = is_array($post->blocks) ? $post->blocks : [];
+        $blocks = $this->normalizeBlocks($post->blocks);
         $blocksJson = json_encode($blocks, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         if ($blocksJson === false) {
             $blocksJson = '[]';
@@ -202,5 +202,21 @@ final class EditController
         }
 
         return $options;
+    }
+
+    /**
+     * @return array<int,mixed>
+     */
+    private function normalizeBlocks(mixed $raw): array
+    {
+        if (! is_array($raw)) {
+            return [];
+        }
+
+        if (array_key_exists('blocks', $raw) && is_array($raw['blocks'])) {
+            return array_values($raw['blocks']);
+        }
+
+        return array_values($raw);
     }
 }

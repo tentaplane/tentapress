@@ -2,7 +2,7 @@
     "id": "tentapress/posts",
     "name": "Posts",
     "description": "Create and manage blog posts.",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "provider": "TentaPress\\Posts\\PostsServiceProvider",
     "requires": ["tentapress/users", "tentapress/blocks"],
     "admin": {

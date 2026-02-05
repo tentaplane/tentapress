@@ -13,17 +13,19 @@ final class PostRenderer
     public function render(TpPost $post): Response
     {
         $layoutKey = (string) ($post->layout ?: 'default');
-        $blocks = is_array($post->blocks) ? $post->blocks : [];
+        $blocks = $this->normalizeBlocks($post->blocks);
         $content = is_array($post->content) ? $post->content : null;
         $editorDriver = (string) ($post->editor_driver ?? '');
         $blocksHtml = $this->renderPageContent($content, $blocks, $editorDriver);
         $view = $this->resolveLayoutView($layoutKey);
+        $isPageEditorContent = $editorDriver === 'page' && is_array($content);
 
         return response()->view($view, [
             'post' => $post,
             'page' => $post,
             'layoutKey' => $layoutKey,
             'blocksHtml' => $blocksHtml,
+            'isPageEditorContent' => $isPageEditorContent,
         ]);
     }
 
@@ -85,5 +87,21 @@ final class PostRenderer
         }
 
         return 'tentapress-posts::layouts.post';
+    }
+
+    /**
+     * @return array<int,mixed>
+     */
+    private function normalizeBlocks(mixed $raw): array
+    {
+        if (! is_array($raw)) {
+            return [];
+        }
+
+        if (array_key_exists('blocks', $raw) && is_array($raw['blocks'])) {
+            return array_values($raw['blocks']);
+        }
+
+        return array_values($raw);
     }
 }

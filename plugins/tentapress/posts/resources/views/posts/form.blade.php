@@ -223,6 +223,8 @@
                                         </div>
                                         <div class="tp-help">Choose the editing experience for this post.</div>
                                     </div>
+                                @else
+                                    <input type="hidden" name="editor_driver" value="blocks" />
                                 @endif
                                 </div>
                             @endif

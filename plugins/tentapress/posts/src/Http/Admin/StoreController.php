@@ -42,6 +42,7 @@ final readonly class StoreController
 
         $pageDocRaw = json_decode((string) ($data['page_doc_json'] ?? ''), true);
         $pageDoc = is_array($pageDocRaw) ? $pageDocRaw : null;
+        $editorDriver = $this->resolveEditorDriver($data);
 
         $nowUserId = Auth::check() && is_object(Auth::user()) ? (int) (Auth::user()->id ?? 0) : null;
 
@@ -66,12 +67,31 @@ final readonly class StoreController
             $payload['content'] = $pageDoc;
         }
         if (Schema::hasColumn('tp_posts', 'editor_driver')) {
-            $payload['editor_driver'] = (string) ($data['editor_driver'] ?? 'blocks');
+            $payload['editor_driver'] = $editorDriver;
         }
 
         $post = TpPost::query()->create($payload);
 
         return to_route('tp.posts.edit', ['post' => $post->id])
             ->with('tp_notice_success', 'Post created.');
+    }
+
+    /**
+     * @param array<string,mixed> $data
+     */
+    private function resolveEditorDriver(array $data): string
+    {
+        $requested = (string) ($data['editor_driver'] ?? 'blocks');
+        if ($requested !== 'page') {
+            return 'blocks';
+        }
+
+        if (! app()->bound('tp.posts.editor.view')) {
+            return 'blocks';
+        }
+
+        $view = resolve('tp.posts.editor.view');
+
+        return is_string($view) && view()->exists($view) ? 'page' : 'blocks';
     }
 }
