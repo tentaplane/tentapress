@@ -13,8 +13,8 @@ final class IndexController
     {
         $status = (string) $request->query('status', 'all');
         $search = trim((string) $request->query('s', ''));
-        $sort = (string) $request->query('sort', 'updated');
-        $requestedDirection = strtolower((string) $request->query('direction', ''));
+        $sort = (string) $request->query('sort', 'title');
+        $requestedDirection = strtolower((string) $request->query('direction', 'asc'));
 
         $sortColumns = [
             'title' => 'title',
