@@ -6,7 +6,7 @@
     <div class="tp-page-header">
         <div>
             <h1 class="tp-page-title">Themes</h1>
-            <p class="tp-description">One theme can be active at a time.</p>
+            <p class="tp-description">Only one theme can be active at a time.</p>
         </div>
 
         <div class="flex gap-2">
@@ -33,17 +33,14 @@
         @if (count($themes) === 0)
             <div class="tp-metabox__body tp-muted text-sm">
                 No themes found. Add a theme under
-                <code class="tp-code">themes/vendor/name</code>
-                and run
-                <code class="tp-code">php artisan tp:themes sync</code>
-                .
+                <code class="tp-code">themes/vendor/name</code>.
             </div>
         @else
             <div class="tp-table-wrap">
                 <table class="tp-table">
                     <thead class="tp-table__thead">
                         <tr>
-                            <th class="tp-table__th w-40">Preview</th>
+                            <th class="tp-table__th w-56">Preview</th>
                             <th class="tp-table__th">Theme</th>
                             <th class="tp-table__th">Version</th>
                             <th class="tp-table__th">Status</th>
@@ -68,7 +65,7 @@
                                         <img
                                             src="{{ route('tp.themes.screenshot', ['themePath' => $id]) }}"
                                             alt=""
-                                            class="w-36 rounded border border-black/10 bg-white object-cover"
+                                            class="w-48 rounded border border-black/10 bg-white object-cover"
                                             loading="lazy" />
                                     @else
                                         <div
@@ -160,16 +157,6 @@
                         @endforeach
                     </tbody>
                 </table>
-            </div>
-
-            <div class="tp-metabox__body tp-muted text-sm">
-                After adding themes, run
-                <code class="tp-code">php artisan tp:themes sync</code>
-                .
-                <br />
-                To activate in CLI:
-                <code class="tp-code">php artisan tp:themes activate vendor/name</code>
-                .
             </div>
         @endif
     </div>
