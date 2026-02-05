@@ -1,1 +1,1 @@
-// Theme JS entrypoint.
+//

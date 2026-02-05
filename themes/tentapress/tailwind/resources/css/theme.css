@@ -8,18 +8,12 @@
 @source '../../views/**/*.blade.php';
 @source '../../views/**/*.js';
 
-@source '../../../../../packages/**/resources/views/**/*.blade.php';
-@source '../../../../../plugins/**/resources/views/**/*.blade.php';
-
-@source '../../../../../packages/**/resources/js/**/*.js';
-@source '../../../../../plugins/**/resources/js/**/*.js';
-
 @theme {
 	/* Typography - General Sans for display, Inter for body */
 	--font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-		'Segoe UI Symbol', 'Noto Color Emoji';
+	'Segoe UI Symbol', 'Noto Color Emoji';
 	--font-display: 'General Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-		'Segoe UI Symbol', 'Noto Color Emoji';
+	'Segoe UI Symbol', 'Noto Color Emoji';
 
 	/* Brand Primary - Pure black tones + blue accent (#3042e6) */
 	--color-brand-50: oklch(0.97 0.01 264);
@@ -57,7 +51,7 @@
 	--color-surface-950: oklch(0.10 0 0);
 
 	/* Page background */
-	--color-page: #f3f3f3;
+	--color-page: #F3F3F3;
 
 	/* Shadows - Minimal flat style */
 	--shadow-sm: 0 1px 2px rgb(0 0 0 / 0.04);
@@ -68,8 +62,8 @@
 
 /* Tighten display font headings globally */
 .font-display {
-	letter-spacing: -0.04em;
-	line-height: 1.0;
+	letter-spacing: -0.03em;
+	line-height: 0.9;
 }
 
 /* Page Editor frontend content styling */

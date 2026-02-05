@@ -20,6 +20,7 @@ Use this structure for all first-party plugin `README.md` files.
 - `## Configuration`
 - `## Asset Build`
 - `## Extending`
+- `## Third-Party Notices`
 
 ## Plugin Details Format
 
@@ -53,3 +54,4 @@ If assets are plugin-local, also include build commands and output paths.
 - Keep dependencies explicit by plugin ID.
 - Prefer short sections over long prose.
 - Use consistent heading names across plugins.
+- If the plugin is distributed independently, include `## Third-Party Notices` and ship a `THIRD_PARTY_NOTICES.md` at the plugin root.

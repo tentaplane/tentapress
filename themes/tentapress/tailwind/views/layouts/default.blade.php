@@ -12,7 +12,7 @@
             <x-tp-theme::header />
 
             <main class="relative z-10 mx-auto w-full max-w-7xl flex-1 px-6">
-                <article class="tp-page-content {{ ! empty($isPageEditorContent) ? 'tp-page-content--page' : '' }}">
+                <article class="tp-page-content {{ ! empty($isPageEditorContent) ? 'tp-page-content--page py-12' : '' }}">
                     {!! $blocksHtml !!}
                 </article>
             </main>

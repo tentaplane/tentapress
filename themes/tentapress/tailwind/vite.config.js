@@ -15,6 +15,7 @@ export default defineConfig(({ mode }) => {
             laravel({
                 input: ['resources/css/theme.css', 'resources/js/theme.js'],
                 buildDirectory: 'themes/tentapress/tailwind/build',
+                hotFile: resolve(appRoot, 'public/themes/tentapress/tailwind/hot'),
             }),
             tailwindcss(),
         ],

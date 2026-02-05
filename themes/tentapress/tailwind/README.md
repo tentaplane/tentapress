@@ -7,7 +7,7 @@ A Tailwind CSS v4 theme for TentaPress.
 | Field         | Value                 |
 |---------------|-----------------------|
 | ID            | `tentapress/tailwind` |
-| Version       | 0.2.0                 |
+| Version       | 0.2.1                 |
 | CSS Framework | Tailwind CSS v4       |
 
 ## Layouts
@@ -35,11 +35,15 @@ This theme uses Tailwind CSS v4 with CSS-first configuration.
 # Install dependencies
 bun install --cwd themes/tentapress/tailwind
 
+# Run dev server (HMR)
+bun run --cwd themes/tentapress/tailwind dev
+
+# Watch build (no HMR)
+bun run --cwd themes/tentapress/tailwind watch
+
 # Build assets
 bun run --cwd themes/tentapress/tailwind build
 ```
-
-Note: this theme currently supports build-only workflows (no HMR/dev server).
 
 ### Entrypoints
 

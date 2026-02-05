@@ -7,16 +7,20 @@
     $alignment = (string) ($props['alignment'] ?? 'left');
     $imagePosition = (string) ($props['image_position'] ?? 'top');
     $rawActions = $props['actions'] ?? [];
+	
     if (is_string($rawActions)) {
         $trim = trim($rawActions);
         $decoded = $trim !== '' ? json_decode($trim, true) : null;
+		
         if (is_array($decoded)) {
             $actions = $decoded;
         } else {
             $lines = preg_split('/\r?\n/', $trim) ?: [];
             $actions = [];
+			
             foreach ($lines as $line) {
                 $line = trim($line);
+				
                 if ($line === '') {
                     continue;
                 }
@@ -94,7 +98,7 @@
                             @if ($secondaryLabel !== '' && $secondaryUrl !== '')
                                 <a
                                     href="{{ $secondaryUrl }}"
-                                    class="inline-flex items-center rounded-lg border border-black/[0.08] px-7 py-3.5 text-sm font-semibold text-surface-700 transition-all hover:bg-surface-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-surface-900 focus-visible:ring-offset-2">
+                                    class="inline-flex items-center rounded-lg border border-black/8 px-7 py-3.5 text-sm font-semibold text-surface-700 transition-all hover:bg-surface-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-surface-900 focus-visible:ring-offset-2">
                                     {{ $secondaryLabel }}
                                 </a>
                             @endif
@@ -103,7 +107,7 @@
                 </div>
 
                 @if ($bg !== '')
-                    <div class="overflow-hidden rounded-[2.5rem] border border-black/[0.08] bg-surface-100">
+                    <div class="overflow-hidden rounded-[2.5rem] border border-black/8 bg-surface-100">
                         <img src="{{ $bg }}" alt="" class="h-full w-full object-cover" />
                     </div>
                 @endif
@@ -116,7 +120,7 @@
         @if ($hasBackground)
             <div class="absolute inset-0">
                 <img src="{{ $bg }}" alt="" class="h-full w-full object-cover" />
-                <div class="absolute inset-0 bg-gradient-to-br from-surface-950/85 via-surface-950/60 to-surface-900/40"></div>
+                <div class="absolute inset-0 bg-linear-to-br from-surface-950/85 via-surface-950/60 to-surface-900/40"></div>
             </div>
         @endif
 

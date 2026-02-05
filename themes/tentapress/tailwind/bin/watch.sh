@@ -7,15 +7,15 @@ cd "${ROOT_DIR}"
 
 if command -v bun >/dev/null 2>&1; then
   bun install
-  bun run build
+  bun run watch
   exit 0
 fi
 
 if command -v npm >/dev/null 2>&1; then
   npm install
-  npm run build
+  npm run watch
   exit 0
 fi
 
-echo "Bun or npm is required to build theme assets." >&2
+echo "Bun or npm is required to watch theme assets." >&2
 exit 1
