@@ -84,6 +84,49 @@
 	}
 
 	/* -----------------------------
+	   Toasts (no composition)
+	------------------------------ */
+	.tp-toast-root {
+		@apply fixed top-5 right-5 z-9999 flex max-w-88 flex-col gap-2;
+	}
+
+	.tp-toast {
+		@apply flex items-start gap-3 rounded-lg border px-4 py-3 text-sm shadow-lg transition;
+	}
+
+	.tp-toast-message {
+		@apply flex-1 leading-snug;
+	}
+
+	.tp-toast-close {
+		@apply cursor-pointer border-0 bg-transparent text-lg leading-none opacity-60;
+	}
+
+	.tp-toast-close:hover {
+		@apply opacity-100;
+	}
+
+	.tp-toast-hide {
+		@apply opacity-0 -translate-y-1;
+	}
+
+	.tp-toast-success {
+		@apply border-emerald-200 bg-emerald-50 text-emerald-900;
+	}
+
+	.tp-toast-warning {
+		@apply border-amber-200 bg-amber-50 text-amber-900;
+	}
+
+	.tp-toast-error {
+		@apply border-red-200 bg-red-50 text-red-900;
+	}
+
+	.tp-toast-info {
+		@apply border-sky-200 bg-sky-50 text-sky-900;
+	}
+
+	/* -----------------------------
 	   Buttons (no composition)
 	------------------------------ */
 	.tp-button-primary {

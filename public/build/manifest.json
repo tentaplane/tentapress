@@ -1,6 +1,6 @@
 {
   "plugins/tentapress/admin-shell/resources/css/admin.css": {
-    "file": "assets/admin-D2w7ymf1.css",
+    "file": "assets/admin-BW6mwpS1.css",
     "src": "plugins/tentapress/admin-shell/resources/css/admin.css",
     "isEntry": true,
     "name": "admin",
@@ -9,7 +9,7 @@
     ]
   },
   "plugins/tentapress/admin-shell/resources/js/admin.js": {
-    "file": "assets/admin-JrkvV8eq.js",
+    "file": "assets/admin-Cq8wOPnt.js",
     "name": "admin",
     "src": "plugins/tentapress/admin-shell/resources/js/admin.js",
     "isEntry": true

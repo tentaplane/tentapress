@@ -14,32 +14,7 @@
                 <div class="text-2xl font-semibold">TentaPress</div>
             </div>
 
-            @if (session('tp_notice_success'))
-                <div class="tp-notice-success">{{ session('tp_notice_success') }}</div>
-            @endif
-
-            @if (session('tp_notice_error'))
-                <div class="tp-notice-error">{{ session('tp_notice_error') }}</div>
-            @endif
-
-            @if (session('tp_notice_warning'))
-                <div class="tp-notice-warning">{{ session('tp_notice_warning') }}</div>
-            @endif
-
-            @if (session('tp_notice_info'))
-                <div class="tp-notice-info">{{ session('tp_notice_info') }}</div>
-            @endif
-
-            @if ($errors->any())
-                <div class="tp-notice-error">
-                    <div class="mb-1 font-semibold">Login failed.</div>
-                    <ul class="list-disc space-y-1 pl-5">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
+            @include('tentapress-admin::partials.notices')
 
             <div class="tp-metabox">
                 <div class="tp-metabox__title">Log In</div>

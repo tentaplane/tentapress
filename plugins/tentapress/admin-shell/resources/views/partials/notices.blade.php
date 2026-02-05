@@ -3,31 +3,37 @@
     $error = session('tp_notice_error');
     $warning = session('tp_notice_warning');
     $info = session('tp_notice_info');
+
+    $toasts = [];
+
+    if ($success) {
+        $toasts[] = ['type' => 'success', 'message' => $success];
+    }
+
+    if ($error) {
+        $toasts[] = ['type' => 'error', 'message' => $error];
+    }
+
+    if ($warning) {
+        $toasts[] = ['type' => 'warning', 'message' => $warning];
+    }
+
+    if ($info) {
+        $toasts[] = ['type' => 'info', 'message' => $info];
+    }
+
+    if (isset($errors) && $errors->any()) {
+        $firstError = (string) $errors->first();
+        $count = (int) $errors->count();
+        $plural = $count === 1 ? '' : 's';
+        $message = $count === 1
+            ? $firstError
+            : "We found {$count} problem{$plural}. First: {$firstError}";
+
+        $toasts[] = ['type' => 'error', 'message' => $message];
+    }
 @endphp
 
-@if ($success)
-    <div class="tp-notice-success">{{ $success }}</div>
-@endif
-
-@if ($error)
-    <div class="tp-notice-error">{{ $error }}</div>
-@endif
-
-@if ($warning)
-    <div class="tp-notice-warning">{{ $warning }}</div>
-@endif
-
-@if ($info)
-    <div class="tp-notice-info">{{ $info }}</div>
-@endif
-
-@if (isset($errors) && $errors->any())
-    <div class="tp-notice-error">
-        <div class="mb-1 font-semibold">We found some problems, correct these to continue:</div>
-        <ul class="list-disc space-y-1 pl-5">
-            @foreach ($errors->all() as $message)
-                <li>{{ $message }}</li>
-            @endforeach
-        </ul>
-    </div>
+@if ($toasts !== [])
+    <div id="tp-toast-root" data-toasts='@json($toasts)'></div>
 @endif
