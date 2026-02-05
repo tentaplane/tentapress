@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.18.1](https://github.com/tentaplane/tentapress/compare/v0.18.0...v0.18.1) (2026-02-05)
+
+
+### Bug Fixes
+
+* **theme-tailwind:** updated theme with hot reload ([05f1c3c](https://github.com/tentaplane/tentapress/commit/05f1c3c03c7b3940930cdc7f88c8f338054ecf24))
+
+
+### Miscellaneous Chores
+
+* **plugins:** update with placeholder 3rd party notice ([914fee4](https://github.com/tentaplane/tentapress/commit/914fee42c52de230ed342241dcc35500fde6907d))
+
 ## [0.18.0](https://github.com/tentaplane/tentapress/compare/v0.17.0...v0.18.0) (2026-02-05)
 
 
