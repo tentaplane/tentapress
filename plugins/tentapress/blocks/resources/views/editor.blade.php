@@ -429,8 +429,9 @@
                                                             class="tp-textarea"
                                                             :rows="field.rows ? field.rows : 4"
                                                             :placeholder="field.placeholder || ''"
-                                                            :value="getProp(index, field.key)"
-                                                            @input="setProp(index, field.key, $event.target.value)"></textarea>
+                                                            :value="textareaValue(index, field.key)"
+                                                            @input="textareaInput(index, field.key, $event.target.value)"
+                                                            @blur="textareaBlur(index, field.key)"></textarea>
                                                     </template>
 
                                                     <template
@@ -911,6 +912,7 @@
                 saveToastTimer: null,
                 savePending: false,
                 boundEditorKeydown: null,
+                textareaDrafts: {},
                 addType: '',
                 insertIndex: null,
                 insertType: '',
@@ -922,6 +924,10 @@
                 dragIndex: null,
                 dragOverIndex: null,
                 jsonInvalid: false,
+                dirty: false,
+                baselineSnapshot: '',
+                beforeUnloadHandler: null,
+                formSubmitHandler: null,
 
                 advanced: false,
                 advancedJson: '',
@@ -955,18 +961,88 @@
                     const parsed = this.safeParseBlocks(this.advancedJson);
                     this.blocks = parsed.blocks.map((b) => this.decorateBlock(b));
                     this.jsonInvalid = !parsed.ok;
-                    this.selectedIndex = this.blocks.length ? 0 : null;
+                    this.selectedIndex = null;
                     this.applyStoredCollapseState();
 
                     this.sync();
+                    this.markClean();
+                    this.setupUnsavedGuards();
 
                     this.$watch(
                         'blocks',
                         () => {
                             this.sync();
+                            this.updateDirtyState();
                         },
                         { deep: true },
                     );
+                },
+
+                setupUnsavedGuards() {
+                    if (
+                        typeof window === 'undefined' ||
+                        this.beforeUnloadHandler !== null
+                    ) {
+                        return;
+                    }
+
+                    this.beforeUnloadHandler = (event) => {
+                        if (!this.dirty) {
+                            return;
+                        }
+                        event.preventDefault();
+                        event.returnValue = '';
+                    };
+
+                    window.addEventListener('beforeunload', this.beforeUnloadHandler);
+
+                    const form = this.$el?.closest?.('form');
+                    if (form) {
+                        this.formSubmitHandler = () => {
+                            this.markClean();
+                        };
+                        form.addEventListener('submit', this.formSubmitHandler);
+                    }
+
+                    this.$el.addEventListener('alpine:destroy', () => {
+                        this.teardownUnsavedGuards();
+                    });
+                },
+
+                teardownUnsavedGuards() {
+                    if (this.beforeUnloadHandler) {
+                        window.removeEventListener(
+                            'beforeunload',
+                            this.beforeUnloadHandler,
+                        );
+                        this.beforeUnloadHandler = null;
+                    }
+
+                    const form = this.$el?.closest?.('form');
+                    if (form && this.formSubmitHandler) {
+                        form.removeEventListener('submit', this.formSubmitHandler);
+                        this.formSubmitHandler = null;
+                    }
+                },
+
+                snapshotFromCanonical(blocks) {
+                    try {
+                        return JSON.stringify(Array.isArray(blocks) ? blocks : []);
+                    } catch (e) {
+                        return '[]';
+                    }
+                },
+
+                markClean() {
+                    this.baselineSnapshot = this.snapshotFromCanonical(
+                        this.canonicalBlocks(),
+                    );
+                    this.dirty = false;
+                },
+
+                updateDirtyState() {
+                    const current = this.snapshotFromCanonical(this.canonicalBlocks());
+                    this.dirty = current !== this.baselineSnapshot;
                 },
 
                 onEditorKeydown(event) {
@@ -1824,6 +1900,73 @@
                     if (raw === null || raw === undefined) return '';
                     if (typeof raw === 'object') return '';
                     return String(raw);
+                },
+
+                textareaKey(index, path) {
+                    return `${index}:${path}`;
+                },
+
+                textareaValue(index, path) {
+                    const key = this.textareaKey(index, path);
+                    if (Object.prototype.hasOwnProperty.call(this.textareaDrafts, key)) {
+                        return this.textareaDrafts[key];
+                    }
+
+                    const raw = this.getPropRaw(index, path);
+                    if (raw === null || raw === undefined) return '';
+                    if (typeof raw === 'object') {
+                        try {
+                            return JSON.stringify(raw, null, 2);
+                        } catch (e) {
+                            return '';
+                        }
+                    }
+
+                    return String(raw);
+                },
+
+                textareaInput(index, path, value) {
+                    const raw = this.getPropRaw(index, path);
+                    const key = this.textareaKey(index, path);
+
+                    if (raw && typeof raw === 'object') {
+                        this.textareaDrafts[key] = value;
+                        return;
+                    }
+
+                    if (Object.prototype.hasOwnProperty.call(this.textareaDrafts, key)) {
+                        this.textareaDrafts[key] = value;
+                        return;
+                    }
+
+                    this.setProp(index, path, value);
+                },
+
+                textareaBlur(index, path) {
+                    const key = this.textareaKey(index, path);
+                    if (!Object.prototype.hasOwnProperty.call(this.textareaDrafts, key)) {
+                        return;
+                    }
+
+                    const value = this.textareaDrafts[key];
+                    delete this.textareaDrafts[key];
+
+                    if (String(value).trim() === '') {
+                        this.setProp(index, path, '');
+                        return;
+                    }
+
+                    try {
+                        const parsed = JSON.parse(value);
+                        if (parsed && typeof parsed === 'object') {
+                            this.setProp(index, path, parsed);
+                            return;
+                        }
+                    } catch (e) {
+                        // fall through to string
+                    }
+
+                    this.setProp(index, path, value);
                 },
 
                 setProp(index, path, value) {
