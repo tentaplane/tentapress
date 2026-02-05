@@ -599,7 +599,6 @@ if ($themeChoice !== 'none') {
             'timeline',
             'table',
             'faq',
-            'buttons',
             'newsletter',
             'embed',
             'map',
@@ -632,7 +631,7 @@ if ($themeChoice !== 'none') {
         $demoBlocks = [
             [
                 'type' => 'blocks/hero',
-                'variant' => 'split',
+                'variant' => 'default',
                 'props' => [
                     'eyebrow' => 'TentaPress for agencies',
                     'headline' => 'Launch client sites in days, not weeks.',
@@ -796,15 +795,14 @@ if ($themeChoice !== 'none') {
                 ],
             ],
             [
-                'type' => 'blocks/buttons',
+                'type' => 'blocks/embed',
                 'props' => [
-                    'actions' => [
-                        ['label' => 'Download brochure', 'url' => '#', 'style' => 'outline'],
-                        ['label' => 'Book a demo', 'url' => '#', 'style' => 'primary'],
-                        ['label' => 'Contact sales', 'url' => '#', 'style' => 'ghost'],
-                    ],
-                    'alignment' => 'left',
-                    'size' => 'md',
+                    'title' => 'Product walkthrough',
+                    'url' => 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+                    'aspect' => '16:9',
+                    'height' => 480,
+                    'allow_fullscreen' => true,
+                    'caption' => 'Placeholder video embed.',
                 ],
             ],
             [
@@ -818,17 +816,6 @@ if ($themeChoice !== 'none') {
                     'email_placeholder' => 'hello@agency.com',
                     'disclaimer' => 'Placeholder only. Unsubscribe anytime.',
                     'alignment' => 'left',
-                ],
-            ],
-            [
-                'type' => 'blocks/embed',
-                'props' => [
-                    'title' => 'Product walkthrough',
-                    'url' => 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-                    'aspect' => '16:9',
-                    'height' => 480,
-                    'allow_fullscreen' => true,
-                    'caption' => 'Placeholder video embed.',
                 ],
             ],
             [
