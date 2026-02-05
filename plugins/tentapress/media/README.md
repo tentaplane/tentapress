@@ -4,10 +4,10 @@ Upload and manage media files for TentaPress.
 
 ## Plugin Details
 
-| Field | Value |
-|-------|-------|
-| ID | `tentapress/media` |
-| Version | 0.1.2 |
+| Field    | Value                                   |
+|----------|-----------------------------------------|
+| ID       | `tentapress/media`                      |
+| Version  | 0.1.3                                   |
 | Provider | `TentaPress\Media\MediaServiceProvider` |
 
 ## Goal
@@ -36,24 +36,24 @@ Provide a first-party media library for uploads, management, and reuse across Pa
 ## Data model
 
 - `tp_media`
-  - `id`
-  - `title` (nullable)
-  - `alt_text` (nullable)
-  - `caption` (nullable)
-  - `disk` (default `public`)
-  - `path` (unique)
-  - `original_name` (nullable)
-  - `mime_type` (nullable)
-  - `size` (nullable)
-  - `width`, `height` (nullable)
-  - `created_by`, `updated_by`
-  - timestamps
+    - `id`
+    - `title` (nullable)
+    - `alt_text` (nullable)
+    - `caption` (nullable)
+    - `disk` (default `public`)
+    - `path` (unique)
+    - `original_name` (nullable)
+    - `mime_type` (nullable)
+    - `size` (nullable)
+    - `width`, `height` (nullable)
+    - `created_by`, `updated_by`
+    - timestamps
 
 ## Admin Menu
 
-| Label | Route | Capability | Icon | Position |
-|-------|-------|------------|------|----------|
-| Media | `tp.media.index` | `manage_media` | image | 35 |
+| Label | Route            | Capability     | Icon  | Position |
+|-------|------------------|----------------|-------|----------|
+| Media | `tp.media.index` | `manage_media` | image | 35       |
 
 ## Admin UI (current)
 

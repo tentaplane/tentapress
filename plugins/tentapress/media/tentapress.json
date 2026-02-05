@@ -2,7 +2,7 @@
     "id": "tentapress/media",
     "name": "Media",
     "description": "Upload and manage media files.",
-    "version": "0.1.2",
+    "version": "0.1.3",
     "provider": "TentaPress\\Media\\MediaServiceProvider",
     "requires": ["tentapress/users"],
     "admin": {

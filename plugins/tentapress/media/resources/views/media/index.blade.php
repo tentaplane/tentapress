@@ -18,7 +18,7 @@
         $urlGenerator = app(\TentaPress\Media\Contracts\MediaUrlGenerator::class);
     @endphp
 
-    <div class="tp-metabox">
+    <div class="tp-metabox" data-media-index data-current-view="{{ $view }}">
         <div class="tp-metabox__title">
             <form method="GET" action="{{ route('tp.media.index') }}" class="flex flex-col gap-2 sm:flex-row sm:items-center">
                 <input type="hidden" name="view" value="{{ $view }}" />
@@ -28,11 +28,13 @@
                     <div class="flex items-center gap-1">
                         <a
                             href="{{ route('tp.media.index', array_merge(request()->query(), ['view' => 'list'])) }}"
+                            data-media-view-link="list"
                             class="{{ $view === 'list' ? 'tp-button-secondary' : 'tp-button-secondary opacity-60 hover:opacity-100' }}">
                             List
                         </a>
                         <a
                             href="{{ route('tp.media.index', array_merge(request()->query(), ['view' => 'grid'])) }}"
+                            data-media-view-link="grid"
                             class="{{ $view === 'grid' ? 'tp-button-secondary' : 'tp-button-secondary opacity-60 hover:opacity-100' }}">
                             Grid
                         </a>
@@ -194,3 +196,40 @@
         @endif
     </div>
 @endsection
+
+@push('scripts')
+    <script>
+        (() => {
+            const root = document.querySelector('[data-media-index]');
+            if (!root) {
+                return;
+            }
+
+            const storageKey = 'tp.media.view';
+            const params = new URLSearchParams(window.location.search);
+            const queryView = params.get('view');
+            const storedView = localStorage.getItem(storageKey);
+            const currentView = root.dataset.currentView;
+
+            if ((queryView === null || queryView === '') && (storedView === 'list' || storedView === 'grid') && storedView !== currentView) {
+                params.set('view', storedView);
+                const query = params.toString();
+                window.location.replace(query === '' ? window.location.pathname : `${window.location.pathname}?${query}`);
+                return;
+            }
+
+            if (queryView === 'list' || queryView === 'grid') {
+                localStorage.setItem(storageKey, queryView);
+            }
+
+            root.querySelectorAll('[data-media-view-link]').forEach((link) => {
+                link.addEventListener('click', () => {
+                    const nextView = link.dataset.mediaViewLink;
+                    if (nextView === 'list' || nextView === 'grid') {
+                        localStorage.setItem(storageKey, nextView);
+                    }
+                });
+            });
+        })();
+    </script>
+@endpush
