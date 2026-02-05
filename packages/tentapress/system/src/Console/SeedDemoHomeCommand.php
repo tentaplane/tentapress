@@ -106,22 +106,15 @@ final class SeedDemoHomeCommand extends Command
         }
 
         $setup = file_get_contents($path);
-        if (! is_string($setup) || $setup === '') {
-            throw new RuntimeException('Unable to read tentapress.php.');
-        }
+        throw_if(! is_string($setup) || $setup === '', RuntimeException::class, 'Unable to read tentapress.php.');
 
-        if (! preg_match('/\$demoBlocks\s*=\s*\[(.*?)\n\s*];\n\n\s*\$blocksExport/s', $setup, $matches)) {
-            throw new RuntimeException('Could not locate $demoBlocks in tentapress.php.');
-        }
+        throw_unless(preg_match('/\$demoBlocks\s*=\s*\[(.*?)\n\s*];\n\n\s*\$blocksExport/s', $setup, $matches), RuntimeException::class, 'Could not locate $demoBlocks in tentapress.php.');
 
         $code = '['.$matches[1]."\n]";
         $blocks = eval('return '.$code.';');
 
-        if (! is_array($blocks)) {
-            throw new RuntimeException('Parsed demo blocks are invalid.');
-        }
+        throw_unless(is_array($blocks), RuntimeException::class, 'Parsed demo blocks are invalid.');
 
-        return array_values(array_filter($blocks, static fn ($entry): bool => is_array($entry)));
+        return array_values(array_filter($blocks, is_array(...)));
     }
 }
-

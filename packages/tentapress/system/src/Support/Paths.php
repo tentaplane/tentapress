@@ -47,7 +47,7 @@ final class Paths
     {
         return array_values(array_filter(
             [self::themesPath()],
-            static fn (string $path): bool => is_dir($path)
+            is_dir(...)
         ));
     }
 
@@ -65,6 +65,6 @@ final class Paths
             }
         }
 
-        return array_values(array_filter($roots, static fn (string $path): bool => is_dir($path)));
+        return array_values(array_filter($roots, is_dir(...)));
     }
 }

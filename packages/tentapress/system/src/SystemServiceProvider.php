@@ -43,17 +43,11 @@ final class SystemServiceProvider extends ServiceProvider
     {
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
 
-        Blade::directive('tpPluginAssets', function ($expression): string {
-            return "<?php echo app('".PluginAssetRegistry::class."')->tags({$expression}); ?>";
-        });
+        Blade::directive('tpPluginAssets', fn ($expression): string => "<?php echo app('".PluginAssetRegistry::class."')->tags({$expression}); ?>");
 
-        Blade::directive('tpPluginStyles', function ($expression): string {
-            return "<?php echo app('".PluginAssetRegistry::class."')->styleTags({$expression}); ?>";
-        });
+        Blade::directive('tpPluginStyles', fn ($expression): string => "<?php echo app('".PluginAssetRegistry::class."')->styleTags({$expression}); ?>");
 
-        Blade::directive('tpPluginScripts', function ($expression): string {
-            return "<?php echo app('".PluginAssetRegistry::class."')->scriptTags({$expression}); ?>";
-        });
+        Blade::directive('tpPluginScripts', fn ($expression): string => "<?php echo app('".PluginAssetRegistry::class."')->scriptTags({$expression}); ?>");
 
         $this->app->make(Router::class)->aliasMiddleware('tp.auth', AdminAuthMiddleware::class);
         $this->app->make(Router::class)->aliasMiddleware('tp.can', CanMiddleware::class);

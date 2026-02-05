@@ -211,8 +211,8 @@ final class PluginAssetRegistry
         $styles = Arr::wrap($contextAssets['styles'] ?? []);
 
         return [
-            'scripts' => array_values(array_filter($scripts, 'is_string')),
-            'styles' => array_values(array_filter($styles, 'is_string')),
+            'scripts' => array_values(array_filter($scripts, is_string(...))),
+            'styles' => array_values(array_filter($styles, is_string(...))),
         ];
     }
 
