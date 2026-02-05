@@ -17,11 +17,25 @@ final class BlocksServiceProvider extends ServiceProvider
         $this->app->singleton(BasicKit::class);
         $this->app->singleton(BlockRenderer::class);
 
-        // Bind renderer hook used by tentapress/pages fallback detection.
+        // Bind renderer hook used by pages/posts/theme front-end rendering.
         $this->app->bind('tp.blocks.render', fn (): callable => function (array $blocks): string {
             $renderer = resolve(BlockRenderer::class);
+            $items = $blocks;
+            if (array_key_exists('blocks', $items) && is_array($items['blocks'])) {
+                $items = $items['blocks'];
+            }
 
-            return $renderer->render($blocks);
+            $html = '';
+
+            foreach ($items as $block) {
+                if (! is_array($block)) {
+                    continue;
+                }
+
+                $html .= $renderer->render($block);
+            }
+
+            return $html;
         });
     }
 
