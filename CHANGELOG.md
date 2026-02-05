@@ -4,6 +4,32 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.16.0](https://github.com/tentaplane/tentapress/compare/v0.15.6...v0.16.0) (2026-02-05)
+
+
+### Features
+
+* **media:** small improvements to the Media plugin UI ([0259ac0](https://github.com/tentaplane/tentapress/commit/0259ac01867cb3f6f8b464274f3c133ae23e2927))
+* **page-editor:** Full working continuous page editor ([d9134f6](https://github.com/tentaplane/tentapress/commit/d9134f6b91d26af48d341278abf2f02d77d4b60a))
+* **pages:** Support for the new first-party page editor ([1b1c1f1](https://github.com/tentaplane/tentapress/commit/1b1c1f10ad62b021642259e0c524707c60db5a89))
+* **posts:** Support for the new first-party page editor ([c2df162](https://github.com/tentaplane/tentapress/commit/c2df162e46a631b79e7dc959957c7863a26d5389))
+* **system:** Improved plugin management and asset syncing ([c775b23](https://github.com/tentaplane/tentapress/commit/c775b237f33a68135c37d5e4441b534f7e0fd563))
+* **system:** new command to seed a demo homepage ([4c040bc](https://github.com/tentaplane/tentapress/commit/4c040bccf7dfe94893fc9300c5b8405bc90c9615))
+
+
+### Bug Fixes
+
+* **blocks:** rendering blocks after switching to the page editor and back again wasn’t correct ([95d6bd0](https://github.com/tentaplane/tentapress/commit/95d6bd000a682425a2d3cc7a7424db0648663622))
+* **pages:** improvements to the Pages forms when enabling/disabling the Page Editor plugin ([95ffe93](https://github.com/tentaplane/tentapress/commit/95ffe9350bf64cbcee998d47f938e14923d0a7bc))
+* **plugins:** better sorting of the plugins in the UI ([10791c5](https://github.com/tentaplane/tentapress/commit/10791c537468843724ebc240d9e09747886b6d62))
+* **posts:** improvements to the Posts forms when enabling/disabling the Page Editor plugin ([48a9e97](https://github.com/tentaplane/tentapress/commit/48a9e970b399411cb6a71a5493de922f57f80847))
+* **themes:** minor improvement to the Themes UI ([b0c5251](https://github.com/tentaplane/tentapress/commit/b0c525101508eb360ecbf2d94fec28c6af777ecb))
+
+
+### Miscellaneous Chores
+
+* **media-bunny:** removing the Bunny CDN integration for now ([d96e8ba](https://github.com/tentaplane/tentapress/commit/d96e8ba0e95872a8a8022f1455a7fc1f8f75fc15))
+
 ## [0.15.6](https://github.com/tentaplane/tentapress/compare/v0.15.5...v0.15.6) (2026-02-04)
 
 
