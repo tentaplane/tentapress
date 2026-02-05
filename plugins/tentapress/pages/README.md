@@ -7,7 +7,7 @@ Page management for TentaPress.
 | Field    | Value                                   |
 |----------|-----------------------------------------|
 | ID       | `tentapress/pages`                      |
-| Version  | 0.2.1                                   |
+| Version  | 0.2.2                                   |
 | Provider | `TentaPress\Pages\PagesServiceProvider` |
 
 ## Features

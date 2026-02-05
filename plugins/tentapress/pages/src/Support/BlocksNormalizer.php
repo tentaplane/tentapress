@@ -89,7 +89,7 @@ final readonly class BlocksNormalizer
 
         $decoded = json_decode($trim, true);
         if (is_array($decoded)) {
-            return array_values(array_filter($decoded, static fn ($item): bool => is_array($item)));
+            return array_values(array_filter($decoded, is_array(...)));
         }
 
         $lines = preg_split('/\r?\n/', $trim) ?: [];
@@ -101,7 +101,7 @@ final readonly class BlocksNormalizer
                 continue;
             }
 
-            $parts = array_map('trim', explode('|', $line));
+            $parts = array_map(trim(...), explode('|', $line));
             $actions[] = [
                 'label' => $parts[0] ?? $line,
                 'url' => $parts[1] ?? '',
