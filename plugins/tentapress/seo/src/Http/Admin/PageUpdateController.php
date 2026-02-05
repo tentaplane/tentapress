@@ -9,9 +9,9 @@ use TentaPress\Pages\Models\TpPage;
 use TentaPress\Seo\Models\TpSeoPage;
 use TentaPress\Seo\Services\SeoPayload;
 
-final class PageUpdateController
+final readonly class PageUpdateController
 {
-    public function __construct(private readonly SeoPayload $payload)
+    public function __construct(private SeoPayload $payload)
     {
     }
 

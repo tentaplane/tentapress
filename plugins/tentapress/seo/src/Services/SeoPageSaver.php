@@ -7,9 +7,9 @@ namespace TentaPress\Seo\Services;
 use Illuminate\Http\Request;
 use TentaPress\Seo\Models\TpSeoPage;
 
-final class SeoPageSaver
+final readonly class SeoPageSaver
 {
-    public function __construct(private readonly SeoEntitySaver $entitySaver)
+    public function __construct(private SeoEntitySaver $entitySaver)
     {
     }
 

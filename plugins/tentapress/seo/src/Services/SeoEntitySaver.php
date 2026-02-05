@@ -8,9 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
 
-final class SeoEntitySaver
+final readonly class SeoEntitySaver
 {
-    public function __construct(private readonly SeoPayload $payload)
+    public function __construct(private SeoPayload $payload)
     {
     }
 
