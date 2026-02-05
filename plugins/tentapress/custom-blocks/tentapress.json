@@ -1,0 +1,11 @@
+{
+    "id": "tentapress/custom-blocks",
+    "name": "Custom Blocks",
+    "description": "Discover and register single-file custom blocks from the active theme.",
+    "version": "0.1.0",
+    "provider": "TentaPress\\CustomBlocks\\CustomBlocksServiceProvider",
+    "requires": [
+        "tentapress/blocks",
+        "tentapress/themes"
+    ]
+}
