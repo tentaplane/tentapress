@@ -17,5 +17,5 @@ if command -v npm >/dev/null 2>&1; then
   exit 0
 fi
 
-echo "Bun or npm is required to build markdown editor assets." >&2
+echo "Bun or npm is required to build markdown-editor assets." >&2
 exit 1
