@@ -4,7 +4,7 @@
     $isPost = isset($post);
     $editorTitle = $editorTitle ?? (is_object($model) && trim((string) ($model->title ?? '')) !== '' ? $model->title : 'Untitled');
     $pageDocJson = $pageDocJson ?? (is_array($model?->content ?? null) ? json_encode($model->content, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) : null);
-    $pageDocJson = is_string($pageDocJson) && $pageDocJson !== '' ? $pageDocJson : '{"type":"page","content":[]}';
+    $pageDocJson = is_string($pageDocJson) && $pageDocJson !== '' ? $pageDocJson : '{"time":0,"blocks":[],"version":"2.28.0"}';
     $editorMode = (bool) ($editorMode ?? false);
     $mode = $mode ?? 'edit';
     $modelId = is_object($model) ? (int) ($model->id ?? 0) : 0;
@@ -24,12 +24,17 @@
 @endonce
 
 
-<div
+    <div
     class="tp-field space-y-3"
-    x-data="tpPageEditor({ initialJson: @js($pageDocJson) })"
+    x-data="tpPageEditor({
+        initialJson: @js($pageDocJson),
+        mediaOptions: @js($mediaOptions ?? []),
+        mediaIndexUrl: @js($mediaIndexUrl ?? ''),
+    })"
     x-init="init()">
     @if ($editorMode && $mode === 'edit' && is_object($model))
-        <div class="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+        <div
+            class="sticky top-0 z-30 -mx-4 flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 bg-white/95 px-4 py-3 shadow-sm backdrop-blur sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
             <div class="flex flex-wrap items-center gap-2 text-xs text-slate-500">
                 <span
                     class="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] font-semibold tracking-[0.12em] text-slate-500 uppercase">
@@ -92,19 +97,57 @@
         </div>
     @endif
 
-    <label class="tp-label">{{ $editorTitle }}</label>
+    <label class="tp-label">Page Editor</label>
 
     <div class="tp-page-editor" x-ref="editor" data-storage-key="{{ $storageKey }}">
-        <div class="tp-page-editor__placeholder">Start writing. Type / for commands.</div>
-        <div class="tp-page-editor__surface" contenteditable="true" x-ref="surface"></div>
-        <div class="tp-page-editor__slash" x-ref="slashMenu"></div>
-    </div>
-
-    <div class="tp-page-editor__bubble" x-ref="bubbleMenu">
-        <button type="button" class="tp-page-editor__bubble-btn" data-action="bold">Bold</button>
-        <button type="button" class="tp-page-editor__bubble-btn" data-action="italic">Italic</button>
-        <button type="button" class="tp-page-editor__bubble-btn" data-action="link">Link</button>
+        <div class="tp-page-editor__surface" x-ref="surface"></div>
     </div>
 
     <textarea name="page_doc_json" class="hidden" x-ref="hidden" x-model="json"></textarea>
+
+    <div
+        class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 px-4 py-8"
+        x-show="mediaModalOpen"
+        x-cloak>
+        <div class="w-full max-w-2xl rounded-2xl bg-white shadow-xl">
+            <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+                <div class="text-sm font-semibold text-slate-900">Select an image</div>
+                <button type="button" class="tp-button-secondary" @click="closeMediaModal()">Close</button>
+            </div>
+            <div class="space-y-4 p-5">
+                <div class="flex flex-wrap items-center gap-3">
+                    <input
+                        type="text"
+                        class="tp-input flex-1"
+                        placeholder="Search media..."
+                        x-model="mediaModalSearch" />
+                    <a
+                        class="tp-button-secondary"
+                        x-show="mediaIndexUrl"
+                        :href="mediaIndexUrl"
+                        target="_blank"
+                        rel="noreferrer">
+                        Open Media Library
+                    </a>
+                </div>
+
+                <div class="max-h-80 space-y-2 overflow-y-auto">
+                    <template x-if="filteredMediaOptions().length === 0">
+                        <div class="rounded-xl border border-dashed border-slate-200 bg-slate-50 p-6 text-sm text-slate-500">
+                            No media found. Upload one in the Media Library.
+                        </div>
+                    </template>
+                    <template x-for="option in filteredMediaOptions()" :key="option.value">
+                        <button
+                            type="button"
+                            class="flex w-full items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 text-left text-sm transition hover:border-slate-300 hover:bg-slate-50"
+                            @click="chooseMedia(option)">
+                            <span class="truncate" x-text="option.label || option.value"></span>
+                            <span class="text-xs text-slate-400" x-text="option.mime_type || ''"></span>
+                        </button>
+                    </template>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

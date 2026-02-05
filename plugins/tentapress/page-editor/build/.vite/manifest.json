@@ -1,6 +1,6 @@
 {
   "resources/css/page-editor.css": {
-    "file": "page-editor-styles-CK0ib2s0.css",
+    "file": "page-editor-styles-D4fJVO1I.css",
     "src": "resources/css/page-editor.css",
     "isEntry": true,
     "name": "page-editor-styles",
@@ -9,7 +9,7 @@
     ]
   },
   "resources/js/page-editor.js": {
-    "file": "page-editor-49nkXEDd.js",
+    "file": "page-editor-nO3kbhIQ.js",
     "name": "page-editor",
     "src": "resources/js/page-editor.js",
     "isEntry": true

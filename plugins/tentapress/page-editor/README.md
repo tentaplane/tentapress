@@ -1,44 +1,64 @@
-# Page Editor Plugin
+# Page Editor
 
-Notion-style page editor for TentaPress with precompiled assets and per-plugin build.
+Notion-style continuous page editor for TentaPress.
 
-## Build Assets (Bun)
+## Plugin Details
 
-From the plugin folder:
+| Field | Value |
+|-------|-------|
+| ID | `tentapress/page-editor` |
+| Version | 0.2.0 |
+| Provider | `TentaPress\\PageEditor\\PageEditorServiceProvider` |
+
+## Features
+
+- Continuous writing surface (Editor.js based)
+- Slash command inserter
+- Inline formatting tools
+- Header, list, quote, delimiter, image, code, checklist, callout, and embed blocks
+- Full-screen editor mode for pages and posts
+- Per-entry editor choice (`blocks` or `page`)
+- JSON document storage + renderer integration
+
+## Dependencies
+
+- `tentapress/pages`
+- `tentapress/posts`
+
+## Data Model Integration
+
+This plugin stores page-editor documents in the `content` JSON column used by pages/posts when `editor_driver = page`.
+
+## Asset Build
+
+Plugin assets are built inside the plugin package:
 
 ```bash
+cd plugins/tentapress/page-editor
 bun install
 bun run build
 ```
 
-Or run the helper script from anywhere:
-
-```bash
-plugins/tentapress/page-editor/bin/build.sh
-```
-
-## Build Assets (npm)
-
-If you are not using Bun:
+If Bun is not available:
 
 ```bash
 npm install
 npm run build
 ```
 
-## Output
+Build output:
 
-Compiled assets are written to the plugin package:
+- `plugins/tentapress/page-editor/build`
 
-```
-plugins/tentapress/page-editor/build/
-```
+When the plugin is enabled, assets are published to:
 
-The admin editor view loads assets using the plugin manifest and the
-`@tpPluginStyles` / `@tpPluginScripts` Blade directives.
+- `public/plugins/tentapress/page-editor/build`
 
-On plugin enable/cache rebuild, assets are copied into the app public folder:
+When the plugin is disabled, published assets are removed.
 
-```
-public/plugins/tentapress/page-editor/build/
+## Development
+
+```bash
+php artisan tp:plugins sync
+php artisan tp:plugins enable tentapress/page-editor
 ```
