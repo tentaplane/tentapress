@@ -32,11 +32,14 @@ final readonly class UpdateController
 
         $slug = $slugger->unique((string) $data['slug'], ignoreId: (int) $page->id);
 
-        $blocksRaw = json_decode((string) ($data['blocks_json'] ?? ''), true);
+        $hasBlocksJson = $request->has('blocks_json');
+        $blocksRaw = $hasBlocksJson ? json_decode((string) ($data['blocks_json'] ?? ''), true) : $page->blocks;
         $blocks = $this->normalizer->normalize($blocksRaw);
 
-        $pageDocRaw = json_decode((string) ($data['page_doc_json'] ?? ''), true);
+        $hasPageDocJson = $request->has('page_doc_json');
+        $pageDocRaw = $hasPageDocJson ? json_decode((string) ($data['page_doc_json'] ?? ''), true) : $page->content;
         $pageDoc = is_array($pageDocRaw) ? $pageDocRaw : $page->content;
+        $editorDriver = $this->resolveEditorDriver($data);
 
         $nowUserId = Auth::check() && is_object(Auth::user()) ? (int) (Auth::user()->id ?? 0) : null;
 
@@ -52,7 +55,7 @@ final readonly class UpdateController
             $payload['content'] = $pageDoc;
         }
         if (Schema::hasColumn('tp_pages', 'editor_driver')) {
-            $payload['editor_driver'] = (string) ($data['editor_driver'] ?? ($page->editor_driver ?? 'blocks'));
+            $payload['editor_driver'] = $editorDriver;
         }
 
         $page->fill($payload);
@@ -68,5 +71,24 @@ final readonly class UpdateController
 
         return to_route('tp.pages.edit', ['page' => $page->id])
             ->with('tp_notice_success', 'Page updated.');
+    }
+
+    /**
+     * @param array<string,mixed> $data
+     */
+    private function resolveEditorDriver(array $data): string
+    {
+        $requested = (string) ($data['editor_driver'] ?? 'blocks');
+        if ($requested !== 'page') {
+            return 'blocks';
+        }
+
+        if (! app()->bound('tp.pages.editor.view')) {
+            return 'blocks';
+        }
+
+        $view = resolve('tp.pages.editor.view');
+
+        return is_string($view) && view()->exists($view) ? 'page' : 'blocks';
     }
 }

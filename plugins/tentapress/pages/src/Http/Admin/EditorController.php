@@ -15,7 +15,7 @@ final class EditorController
 {
     public function __invoke(TpPage $page, ThemeManager $themes)
     {
-        $blocks = is_array($page->blocks) ? $page->blocks : [];
+        $blocks = $this->normalizeBlocks($page->blocks);
         $blocksJson = json_encode($blocks, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         if ($blocksJson === false) {
             $blocksJson = '[]';
@@ -174,5 +174,21 @@ final class EditorController
         }
 
         return $options;
+    }
+
+    /**
+     * @return array<int,mixed>
+     */
+    private function normalizeBlocks(mixed $raw): array
+    {
+        if (! is_array($raw)) {
+            return [];
+        }
+
+        if (array_key_exists('blocks', $raw) && is_array($raw['blocks'])) {
+            return array_values($raw['blocks']);
+        }
+
+        return array_values($raw);
     }
 }

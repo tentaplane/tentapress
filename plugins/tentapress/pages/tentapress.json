@@ -2,7 +2,7 @@
     "id": "tentapress/pages",
     "name": "Pages",
     "description": "Create and manage pages.",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "provider": "TentaPress\\Pages\\PagesServiceProvider",
     "requires": [],
     "admin": {

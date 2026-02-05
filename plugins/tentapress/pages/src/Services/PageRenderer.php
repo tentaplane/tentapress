@@ -13,16 +13,18 @@ final class PageRenderer
     public function render(TpPage $page): Response
     {
         $layoutKey = (string) ($page->layout ?: 'default');
-        $blocks = is_array($page->blocks) ? $page->blocks : [];
+        $blocks = $this->normalizeBlocks($page->blocks);
         $content = is_array($page->content) ? $page->content : null;
         $editorDriver = (string) ($page->editor_driver ?? '');
         $blocksHtml = $this->renderPageContent($content, $blocks, $editorDriver);
         $view = $this->resolveLayoutView($layoutKey);
+        $isPageEditorContent = $editorDriver === 'page' && is_array($content);
 
         return response()->view($view, [
             'page' => $page,
             'layoutKey' => $layoutKey,
             'blocksHtml' => $blocksHtml,
+            'isPageEditorContent' => $isPageEditorContent,
         ]);
     }
 
@@ -85,5 +87,21 @@ final class PageRenderer
 
         // Plugin fallback
         return 'tentapress-pages::layouts.page';
+    }
+
+    /**
+     * @return array<int,mixed>
+     */
+    private function normalizeBlocks(mixed $raw): array
+    {
+        if (! is_array($raw)) {
+            return [];
+        }
+
+        if (array_key_exists('blocks', $raw) && is_array($raw['blocks'])) {
+            return array_values($raw['blocks']);
+        }
+
+        return array_values($raw);
     }
 }

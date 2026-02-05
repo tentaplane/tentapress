@@ -22,6 +22,10 @@ final readonly class BlocksNormalizer
             return [];
         }
 
+        if (array_key_exists('blocks', $raw) && is_array($raw['blocks'])) {
+            $raw = $raw['blocks'];
+        }
+
         $out = [];
 
         foreach ($raw as $b) {
