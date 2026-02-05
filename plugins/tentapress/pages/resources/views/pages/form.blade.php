@@ -48,7 +48,11 @@
                             method="POST"
                             action="{{ $mode === 'create' ? route('tp.pages.store') : route('tp.pages.update', ['page' => $page->id]) }}"
                             class="space-y-4"
-                            id="page-form">
+                            id="page-form"
+                            @if ($mode === 'edit' && $customEditorView)
+                                data-editor-switch-form="1"
+                                data-editor-driver-current="{{ $editorDriver }}"
+                            @endif>
                             @csrf
                             @if ($mode === 'edit')
                                 @method('PUT')
@@ -157,17 +161,16 @@
 
                                     @if ($customEditorView)
                                         <div class="tp-field">
-                                            <label class="tp-label">Editor</label>
                                             <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
                                                 <label class="cursor-pointer">
-                                                    <input type="radio" name="editor_driver" value="blocks" class="sr-only peer" @checked($editorDriver === 'blocks') />
+                                                    <input type="radio" name="editor_driver" value="blocks" class="sr-only peer" data-editor-switch-radio @checked($editorDriver === 'blocks') />
                                                     <div class="rounded-xl border border-slate-200 bg-white p-3 transition peer-checked:border-slate-900 peer-checked:ring-2 peer-checked:ring-slate-200">
                                                         <div class="text-sm font-semibold text-slate-900">Blocks Builder</div>
                                                         <div class="mt-1 text-xs text-slate-500">Structured sections and fields.</div>
                                                     </div>
                                                 </label>
                                                 <label class="cursor-pointer">
-                                                    <input type="radio" name="editor_driver" value="page" class="sr-only peer" @checked($editorDriver === 'page') />
+                                                    <input type="radio" name="editor_driver" value="page" class="sr-only peer" data-editor-switch-radio @checked($editorDriver === 'page') />
                                                     <div class="rounded-xl border border-slate-200 bg-white p-3 transition peer-checked:border-slate-900 peer-checked:ring-2 peer-checked:ring-slate-200">
                                                         <div class="text-sm font-semibold text-slate-900">Page Editor</div>
                                                         <div class="mt-1 text-xs text-slate-500">Continuous writing surface.</div>
@@ -347,3 +350,76 @@
         </div>
     </div>
 @endsection
+
+@once
+    @push('scripts')
+        <script>
+            (() => {
+                if (window.tpEditorSwitchInit === true) {
+                    return;
+                }
+                window.tpEditorSwitchInit = true;
+
+                const forms = document.querySelectorAll(
+                    'form[data-editor-switch-form="1"]',
+                );
+
+                forms.forEach((form) => {
+                    const radios = Array.from(
+                        form.querySelectorAll(
+                            'input[type="radio"][name="editor_driver"][data-editor-switch-radio]',
+                        ),
+                    );
+
+                    if (radios.length < 2) {
+                        return;
+                    }
+
+                    let suppressChange = false;
+                    let current =
+                        form.dataset.editorDriverCurrent ||
+                        (radios.find((radio) => radio.checked)?.value ?? '');
+
+                    const chooseRadio = (value) => {
+                        const target = radios.find((radio) => radio.value === value);
+                        if (target) {
+                            target.checked = true;
+                        }
+                    };
+
+                    radios.forEach((radio) => {
+                        radio.addEventListener('change', () => {
+                            if (suppressChange || !radio.checked) {
+                                return;
+                            }
+
+                            const next = String(radio.value || '').trim();
+                            if (next === '' || next === current) {
+                                current = next || current;
+                                form.dataset.editorDriverCurrent = current;
+                                return;
+                            }
+
+                            const nextLabel =
+                                next === 'page' ? 'Page Editor' : 'Blocks Builder';
+                            const ok = window.confirm(
+                                `Switch to ${nextLabel}? This will save your changes and reload the editor.`,
+                            );
+
+                            if (!ok) {
+                                suppressChange = true;
+                                chooseRadio(current);
+                                suppressChange = false;
+                                return;
+                            }
+
+                            current = next;
+                            form.dataset.editorDriverCurrent = current;
+                            form.requestSubmit();
+                        });
+                    });
+                });
+            })();
+        </script>
+    @endpush
+@endonce

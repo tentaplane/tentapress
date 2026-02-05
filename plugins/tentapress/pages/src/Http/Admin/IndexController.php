@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace TentaPress\Pages\Http\Admin;
 
-use Illuminate\Support\Collection;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use TentaPress\Pages\Models\TpPage;
@@ -16,7 +16,7 @@ final class IndexController
     {
         $status = (string) $request->query('status', 'all');
         $search = trim((string) $request->query('s', ''));
-        $sort = (string) $request->query('sort', 'updated');
+        $sort = (string) $request->query('sort', 'title');
         $requestedDirection = strtolower((string) $request->query('direction', 'asc'));
 
         $sortColumns = [
