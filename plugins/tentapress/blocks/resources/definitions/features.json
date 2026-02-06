@@ -10,9 +10,13 @@
         {
             "key": "items",
             "label": "Items",
-            "type": "textarea",
-            "rows": 6,
-            "help": "JSON array of {title, body, icon} or one per line: Title | Body | Icon."
+            "type": "repeater",
+            "help": "Add each feature card.",
+            "columns": [
+                { "key": "title", "label": "Title", "type": "text" },
+                { "key": "body", "label": "Body", "type": "textarea", "rows": 3 },
+                { "key": "icon", "label": "Icon", "type": "text", "placeholder": "⚡" }
+            ]
         },
         {
             "key": "columns",
@@ -28,14 +32,46 @@
     "defaults": {
         "title": "Features",
         "subtitle": "",
-        "items": "",
+        "items": [
+            {
+                "title": "Fast setup",
+                "body": "Get started quickly",
+                "icon": "⚡"
+            },
+            {
+                "title": "Flexible layouts",
+                "body": "Mix blocks freely",
+                "icon": "✨"
+            },
+            {
+                "title": "Open source",
+                "body": "Extend as needed",
+                "icon": "🧩"
+            }
+        ],
         "columns": "3"
     },
     "example": {
         "props": {
             "title": "Features",
             "subtitle": "",
-            "items": "Fast setup | Get started quickly | ⚡\nFlexible layouts | Mix blocks freely | ✨\nOpen source | Extend as needed | 🧩",
+            "items": [
+                {
+                    "title": "Fast setup",
+                    "body": "Get started quickly",
+                    "icon": "⚡"
+                },
+                {
+                    "title": "Flexible layouts",
+                    "body": "Mix blocks freely",
+                    "icon": "✨"
+                },
+                {
+                    "title": "Open source",
+                    "body": "Extend as needed",
+                    "icon": "🧩"
+                }
+            ],
             "columns": "3"
         }
     }

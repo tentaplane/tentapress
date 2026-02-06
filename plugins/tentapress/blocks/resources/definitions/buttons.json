@@ -8,9 +8,22 @@
         {
             "key": "actions",
             "label": "Actions",
-            "type": "textarea",
-            "rows": 5,
-            "help": "JSON array of {label,url,style} or one per line: Label | URL | Style."
+            "type": "repeater",
+            "help": "Add each button in the row.",
+            "columns": [
+                { "key": "label", "label": "Label", "type": "text", "placeholder": "Get started" },
+                { "key": "url", "label": "URL", "type": "text", "placeholder": "/" },
+                {
+                    "key": "style",
+                    "label": "Style",
+                    "type": "select",
+                    "options": [
+                        { "value": "primary", "label": "Primary" },
+                        { "value": "outline", "label": "Outline" },
+                        { "value": "ghost", "label": "Ghost" }
+                    ]
+                }
+            ]
         },
         {
             "key": "alignment",
@@ -34,13 +47,19 @@
         }
     ],
     "defaults": {
-        "actions": "",
+        "actions": [
+            { "label": "Get started", "url": "#", "style": "primary" },
+            { "label": "Learn more", "url": "#", "style": "outline" }
+        ],
         "alignment": "left",
         "size": "md"
     },
     "example": {
         "props": {
-            "actions": "Get started | # | primary\nLearn more | # | outline",
+            "actions": [
+                { "label": "Get started", "url": "#", "style": "primary" },
+                { "label": "Learn more", "url": "#", "style": "outline" }
+            ],
             "alignment": "left",
             "size": "md"
         }

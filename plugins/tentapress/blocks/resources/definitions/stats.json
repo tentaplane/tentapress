@@ -9,9 +9,12 @@
         {
             "key": "items",
             "label": "Items",
-            "type": "textarea",
-            "rows": 5,
-            "help": "JSON array of {value,label} or one per line: Value | Label."
+            "type": "repeater",
+            "help": "Add each stat row.",
+            "columns": [
+                { "key": "value", "label": "Value", "type": "text", "placeholder": "10×" },
+                { "key": "label", "label": "Label", "type": "text", "placeholder": "Faster publishing" }
+            ]
         },
         {
             "key": "columns",
@@ -27,14 +30,22 @@
     ],
     "defaults": {
         "title": "",
-        "items": "",
+        "items": [
+            { "value": "10k+", "label": "Monthly visitors" },
+            { "value": "120", "label": "Pages shipped" },
+            { "value": "4.9★", "label": "Avg rating" }
+        ],
         "columns": "3",
         "dividers": false
     },
     "example": {
         "props": {
             "title": "By the numbers",
-            "items": "10k+ | Monthly visitors\n120 | Pages shipped\n4.9★ | Avg rating",
+            "items": [
+                { "value": "10k+", "label": "Monthly visitors" },
+                { "value": "120", "label": "Pages shipped" },
+                { "value": "4.9★", "label": "Avg rating" }
+            ],
             "columns": "3",
             "dividers": true
         }

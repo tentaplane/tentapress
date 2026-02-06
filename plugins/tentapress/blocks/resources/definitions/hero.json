@@ -36,9 +36,22 @@
         {
             "key": "actions",
             "label": "Actions",
-            "type": "textarea",
-            "rows": 4,
-            "help": "JSON array of {label,url,style} or one per line: Label | URL | Style."
+            "type": "repeater",
+            "help": "Add call-to-action buttons.",
+            "columns": [
+                { "key": "label", "label": "Label", "type": "text", "placeholder": "Open admin" },
+                { "key": "url", "label": "URL", "type": "text", "placeholder": "/admin" },
+                {
+                    "key": "style",
+                    "label": "Style",
+                    "type": "select",
+                    "options": [
+                        { "value": "primary", "label": "Primary" },
+                        { "value": "outline", "label": "Outline" },
+                        { "value": "ghost", "label": "Ghost" }
+                    ]
+                }
+            ]
         }
     ],
     "defaults": {

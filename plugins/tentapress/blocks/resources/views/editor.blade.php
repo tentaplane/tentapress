@@ -435,6 +435,84 @@
                                                     </template>
 
                                                     <template
+                                                        x-if="field.type === 'repeater'">
+                                                        <div class="space-y-3">
+                                                            <template
+                                                                x-for="(item, rowIndex) in repeaterItems(index, field.key, field)"
+                                                                :key="field.key + ':' + rowIndex">
+                                                                <div class="space-y-3 rounded-lg border border-black/10 bg-white p-3">
+                                                                    <div class="flex items-center justify-between gap-2">
+                                                                        <div class="text-xs font-semibold tracking-[0.12em] text-slate-500 uppercase">
+                                                                            Row <span x-text="rowIndex + 1"></span>
+                                                                        </div>
+                                                                        <button
+                                                                            type="button"
+                                                                            class="tp-button-link text-red-600 hover:text-red-700"
+                                                                            @click="repeaterRemoveRow(index, field.key, field, rowIndex)">
+                                                                            Remove
+                                                                        </button>
+                                                                    </div>
+
+                                                                    <div class="grid gap-3 sm:grid-cols-2">
+                                                                        <template
+                                                                            x-for="col in repeaterColumns(field)"
+                                                                            :key="col.key">
+                                                                            <div class="tp-field">
+                                                                                <label
+                                                                                    class="tp-label"
+                                                                                    x-text="col.label || col.key"></label>
+
+                                                                                <template
+                                                                                    x-if="col.type === 'select'">
+                                                                                    <select
+                                                                                        class="tp-select"
+                                                                                        :value="String(item[col.key] ?? '')"
+                                                                                        @change="repeaterSetValue(index, field.key, field, rowIndex, col.key, String($event.target.value || ''))">
+                                                                                        <template
+                                                                                            x-for="opt in selectOptions(col)"
+                                                                                            :key="String(opt.value)">
+                                                                                            <option
+                                                                                                :value="String(opt.value)"
+                                                                                                x-text="opt.label"></option>
+                                                                                        </template>
+                                                                                    </select>
+                                                                                </template>
+
+                                                                                <template
+                                                                                    x-if="col.type === 'textarea'">
+                                                                                    <textarea
+                                                                                        class="tp-textarea"
+                                                                                        :rows="col.rows ? col.rows : 3"
+                                                                                        :placeholder="col.placeholder || ''"
+                                                                                        :value="String(item[col.key] ?? '')"
+                                                                                        @input="repeaterSetValue(index, field.key, field, rowIndex, col.key, $event.target.value)"></textarea>
+                                                                                </template>
+
+                                                                                <template
+                                                                                    x-if="col.type !== 'select' && col.type !== 'textarea'">
+                                                                                    <input
+                                                                                        class="tp-input"
+                                                                                        type="text"
+                                                                                        :placeholder="col.placeholder || ''"
+                                                                                        :value="String(item[col.key] ?? '')"
+                                                                                        @input="repeaterSetValue(index, field.key, field, rowIndex, col.key, $event.target.value)" />
+                                                                                </template>
+                                                                            </div>
+                                                                        </template>
+                                                                    </div>
+                                                                </div>
+                                                            </template>
+
+                                                            <button
+                                                                type="button"
+                                                                class="tp-button-secondary"
+                                                                @click="repeaterAddRow(index, field.key, field)">
+                                                                Add row
+                                                            </button>
+                                                        </div>
+                                                    </template>
+
+                                                    <template
                                                         x-if="field.type === 'select'">
                                                         <select
                                                             class="tp-select"
@@ -665,7 +743,8 @@
                                                 field.type !== 'range' &&
                                                 field.type !== 'color' &&
                                                 field.type !== 'richtext' &&
-                                                field.type !== 'markdown'
+                                                field.type !== 'markdown' &&
+                                                field.type !== 'repeater'
                                             ">
                                                         <input
                                                             class="tp-input"
@@ -2116,6 +2195,129 @@
                     }
 
                     this.setProp(index, path, value);
+                },
+
+                repeaterColumns(field) {
+                    if (!field || !Array.isArray(field.columns)) {
+                        return [];
+                    }
+
+                    return field.columns.filter(
+                        (column) => column && typeof column.key === 'string' && column.key.trim() !== '',
+                    );
+                },
+
+                repeaterNormalizeRow(field, row = {}) {
+                    const columns = this.repeaterColumns(field);
+                    const normalized = {};
+
+                    columns.forEach((column) => {
+                        const key = String(column.key || '').trim();
+                        if (key === '') {
+                            return;
+                        }
+
+                        const value =
+                            row && typeof row === 'object' && Object.prototype.hasOwnProperty.call(row, key)
+                                ? row[key]
+                                : '';
+
+                        normalized[key] = value === null || value === undefined ? '' : String(value);
+                    });
+
+                    return normalized;
+                },
+
+                repeaterParseLines(field, value) {
+                    const columns = this.repeaterColumns(field);
+                    const lines = String(value || '').split(/\r?\n/);
+                    const rows = [];
+
+                    lines.forEach((line) => {
+                        const trimmed = String(line || '').trim();
+                        if (trimmed === '') {
+                            return;
+                        }
+
+                        const parts = trimmed.split('|').map((part) => String(part || '').trim());
+                        const row = {};
+                        columns.forEach((column, index) => {
+                            const key = String(column.key || '').trim();
+                            if (key === '') {
+                                return;
+                            }
+                            row[key] = parts[index] ?? '';
+                        });
+                        rows.push(this.repeaterNormalizeRow(field, row));
+                    });
+
+                    return rows;
+                },
+
+                repeaterItems(index, path, field) {
+                    const raw = this.getPropRaw(index, path);
+
+                    if (Array.isArray(raw)) {
+                        return raw.map((row) => this.repeaterNormalizeRow(field, row));
+                    }
+
+                    if (typeof raw !== 'string') {
+                        return [];
+                    }
+
+                    const trimmed = raw.trim();
+                    if (trimmed === '') {
+                        return [];
+                    }
+
+                    let next = null;
+                    try {
+                        const parsed = JSON.parse(trimmed);
+                        if (Array.isArray(parsed)) {
+                            next = parsed.map((row) => this.repeaterNormalizeRow(field, row));
+                        }
+                    } catch (e) {
+                        next = null;
+                    }
+
+                    if (!Array.isArray(next)) {
+                        next = this.repeaterParseLines(field, trimmed);
+                    }
+
+                    this.setProp(index, path, next);
+
+                    return next;
+                },
+
+                repeaterAddRow(index, path, field) {
+                    const items = this.repeaterItems(index, path, field);
+                    items.push(this.repeaterNormalizeRow(field, {}));
+                    this.setProp(index, path, items);
+                },
+
+                repeaterRemoveRow(index, path, field, rowIndex) {
+                    const items = this.repeaterItems(index, path, field);
+                    if (rowIndex < 0 || rowIndex >= items.length) {
+                        return;
+                    }
+                    items.splice(rowIndex, 1);
+                    this.setProp(index, path, items);
+                },
+
+                repeaterSetValue(index, path, field, rowIndex, columnKey, value) {
+                    const items = this.repeaterItems(index, path, field);
+                    if (rowIndex < 0 || rowIndex >= items.length) {
+                        return;
+                    }
+                    const key = String(columnKey || '').trim();
+                    if (key === '') {
+                        return;
+                    }
+
+                    const nextRow = this.repeaterNormalizeRow(field, items[rowIndex]);
+                    nextRow[key] = value === null || value === undefined ? '' : String(value);
+                    items[rowIndex] = nextRow;
+                    this.setProp(index, path, items);
                 },
 
                 setProp(index, path, value) {

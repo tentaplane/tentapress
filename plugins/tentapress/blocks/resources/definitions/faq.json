@@ -10,23 +10,32 @@
         {
             "key": "items",
             "label": "Questions",
-            "type": "textarea",
-            "rows": 6,
-            "help": "JSON array of {question,answer} or one per line: Question | Answer."
+            "type": "repeater",
+            "help": "Add each question and answer.",
+            "columns": [
+                { "key": "question", "label": "Question", "type": "text" },
+                { "key": "answer", "label": "Answer", "type": "textarea", "rows": 3 }
+            ]
         },
         { "key": "open_first", "label": "Open first question", "type": "toggle" }
     ],
     "defaults": {
         "title": "FAQs",
         "subtitle": "",
-        "items": "",
+        "items": [
+            { "question": "Is it open source?", "answer": "Yes." },
+            { "question": "Can I add plugins?", "answer": "Absolutely." }
+        ],
         "open_first": false
     },
     "example": {
         "props": {
             "title": "FAQs",
             "subtitle": "",
-            "items": "Is it open source? | Yes.\nCan I add plugins? | Absolutely.",
+            "items": [
+                { "question": "Is it open source?", "answer": "Yes." },
+                { "question": "Can I add plugins?", "answer": "Absolutely." }
+            ],
             "open_first": true
         }
     }

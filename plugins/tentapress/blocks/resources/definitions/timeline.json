@@ -9,19 +9,29 @@
         {
             "key": "items",
             "label": "Items",
-            "type": "textarea",
-            "rows": 6,
-            "help": "JSON array of {date,title,body} or one per line: Date | Title | Body."
+            "type": "repeater",
+            "help": "Add each timeline event.",
+            "columns": [
+                { "key": "date", "label": "Date", "type": "text", "placeholder": "2025" },
+                { "key": "title", "label": "Title", "type": "text", "placeholder": "Launch" },
+                { "key": "body", "label": "Body", "type": "textarea", "rows": 3 }
+            ]
         }
     ],
     "defaults": {
         "title": "Timeline",
-        "items": ""
+        "items": [
+            { "date": "2024", "title": "Launch", "body": "First release" },
+            { "date": "2025", "title": "Scale", "body": "New features" }
+        ]
     },
     "example": {
         "props": {
             "title": "Timeline",
-            "items": "2024 | Launch | First release\n2025 | Scale | New features"
+            "items": [
+                { "date": "2024", "title": "Launch", "body": "First release" },
+                { "date": "2025", "title": "Scale", "body": "New features" }
+            ]
         }
     }
 }

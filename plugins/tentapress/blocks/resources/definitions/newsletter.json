@@ -10,9 +10,22 @@
         {
             "key": "actions",
             "label": "Actions",
-            "type": "textarea",
-            "rows": 3,
-            "help": "JSON array of {label,url,style} or one per line: Label | URL | Style."
+            "type": "repeater",
+            "help": "Add newsletter actions.",
+            "columns": [
+                { "key": "label", "label": "Label", "type": "text", "placeholder": "Subscribe" },
+                { "key": "url", "label": "URL", "type": "text", "placeholder": "/newsletter/subscribe" },
+                {
+                    "key": "style",
+                    "label": "Style",
+                    "type": "select",
+                    "options": [
+                        { "value": "primary", "label": "Primary" },
+                        { "value": "outline", "label": "Outline" },
+                        { "value": "ghost", "label": "Ghost" }
+                    ]
+                }
+            ]
         },
         { "key": "email_placeholder", "label": "Email Placeholder", "type": "text" },
         { "key": "disclaimer", "label": "Disclaimer", "type": "textarea", "rows": 2 },
