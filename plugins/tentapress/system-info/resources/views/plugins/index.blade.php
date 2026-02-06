@@ -6,13 +6,13 @@
     <div class="tp-page-header">
         <div>
             <h1 class="tp-page-title">Plugins</h1>
-            <p class="tp-description">Sync, enable, and disable TentaPress plugins.</p>
+            <p class="tp-description">Manage which plugins are available and active on this site.</p>
         </div>
 
         <div class="flex gap-2">
             <form method="POST" action="{{ route('tp.plugins.sync') }}">
                 @csrf
-                <button type="submit" class="tp-button-secondary">Sync plugins</button>
+                <button type="submit" class="tp-button-secondary">Refresh plugin list</button>
             </form>
         </div>
     </div>
@@ -24,7 +24,7 @@
     @if (empty($plugins))
         <div class="tp-panel">
             <div class="font-semibold">No plugins found</div>
-            <div class="tp-muted mt-1 text-sm">Run a sync to discover plugins in the filesystem.</div>
+            <div class="tp-muted mt-1 text-sm">Refresh the list to discover plugins in your project.</div>
         </div>
     @else
         <div class="tp-table-wrap">
@@ -53,7 +53,7 @@
                                     <div class="tp-muted mt-1 text-xs">{{ $plugin['description'] }}</div>
                                 @endif
                                 @if (! empty($plugin['provider']))
-                                    <div class="tp-code mt-1 text-[11px]">Provider: {{ $plugin['provider'] }}</div>
+                                    <div class="tp-code mt-1 text-[11px]">Service class: {{ $plugin['provider'] }}</div>
                                 @endif
                                 @if (! empty($plugin['path']))
                                     <div class="tp-code mt-1 text-[11px]">Path: {{ $plugin['path'] }}</div>
@@ -67,11 +67,11 @@
                                 @endif
 
                                 @if (! $isInstalled)
-                                    <div class="tp-muted mt-2 text-xs">Not installed (run composer require).</div>
+                                    <div class="tp-muted mt-2 text-xs">Not installed. Add it to Composer first.</div>
                                 @endif
 
                                 @if ($isProtected)
-                                    <div class="tp-muted mt-2 text-xs">Protected</div>
+                                    <div class="tp-muted mt-2 text-xs">Required plugin</div>
                                 @endif
                             </td>
                             <td class="tp-table__td tp-code">
