@@ -1,0 +1,24 @@
+{
+    "name": "tentapress/media-optimization-imagekit",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "php": "^8.2",
+        "tentapress/media": "<1.0",
+        "tentapress/settings": "<1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "TentaPress\\MediaOptimizationImageKit\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "TentaPress\\MediaOptimizationImageKit\\MediaOptimizationImageKitServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

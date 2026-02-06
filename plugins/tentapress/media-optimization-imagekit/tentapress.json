@@ -1,0 +1,8 @@
+{
+    "id": "tentapress/media-optimization-imagekit",
+    "name": "Media Optimization (ImageKit)",
+    "description": "ImageKit optimization provider.",
+    "version": "0.1.0",
+    "provider": "TentaPress\\MediaOptimizationImageKit\\MediaOptimizationImageKitServiceProvider",
+    "requires": ["tentapress/media"]
+}
