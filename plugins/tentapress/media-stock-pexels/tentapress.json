@@ -1,0 +1,8 @@
+{
+    "id": "tentapress/media-stock-pexels",
+    "name": "Media Stock (Pexels)",
+    "description": "Pexels provider for the Media stock library.",
+    "version": "0.1.0",
+    "provider": "TentaPress\\MediaStockPexels\\MediaStockPexelsServiceProvider",
+    "requires": ["tentapress/media"]
+}
