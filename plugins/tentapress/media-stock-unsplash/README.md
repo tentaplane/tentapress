@@ -7,7 +7,7 @@ Unsplash provider plugin for the TentaPress Media stock library.
 | Field    | Value                                                        |
 |----------|--------------------------------------------------------------|
 | ID       | `tentapress/media-stock-unsplash`                             |
-| Version  | 0.1.0                                                        |
+| Version  | 0.1.1                                                        |
 | Provider | `TentaPress\\MediaStockUnsplash\\MediaStockUnsplashServiceProvider` |
 
 ## Dependencies

@@ -2,7 +2,7 @@
     "id": "tentapress/media-stock-unsplash",
     "name": "Media Stock (Unsplash)",
     "description": "Unsplash provider for the Media stock library.",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "provider": "TentaPress\\MediaStockUnsplash\\MediaStockUnsplashServiceProvider",
     "requires": ["tentapress/media"]
 }

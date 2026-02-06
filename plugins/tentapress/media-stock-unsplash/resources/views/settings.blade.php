@@ -11,7 +11,7 @@
                 value="1"
                 class="tp-checkbox"
                 @checked(old('stock_unsplash_enabled', $stockUnsplashEnabled) === '1') />
-            Enabled
+            Enable source
         </label>
     </div>
 
@@ -23,7 +23,7 @@
             class="tp-input"
             value="{{ old('stock_unsplash_key', $stockUnsplashKey) }}" />
         <div class="tp-help mt-1">
-            Create a demo Unsplash application and use your Unsplash Access Key.
+            Create an Unsplash app and paste your Access Key.
             <br /><a class="tp-button-link" href="https://unsplash.com/documentation#creating-a-developer-account" target="_blank" rel="noopener">Unsplash documentation</a>
         </div>
     </div>
