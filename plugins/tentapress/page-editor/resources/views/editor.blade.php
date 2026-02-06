@@ -91,7 +91,7 @@
                 <a
                     href="{{ $isPost ? route('tp.posts.edit', ['post' => $model->id]) : route('tp.pages.edit', ['page' => $model->id]) }}"
                     class="tp-button-secondary">
-                    Exit full screen
+                    Exit full-screen
                 </a>
             </div>
         </div>
@@ -132,7 +132,7 @@
                 <div class="max-h-80 space-y-2 overflow-y-auto">
                     <template x-if="filteredMediaOptions().length === 0">
                         <div class="rounded-xl border border-dashed border-slate-200 bg-slate-50 p-6 text-sm text-slate-500">
-                            No media found. Upload one in the Media Library.
+                            No media available yet. Upload a file in Media Library first.
                         </div>
                     </template>
                     <template x-for="option in filteredMediaOptions()" :key="option.value">
