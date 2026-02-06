@@ -372,7 +372,7 @@
                                     <form
                                         method="POST"
                                         action="{{ route('tp.posts.destroy', ['post' => $post->id]) }}"
-                                        onsubmit="return confirm('Delete this post? This cannot be undone.');">
+                                        data-confirm="Delete this post? This cannot be undone.">
                                         @csrf
                                         @method('DELETE')
                                         <button
@@ -445,20 +445,24 @@
 
                             const nextLabel =
                                 next === 'page' ? 'Page Editor' : 'Blocks Builder';
-                            const ok = window.confirm(
+                            window.tpConfirm(
                                 `Switch to ${nextLabel}? This will save your changes and reload the editor.`,
-                            );
+                                {
+                                    title: 'Switch editor?',
+                                    confirmText: 'Switch',
+                                },
+                            ).then((ok) => {
+                                if (!ok) {
+                                    suppressChange = true;
+                                    chooseRadio(current);
+                                    suppressChange = false;
+                                    return;
+                                }
 
-                            if (!ok) {
-                                suppressChange = true;
-                                chooseRadio(current);
-                                suppressChange = false;
-                                return;
-                            }
-
-                            current = next;
-                            form.dataset.editorDriverCurrent = current;
-                            form.requestSubmit();
+                                current = next;
+                                form.dataset.editorDriverCurrent = current;
+                                form.requestSubmit();
+                            });
                         });
                     });
                 });

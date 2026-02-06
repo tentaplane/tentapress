@@ -168,7 +168,7 @@
                                         <form
                                             method="POST"
                                             action="{{ route('tp.posts.destroy', ['post' => $post->id]) }}"
-                                            onsubmit="return confirm('Delete this post?');">
+                                            data-confirm="Delete this post?">
                                             @csrf
                                             @method('DELETE')
                                             <button
