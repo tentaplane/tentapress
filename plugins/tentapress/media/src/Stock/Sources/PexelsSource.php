@@ -11,6 +11,7 @@ use TentaPress\Media\Stock\StockResult;
 use TentaPress\Media\Stock\StockSearchResults;
 use TentaPress\Media\Stock\StockSettings;
 use TentaPress\Media\Stock\StockSource;
+use Throwable;
 
 final readonly class PexelsSource implements StockSource
 {
@@ -44,22 +45,41 @@ final readonly class PexelsSource implements StockSource
     public function search(StockQuery $query): StockSearchResults
     {
         $mediaType = $query->mediaType === 'video' && $this->settings->pexelsVideoEnabled() ? 'video' : 'image';
+        $sort = $this->resolveSort($query->sort);
         $cacheKey = sprintf(
-            'tp-stock-pexels:%s:%s:%d:%d',
+            'tp-stock-pexels:%s:%s:%s:%d:%d',
             $mediaType,
+            $sort ?? 'relevant',
             md5($query->query),
             $query->page,
             $query->perPage
         );
 
-        return Cache::remember($cacheKey, 60, function () use ($query, $mediaType): StockSearchResults {
-            $endpoint = $mediaType === 'video' ? self::VIDEO_URL.'/search' : self::PHOTO_URL.'/search';
-            $response = Http::withHeaders($this->headers())
-                ->get($endpoint, [
+        return Cache::remember($cacheKey, 60, function () use ($query, $mediaType, $sort): StockSearchResults {
+            $endpoint = $this->resolveEndpoint($mediaType, $sort);
+            try {
+                $payload = [
                     'query' => $query->query,
                     'page' => $query->page,
                     'per_page' => $query->perPage,
-                ]);
+                ];
+
+                if ($mediaType === 'image' && $sort === null) {
+                    $orientation = $this->resolveOrientation($query->orientation);
+                    if ($orientation !== null) {
+                        $payload['orientation'] = $orientation;
+                    }
+                }
+
+                if ($sort === 'popular') {
+                    unset($payload['query']);
+                }
+
+                $response = Http::withHeaders($this->headers())
+                    ->get($endpoint, $payload);
+            } catch (Throwable) {
+                return new StockSearchResults([], $query->page, $query->perPage, null, false, true);
+            }
 
             if (! $response->ok()) {
                 return new StockSearchResults([], $query->page, $query->perPage, null, false);
@@ -137,7 +157,11 @@ final readonly class PexelsSource implements StockSource
             ? self::VIDEO_URL.'/videos/'.$id
             : self::PHOTO_URL.'/photos/'.$id;
 
-        $response = Http::withHeaders($this->headers())->get($endpoint);
+        try {
+            $response = Http::withHeaders($this->headers())->get($endpoint);
+        } catch (Throwable) {
+            return null;
+        }
         if (! $response->ok()) {
             return null;
         }
@@ -231,5 +255,42 @@ final readonly class PexelsSource implements StockSource
         }
 
         return isset($best['link']) ? (string) $best['link'] : null;
+    }
+
+    private function resolveSort(?string $sort): ?string
+    {
+        if ($sort === null || $sort === '') {
+            return null;
+        }
+
+        $normalized = strtolower($sort);
+        if ($normalized === 'popular') {
+            return 'popular';
+        }
+
+        return null;
+    }
+
+    private function resolveEndpoint(string $mediaType, ?string $sort): string
+    {
+        if ($mediaType === 'video') {
+            return $sort === 'popular' ? self::VIDEO_URL.'/popular' : self::VIDEO_URL.'/search';
+        }
+
+        return $sort === 'popular' ? self::PHOTO_URL.'/curated' : self::PHOTO_URL.'/search';
+    }
+
+    private function resolveOrientation(?string $orientation): ?string
+    {
+        if ($orientation === null || $orientation === '') {
+            return null;
+        }
+
+        $normalized = strtolower($orientation);
+        if (in_array($normalized, ['landscape', 'portrait', 'square'], true)) {
+            return $normalized;
+        }
+
+        return null;
     }
 }

@@ -17,6 +17,8 @@ final class IndexController
         $query = trim((string) $request->query('q', ''));
         $sourceKey = (string) $request->query('source', '');
         $mediaType = (string) $request->query('media_type', '');
+        $orientation = (string) $request->query('orientation', '');
+        $sort = (string) $request->query('sort', '');
         $page = max(1, (int) $request->query('page', 1));
 
         $enabledSources = $manager->enabled();
@@ -33,6 +35,8 @@ final class IndexController
             $results = $source->search(new StockQuery(
                 query: $query,
                 mediaType: $mediaType !== '' ? $mediaType : null,
+                orientation: $orientation !== '' ? $orientation : null,
+                sort: $sort !== '' ? $sort : null,
                 page: $page,
             ));
         }
@@ -41,6 +45,8 @@ final class IndexController
             'query' => $query,
             'sourceKey' => $sourceKey,
             'mediaType' => $mediaType,
+            'orientation' => $orientation,
+            'sort' => $sort,
             'sources' => $enabledSources,
             'results' => $results,
             'attributionReminder' => $settings->attributionReminderEnabled(),

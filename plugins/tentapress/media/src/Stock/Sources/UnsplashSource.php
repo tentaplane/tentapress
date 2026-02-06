@@ -12,6 +12,7 @@ use TentaPress\Media\Stock\StockResult;
 use TentaPress\Media\Stock\StockSearchResults;
 use TentaPress\Media\Stock\StockSettings;
 use TentaPress\Media\Stock\StockSource;
+use Throwable;
 
 final readonly class UnsplashSource implements StockSource
 {
@@ -51,13 +52,29 @@ final readonly class UnsplashSource implements StockSource
         );
 
         return Cache::remember($cacheKey, 60, function () use ($query): StockSearchResults {
-            $response = Http::withHeaders($this->headers())
-                ->get(self::BASE_URL.'/search/photos', [
+            try {
+                $payload = [
                     'query' => $query->query,
                     'page' => $query->page,
                     'per_page' => $query->perPage,
                     'content_filter' => 'high',
-                ]);
+                ];
+
+                $orientation = $this->resolveOrientation($query->orientation);
+                if ($orientation !== null) {
+                    $payload['orientation'] = $orientation;
+                }
+
+                $orderBy = $this->resolveOrderBy($query->sort);
+                if ($orderBy !== null) {
+                    $payload['order_by'] = $orderBy;
+                }
+
+                $response = Http::withHeaders($this->headers())
+                    ->get(self::BASE_URL.'/search/photos', $payload);
+            } catch (Throwable) {
+                return new StockSearchResults([], $query->page, $query->perPage, null, false, true);
+            }
 
             if (! $response->ok()) {
                 return new StockSearchResults([], $query->page, $query->perPage, null, false);
@@ -115,8 +132,12 @@ final readonly class UnsplashSource implements StockSource
 
     public function find(string $id, ?string $mediaType = null): ?StockResult
     {
-        $response = Http::withHeaders($this->headers())
-            ->get(self::BASE_URL.'/photos/'.$id);
+        try {
+            $response = Http::withHeaders($this->headers())
+                ->get(self::BASE_URL.'/photos/'.$id);
+        } catch (Throwable) {
+            return null;
+        }
 
         if (! $response->ok()) {
             return null;
@@ -163,7 +184,11 @@ final readonly class UnsplashSource implements StockSource
             return null;
         }
 
-        $response = Http::withHeaders($this->headers())->get($downloadLocation);
+        try {
+            $response = Http::withHeaders($this->headers())->get($downloadLocation);
+        } catch (Throwable) {
+            return null;
+        }
         if (! $response->ok()) {
             return null;
         }
@@ -217,5 +242,37 @@ final readonly class UnsplashSource implements StockSource
         $separator = Str::contains($url, '?') ? '&' : '?';
 
         return $url.$separator.'utm_source=tentapress&utm_medium=referral';
+    }
+
+    private function resolveOrientation(?string $orientation): ?string
+    {
+        if ($orientation === null || $orientation === '') {
+            return null;
+        }
+
+        $normalized = strtolower($orientation);
+        if ($normalized === 'square') {
+            return 'squarish';
+        }
+
+        if (in_array($normalized, ['landscape', 'portrait', 'squarish'], true)) {
+            return $normalized;
+        }
+
+        return null;
+    }
+
+    private function resolveOrderBy(?string $sort): ?string
+    {
+        if ($sort === null || $sort === '') {
+            return null;
+        }
+
+        $normalized = strtolower($sort);
+        if (in_array($normalized, ['relevant', 'latest'], true)) {
+            return $normalized;
+        }
+
+        return null;
     }
 }

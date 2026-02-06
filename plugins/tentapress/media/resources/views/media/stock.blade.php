@@ -3,6 +3,30 @@
 @section('title', 'Stock Library')
 
 @section('content')
+    <div
+        x-data="{
+            previewOpen: false,
+            previewTitle: '',
+            previewAuthor: '',
+            previewType: '',
+            previewUrl: '',
+            previewSourceUrl: '',
+            previewLicense: '',
+            openPreview(payload) {
+                this.previewTitle = payload.title || 'Untitled';
+                this.previewAuthor = payload.author || '';
+                this.previewType = payload.type || 'image';
+                this.previewUrl = payload.url || '';
+                this.previewSourceUrl = payload.sourceUrl || '';
+                this.previewLicense = payload.license || '';
+                this.previewOpen = true;
+            },
+            closePreview() {
+                this.previewOpen = false;
+                this.previewUrl = '';
+            }
+        }"
+        x-ref="previewRoot">
     <div class="tp-page-header">
         <div>
             <h1 class="tp-page-title">Stock Library</h1>
@@ -17,13 +41,13 @@
 
     <div class="tp-metabox">
         <div class="tp-metabox__body space-y-4">
-            <form method="GET" action="{{ route('tp.media.stock') }}" class="grid gap-3 lg:grid-cols-4 lg:items-end">
+            <form method="GET" action="{{ route('tp.media.stock') }}" class="grid gap-3 lg:grid-cols-7 lg:items-end">
                 <div class="lg:col-span-2">
                     <label class="tp-label">Search</label>
                     <input name="q" value="{{ $query }}" class="tp-input" placeholder="Search stock libraries…" />
                 </div>
 
-                <div>
+                <div class="lg:col-span-1">
                     <label class="tp-label">Source</label>
                     <select name="source" class="tp-select">
                         @forelse ($sources as $source)
@@ -36,7 +60,7 @@
                     </select>
                 </div>
 
-                <div>
+                <div class="lg:col-span-1">
                     <label class="tp-label">Media type</label>
                     <select name="media_type" class="tp-select">
                         <option value="">Any</option>
@@ -52,7 +76,26 @@
                     </select>
                 </div>
 
-                <div class="lg:col-span-4 flex gap-2">
+                <div class="lg:col-span-1">
+                    <label class="tp-label">Orientation</label>
+                    <select name="orientation" class="tp-select">
+                        <option value="">Any</option>
+                        <option value="landscape" @selected($orientation === 'landscape')>Landscape</option>
+                        <option value="portrait" @selected($orientation === 'portrait')>Portrait</option>
+                        <option value="square" @selected($orientation === 'square')>Square</option>
+                    </select>
+                </div>
+
+                <div class="lg:col-span-1">
+                    <label class="tp-label">Sort</label>
+                    <select name="sort" class="tp-select">
+                        <option value="">Relevant</option>
+                        <option value="latest" @selected($sort === 'latest')>Latest</option>
+                        <option value="popular" @selected($sort === 'popular')>Popular</option>
+                    </select>
+                </div>
+
+                <div class="lg:col-span-7 flex gap-2">
                     <button class="tp-button-primary" type="submit">Search</button>
                     <a class="tp-button-secondary" href="{{ route('tp.media.stock') }}">Reset</a>
                 </div>
@@ -76,6 +119,12 @@
         </div>
     @endif
 
+    @if ($results && $results->offline)
+        <div class="tp-notice-warning">
+            You appear to be offline. Stock search results may be unavailable until you’re connected.
+        </div>
+    @endif
+
     @if ($results && count($results->items) > 0)
         @if ($attributionReminder)
             <div class="tp-notice-info">
@@ -85,8 +134,21 @@
 
         <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mt-4">
             @foreach ($results->items as $item)
+                @php
+                    $previewPayload = [
+                        'title' => $item->title !== '' ? $item->title : 'Untitled',
+                        'author' => $item->author,
+                        'type' => $item->mediaType ?? 'image',
+                        'url' => $item->previewUrl,
+                        'sourceUrl' => $item->sourceUrl ?? '',
+                        'license' => $item->license ?? '',
+                    ];
+                @endphp
                 <div class="rounded-lg border border-black/10 bg-white shadow-sm overflow-hidden">
-                    <div class="border-b border-black/10 bg-slate-50">
+                    <button
+                        type="button"
+                        class="border-b border-black/10 bg-slate-50 text-left w-full"
+                        @click="openPreview({{ Js::from($previewPayload) }})">
                         @if ($item->previewUrl)
                             <img src="{{ $item->previewUrl }}" alt="" class="h-40 w-full object-cover" />
                         @else
@@ -94,10 +156,10 @@
                                 {{ $item->mediaType ?? 'Asset' }}
                             </div>
                         @endif
-                    </div>
+                    </button>
                     <div class="p-3 space-y-2">
                         <div>
-                            <p class="text-sm font-semibold text-[#1d2327]">
+                            <p class="text-sm font-semibold text-[#1d2327] line-clamp-2">
                                 {{ $item->title !== '' ? $item->title : 'Untitled' }}
                             </p>
                             <p class="text-xs text-black/60">{{ $item->author }}</p>
@@ -137,4 +199,50 @@
             </div>
         @endif
     @endif
+
+    <div
+        class="fixed inset-0 z-50"
+        x-show="previewOpen"
+        x-cloak>
+        <div class="absolute inset-0 bg-black/60" @click="closePreview()"></div>
+        <div class="relative mx-auto flex h-full max-w-4xl items-center justify-center px-4 py-8">
+            <div class="w-full overflow-hidden rounded-2xl bg-white shadow-xl">
+                <div class="flex items-center justify-between gap-4 border-b border-black/10 px-4 py-3">
+                    <div>
+                        <p class="text-sm font-semibold text-[#1d2327]" x-text="previewTitle"></p>
+                        <p class="text-xs text-black/60" x-text="previewAuthor"></p>
+                    </div>
+                    <button
+                        type="button"
+                        class="rounded-md border border-black/10 bg-white px-2.5 py-1 text-xs font-semibold text-black/70"
+                        @click="closePreview()">
+                        Close
+                    </button>
+                </div>
+                <div class="bg-black">
+                    <template x-if="previewType === 'video'">
+                        <video class="w-full max-h-[70vh]" controls :src="previewUrl"></video>
+                    </template>
+                    <template x-if="previewType !== 'video'">
+                        <img class="w-full max-h-[70vh] object-contain" :src="previewUrl" alt="" />
+                    </template>
+                </div>
+                <div class="flex flex-wrap items-center justify-between gap-2 px-4 py-3 text-xs text-black/60">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span x-text="previewType ? previewType.toUpperCase() : ''"></span>
+                        <span x-show="previewLicense" x-text="previewLicense"></span>
+                    </div>
+                    <a
+                        class="tp-button-link"
+                        x-show="previewSourceUrl"
+                        :href="previewSourceUrl"
+                        target="_blank"
+                        rel="noopener">
+                        View source
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
 @endsection

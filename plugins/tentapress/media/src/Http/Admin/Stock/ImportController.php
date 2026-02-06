@@ -14,6 +14,7 @@ use TentaPress\Media\Models\TpMedia;
 use TentaPress\Media\Stock\StockManager;
 use TentaPress\Media\Stock\StockResult;
 use TentaPress\Media\Stock\Sources\UnsplashSource;
+use Throwable;
 
 final class ImportController
 {
@@ -32,7 +33,11 @@ final class ImportController
         }
 
         $mediaType = isset($data['media_type']) ? (string) $data['media_type'] : null;
-        $result = $source->find((string) $data['id'], $mediaType);
+        try {
+            $result = $source->find((string) $data['id'], $mediaType);
+        } catch (Throwable) {
+            return back()->with('tp_notice_error', 'Unable to reach stock provider (offline?).');
+        }
         if ($result === null || $result->downloadUrl === null || $result->downloadUrl === '') {
             return back()->with('tp_notice_error', 'Unable to download this asset.');
         }
@@ -42,7 +47,11 @@ final class ImportController
             return back()->with('tp_notice_error', 'Unable to resolve download URL.');
         }
 
-        $response = Http::withOptions(['stream' => true])->get($downloadUrl);
+        try {
+            $response = Http::withOptions(['stream' => true])->get($downloadUrl);
+        } catch (Throwable) {
+            return back()->with('tp_notice_error', 'Download failed (offline?).');
+        }
         if (! $response->ok()) {
             return back()->with('tp_notice_error', 'Download failed.');
         }

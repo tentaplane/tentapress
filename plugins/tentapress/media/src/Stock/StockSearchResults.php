@@ -15,6 +15,7 @@ final readonly class StockSearchResults
         public int $perPage,
         public ?int $total,
         public bool $hasMore,
+        public bool $offline = false,
     ) {
     }
 }
