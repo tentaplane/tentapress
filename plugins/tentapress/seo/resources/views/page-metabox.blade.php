@@ -241,7 +241,7 @@
                     <div
                         class="tp-muted rounded border border-dashed border-black/15 bg-white p-6 text-center text-sm"
                         x-show="filtered().length === 0">
-                        No images match that search yet.
+                        No images match your search.
                     </div>
                 </div>
 

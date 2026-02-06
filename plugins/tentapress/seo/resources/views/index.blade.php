@@ -46,11 +46,11 @@
     <div class="tp-page-header">
         <div>
             <h1 class="tp-page-title">SEO</h1>
-            <p class="tp-description">Manage SEO across pages and posts.</p>
+            <p class="tp-description">Manage search and social sharing details for pages and posts.</p>
         </div>
 
         <div class="flex gap-2">
-            <a href="{{ route('tp.seo.settings') }}" class="tp-button-secondary">Settings</a>
+            <a href="{{ route('tp.seo.settings') }}" class="tp-button-secondary">SEO settings</a>
         </div>
     </div>
 
@@ -84,7 +84,7 @@
                     <a
                         href="{{ route('tp.seo.index', ['type' => $type, 'seo' => 'all', 's' => $search, 'sort' => $sort, 'direction' => $direction]) }}"
                         class="{{ $seo === 'all' ? 'tp-button-primary' : 'tp-button-secondary' }}">
-                        All SEO
+                        All entries
                     </a>
                     <a
                         href="{{ route('tp.seo.index', ['type' => $type, 'seo' => 'custom', 's' => $search, 'sort' => $sort, 'direction' => $direction]) }}"
@@ -94,7 +94,7 @@
                     <a
                         href="{{ route('tp.seo.index', ['type' => $type, 'seo' => 'missing', 's' => $search, 'sort' => $sort, 'direction' => $direction]) }}"
                         class="{{ $seo === 'missing' ? 'tp-button-primary' : 'tp-button-secondary' }}">
-                        Missing
+                        Missing setup
                     </a>
                 </div>
 
@@ -116,7 +116,7 @@
         </div>
 
         @if ($entries->count() === 0)
-            <div class="tp-metabox__body tp-muted text-sm">No results found.</div>
+            <div class="tp-metabox__body tp-muted text-sm">No matching pages or posts found.</div>
         @else
             <div class="tp-table-wrap">
                 <table class="tp-table">
@@ -135,14 +135,14 @@
                                         <span class="inline-flex" aria-hidden="true">{!! $sortIconSvgFor('title') !!}</span>
                                     </a>
                                     <a class="inline-flex items-center gap-1 py-0.5 text-black/60 hover:text-black/90" href="{{ $sortUrlFor('slug') }}">
-                                        Slug
+                                        URL
                                         <span class="inline-flex" aria-hidden="true">{!! $sortIconSvgFor('slug') !!}</span>
                                     </a>
                                 </div>
                             </th>
                             <th class="tp-table__th">
                                 <a class="inline-flex items-center gap-1.5 py-0.5 hover:text-black/90" href="{{ $sortUrlFor('custom') }}">
-                                    Custom SEO
+                                    Custom setup
                                     <span class="inline-flex" aria-hidden="true">{!! $sortIconSvgFor('custom') !!}</span>
                                 </a>
                             </th>

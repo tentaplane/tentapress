@@ -6,11 +6,11 @@
     <div class="tp-page-header">
         <div>
             <h1 class="tp-page-title">SEO Settings</h1>
-            <p class="tp-description">Set global defaults for title, description and robots.</p>
+            <p class="tp-description">Set default SEO values for your site.</p>
         </div>
 
         <div class="flex gap-2">
-            <a href="{{ route('tp.seo.index') }}" class="tp-button-secondary">Back</a>
+            <a href="{{ route('tp.seo.index') }}" class="tp-button-secondary">Back to SEO</a>
         </div>
     </div>
 
@@ -58,9 +58,9 @@
                         class="tp-input"
                         value="{{ old('canonical_base', $canonicalBase) }}" />
                     <div class="tp-help">
-                        If set, canonical becomes
+                        If set, canonical URLs use
                         <code class="tp-code">base/slug</code>
-                        unless overridden per page.
+                        unless you set a custom canonical URL on a page or post.
                     </div>
                 </div>
 
