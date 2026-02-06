@@ -67,7 +67,11 @@
                 </div>
             </div>
 
-            <form method="POST" action="{{ route('tp.import.run') }}" class="space-y-4">
+            <form
+                method="POST"
+                action="{{ route('tp.import.run') }}"
+                class="space-y-4"
+                data-confirm="Run import now?">
                 @csrf
                 <input type="hidden" name="token" value="{{ $token }}" />
 
@@ -168,7 +172,7 @@
                 </div>
 
                 <div class="flex gap-2">
-                    <button type="submit" class="tp-button-primary" onclick="return confirm('Run import now?');">
+                    <button type="submit" class="tp-button-primary">
                         Run import
                     </button>
                     <a href="{{ route('tp.import.index') }}" class="tp-button-secondary">Cancel</a>
