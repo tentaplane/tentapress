@@ -10,6 +10,7 @@
         </div>
 
         <div class="flex gap-2">
+            <a href="{{ route('tp.media.stock') }}" class="tp-button-secondary">Stock Library</a>
             <a href="{{ route('tp.media.create') }}" class="tp-button-primary">Upload</a>
         </div>
     </div>
@@ -51,10 +52,27 @@
         </div>
 
         @if ($media->count() === 0)
-            <div class="tp-metabox__body tp-muted text-sm">No media found.</div>
+            <div class="tp-metabox__body">
+                <div class="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-black/10 bg-[#f6f7f7] px-6 py-10 text-center">
+                    <div class="rounded-full bg-white p-3 text-black/60 shadow-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-6 w-6 fill-current" aria-hidden="true">
+                            <path
+                                d="M7 3a2 2 0 0 0-2 2v13a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7.83a2 2 0 0 0-.59-1.41l-2.83-2.83A2 2 0 0 0 16.17 3H7Zm0 2h9.17L19 7.83V18a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V5Z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-sm font-semibold text-[#1d2327]">No media yet</p>
+                        <p class="text-xs text-black/60">Upload files or import from the Stock Library to get started.</p>
+                    </div>
+                    <div class="flex flex-wrap items-center justify-center gap-2">
+                        <a href="{{ route('tp.media.create') }}" class="tp-button-primary">Upload Media</a>
+                        <a href="{{ route('tp.media.stock') }}" class="tp-button-secondary">Browse Stock</a>
+                    </div>
+                </div>
+            </div>
         @elseif ($view === 'grid')
             <div class="tp-metabox__body">
-                <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                     @foreach ($media as $item)
                         @php
                             $disk = (string) ($item->disk ?? 'public');
@@ -66,45 +84,57 @@
                             $sizeLabel = $size ? number_format($size / 1024, 1).' KB' : '—';
                             $title = (string) ($item->title ?? '');
                             $originalName = (string) ($item->original_name ?? '');
+                            $typeLabel = $mime !== '' ? strtoupper(strtok($mime, '/')) : 'FILE';
+                            $dateLabel = $item->created_at?->format('Y-m-d') ?? '—';
                         @endphp
-                        <div class="rounded border border-slate-200 bg-white shadow-sm">
-                            <div class="border-b border-slate-100">
+                        <div class="group overflow-hidden rounded-xl border border-black/10 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+                            <div class="relative">
                                 @if ($url && $isImage)
                                     <img
                                         src="{{ $url }}"
                                         alt=""
-                                        class="h-32 w-full rounded-t object-cover" />
+                                        class="aspect-[4/3] w-full object-cover" />
                                 @else
-                                    <div class="flex h-32 items-center justify-center rounded-t bg-slate-50 text-xs uppercase text-slate-400">
-                                        File
+                                    <div class="flex aspect-[4/3] items-center justify-center bg-gradient-to-br from-slate-50 via-white to-slate-100 text-xs font-semibold uppercase text-slate-400">
+                                        {{ $typeLabel }}
                                     </div>
                                 @endif
-                            </div>
-                            <div class="space-y-2 p-3">
-                                <div class="text-sm font-semibold">
-                                    <a href="{{ route('tp.media.edit', ['media' => $item->id]) }}" class="hover:underline">
-                                        {{ $title !== '' ? $title : ($originalName !== '' ? $originalName : 'Untitled') }}
-                                    </a>
-                                </div>
-                                <div class="text-xs text-slate-500">
-                                    {{ $mime !== '' ? $mime : '—' }} · {{ $sizeLabel }}
-                                </div>
-                                <div class="flex flex-wrap gap-3 text-xs text-slate-600">
+                                <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent opacity-0 transition group-hover:opacity-100"></div>
+                                <div class="absolute inset-x-0 bottom-0 flex items-center justify-between gap-2 p-3 text-white opacity-0 transition group-hover:opacity-100">
                                     <a
-                                        class="tp-button-link hover:text-slate-900"
+                                        class="inline-flex items-center rounded-md bg-white/90 px-2.5 py-1 text-xs font-semibold text-[#1d2327] shadow-sm"
                                         href="{{ route('tp.media.edit', ['media' => $item->id]) }}">
                                         Edit
                                     </a>
                                     <form
                                         method="POST"
                                         action="{{ route('tp.media.destroy', ['media' => $item->id]) }}"
-                                        onsubmit="return confirm('Delete this media file?');">
+                                        data-confirm="Delete this media file?">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="tp-button-link text-red-600 hover:text-red-700">
+                                        <button type="submit" class="inline-flex items-center rounded-md bg-red-600 px-2.5 py-1 text-xs font-semibold text-white shadow-sm">
                                             Delete
                                         </button>
                                     </form>
+                                </div>
+                            </div>
+                            <div class="space-y-2 p-3">
+                                <div class="flex items-center justify-between gap-2">
+                                    <a
+                                        href="{{ route('tp.media.edit', ['media' => $item->id]) }}"
+                                        class="text-sm font-semibold text-[#1d2327] hover:underline truncate">
+                                        {{ $title !== '' ? $title : ($originalName !== '' ? $originalName : 'Untitled') }}
+                                    </a>
+                                    <span class="rounded-full bg-black/5 px-2 py-0.5 text-[11px] font-semibold text-black/60">
+                                        {{ $typeLabel }}
+                                    </span>
+                                </div>
+                                <div class="text-xs text-black/60 flex flex-wrap items-center gap-2">
+                                    <span>{{ $mime !== '' ? $mime : '—' }}</span>
+                                    <span>·</span>
+                                    <span>{{ $sizeLabel }}</span>
+                                    <span>·</span>
+                                    <span>{{ $dateLabel }}</span>
                                 </div>
                             </div>
                         </div>
@@ -137,15 +167,18 @@
                                 $sizeLabel = $size ? number_format($size / 1024, 1).' KB' : '—';
                                 $title = (string) ($item->title ?? '');
                                 $originalName = (string) ($item->original_name ?? '');
+                                $typeLabel = $mime !== '' ? strtoupper(strtok($mime, '/')) : 'FILE';
                             @endphp
                             <tr class="tp-table__row">
                                 <td class="tp-table__td">
                                     @if ($url && $isImage)
-                                        <img src="{{ $url }}" alt="" class="h-12 w-12 rounded border border-slate-200 object-cover" />
+                                        <div class="h-20 w-28 overflow-hidden rounded-xl border border-black/10 bg-slate-50 shadow-sm">
+                                            <img src="{{ $url }}" alt="" class="h-full w-full object-cover" />
+                                        </div>
                                     @else
                                         <div
-                                            class="flex h-12 w-12 items-center justify-center rounded border border-dashed border-slate-300 text-[10px] uppercase text-slate-500">
-                                            File
+                                            class="flex h-20 w-28 items-center justify-center rounded-xl border border-dashed border-black/20 bg-slate-50 text-[10px] font-semibold uppercase text-slate-500">
+                                            {{ $typeLabel }}
                                         </div>
                                     @endif
                                 </td>
@@ -175,7 +208,7 @@
                                         <form
                                             method="POST"
                                             action="{{ route('tp.media.destroy', ['media' => $item->id]) }}"
-                                            onsubmit="return confirm('Delete this media file?');">
+                                            data-confirm="Delete this media file?">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="tp-button-link text-red-600 hover:text-red-700">

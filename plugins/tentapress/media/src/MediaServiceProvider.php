@@ -6,8 +6,11 @@ namespace TentaPress\Media;
 
 use Illuminate\Support\ServiceProvider;
 use TentaPress\Media\Contracts\MediaUrlGenerator;
+use TentaPress\Media\Stock\StockManager;
+use TentaPress\Media\Stock\StockSettings;
 use TentaPress\Media\Support\LocalMediaUrlGenerator;
 use TentaPress\Media\Support\NullMediaUrlGenerator;
+use TentaPress\Settings\Services\SettingsStore;
 
 final class MediaServiceProvider extends ServiceProvider
 {
@@ -26,6 +29,16 @@ final class MediaServiceProvider extends ServiceProvider
                 default => new LocalMediaUrlGenerator(),
             };
         });
+
+        if (class_exists(SettingsStore::class)) {
+            if (! $this->app->bound(StockSettings::class)) {
+                $this->app->singleton(StockSettings::class, fn ($app) => new StockSettings($app->make(SettingsStore::class)));
+            }
+
+            if (! $this->app->bound(StockManager::class)) {
+                $this->app->singleton(StockManager::class, fn ($app) => new StockManager($app->make(StockSettings::class)));
+            }
+        }
     }
 
     public function boot(): void

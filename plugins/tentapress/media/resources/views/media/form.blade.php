@@ -124,7 +124,7 @@
                         <form
                             method="POST"
                             action="{{ route('tp.media.destroy', ['media' => $media->id]) }}"
-                            onsubmit="return confirm('Delete this media file? This cannot be undone.');">
+                            data-confirm="Delete this media file? This cannot be undone.">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="tp-button-danger w-full justify-center" aria-label="Delete media">
@@ -172,6 +172,39 @@
                             <span class="tp-muted">Uploaded:</span>
                             <span class="tp-code">{{ $media->created_at?->toDateTimeString() ?? '—' }}</span>
                         </div>
+
+                        @if ($media->source)
+                            <div>
+                                <span class="tp-muted">Source:</span>
+                                <span class="tp-code">{{ strtoupper($media->source) }}</span>
+                            </div>
+                            @if ($media->source_url)
+                                <div>
+                                    <span class="tp-muted">Source URL:</span>
+                                    <a class="tp-button-link" href="{{ $media->source_url }}" target="_blank" rel="noopener">
+                                        View source
+                                    </a>
+                                </div>
+                            @endif
+                            @if ($media->license)
+                                <div>
+                                    <span class="tp-muted">License:</span>
+                                    @if ($media->license_url)
+                                        <a class="tp-button-link" href="{{ $media->license_url }}" target="_blank" rel="noopener">
+                                            {{ $media->license }}
+                                        </a>
+                                    @else
+                                        <span class="tp-code">{{ $media->license }}</span>
+                                    @endif
+                                </div>
+                            @endif
+                            @if ($media->attribution)
+                                <div>
+                                    <span class="tp-muted">Attribution:</span>
+                                    <div class="tp-pre">{{ $media->attribution }}</div>
+                                </div>
+                            @endif
+                        @endif
                     </div>
                 </div>
             @endif

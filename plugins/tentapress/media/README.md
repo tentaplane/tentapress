@@ -7,7 +7,7 @@ Upload and manage media files for TentaPress.
 | Field    | Value                                   |
 |----------|-----------------------------------------|
 | ID       | `tentapress/media`                      |
-| Version  | 0.1.3                                   |
+| Version  | 0.2.0                                   |
 | Provider | `TentaPress\Media\MediaServiceProvider` |
 
 ## Goal
@@ -17,6 +17,8 @@ Provide a first-party media library for uploads, management, and reuse across Pa
 ## Scope (v1)
 
 - Upload + browse media assets (images + generic files).
+- Stock library import (Unsplash + Pexels).
+- Attribution metadata stored with assets.
 - Basic metadata: title, alt text, caption, mime type, size, dimensions.
 - Simple library with search (no folders).
 - Permissions via `manage_media` capability.
@@ -24,9 +26,9 @@ Provide a first-party media library for uploads, management, and reuse across Pa
 ## Features
 
 - Upload images and files
-- Media library browser
+- Media library browser + stock library search
 - Alt text and captions
-- Thumbnail generation
+- Stock library import + attribution
 - Media selector for pages, posts, blocks, SEO
 
 ## Dependencies
@@ -46,6 +48,14 @@ Provide a first-party media library for uploads, management, and reuse across Pa
     - `mime_type` (nullable)
     - `size` (nullable)
     - `width`, `height` (nullable)
+    - `source` (nullable)
+    - `source_item_id` (nullable)
+    - `source_url` (nullable)
+    - `license` (nullable)
+    - `license_url` (nullable)
+    - `attribution` (nullable)
+    - `attribution_html` (nullable)
+    - `stock_meta` (nullable)
     - `created_by`, `updated_by`
     - timestamps
 
@@ -57,9 +67,10 @@ Provide a first-party media library for uploads, management, and reuse across Pa
 
 ## Admin UI (current)
 
-- Media index: searchable table with previews, type, size, and actions.
+- Media index: grid + list with previews, type, size, and actions.
 - Upload screen: file upload + metadata fields.
 - Edit screen: metadata editing + details panel.
+- Stock library: search and import from external providers.
 
 ## Storage
 

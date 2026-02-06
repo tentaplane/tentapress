@@ -14,6 +14,14 @@ final class TpMedia extends Model
         'title',
         'alt_text',
         'caption',
+        'source',
+        'source_item_id',
+        'source_url',
+        'license',
+        'license_url',
+        'attribution',
+        'attribution_html',
+        'stock_meta',
         'disk',
         'path',
         'original_name',
@@ -29,5 +37,6 @@ final class TpMedia extends Model
         'size' => 'integer',
         'width' => 'integer',
         'height' => 'integer',
+        'stock_meta' => 'array',
     ];
 }

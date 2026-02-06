@@ -260,8 +260,7 @@
                             <button
                                 type="submit"
                                 form="delete-menu-form"
-                                class="tp-button-danger w-full justify-center"
-                                onclick="return confirm('Delete this menu? This cannot be undone.');">
+                                class="tp-button-danger w-full justify-center">
                                 Delete
                             </button>
                             <div class="tp-muted text-xs">Changes to locations affect the active theme.</div>
@@ -327,7 +326,8 @@
         id="delete-menu-form"
         method="POST"
         action="{{ route('tp.menus.destroy', ['menu' => $menu->id]) }}"
-        class="hidden">
+        class="hidden"
+        data-confirm="Delete this menu? This cannot be undone.">
         @csrf
         @method('DELETE')
     </form>

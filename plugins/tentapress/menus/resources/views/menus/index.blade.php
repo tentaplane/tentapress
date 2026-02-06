@@ -98,7 +98,7 @@
                                         <form
                                             method="POST"
                                             action="{{ route('tp.menus.destroy', ['menu' => $menu->id]) }}"
-                                            onsubmit="return confirm('Delete this menu?');">
+                                            data-confirm="Delete this menu?">
                                             @csrf
                                             @method('DELETE')
                                             <button
