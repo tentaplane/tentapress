@@ -11,6 +11,7 @@
 
         <div class="flex gap-2">
             <a href="{{ route('tp.media.stock') }}" class="tp-button-secondary">Stock Library</a>
+            <a href="{{ route('tp.media.optimizations') }}" class="tp-button-secondary">Optimizations</a>
             <a href="{{ route('tp.media.create') }}" class="tp-button-primary">Upload</a>
         </div>
     </div>
