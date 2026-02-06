@@ -7,7 +7,7 @@ Admin UI shell providing the base layout, navigation, and shared components for 
 | Field    | Value                                             |
 |----------|---------------------------------------------------|
 | ID       | `tentapress/admin-shell`                          |
-| Version  | 0.2.1                                             |
+| Version  | 0.2.2                                             |
 | Provider | `TentaPress\AdminShell\AdminShellServiceProvider` |
 
 ## Features
@@ -16,6 +16,7 @@ Admin UI shell providing the base layout, navigation, and shared components for 
 - Navigation menu built dynamically from plugin manifests
 - Shared UI components and `tp-*` CSS utility classes
 - Notification/toast system
+- Confirmation dialogs via `data-confirm` (replaces native alert/confirm)
 - Admin asset entrypoints (CSS/JS)
 
 ## Dependencies

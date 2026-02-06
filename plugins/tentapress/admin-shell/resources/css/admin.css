@@ -87,15 +87,16 @@
 	   Toasts (no composition)
 	------------------------------ */
 	.tp-toast-root {
-		@apply fixed top-5 right-5 z-9999 flex max-w-88 flex-col gap-2;
+		@apply fixed top-5 left-1/2 z-9999 flex max-w-88 -translate-x-1/2 flex-col gap-2;
 	}
 
 	.tp-toast {
-		@apply flex items-start gap-3 rounded-lg border px-4 py-3 text-sm shadow-lg transition;
+		@apply flex items-start gap-3 rounded-xl border px-4 py-3 text-sm shadow-lg transition;
+		@apply bg-white/95 backdrop-blur-sm ring-1 ring-black/5;
 	}
 
 	.tp-toast-message {
-		@apply flex-1 leading-snug;
+		@apply flex-1 leading-snug text-black/80;
 	}
 
 	.tp-toast-close {
@@ -124,6 +125,29 @@
 
 	.tp-toast-info {
 		@apply border-sky-200 bg-sky-50 text-sky-900;
+	}
+
+	/* -----------------------------
+	   Dialogs (no composition)
+	------------------------------ */
+	.tp-dialog-backdrop {
+		@apply fixed inset-0 z-9999 flex items-start justify-center bg-black/40 px-4 pb-6 pt-20 backdrop-blur-sm;
+	}
+
+	.tp-dialog-card {
+		@apply w-full max-w-md rounded-2xl border border-black/10 bg-white/95 p-6 shadow-xl;
+	}
+
+	.tp-dialog-title {
+		@apply text-lg font-semibold text-[#1d2327];
+	}
+
+	.tp-dialog-message {
+		@apply mt-2 text-sm text-black/70;
+	}
+
+	.tp-dialog-actions {
+		@apply mt-6 flex items-center justify-end gap-2;
 	}
 
 	/* -----------------------------
