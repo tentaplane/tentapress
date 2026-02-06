@@ -1,0 +1,8 @@
+{
+    "id": "tentapress/media-optimization-imgix",
+    "name": "Media Optimization (Imgix)",
+    "description": "Imgix optimization provider.",
+    "version": "0.1.0",
+    "provider": "TentaPress\\MediaOptimizationImgix\\MediaOptimizationImgixServiceProvider",
+    "requires": ["tentapress/media"]
+}

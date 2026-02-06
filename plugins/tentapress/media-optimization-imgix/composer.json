@@ -1,0 +1,24 @@
+{
+    "name": "tentapress/media-optimization-imgix",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "php": "^8.2",
+        "tentapress/media": "<1.0",
+        "tentapress/settings": "<1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "TentaPress\\MediaOptimizationImgix\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "TentaPress\\MediaOptimizationImgix\\MediaOptimizationImgixServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
