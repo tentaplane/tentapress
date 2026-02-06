@@ -7,13 +7,13 @@
         <div>
             <h1 class="tp-page-title">Static Deploy</h1>
             <p class="tp-description">
-                Generate a downloadable static ZIP archive of your site.
+                Generate a downloadable static ZIP file of your site.
             </p>
         </div>
 
         @if ($last && !empty($last['zip_path']) && is_file($last['zip_path']))
             <div class="flex gap-2">
-                <a href="{{ route('tp.static.download') }}" class="tp-button-primary">Download last ZIP</a>
+                <a href="{{ route('tp.static.download') }}" class="tp-button-primary">Download latest ZIP</a>
             </div>
         @endif
     </div>
@@ -22,7 +22,7 @@
         <div class="tp-metabox__title">Last build</div>
         <div class="tp-metabox__body space-y-3">
             @if (!$last)
-                <div class="tp-muted text-sm">No builds generated yet.</div>
+                <div class="tp-muted text-sm">No builds yet.</div>
             @else
                 <div class="tp-panel space-y-1 text-sm">
                     <div>
@@ -49,7 +49,7 @@
 
                 @if (count($warnings) > 0)
                     <div class="tp-notice-warning">
-                        <div class="mb-2 font-semibold">Warnings ({{ count($warnings) }})</div>
+                        <div class="mb-2 font-semibold">Warnings found ({{ count($warnings) }})</div>
                         <ul class="list-disc space-y-1 pl-5">
                             @foreach ($warnings as $w)
                                 <li>{{ $w }}</li>
@@ -57,7 +57,7 @@
                         </ul>
                     </div>
                 @else
-                    <div class="tp-notice-success mb-0">No warnings.</div>
+                    <div class="tp-notice-success mb-0">No warnings found.</div>
                 @endif
             @endif
         </div>
@@ -87,9 +87,9 @@
                     <label class="flex items-center gap-3">
                         <input type="checkbox" class="tp-checkbox" name="compress_html" value="1" />
                         <span class="text-sm">
-                            <span class="font-semibold">Compress HTML output</span>
+                            <span class="font-semibold">Compress HTML files</span>
                             <span class="tp-muted mt-1 block text-xs">
-                                Removes extra whitespace and comments (preserves pre/textarea/script/style).
+                                Removes extra spaces and comments (keeps pre/textarea/script/style as-is).
                             </span>
                         </span>
                     </label>
@@ -97,7 +97,7 @@
 
                 <div class="flex gap-2">
                     <button type="submit" class="tp-button-primary">
-                        Generate build
+                        Generate static build
                     </button>
                 </div>
 

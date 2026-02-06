@@ -2,7 +2,7 @@
     "id": "tentapress/static-deploy",
     "name": "Static Deploy",
     "description": "Generate a downloadable static ZIP archive.",
-    "version": "0.1.3",
+    "version": "0.1.4",
     "provider": "TentaPress\\StaticDeploy\\StaticDeployServiceProvider",
     "requires": [],
     "admin": {
