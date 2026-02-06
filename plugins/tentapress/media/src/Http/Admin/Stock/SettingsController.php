@@ -59,14 +59,14 @@ final class SettingsController
         $data = [];
 
         if (class_exists(\TentaPress\MediaStockUnsplash\Http\Admin\SettingsController::class)) {
-            $controller = app(\TentaPress\MediaStockUnsplash\Http\Admin\SettingsController::class);
+            $controller = resolve(\TentaPress\MediaStockUnsplash\Http\Admin\SettingsController::class);
             if (method_exists($controller, 'defaults')) {
                 $data = array_merge($data, $controller->defaults($settings));
             }
         }
 
         if (class_exists(\TentaPress\MediaStockPexels\Http\Admin\SettingsController::class)) {
-            $controller = app(\TentaPress\MediaStockPexels\Http\Admin\SettingsController::class);
+            $controller = resolve(\TentaPress\MediaStockPexels\Http\Admin\SettingsController::class);
             if (method_exists($controller, 'defaults')) {
                 $data = array_merge($data, $controller->defaults($settings));
             }
@@ -78,7 +78,7 @@ final class SettingsController
     private function persistProviderSettings(Request $request, SettingsStore $settings): void
     {
         if (class_exists(\TentaPress\MediaStockUnsplash\Http\Admin\SettingsController::class)) {
-            $controller = app(\TentaPress\MediaStockUnsplash\Http\Admin\SettingsController::class);
+            $controller = resolve(\TentaPress\MediaStockUnsplash\Http\Admin\SettingsController::class);
             if (method_exists($controller, 'validate') && method_exists($controller, 'persist')) {
                 $data = $controller->validate($request);
                 $controller->persist($request, $settings, $data);
@@ -86,7 +86,7 @@ final class SettingsController
         }
 
         if (class_exists(\TentaPress\MediaStockPexels\Http\Admin\SettingsController::class)) {
-            $controller = app(\TentaPress\MediaStockPexels\Http\Admin\SettingsController::class);
+            $controller = resolve(\TentaPress\MediaStockPexels\Http\Admin\SettingsController::class);
             if (method_exists($controller, 'validate') && method_exists($controller, 'persist')) {
                 $data = $controller->validate($request);
                 $controller->persist($request, $settings, $data);

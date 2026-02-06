@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace TentaPress\Media\Stock;
 
-final class StockManager
+final readonly class StockManager
 {
-    public function __construct(private readonly StockSourceRegistry $registry)
+    public function __construct(private StockSourceRegistry $registry)
     {
     }
 

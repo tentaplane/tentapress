@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TentaPress\Media;
 
+use TentaPress\Settings\Services\SettingsStore;
 use Illuminate\Support\ServiceProvider;
 use TentaPress\Media\Contracts\MediaUrlGenerator;
 use TentaPress\Media\Stock\StockManager;
@@ -29,7 +30,7 @@ final class MediaServiceProvider extends ServiceProvider
             };
         });
 
-        if (class_exists(\TentaPress\Settings\Services\SettingsStore::class)) {
+        if (class_exists(SettingsStore::class)) {
             if (! $this->app->bound(StockSourceRegistry::class)) {
                 $this->app->singleton(StockSourceRegistry::class, fn () => new StockSourceRegistry());
             }
