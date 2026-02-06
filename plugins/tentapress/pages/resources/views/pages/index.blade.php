@@ -43,11 +43,11 @@
     <div class="tp-page-header">
         <div>
             <h1 class="tp-page-title">Pages</h1>
-            <p class="tp-description">Create and manage pages with sorting and menu visibility.</p>
+            <p class="tp-description">Create and manage site pages.</p>
         </div>
 
         <div class="flex gap-2">
-            <a href="{{ route('tp.pages.create') }}" class="tp-button-primary">Add New</a>
+            <a href="{{ route('tp.pages.create') }}" class="tp-button-primary">Create page</a>
         </div>
     </div>
 
@@ -91,7 +91,7 @@
         </div>
 
         @if ($pages->count() === 0)
-            <div class="tp-metabox__body tp-muted text-sm">No pages found.</div>
+            <div class="tp-metabox__body tp-muted text-sm">No pages yet.</div>
         @else
             <div class="tp-table-wrap">
                 <table class="tp-table">
@@ -104,7 +104,7 @@
                                         <span class="inline-flex" aria-hidden="true">{!! $sortIconSvgFor('title') !!}</span>
                                     </a>
                                     <a class="inline-flex items-center gap-1 py-0.5 text-black/60 hover:text-black/90" href="{{ $sortUrlFor('slug') }}">
-                                        Slug
+                                        URL
                                         <span class="inline-flex" aria-hidden="true">{!! $sortIconSvgFor('slug') !!}</span>
                                     </a>
                                 </div>
@@ -184,7 +184,7 @@
                                         <form
                                             method="POST"
                                             action="{{ route('tp.pages.destroy', ['page' => $page->id]) }}"
-                                            data-confirm="Delete this page?">
+                                            data-confirm="Delete this page? This cannot be undone.">
                                             @csrf
                                             @method('DELETE')
                                             <button
