@@ -123,6 +123,7 @@ jobs:
               | sort -V \
               | tail -n 1)"
 
+            git tag -d "${tag}" >/dev/null 2>&1 || true
             git tag -a "${tag}" -m "${repo} ${tag}" "${sha}"
             git push "$remote" "refs/tags/${tag}"
             git tag -d "${tag}"
