@@ -12,8 +12,8 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use TentaPress\Media\Models\TpMedia;
 use TentaPress\Media\Stock\StockManager;
+use TentaPress\Media\Stock\StockSource;
 use TentaPress\Media\Stock\StockResult;
-use TentaPress\Media\Stock\Sources\UnsplashSource;
 use Throwable;
 
 final class ImportController
@@ -106,11 +106,16 @@ final class ImportController
 
     private function resolveDownloadUrl(object $source, StockResult $result): ?string
     {
-        if (! $source instanceof UnsplashSource) {
+        if (! $source instanceof StockSource) {
             return $result->downloadUrl;
         }
 
-        return $source->resolveDownloadUrl($result);
+        $resolved = $source->resolveDownloadUrl($result);
+        if (is_string($resolved) && $resolved !== '') {
+            return $resolved;
+        }
+
+        return $result->downloadUrl;
     }
 
     private function guessExtension(?string $contentType, string $downloadUrl): string

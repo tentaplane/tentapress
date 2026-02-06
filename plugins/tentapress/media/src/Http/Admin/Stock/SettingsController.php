@@ -14,36 +14,84 @@ final class SettingsController
     public function edit(SettingsStore $settings): View
     {
         return view('tentapress-media::media.stock-settings', [
-            'stockUnsplashEnabled' => (string) $settings->get('stock.unsplash.enabled', '1'),
-            'stockUnsplashKey' => (string) $settings->get('stock.unsplash.key', ''),
-            'stockPexelsEnabled' => (string) $settings->get('stock.pexels.enabled', '1'),
-            'stockPexelsKey' => (string) $settings->get('stock.pexels.key', ''),
-            'stockPexelsVideoEnabled' => (string) $settings->get('stock.pexels.video_enabled', '1'),
             'stockAttributionReminder' => (string) $settings->get('stock.attribution.reminder', '1'),
+            'providerSettings' => $this->providerSettings($settings),
+            'providerSettingsData' => $this->providerSettingsData($settings),
         ]);
     }
 
     public function update(Request $request, SettingsStore $settings): RedirectResponse
     {
-        $data = $request->validate([
-            'stock_unsplash_enabled' => ['nullable', 'string'],
-            'stock_unsplash_key' => ['nullable', 'string', 'max:255'],
-            'stock_pexels_enabled' => ['nullable', 'string'],
-            'stock_pexels_key' => ['nullable', 'string', 'max:255'],
-            'stock_pexels_video_enabled' => ['nullable', 'string'],
+        $request->validate([
             'stock_attribution_reminder' => ['nullable', 'string'],
         ]);
 
-        $settings->set('stock.unsplash.enabled', $request->has('stock_unsplash_enabled') ? '1' : '0', true);
-        $settings->set('stock.unsplash.key', trim((string) ($data['stock_unsplash_key'] ?? '')), true);
-
-        $settings->set('stock.pexels.enabled', $request->has('stock_pexels_enabled') ? '1' : '0', true);
-        $settings->set('stock.pexels.key', trim((string) ($data['stock_pexels_key'] ?? '')), true);
-        $settings->set('stock.pexels.video_enabled', $request->has('stock_pexels_video_enabled') ? '1' : '0', true);
-
+        $this->persistProviderSettings($request, $settings);
         $settings->set('stock.attribution.reminder', $request->has('stock_attribution_reminder') ? '1' : '0', true);
 
         return to_route('tp.media.stock.settings')
             ->with('tp_notice_success', 'Stock settings saved.');
     }
+
+    /**
+     * @return array<int,string>
+     */
+    private function providerSettings(SettingsStore $settings): array
+    {
+        $views = [];
+
+        if (view()->exists('tentapress-media-stock-unsplash::settings')) {
+            $views[] = 'tentapress-media-stock-unsplash::settings';
+        }
+
+        if (view()->exists('tentapress-media-stock-pexels::settings')) {
+            $views[] = 'tentapress-media-stock-pexels::settings';
+        }
+
+        return $views;
+    }
+
+    /**
+     * @return array<string,string>
+     */
+    private function providerSettingsData(SettingsStore $settings): array
+    {
+        $data = [];
+
+        if (class_exists(\TentaPress\MediaStockUnsplash\Http\Admin\SettingsController::class)) {
+            $controller = app(\TentaPress\MediaStockUnsplash\Http\Admin\SettingsController::class);
+            if (method_exists($controller, 'defaults')) {
+                $data = array_merge($data, $controller->defaults($settings));
+            }
+        }
+
+        if (class_exists(\TentaPress\MediaStockPexels\Http\Admin\SettingsController::class)) {
+            $controller = app(\TentaPress\MediaStockPexels\Http\Admin\SettingsController::class);
+            if (method_exists($controller, 'defaults')) {
+                $data = array_merge($data, $controller->defaults($settings));
+            }
+        }
+
+        return $data;
+    }
+
+    private function persistProviderSettings(Request $request, SettingsStore $settings): void
+    {
+        if (class_exists(\TentaPress\MediaStockUnsplash\Http\Admin\SettingsController::class)) {
+            $controller = app(\TentaPress\MediaStockUnsplash\Http\Admin\SettingsController::class);
+            if (method_exists($controller, 'validate') && method_exists($controller, 'persist')) {
+                $data = $controller->validate($request);
+                $controller->persist($request, $settings, $data);
+            }
+        }
+
+        if (class_exists(\TentaPress\MediaStockPexels\Http\Admin\SettingsController::class)) {
+            $controller = app(\TentaPress\MediaStockPexels\Http\Admin\SettingsController::class);
+            if (method_exists($controller, 'validate') && method_exists($controller, 'persist')) {
+                $data = $controller->validate($request);
+                $controller->persist($request, $settings, $data);
+            }
+        }
+    }
+
 }

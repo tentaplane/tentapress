@@ -20,4 +20,6 @@ interface StockSource
     public function search(StockQuery $query): StockSearchResults;
 
     public function find(string $id, ?string $mediaType = null): ?StockResult;
+
+    public function resolveDownloadUrl(StockResult $result): ?string;
 }

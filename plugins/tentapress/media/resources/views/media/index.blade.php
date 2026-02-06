@@ -17,13 +17,23 @@
 
     @php
         $urlGenerator = app(\TentaPress\Media\Contracts\MediaUrlGenerator::class);
+        $totalCount = method_exists($media, 'total') ? (int) $media->total() : $media->count();
     @endphp
 
     <div class="tp-metabox" data-media-index data-current-view="{{ $view }}">
         <div class="tp-metabox__title">
             <form method="GET" action="{{ route('tp.media.index') }}" class="flex flex-col gap-2 sm:flex-row sm:items-center">
                 <input type="hidden" name="view" value="{{ $view }}" />
-                <div class="flex-1"></div>
+                <div class="flex-1">
+                    <div class="flex items-center gap-3">
+                        <div class="rounded-full bg-black/5 px-3 py-1 text-xs font-semibold text-black/70">
+                            {{ number_format($totalCount) }} files
+                        </div>
+                        <div class="text-xs text-black/60">
+                            Showing {{ number_format($media->count()) }}{{ $totalCount > $media->count() ? ' of '.number_format($totalCount) : '' }}
+                        </div>
+                    </div>
+                </div>
 
                 <div class="flex flex-wrap items-center gap-2">
                     <div class="flex items-center gap-1">
@@ -72,7 +82,7 @@
             </div>
         @elseif ($view === 'grid')
             <div class="tp-metabox__body">
-                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                     @foreach ($media as $item)
                         @php
                             $disk = (string) ($item->disk ?? 'public');
@@ -87,7 +97,7 @@
                             $typeLabel = $mime !== '' ? strtoupper(strtok($mime, '/')) : 'FILE';
                             $dateLabel = $item->created_at?->format('Y-m-d') ?? '—';
                         @endphp
-                        <div class="group overflow-hidden rounded-xl border border-black/10 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+                        <div class="group overflow-hidden rounded-2xl border border-black/10 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
                             <div class="relative">
                                 @if ($url && $isImage)
                                     <img
@@ -95,7 +105,7 @@
                                         alt=""
                                         class="aspect-[4/3] w-full object-cover" />
                                 @else
-                                    <div class="flex aspect-[4/3] items-center justify-center bg-gradient-to-br from-slate-50 via-white to-slate-100 text-xs font-semibold uppercase text-slate-400">
+                                    <div class="flex aspect-[4/3] items-center justify-center bg-gradient-to-br from-slate-50 via-white to-slate-100 text-xs font-semibold uppercase tracking-wide text-slate-400">
                                         {{ $typeLabel }}
                                     </div>
                                 @endif
@@ -172,12 +182,12 @@
                             <tr class="tp-table__row">
                                 <td class="tp-table__td">
                                     @if ($url && $isImage)
-                                        <div class="h-20 w-28 overflow-hidden rounded-xl border border-black/10 bg-slate-50 shadow-sm">
+                                        <div class="h-28 w-40 overflow-hidden rounded-2xl border border-black/10 bg-slate-50 shadow-sm">
                                             <img src="{{ $url }}" alt="" class="h-full w-full object-cover" />
                                         </div>
                                     @else
                                         <div
-                                            class="flex h-20 w-28 items-center justify-center rounded-xl border border-dashed border-black/20 bg-slate-50 text-[10px] font-semibold uppercase text-slate-500">
+                                            class="flex h-28 w-40 items-center justify-center rounded-2xl border border-dashed border-black/20 bg-slate-50 text-[10px] font-semibold uppercase tracking-wide text-slate-500">
                                             {{ $typeLabel }}
                                         </div>
                                     @endif
