@@ -2,7 +2,7 @@
     "id": "tentapress/users",
     "name": "Users",
     "description": "Users, roles, capabilities and admin authentication.",
-    "version": "0.1.4",
+    "version": "0.1.5",
     "provider": "TentaPress\\Users\\UsersServiceProvider",
     "requires": [],
     "admin": {

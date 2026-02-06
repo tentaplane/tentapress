@@ -139,7 +139,7 @@
                             <form
                                 method="POST"
                                 action="{{ route('tp.users.destroy', ['user' => $user->id]) }}"
-                                onsubmit="return confirm('Delete this user?');">
+                                data-confirm="Delete this user?">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="tp-button-danger w-full justify-center">Delete</button>

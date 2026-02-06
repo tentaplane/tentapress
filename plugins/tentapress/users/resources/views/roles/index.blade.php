@@ -77,7 +77,7 @@
                                         <form
                                             method="POST"
                                             action="{{ route('tp.roles.destroy', ['role' => $role->id]) }}"
-                                            onsubmit="return confirm('Delete this role?');">
+                                            data-confirm="Delete this role?">
                                             @csrf
                                             @method('DELETE')
                                             <button
