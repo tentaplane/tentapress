@@ -10,7 +10,7 @@
         </div>
 
         <div class="flex gap-2">
-            <a href="{{ route('tp.roles.create') }}" class="tp-button-primary">Add New</a>
+            <a href="{{ route('tp.roles.create') }}" class="tp-button-primary">Create role</a>
         </div>
     </div>
 
@@ -36,14 +36,14 @@
         </div>
 
         @if ($roles->count() === 0)
-            <div class="tp-metabox__body tp-muted text-sm">No roles yet.</div>
+            <div class="tp-metabox__body tp-muted text-sm">No roles yet. Create your first role.</div>
         @else
             <div class="tp-table-wrap">
                 <table class="tp-table">
                     <thead class="tp-table__thead">
                         <tr>
                             <th class="tp-table__th">Name</th>
-                            <th class="tp-table__th">Slug</th>
+                            <th class="tp-table__th">Key</th>
                             <th class="tp-table__th">Capabilities</th>
                             <th class="tp-table__th text-right">Actions</th>
                         </tr>

@@ -1,13 +1,13 @@
 @extends('tentapress-admin::layouts.shell')
 
-@section('title', $mode === 'create' ? 'Add New Role' : 'Edit Role')
+@section('title', $mode === 'create' ? 'Create Role' : 'Edit Role')
 
 @section('content')
     <div class="tp-editor space-y-6">
         <div class="tp-page-header">
             <div>
-                <h1 class="tp-page-title">{{ $mode === 'create' ? 'Add New Role' : 'Edit Role' }}</h1>
-                <p class="tp-description">Tick capabilities to grant access.</p>
+                <h1 class="tp-page-title">{{ $mode === 'create' ? 'Create Role' : 'Edit Role' }}</h1>
+                <p class="tp-description">Choose what this role is allowed to do.</p>
             </div>
         </div>
 
@@ -36,7 +36,7 @@
                                 </div>
 
                                 <div class="tp-field">
-                                    <label class="tp-label">Slug</label>
+                                    <label class="tp-label">Role key</label>
                                     <input
                                         name="slug"
                                         class="tp-input"
@@ -101,7 +101,7 @@
                             {{ $mode === 'create' ? 'Create Role' : 'Save Changes' }}
                         </button>
                         <a href="{{ route('tp.roles.index') }}" class="tp-button-secondary w-full justify-center">
-                            Back
+                            Back to roles
                         </a>
                     </div>
                 </div>

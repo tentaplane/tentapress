@@ -1,14 +1,14 @@
 @extends('tentapress-admin::layouts.shell')
 
-@section('title', $mode === 'create' ? 'Add New User' : 'Edit User')
+@section('title', $mode === 'create' ? 'Create User' : 'Edit User')
 
 @section('content')
     <div class="tp-editor space-y-6">
         <div class="tp-page-header">
             <div>
-                <h1 class="tp-page-title">{{ $mode === 'create' ? 'Add New User' : 'Edit User' }}</h1>
+                <h1 class="tp-page-title">{{ $mode === 'create' ? 'Create User' : 'Edit User' }}</h1>
                 <p class="tp-description">
-                    {{ $mode === 'create' ? 'Create a user who can access the admin.' : 'Update details, roles and access.' }}
+                    {{ $mode === 'create' ? 'Add someone who can sign in to the admin area.' : 'Update account details, roles, and access.' }}
                 </p>
             </div>
         </div>
@@ -73,9 +73,9 @@
                                         name="is_super_admin"
                                         value="1"
                                         @checked(old('is_super_admin', $user->is_super_admin) ? true : false) />
-                                    <span>
-                                        <span class="block text-sm font-semibold">Super Admin</span>
-                                        <span class="tp-muted mt-1 block text-xs">Bypasses all capability checks.</span>
+                                        <span>
+                                            <span class="block text-sm font-semibold">Super Admin</span>
+                                        <span class="tp-muted mt-1 block text-xs">Has full access to all admin areas.</span>
                                     </span>
                                 </label>
                             </div>
@@ -89,7 +89,7 @@
                                     <div class="tp-muted text-sm">
                                         No roles available. Run
                                         <code class="tp-code">php artisan tp:permissions seed</code>
-                                        .
+                                        to add default roles.
                                     </div>
                                 @else
                                     <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
@@ -132,7 +132,7 @@
                             {{ $mode === 'create' ? 'Create User' : 'Save Changes' }}
                         </button>
                         <a href="{{ route('tp.users.index') }}" class="tp-button-secondary w-full justify-center">
-                            Back
+                            Back to users
                         </a>
 
                         @if ($mode === 'edit')

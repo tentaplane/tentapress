@@ -10,7 +10,7 @@
         </div>
 
         <div class="flex gap-2">
-            <a href="{{ route('tp.users.create') }}" class="tp-button-primary">Add New</a>
+            <a href="{{ route('tp.users.create') }}" class="tp-button-primary">Create user</a>
         </div>
     </div>
 
@@ -23,20 +23,20 @@
                 </span>
             </div>
             <form method="GET" class="flex w-full items-center gap-2 md:w-auto">
-                <label class="sr-only" for="roles-search">Search roles</label>
+                <label class="sr-only" for="roles-search">Search users</label>
                 <input
                     id="roles-search"
                     name="s"
                     type="search"
                     value="{{ request('s') }}"
-                    placeholder="Search roles"
+                    placeholder="Search users"
                     class="w-full rounded-md border border-slate-200 px-3 py-1.5 text-sm md:w-56" />
                 <button type="submit" class="tp-button-secondary">Search</button>
             </form>
         </div>
 
         @if ($users->count() === 0)
-            <div class="tp-metabox__body tp-muted text-sm">No users yet.</div>
+            <div class="tp-metabox__body tp-muted text-sm">No users yet. Create your first user.</div>
         @else
             <div class="tp-table-wrap">
                 <table class="tp-table">
