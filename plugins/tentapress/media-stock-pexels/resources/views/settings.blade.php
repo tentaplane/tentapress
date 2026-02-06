@@ -11,7 +11,7 @@
                 value="1"
                 class="tp-checkbox"
                 @checked(old('stock_pexels_enabled', $stockPexelsEnabled) === '1') />
-            Enabled
+            Enable source
         </label>
     </div>
 
@@ -23,7 +23,7 @@
             class="tp-input"
             value="{{ old('stock_pexels_key', $stockPexelsKey) }}" />
         <div class="tp-help">
-            <a class="tp-button-link" href="https://www.pexels.com/api/key/" target="_blank" rel="noopener">Your Pexels API Key</a>
+            <a class="tp-button-link" href="https://www.pexels.com/api/key/" target="_blank" rel="noopener">Find your Pexels API key</a>
         </div>
     </div>
 
@@ -34,6 +34,6 @@
             value="1"
             class="tp-checkbox"
             @checked(old('stock_pexels_video_enabled', $stockPexelsVideoEnabled) === '1') />
-        Enable video results
+        Include videos in results
     </label>
 </div>

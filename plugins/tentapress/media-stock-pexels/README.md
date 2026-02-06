@@ -7,7 +7,7 @@ Pexels provider plugin for the TentaPress Media stock library.
 | Field    | Value                                                      |
 |----------|------------------------------------------------------------|
 | ID       | `tentapress/media-stock-pexels`                             |
-| Version  | 0.1.0                                                      |
+| Version  | 0.1.1                                                      |
 | Provider | `TentaPress\\MediaStockPexels\\MediaStockPexelsServiceProvider` |
 
 ## Dependencies
