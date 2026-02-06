@@ -4,6 +4,35 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.20.0](https://github.com/tentaplane/tentapress/compare/v0.19.0...v0.20.0) (2026-02-06)
+
+
+### Features
+
+* **media-optimization-bunny:** add provider plugin ([ca8c9a0](https://github.com/tentaplane/tentapress/commit/ca8c9a0395d42723afd11342b8604998c2533a7c))
+* **media-optimization-cloudflare:** add provider plugin ([1dcd7e8](https://github.com/tentaplane/tentapress/commit/1dcd7e866680fadbc5a4902d5c512a16f5737deb))
+* **media-optimization-imagekit:** add provider plugin ([022cadc](https://github.com/tentaplane/tentapress/commit/022cadc16dce4d78536c5e50e2b1178944a1410c))
+* **media-optimization-imgix:** add provider plugin ([5dd0adf](https://github.com/tentaplane/tentapress/commit/5dd0adf0db53465f8a3c8c2e1a3f266c7d99da83))
+* **media-stock-pexels:** add provider plugin ([7447976](https://github.com/tentaplane/tentapress/commit/7447976a487b3f67bf9a14de557480995eea34cd))
+* **media-stock-unsplash:** add provider plugin ([38fe813](https://github.com/tentaplane/tentapress/commit/38fe813960fa31ebc6a2747d568f502be7faf335))
+* **media:** add optimization providers ([d491f48](https://github.com/tentaplane/tentapress/commit/d491f4878bf73d2d1501ec3dfe97bc92158f66ee))
+* **media:** add optimization settings ([9504ca9](https://github.com/tentaplane/tentapress/commit/9504ca9bb9f4b7fd6afde669e8c2e5d7d1d3d134))
+* **media:** refactor stock providers ([92746ba](https://github.com/tentaplane/tentapress/commit/92746ba0b5967d343f2ceb1fba921e8c1db981bb))
+
+
+### Bug Fixes
+
+* **ci:** fix for actions not running for plugin distribution ([4003fd7](https://github.com/tentaplane/tentapress/commit/4003fd7e124a627da289ffa8c2ac7648d17684d2))
+* **media:** promote stock libraries and optimisations to menu items ([7314f83](https://github.com/tentaplane/tentapress/commit/7314f8348d80519e95f98be5ca7c32c3d1053589))
+* **theme-tailwind:** before and after custom block fixed ([99babf2](https://github.com/tentaplane/tentapress/commit/99babf294a580fcfd8fd18d4e9d989bd6bea532d))
+
+
+### Miscellaneous Chores
+
+* **media:** apply cleanup ([958ef1f](https://github.com/tentaplane/tentapress/commit/958ef1f0495eecdf5a4aa76fdee8f8dc48c8a1ab))
+* **media:** normalize optimization redirect ([96d1cbb](https://github.com/tentaplane/tentapress/commit/96d1cbbe5e29ed48da99948782d008cebeaf1211))
+* **theme-tailwind:** new clone script for creating copies of the base Tailwind theme ([8ca8405](https://github.com/tentaplane/tentapress/commit/8ca840500859b5e546e3762a18572d4c717830a5))
+
 ## [0.19.0](https://github.com/tentaplane/tentapress/compare/v0.18.1...v0.19.0) (2026-02-06)
 
 
