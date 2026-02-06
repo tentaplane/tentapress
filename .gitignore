@@ -20,12 +20,9 @@ boost.json
 CLAUDE.md
 config.json
 /.ai
-/.claude
 /.codex
 /.idea
-/.junie
 /.phpunit.cache
-/.opencode
 /docs/planning
 /node_modules
 /plugins/acme

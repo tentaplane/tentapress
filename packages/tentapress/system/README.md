@@ -4,10 +4,10 @@ Core platform layer for TentaPress plugin and theme management.
 
 ## Package Details
 
-| Field | Value |
-|-------|-------|
-| Name | `tentapress/system` |
-| Version | 0.1.1 |
+| Field    | Value                                     |
+|----------|-------------------------------------------|
+| Name     | `tentapress/system`                       |
+| Version  | 0.1.2                                     |
 | Provider | `TentaPress\System\SystemServiceProvider` |
 
 ## Overview
@@ -23,36 +23,36 @@ The system package provides the foundational infrastructure for TentaPress:
 
 ### Plugin System
 
-| Class | Purpose |
-|-------|---------|
-| `PluginRegistry` | Discover and track plugins from filesystem |
-| `PluginManager` | Enable, disable, and boot plugins |
+| Class            | Purpose                                        |
+|------------------|------------------------------------------------|
+| `PluginRegistry` | Discover and track plugins from filesystem     |
+| `PluginManager`  | Enable, disable, and boot plugins              |
 | `PluginManifest` | Parse and validate `tentapress.json` manifests |
 
 ### Theme System
 
-| Class | Purpose |
-|-------|---------|
-| `ThemeRegistry` | Discover and track themes from filesystem |
-| `ThemeManager` | Activate themes and register view namespaces |
-| `ThemeManifest` | Parse and validate theme manifests |
+| Class           | Purpose                                      |
+|-----------------|----------------------------------------------|
+| `ThemeRegistry` | Discover and track themes from filesystem    |
+| `ThemeManager`  | Activate themes and register view namespaces |
+| `ThemeManifest` | Parse and validate theme manifests           |
 
 ### Middleware
 
-| Class | Purpose |
-|-------|---------|
-| `AdminMiddleware` | Composite admin middleware stack |
-| `AdminAuthMiddleware` | Admin authentication |
-| `CanMiddleware` | Capability/permission checks |
-| `AdminErrorPagesMiddleware` | Admin-styled error pages |
+| Class                       | Purpose                          |
+|-----------------------------|----------------------------------|
+| `AdminMiddleware`           | Composite admin middleware stack |
+| `AdminAuthMiddleware`       | Admin authentication             |
+| `CanMiddleware`             | Capability/permission checks     |
+| `AdminErrorPagesMiddleware` | Admin-styled error pages         |
 
 ### Support
 
-| Class | Purpose |
-|-------|---------|
+| Class         | Purpose                    |
+|---------------|----------------------------|
 | `AdminRoutes` | Route registration helpers |
-| `JsonPayload` | JSON encoding helper |
-| `Paths` | Path resolution utilities |
+| `JsonPayload` | JSON encoding helper       |
+| `Paths`       | Path resolution utilities  |
 
 ## Console Commands
 
@@ -78,17 +78,17 @@ php artisan tp:themes activate <id> # Activate a theme
 
 ## Database
 
-| Table | Purpose |
-|-------|---------|
+| Table        | Purpose                       |
+|--------------|-------------------------------|
 | `tp_plugins` | Plugin enabled/disabled state |
-| `tp_themes` | Active theme record |
+| `tp_themes`  | Active theme record           |
 
 ## Cache
 
-| File | Purpose |
-|------|---------|
+| File                             | Purpose                        |
+|----------------------------------|--------------------------------|
 | `bootstrap/cache/tp_plugins.php` | Enabled plugins and boot order |
-| `bootstrap/cache/tp_theme.php` | Active theme metadata |
+| `bootstrap/cache/tp_theme.php`   | Active theme metadata          |
 
 ## Discovery
 

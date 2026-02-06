@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TentaPress\System\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Artisan;
 use TentaPress\System\Plugin\PluginRegistry;
 use Throwable;
 
@@ -32,7 +33,7 @@ final class PluginsCommand extends Command
         $force = (bool) $this->option('force');
 
         try {
-            return match ($action) {
+            $result = match ($action) {
                 'sync' => $this->doSync(),
                 'list' => $this->doList(),
                 'enable' => $this->doEnable($id, $all),
@@ -42,6 +43,11 @@ final class PluginsCommand extends Command
                 'clear-cache' => $this->doClearCache(),
                 default => $this->fail("Unknown action '{$action}'. Expected: sync|list|enable|disable|defaults|cache|clear-cache"),
             };
+            if ($result === self::SUCCESS && $this->shouldMigrate($action)) {
+                $this->runMigrations();
+            }
+
+            return $result;
         } catch (Throwable $e) {
             $this->error($e->getMessage());
 
@@ -161,6 +167,22 @@ final class PluginsCommand extends Command
         $this->info('Plugin cache cleared.');
 
         return self::SUCCESS;
+    }
+
+    private function shouldMigrate(string $action): bool
+    {
+        return in_array($action, ['sync', 'enable', 'disable', 'defaults', 'cache'], true);
+    }
+
+    private function runMigrations(): void
+    {
+        $this->info('Running pending migrations...');
+
+        Artisan::call('migrate');
+        $output = trim(Artisan::output());
+        if ($output !== '') {
+            $this->line($output);
+        }
     }
 
     /**
