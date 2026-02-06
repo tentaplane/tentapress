@@ -52,6 +52,107 @@ Create a block file in your active theme, for example:
 - `name` and `description` fallback automatically if omitted.
 - `fields`, `defaults`, `variants`, and `default_variant` follow the same shape as JSON block definitions.
 
+## Field Types (Admin Inputs)
+
+Each field is an object in the `fields` array with the core keys:
+
+- `key` (string, required): stored under `props[key]`
+- `label` (string, required): shown in the editor UI
+- `type` (string, required): one of the types below
+
+Optional keys supported on all field types:
+
+- `help` (string): helper text below the input
+- `placeholder` (string): placeholder text for text-like inputs
+
+### Supported types
+
+**Text**
+
+```json
+{ "key": "headline", "label": "Headline", "type": "text" }
+```
+
+**Textarea**
+
+```json
+{ "key": "body", "label": "Body", "type": "textarea", "rows": 4 }
+```
+
+**Markdown**
+
+```json
+{ "key": "content", "label": "Content", "type": "markdown", "rows": 10, "height": "240px" }
+```
+
+**Rich text**
+
+```json
+{ "key": "summary", "label": "Summary", "type": "richtext" }
+```
+
+**Select**
+
+```json
+{
+  "key": "alignment",
+  "label": "Alignment",
+  "type": "select",
+  "options": [
+    { "value": "left", "label": "Left" },
+    { "value": "center", "label": "Center" }
+  ]
+}
+```
+
+**Toggle**
+
+```json
+{ "key": "show_border", "label": "Show border", "type": "toggle", "toggle_label": "Enabled" }
+```
+
+**Number**
+
+```json
+{ "key": "columns", "label": "Columns", "type": "number", "min": 1, "max": 6, "step": 1 }
+```
+
+**Range**
+
+```json
+{ "key": "opacity", "label": "Opacity", "type": "range", "min": 0, "max": 100, "step": 5 }
+```
+
+**Color**
+
+```json
+{ "key": "accent", "label": "Accent Color", "type": "color" }
+```
+
+**URL**
+
+```json
+{ "key": "cta_url", "label": "CTA URL", "type": "url" }
+```
+
+**Media**
+
+```json
+{ "key": "hero_image", "label": "Hero Image", "type": "media" }
+```
+
+**Media list**
+
+```json
+{ "key": "gallery", "label": "Gallery", "type": "media-list" }
+```
+
+### Notes
+
+- Any unrecognized `type` falls back to a standard text input.
+- `defaults` are applied when fields are missing on a block.
+- `variants` and `default_variant` are optional and follow the same structure as core block definitions.
+
 ## Commands
 
 ```bash
