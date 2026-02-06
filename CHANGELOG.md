@@ -4,6 +4,32 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.19.0](https://github.com/tentaplane/tentapress/compare/v0.18.1...v0.19.0) (2026-02-06)
+
+
+### Features
+
+* **media:** now includes stock media availability ([af2033c](https://github.com/tentaplane/tentapress/commit/af2033c30d3483dcd3fd84f55ae75629e5aa8fd8))
+* **seo:** improved UI and promoted to full feature ([3a64e7b](https://github.com/tentaplane/tentapress/commit/3a64e7b0eb80f2e2a27807a2984210379fd0cf36))
+* **system:** ensure migrations run when plugins are synced or cached ([ed8a5f8](https://github.com/tentaplane/tentapress/commit/ed8a5f82b5a1e7615c4ff865e507b42227ce2c21))
+
+
+### Bug Fixes
+
+* **admin-shell:** better UI for alert/confirm dialogues ([843233a](https://github.com/tentaplane/tentapress/commit/843233ae1996e96e883a55c84a2e513d718776b1))
+* **blocks:** improve UI save states for collapse/expand ([bb6398d](https://github.com/tentaplane/tentapress/commit/bb6398df69657111dfed7119efcba323825ba7a1))
+* **import:** new dialog modal ([58ab995](https://github.com/tentaplane/tentapress/commit/58ab9951c3d394f7b8d59660f6c32112834409bb))
+* **media:** improved search for stock images ([52f89bb](https://github.com/tentaplane/tentapress/commit/52f89bbadb170a2ce5378130b7448a72f572b704))
+* **pages:** new dialog modal ([2a053c6](https://github.com/tentaplane/tentapress/commit/2a053c6b4d9910d4a397f93699aa5d82ddd8bc2d))
+* **posts:** new dialog modal ([b1ad7ba](https://github.com/tentaplane/tentapress/commit/b1ad7ba935c73d79af098d94f3910129650c1772))
+* **static-deploy:** new dialog modal ([bd17f0e](https://github.com/tentaplane/tentapress/commit/bd17f0e5f6f9209e65afed6caa18ad6e0874cf85))
+* **users:** new dialog modal ([3f4fb9f](https://github.com/tentaplane/tentapress/commit/3f4fb9f009538e0aa40f0712d089fd692399f7ad))
+
+
+### Miscellaneous Chores
+
+* **custom-blocks:** improved the documentation of field types available ([9b1e4d1](https://github.com/tentaplane/tentapress/commit/9b1e4d1ec660d89fee1e04bf5856aeb507562a32))
+
 ## [0.18.1](https://github.com/tentaplane/tentapress/compare/v0.18.0...v0.18.1) (2026-02-05)
 
 
