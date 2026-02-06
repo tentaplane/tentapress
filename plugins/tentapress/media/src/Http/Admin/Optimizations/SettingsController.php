@@ -41,8 +41,7 @@ final readonly class SettingsController
 
         $this->persistProviderSettings($request, $settings);
 
-        return redirect()
-            ->route('tp.media.optimizations')
+        return to_route('tp.media.optimizations')
             ->with('tp_notice_success', 'Optimization settings saved.');
     }
 
