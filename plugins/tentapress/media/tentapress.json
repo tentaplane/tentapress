@@ -2,7 +2,7 @@
     "id": "tentapress/media",
     "name": "Media",
     "description": "Upload and manage media files.",
-    "version": "0.4.0",
+    "version": "0.4.1",
     "provider": "TentaPress\\Media\\MediaServiceProvider",
     "requires": ["tentapress/users"],
     "admin": {
@@ -13,6 +13,20 @@
                 "capability": "manage_media",
                 "icon": "image",
                 "position": 35
+            },{
+                "label": "Stock Libraries",
+                "route": "tp.media.stock",
+                "capability": "manage_media",
+                "icon": "image",
+                "position": 10,
+                "parent": "Media"
+            },{
+                "label": "Optimizations",
+                "route": "tp.media.optimizations",
+                "capability": "manage_media",
+                "icon": "image",
+                "position": 20,
+                "parent": "Media"
             }
         ]
     }
