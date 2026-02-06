@@ -6,25 +6,25 @@
     <div class="tp-page-header">
         <div>
             <h1 class="tp-page-title">Review import</h1>
-            <p class="tp-description">Confirm what will be imported and choose the import mode.</p>
+            <p class="tp-description">Review what will be added and choose how settings should be handled.</p>
         </div>
 
         <div class="flex gap-2">
-            <a href="{{ route('tp.import.index') }}" class="tp-button-secondary">Back</a>
+            <a href="{{ route('tp.import.index') }}" class="tp-button-secondary">Back to upload</a>
         </div>
     </div>
 
     <div class="tp-metabox">
-        <div class="tp-metabox__title">Bundle summary</div>
+        <div class="tp-metabox__title">Import summary</div>
         <div class="tp-metabox__body space-y-4">
             <div class="tp-panel">
                 <div class="grid grid-cols-1 gap-3 text-sm md:grid-cols-2">
                     <div>
-                        <div class="tp-muted text-xs font-semibold uppercase">Schema</div>
+                        <div class="tp-muted text-xs font-semibold uppercase">File format</div>
                         <div class="mt-1">v{{ $meta['schema_version'] ?? 1 }}</div>
                     </div>
                     <div>
-                        <div class="tp-muted text-xs font-semibold uppercase">Generated</div>
+                        <div class="tp-muted text-xs font-semibold uppercase">Created</div>
                         <div class="mt-1">{{ $meta['generated_at_utc'] ?: 'Unknown' }}</div>
                     </div>
 
@@ -46,7 +46,7 @@
                     </div>
 
                     <div>
-                        <div class="tp-muted text-xs font-semibold uppercase">SEO rows</div>
+                        <div class="tp-muted text-xs font-semibold uppercase">SEO records</div>
                         <div class="mt-1">{{ (int) ($summary['seo'] ?? 0) }}</div>
                     </div>
                     <div>
@@ -60,7 +60,7 @@
                             @if (!empty($summary['theme_active_id']))
                                 <code class="tp-code">{{ $summary['theme_active_id'] }}</code>
                             @else
-                                <span class="tp-muted">No theme metadata</span>
+                                <span class="tp-muted">No theme details found</span>
                             @endif
                         </div>
                     </div>
@@ -71,7 +71,7 @@
                 method="POST"
                 action="{{ route('tp.import.run') }}"
                 class="space-y-4"
-                data-confirm="Run import now?">
+                data-confirm="Start import now?">
                 @csrf
                 <input type="hidden" name="token" value="{{ $token }}" />
 
@@ -83,11 +83,11 @@
                             <span class="text-sm">
                                 <span class="font-semibold">Create only</span>
                                 <span class="tp-muted mt-1 block text-xs">
-                                    Existing slugs will not be overwritten — new pages will be created with
+                                    Existing page URLs are kept as-is. If needed, new pages use
                                     <code class="tp-code">-2</code>
                                     ,
                                     <code class="tp-code">-3</code>
-                                    , … suffixes.
+                                    , etc.
                                 </span>
                             </span>
                         </label>
@@ -103,7 +103,7 @@
                             <span class="text-sm">
                                 <span class="font-semibold">Merge</span>
                                 <span class="tp-muted mt-1 block text-xs">
-                                    Only create missing keys. Existing keys stay unchanged.
+                                    Add only missing settings. Existing settings stay the same.
                                 </span>
                             </span>
                         </label>
@@ -113,7 +113,7 @@
                             <span class="text-sm">
                                 <span class="font-semibold">Overwrite</span>
                                 <span class="tp-muted mt-1 block text-xs">
-                                    Existing keys will be updated to match the bundle.
+                                    Update existing settings to match this file.
                                 </span>
                             </span>
                         </label>
@@ -132,11 +132,11 @@
                         <span class="text-sm">
                             <span class="font-semibold">Import posts</span>
                             <span class="tp-muted mt-1 block text-xs">
-                                Creates posts from the bundle. Existing slugs will be de-duped with
+                                Add posts from this file. If needed, duplicate URLs use
                                 <code class="tp-code">-2</code>
                                 ,
                                 <code class="tp-code">-3</code>
-                                , … suffixes.
+                                , etc.
                             </span>
                         </span>
                     </label>
@@ -150,9 +150,9 @@
                             @checked((int) ($summary['media'] ?? 0) > 0)
                         />
                         <span class="text-sm">
-                            <span class="font-semibold">Import media metadata</span>
+                            <span class="font-semibold">Import media details</span>
                             <span class="tp-muted mt-1 block text-xs">
-                                Creates media rows if the file path is unique. Files are not copied in v0.
+                                Add media records when the file path is unique. Files are not copied in this version.
                             </span>
                         </span>
                     </label>
@@ -164,8 +164,7 @@
                         <span class="text-sm">
                             <span class="font-semibold">Import SEO data</span>
                             <span class="tp-muted mt-1 block text-xs">
-                                Best effort in v0. SEO rows import only where the referenced page or post ID exists in
-                                this installation.
+                                SEO data is imported when its related page or post already exists on this site.
                             </span>
                         </span>
                     </label>
@@ -173,12 +172,12 @@
 
                 <div class="flex gap-2">
                     <button type="submit" class="tp-button-primary">
-                        Run import
+                        Start import
                     </button>
                     <a href="{{ route('tp.import.index') }}" class="tp-button-secondary">Cancel</a>
                 </div>
 
-                <div class="tp-muted text-xs">After import, the temporary bundle is deleted from storage.</div>
+                <div class="tp-muted text-xs">The uploaded file is removed from temporary storage after import.</div>
             </form>
         </div>
     </div>
