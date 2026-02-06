@@ -7,7 +7,7 @@ Site settings management for TentaPress.
 | Field | Value |
 |-------|-------|
 | ID | `tentapress/settings` |
-| Version | 0.1.2 |
+| Version | 0.1.3 |
 | Provider | `TentaPress\Settings\SettingsServiceProvider` |
 
 ## Features

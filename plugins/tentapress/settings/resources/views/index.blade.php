@@ -6,7 +6,7 @@
     <div class="tp-page-header">
         <div>
             <h1 class="tp-page-title">Settings</h1>
-            <p class="tp-description">Basic site configuration.</p>
+            <p class="tp-description">Manage your site's main details and homepage.</p>
         </div>
     </div>
 
@@ -28,7 +28,7 @@
                 <div class="tp-field">
                     <label class="tp-label">Home page</label>
                     <select name="home_page_id" class="tp-select">
-                        <option value="">— Use default —</option>
+                        <option value="">Use default homepage</option>
                         @foreach ($pages as $p)
                             @php
                                 $id = (int) $p->id;
@@ -40,13 +40,13 @@
                             </option>
                         @endforeach
                     </select>
-                    <div class="tp-help">Select a page to use as the site homepage.</div>
+                    <div class="tp-help">Choose which page opens at your main site URL.</div>
                 </div>
 
                 <div class="tp-field">
                     <label class="tp-label">Blog base (optional)</label>
                     <input name="blog_base" class="tp-input" value="{{ old('blog_base', $blogBase) }}" />
-                    <div class="tp-help">URL slug for the blog index. Default is <code class="tp-code">blog</code>.</div>
+                    <div class="tp-help">Set the URL path for your blog list. Default: <code class="tp-code">blog</code>.</div>
                 </div>
 
                 <div class="flex gap-2">
