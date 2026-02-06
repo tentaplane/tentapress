@@ -36,12 +36,12 @@
     <div class="tp-page-header">
         <div>
             <h1 class="tp-page-title">Stock Library</h1>
-            <p class="tp-description">Search and import images and videos.</p>
+            <p class="tp-description">Search and import media from connected stock sources.</p>
         </div>
 
         <div class="flex gap-2">
             <a href="{{ route('tp.media.index') }}" class="tp-button-secondary">Back to Media</a>
-            <a href="{{ route('tp.media.stock.settings') }}" class="tp-button-secondary">Settings</a>
+            <a href="{{ route('tp.media.stock.settings') }}" class="tp-button-secondary">Stock settings</a>
         </div>
     </div>
 
@@ -111,17 +111,17 @@
 
     @if (count($sources) === 0)
         <div class="tp-notice-warning">
-            No stock sources are enabled. Add API keys in Settings to continue.
+            No stock sources are enabled. Add API keys in Stock settings to continue.
         </div>
     @endif
 
     @if ($results === null && $query !== '')
-        <div class="tp-notice-warning">No provider available for this search.</div>
+        <div class="tp-notice-warning">No source is available for this search.</div>
     @endif
 
     @if ($results && count($results->items) === 0)
         <div class="tp-metabox mt-4">
-            <div class="tp-metabox__body tp-muted text-sm">No results found.</div>
+            <div class="tp-metabox__body tp-muted text-sm">No matching results found.</div>
         </div>
     @endif
 

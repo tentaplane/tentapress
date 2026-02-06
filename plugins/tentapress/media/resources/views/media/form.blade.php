@@ -1,13 +1,13 @@
 @extends('tentapress-admin::layouts.shell')
 
-@section('title', $mode === 'create' ? 'Upload Media' : 'Edit Media')
+@section('title', $mode === 'create' ? 'Upload File' : 'Edit Media')
 
 @section('content')
     <div class="tp-editor space-y-6">
         <div class="tp-page-header">
             <div>
                 <h1 class="tp-page-title">
-                    {{ $mode === 'create' ? 'Upload Media' : 'Edit Media' }}
+                    {{ $mode === 'create' ? 'Upload File' : 'Edit Media' }}
                 </h1>
             </div>
         </div>
@@ -117,14 +117,14 @@
                 <div class="tp-metabox__title">Actions</div>
                 <div class="tp-metabox__body space-y-3 text-sm">
                     <button type="submit" form="media-form" class="tp-button-primary w-full justify-center">
-                        {{ $mode === 'create' ? 'Upload Media' : 'Save Changes' }}
+                        {{ $mode === 'create' ? 'Upload file' : 'Save changes' }}
                     </button>
 
                     @if ($mode === 'edit')
                         <form
                             method="POST"
                             action="{{ route('tp.media.destroy', ['media' => $media->id]) }}"
-                            data-confirm="Delete this media file? This cannot be undone.">
+                            data-confirm="Delete this media file? This action cannot be undone.">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="tp-button-danger w-full justify-center" aria-label="Delete media">

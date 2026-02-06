@@ -6,13 +6,13 @@
     <div class="tp-page-header">
         <div>
             <h1 class="tp-page-title">Media</h1>
-            <p class="tp-description">Upload and manage media files.</p>
+            <p class="tp-description">Upload and manage your media library.</p>
         </div>
 
         <div class="flex gap-2">
             <a href="{{ route('tp.media.stock') }}" class="tp-button-secondary">Stock Library</a>
             <a href="{{ route('tp.media.optimizations') }}" class="tp-button-secondary">Optimizations</a>
-            <a href="{{ route('tp.media.create') }}" class="tp-button-primary">Upload</a>
+            <a href="{{ route('tp.media.create') }}" class="tp-button-primary">Upload file</a>
         </div>
     </div>
 
@@ -120,7 +120,7 @@
                                     <form
                                         method="POST"
                                         action="{{ route('tp.media.destroy', ['media' => $item->id]) }}"
-                                        data-confirm="Delete this media file?">
+                                        data-confirm="Delete this media file? This action cannot be undone.">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="inline-flex items-center rounded-md bg-red-600 px-2.5 py-1 text-xs font-semibold text-white shadow-sm">
@@ -219,7 +219,7 @@
                                         <form
                                             method="POST"
                                             action="{{ route('tp.media.destroy', ['media' => $item->id]) }}"
-                                            data-confirm="Delete this media file?">
+                                            data-confirm="Delete this media file? This action cannot be undone.">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="tp-button-link text-red-600 hover:text-red-700">

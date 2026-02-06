@@ -6,7 +6,7 @@
     <div class="tp-page-header">
         <div>
             <h1 class="tp-page-title">Media Optimizations</h1>
-            <p class="tp-description">Configure optimization providers for resized images across the admin and themes.</p>
+            <p class="tp-description">Control how optimized image URLs are generated.</p>
         </div>
 
         <div class="flex gap-2">
@@ -21,9 +21,9 @@
 
                 <div class="grid gap-4 lg:grid-cols-2">
                     <div class="space-y-2">
-                        <label class="text-sm font-semibold text-[#1d2327]" for="optimization_provider">Active provider</label>
+                        <label class="text-sm font-semibold text-[#1d2327]" for="optimization_provider">Active service</label>
                         <select id="optimization_provider" name="optimization_provider" class="tp-select">
-                            <option value="">Select a provider</option>
+                            <option value="">Select a service</option>
                             @foreach ($providers as $provider)
                                 <option value="{{ $provider->key() }}" @selected($optimizationProvider === $provider->key())>
                                     {{ $provider->label() }}
@@ -31,7 +31,7 @@
                             @endforeach
                         </select>
                         <div class="tp-help">
-                            The active provider is used when requesting optimized image URLs.
+                            This service is used when generating optimized image URLs.
                         </div>
                     </div>
 
@@ -42,7 +42,7 @@
                             value="1"
                             class="tp-checkbox"
                             @checked(old('optimization_enabled', $optimizationEnabled) === '1') />
-                        Enable media optimizations
+                        Enable optimized image URLs
                     </label>
                 </div>
 
@@ -53,7 +53,7 @@
                 </div>
 
                 <div class="rounded-lg border border-black/10 bg-slate-50 p-3 text-xs text-black/60">
-                    Optimized URLs are only generated for image requests that use
+                    Optimized URLs are generated only for image requests that use
                     <code class="tp-code">imageUrl</code>.
                 </div>
 

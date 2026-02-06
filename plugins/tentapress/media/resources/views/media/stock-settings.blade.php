@@ -6,7 +6,7 @@
     <div class="tp-page-header">
         <div>
             <h1 class="tp-page-title">Stock Library Settings</h1>
-            <p class="tp-description">Configure providers and API keys for the Media stock library.</p>
+            <p class="tp-description">Manage stock sources and API keys for media imports.</p>
         </div>
 
         <div class="flex gap-2">
@@ -32,7 +32,7 @@
                         value="1"
                         class="tp-checkbox"
                         @checked(old('stock_attribution_reminder', $stockAttributionReminder) === '1') />
-                    Show attribution reminder in stock results
+                    Show attribution reminder in search results
                 </label>
 
                 <div class="flex gap-2">
