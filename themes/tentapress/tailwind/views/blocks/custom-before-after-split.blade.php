@@ -51,12 +51,15 @@
             </div>
         @else
             <div id="{{ $instance }}" class="rounded-2xl border border-black/8 bg-white p-4 sm:p-6">
-                <div class="relative aspect-video overflow-hidden rounded-xl border border-black/10 bg-slate-100">
+                <div data-compare class="relative aspect-video overflow-hidden rounded-xl border border-black/10 bg-slate-100">
                     <img src="{{ $beforeImage }}" alt="" class="absolute inset-0 h-full w-full object-cover" />
 
-                    <div data-after-wrap class="absolute inset-y-0 left-0 overflow-hidden" style="width: {{ $startPercent }}%;">
-                        <img src="{{ $afterImage }}" alt="" class="h-full w-full max-w-none object-cover" />
-                    </div>
+                    <img
+                        data-after-image
+                        src="{{ $afterImage }}"
+                        alt=""
+                        class="absolute inset-0 h-full w-full object-cover"
+                        style="clip-path: inset(0 calc(100% - {{ $startPercent }}%) 0 0);" />
 
                     <div data-divider class="pointer-events-none absolute inset-y-0" style="left: {{ $startPercent }}%; transform: translateX(-1px);">
                         <div class="h-full w-0.5 bg-white shadow"></div>
@@ -84,13 +87,14 @@
                     if (!root) return;
 
                     const range = root.querySelector('[data-range]');
-                    const wrap = root.querySelector('[data-after-wrap]');
+                    const compare = root.querySelector('[data-compare]');
+                    const afterImage = root.querySelector('[data-after-image]');
                     const divider = root.querySelector('[data-divider]');
-                    if (!range || !wrap || !divider) return;
+                    if (!range || !compare || !afterImage || !divider) return;
 
                     const apply = (value) => {
                         const pct = Math.max(5, Math.min(95, Number(value || 50)));
-                        wrap.style.width = `${pct}%`;
+                        afterImage.style.clipPath = `inset(0 calc(100% - ${pct}%) 0 0)`;
                         divider.style.left = `${pct}%`;
                     };
 
