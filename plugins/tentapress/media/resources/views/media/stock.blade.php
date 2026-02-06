@@ -10,6 +10,8 @@
             previewAuthor: '',
             previewType: '',
             previewUrl: '',
+            previewVideoUrl: '',
+            previewPosterUrl: '',
             previewSourceUrl: '',
             previewLicense: '',
             openPreview(payload) {
@@ -17,6 +19,8 @@
                 this.previewAuthor = payload.author || '';
                 this.previewType = payload.type || 'image';
                 this.previewUrl = payload.url || '';
+                this.previewVideoUrl = payload.videoUrl || payload.url || '';
+                this.previewPosterUrl = payload.posterUrl || payload.url || '';
                 this.previewSourceUrl = payload.sourceUrl || '';
                 this.previewLicense = payload.license || '';
                 this.previewOpen = true;
@@ -24,6 +28,8 @@
             closePreview() {
                 this.previewOpen = false;
                 this.previewUrl = '';
+                this.previewVideoUrl = '';
+                this.previewPosterUrl = '';
             }
         }"
         x-ref="previewRoot">
@@ -140,6 +146,8 @@
                         'author' => $item->author,
                         'type' => $item->mediaType ?? 'image',
                         'url' => $item->previewUrl,
+                        'videoUrl' => $item->mediaType === 'video' ? ($item->downloadUrl ?? $item->previewUrl) : null,
+                        'posterUrl' => $item->previewUrl,
                         'sourceUrl' => $item->sourceUrl ?? '',
                         'license' => $item->license ?? '',
                     ];
@@ -221,7 +229,7 @@
                 </div>
                 <div class="bg-black">
                     <template x-if="previewType === 'video'">
-                        <video class="w-full max-h-[70vh]" controls :src="previewUrl"></video>
+                        <video class="w-full max-h-[70vh]" controls :src="previewVideoUrl" :poster="previewPosterUrl"></video>
                     </template>
                     <template x-if="previewType !== 'video'">
                         <img class="w-full max-h-[70vh] object-contain" :src="previewUrl" alt="" />
