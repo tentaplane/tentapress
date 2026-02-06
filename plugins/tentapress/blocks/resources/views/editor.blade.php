@@ -132,7 +132,7 @@
                 </div>
 
                 <div class="tp-notice-warning" x-show="jsonInvalid" x-cloak>
-                    The blocks JSON is invalid. Fix it in Advanced mode.
+                    This block data is invalid. Fix it in Advanced mode.
                 </div>
 
                 <div class="space-y-3" x-ref="blocksList">
@@ -145,7 +145,7 @@
                     </template>
 
                     <div class="tp-metabox" x-show="advanced" x-cloak>
-                        <div class="tp-metabox__title">Advanced JSON</div>
+                        <div class="tp-metabox__title">Advanced data</div>
                         <div class="tp-metabox__body space-y-2">
                             <textarea
                                 class="tp-textarea font-mono text-xs"
@@ -766,7 +766,7 @@
 
                                     <template x-if="fieldsFor(block.type).length === 0">
                                         <div class="tp-field">
-                                            <label class="tp-label">Props (JSON)</label>
+                                            <label class="tp-label">Properties (JSON)</label>
                                             <textarea
                                                 class="tp-textarea font-mono text-xs"
                                                 rows="10"
@@ -915,7 +915,7 @@
                             <div
                                 class="tp-muted rounded border border-dashed border-black/15 bg-white p-6 text-center text-sm"
                                 x-show="modalFilteredOptions().length === 0">
-                                No media matches that search yet.
+                                No media matches your search.
                             </div>
                         </div>
 
