@@ -18,7 +18,7 @@
     @section('body_class', 'bg-slate-100')
 @endif
 
-@section('title', $editorMode ? $editorLabel : ($mode === 'create' ? 'Add New Post' : 'Edit Post'))
+@section('title', $editorMode ? $editorLabel : ($mode === 'create' ? 'Create Post' : 'Edit Post'))
 
 @section('content')
     <div class="tp-editor {{ $editorMode ? 'space-y-0 px-4 pt-0 pb-6 sm:px-6 lg:px-8' : 'space-y-6' }}">
@@ -26,14 +26,14 @@
             <div class="tp-page-header">
                 <div>
                     <h1 class="tp-page-title">
-                        {{ $mode === 'create' ? 'Add New Post' : 'Edit Post' }}
+                        {{ $mode === 'create' ? 'Create Post' : 'Edit Post' }}
                     </h1>
                 </div>
 
                 @if ($mode === 'edit')
                     <div class="flex flex-wrap gap-2">
                         <a href="{{ route('tp.posts.editor', ['post' => $post->id]) }}" class="tp-button-secondary">
-                            Full screen editor
+                            Full-screen editor
                         </a>
                     </div>
                 @endif
@@ -114,7 +114,7 @@
 
                                 <div class="grid gap-4 lg:grid-cols-2">
                                     <div class="tp-field">
-                                        <label class="tp-label">Slug</label>
+                                        <label class="tp-label">URL slug</label>
                                         <input
                                             name="slug"
                                             class="tp-input"
@@ -152,7 +152,7 @@
                                                     @endif
                                                 @endforeach
                                             </select>
-                                            <div class="tp-help">Layouts come from the active theme manifest.</div>
+                                            <div class="tp-help">Layouts come from your active theme.</div>
                                         @else
                                             <input
                                                 name="layout"
@@ -306,7 +306,7 @@
                                                     <a
                                                         href="{{ route('tp.posts.edit', ['post' => $post->id]) }}"
                                                         class="tp-button-secondary">
-                                                        Exit full screen
+                                                        Exit full-screen
                                                     </a>
                                                 </div>
                                             </div>
@@ -372,7 +372,7 @@
                                     <form
                                         method="POST"
                                         action="{{ route('tp.posts.destroy', ['post' => $post->id]) }}"
-                                        data-confirm="Delete this post? This cannot be undone.">
+                                        data-confirm="Delete this post? This action cannot be undone.">
                                         @csrf
                                         @method('DELETE')
                                         <button

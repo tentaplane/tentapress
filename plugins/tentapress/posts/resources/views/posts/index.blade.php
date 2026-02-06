@@ -42,11 +42,11 @@
     <div class="tp-page-header">
         <div>
             <h1 class="tp-page-title">Posts</h1>
-            <p class="tp-description">Create and manage blog posts.</p>
+            <p class="tp-description">Create and manage blog posts for your site.</p>
         </div>
 
         <div class="flex gap-2">
-            <a href="{{ route('tp.posts.create') }}" class="tp-button-primary">Add New</a>
+            <a href="{{ route('tp.posts.create') }}" class="tp-button-primary">Create post</a>
         </div>
     </div>
 
@@ -90,7 +90,7 @@
         </div>
 
         @if ($posts->count() === 0)
-            <div class="tp-metabox__body tp-muted text-sm">No posts found.</div>
+            <div class="tp-metabox__body tp-muted text-sm">No posts yet.</div>
         @else
             <div class="tp-table-wrap">
                 <table class="tp-table">
@@ -103,7 +103,7 @@
                                         <span class="inline-flex" aria-hidden="true">{!! $sortIconSvgFor('title') !!}</span>
                                     </a>
                                     <a class="inline-flex items-center gap-1 py-0.5 text-black/60 hover:text-black/90" href="{{ $sortUrlFor('slug') }}">
-                                        Slug
+                                        URL
                                         <span class="inline-flex" aria-hidden="true">{!! $sortIconSvgFor('slug') !!}</span>
                                     </a>
                                 </div>
@@ -168,7 +168,7 @@
                                         <form
                                             method="POST"
                                             action="{{ route('tp.posts.destroy', ['post' => $post->id]) }}"
-                                            data-confirm="Delete this post?">
+                                            data-confirm="Delete this post? This cannot be undone.">
                                             @csrf
                                             @method('DELETE')
                                             <button
