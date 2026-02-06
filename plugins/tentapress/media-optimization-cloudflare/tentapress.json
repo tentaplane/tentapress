@@ -1,0 +1,8 @@
+{
+    "id": "tentapress/media-optimization-cloudflare",
+    "name": "Media Optimization (Cloudflare)",
+    "description": "Cloudflare Images optimization provider.",
+    "version": "0.1.0",
+    "provider": "TentaPress\\MediaOptimizationCloudflare\\MediaOptimizationCloudflareServiceProvider",
+    "requires": ["tentapress/media"]
+}
