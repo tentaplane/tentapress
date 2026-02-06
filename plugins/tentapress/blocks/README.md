@@ -7,7 +7,7 @@ Block registry and rendering system for TentaPress pages and posts.
 | Field    | Value                                     |
 |----------|-------------------------------------------|
 | ID       | `tentapress/blocks`                       |
-| Version  | 0.2.11                                    |
+| Version  | 0.2.12                                    |
 | Provider | `TentaPress\Blocks\BlocksServiceProvider` |
 
 ## Features

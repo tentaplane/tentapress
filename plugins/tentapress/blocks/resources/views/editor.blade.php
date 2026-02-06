@@ -928,6 +928,7 @@
                 baselineSnapshot: '',
                 beforeUnloadHandler: null,
                 formSubmitHandler: null,
+                restoringUiState: false,
 
                 advanced: false,
                 advancedJson: '',
@@ -963,6 +964,7 @@
                     this.jsonInvalid = !parsed.ok;
                     this.selectedIndex = null;
                     this.applyStoredCollapseState();
+                    this.restoreUiStateFromSession();
 
                     this.sync();
                     this.markClean();
@@ -999,6 +1001,7 @@
                     const form = this.$el?.closest?.('form');
                     if (form) {
                         this.formSubmitHandler = () => {
+                            this.persistUiStateForRefresh();
                             this.markClean();
                         };
                         form.addEventListener('submit', this.formSubmitHandler);
@@ -1043,6 +1046,96 @@
                 updateDirtyState() {
                     const current = this.snapshotFromCanonical(this.canonicalBlocks());
                     this.dirty = current !== this.baselineSnapshot;
+                },
+
+                uiStateKey() {
+                    const path =
+                        typeof window !== 'undefined' && window.location
+                            ? `${window.location.pathname}${window.location.search}`
+                            : 'unknown';
+                    return `tp.blocks.uiState:${path}`;
+                },
+
+                persistUiStateForRefresh() {
+                    if (typeof window === 'undefined' || !window.sessionStorage) {
+                        return;
+                    }
+
+                    try {
+                        const payload = {
+                            selectedIndex: Number.isFinite(this.selectedIndex)
+                                ? this.selectedIndex
+                                : null,
+                            collapsed: this.blocks.map((block) => !!block._collapsed),
+                            scrollY:
+                                typeof window.scrollY === 'number'
+                                    ? window.scrollY
+                                    : 0,
+                            timestamp: Date.now(),
+                        };
+                        window.sessionStorage.setItem(
+                            this.uiStateKey(),
+                            JSON.stringify(payload),
+                        );
+                    } catch (e) {
+                        return;
+                    }
+                },
+
+                restoreUiStateFromSession() {
+                    if (typeof window === 'undefined' || !window.sessionStorage) {
+                        return;
+                    }
+
+                    let payload = null;
+
+                    try {
+                        const raw = window.sessionStorage.getItem(this.uiStateKey());
+                        if (!raw) {
+                            return;
+                        }
+                        payload = JSON.parse(raw);
+                        window.sessionStorage.removeItem(this.uiStateKey());
+                    } catch (e) {
+                        return;
+                    }
+
+                    if (!payload || typeof payload !== 'object') {
+                        return;
+                    }
+
+                    const collapsed = Array.isArray(payload.collapsed)
+                        ? payload.collapsed
+                        : [];
+                    if (collapsed.length > 0) {
+                        this.blocks.forEach((block, index) => {
+                            if (typeof collapsed[index] === 'boolean') {
+                                block._collapsed = collapsed[index];
+                            }
+                        });
+                    }
+
+                    const selectedIndex = Number.isFinite(payload.selectedIndex)
+                        ? payload.selectedIndex
+                        : null;
+                    if (
+                        selectedIndex !== null &&
+                        selectedIndex >= 0 &&
+                        selectedIndex < this.blocks.length
+                    ) {
+                        this.selectedIndex = selectedIndex;
+                    }
+
+                    const scrollY = Number(payload.scrollY);
+                    if (!Number.isFinite(scrollY) || scrollY < 0) {
+                        return;
+                    }
+
+                    this.restoringUiState = true;
+                    requestAnimationFrame(() => {
+                        window.scrollTo({ top: scrollY, behavior: 'auto' });
+                        this.restoringUiState = false;
+                    });
                 },
 
                 onEditorKeydown(event) {
@@ -1563,6 +1656,7 @@
                     this.insertIndex = null;
                     this.insertType = '';
                     this.selectedIndex = this.blocks.length - 1;
+                    this.storeCollapseState('custom');
                 },
 
                 addBlockType(type) {
@@ -1645,6 +1739,7 @@
                     );
 
                     this.selectedIndex = nextIndex;
+                    this.storeCollapseState('custom');
                 },
 
                 selectBlock(index) {
@@ -1671,6 +1766,7 @@
                     this.insertIndex = null;
                     this.insertType = '';
                     this.selectedIndex = clampedIndex;
+                    this.storeCollapseState('custom');
                 },
 
                 duplicateBlock(index) {
@@ -1693,11 +1789,13 @@
 
                     this.blocks.splice(index + 1, 0, this.decorateBlock(copy));
                     this.selectedIndex = index + 1;
+                    this.storeCollapseState('custom');
                 },
 
                 toggleCollapse(index) {
                     if (index < 0 || index >= this.blocks.length) return;
                     this.blocks[index]._collapsed = !this.blocks[index]._collapsed;
+                    this.storeCollapseState('custom');
                 },
 
                 move(index, delta) {
@@ -1713,6 +1811,8 @@
                     } else if (this.selectedIndex === next) {
                         this.selectedIndex = index;
                     }
+
+                    this.storeCollapseState('custom');
                 },
 
                 dragStart(index, event) {
@@ -1800,6 +1900,8 @@
                     ) {
                         this.selectedIndex += 1;
                     }
+
+                    this.storeCollapseState('custom');
                 },
 
                 remove(index) {
@@ -1817,6 +1919,8 @@
                     } else if (this.selectedIndex > index) {
                         this.selectedIndex -= 1;
                     }
+
+                    this.storeCollapseState('custom');
                 },
 
                 expandAll() {
@@ -1846,14 +1950,52 @@
                         return;
                     }
                     try {
-                        const state = window.localStorage.getItem(
+                        const raw = window.localStorage.getItem(
                             this.collapseStateKey(),
                         );
-                        if (state === 'collapsed') {
+                        if (!raw) {
+                            return;
+                        }
+
+                        let payload = null;
+                        try {
+                            payload = JSON.parse(raw);
+                        } catch (e) {
+                            payload = null;
+                        }
+
+                        if (payload && typeof payload === 'object') {
+                            const collapsed = Array.isArray(payload.collapsed)
+                                ? payload.collapsed
+                                : [];
+                            if (collapsed.length > 0) {
+                                this.blocks.forEach((block, index) => {
+                                    if (typeof collapsed[index] === 'boolean') {
+                                        block._collapsed = collapsed[index];
+                                    }
+                                });
+                                return;
+                            }
+
+                            if (payload.mode === 'collapsed') {
+                                this.blocks.forEach((block) => {
+                                    block._collapsed = true;
+                                });
+                                return;
+                            }
+                            if (payload.mode === 'expanded') {
+                                this.blocks.forEach((block) => {
+                                    block._collapsed = false;
+                                });
+                                return;
+                            }
+                        }
+
+                        if (raw === 'collapsed') {
                             this.blocks.forEach((block) => {
                                 block._collapsed = true;
                             });
-                        } else if (state === 'expanded') {
+                        } else if (raw === 'expanded') {
                             this.blocks.forEach((block) => {
                                 block._collapsed = false;
                             });
@@ -1868,7 +2010,14 @@
                         return;
                     }
                     try {
-                        window.localStorage.setItem(this.collapseStateKey(), state);
+                        const payload = {
+                            mode: state,
+                            collapsed: this.blocks.map((block) => !!block._collapsed),
+                        };
+                        window.localStorage.setItem(
+                            this.collapseStateKey(),
+                            JSON.stringify(payload),
+                        );
                     } catch (e) {
                         return;
                     }
