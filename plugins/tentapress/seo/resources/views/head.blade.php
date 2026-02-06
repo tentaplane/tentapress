@@ -3,14 +3,16 @@
     if (! isset($seo) || ! is_array($seo)) {
         if (isset($post) && is_object($post)) {
             $seo = $manager->forPost($post);
-        } else {
+        } elseif (isset($page) && is_object($page)) {
             $seo = $manager->forPage($page);
+        } else {
+            $seo = $manager->forBlogIndex();
         }
     }
 @endphp
 
 @if (!empty($seo['title']))
-    <title>{{ $seo['title'] }} - {{ $tpSiteTitle }}</title>
+    <title>{{ $seo['title'] }}</title>
 @endif
 
 @if (!empty($seo['description']))

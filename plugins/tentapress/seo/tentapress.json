@@ -1,7 +1,7 @@
 {
     "id": "tentapress/seo",
     "name": "SEO",
-    "version": "0.1.4",
+    "version": "0.2.0",
     "provider": "TentaPress\\Seo\\SeoServiceProvider",
     "admin": {
         "menus": [
@@ -9,8 +9,7 @@
                 "label": "SEO",
                 "route": "tp.seo.index",
                 "capability": "manage_seo",
-                "position": 20,
-                "parent": "Pages"
+                "position": 40
             }
         ]
     }

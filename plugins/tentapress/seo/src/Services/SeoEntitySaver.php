@@ -47,6 +47,11 @@ final readonly class SeoEntitySaver
         }
 
         if ($this->payload->isEmpty($payload, $this->seoPayloadKeys())) {
+            $existing = $modelClass::query()->where($foreignKey, $entityId)->first();
+            if ($existing !== null && $this->rowHasAdvancedFields($existing)) {
+                $modelClass::query()->where($foreignKey, $entityId)->update($payload);
+                return;
+            }
             $modelClass::query()->where($foreignKey, $entityId)->delete();
             return;
         }
@@ -90,5 +95,29 @@ final readonly class SeoEntitySaver
             'og_image',
             'twitter_image',
         ];
+    }
+
+    private function rowHasAdvancedFields(Model $row): bool
+    {
+        $keys = [
+            'og_title',
+            'og_description',
+            'twitter_title',
+            'twitter_description',
+        ];
+
+        foreach ($keys as $key) {
+            $value = $row->getAttribute($key);
+
+            if (is_string($value) && trim($value) !== '') {
+                return true;
+            }
+
+            if ($value !== null && !is_string($value)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
