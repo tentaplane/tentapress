@@ -19,7 +19,7 @@
     @else
         <div class="tp-metabox">
             <div class="tp-metabox__body py-8 text-center">
-                <p class="text-black/60">No widgets available.</p>
+                <p class="text-black/60">No dashboard cards are available yet.</p>
             </div>
         </div>
     @endif

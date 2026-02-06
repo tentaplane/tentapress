@@ -21,7 +21,7 @@
 @else
     <div class="tp-metabox">
         <div class="tp-metabox__body py-6 text-center text-black/50">
-            <p>Enable plugins to see content stats.</p>
+            <p>Enable content plugins to see dashboard stats.</p>
         </div>
     </div>
 @endif

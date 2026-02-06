@@ -3,7 +3,7 @@
         type="button"
         class="inline-flex h-9 w-9 items-center justify-center rounded border border-black/10 text-sm text-black/70 transition hover:bg-black/5 md:hidden"
         @click="sidebarOpen = !sidebarOpen"
-        aria-label="Toggle menu">
+        aria-label="Open or close menu">
         <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -21,10 +21,10 @@
 
     <div class="flex items-center gap-3">
         @auth
-            <span class="tp-muted text-sm">Hello, {{ auth()->user()->name ?? 'User' }}</span>
+            <span class="tp-muted text-sm">Signed in as {{ auth()->user()->name ?? 'User' }}</span>
             <form method="POST" action="{{ route('tp.logout') }}">
                 @csrf
-                <button type="submit" class="tp-button-secondary">Log out</button>
+                <button type="submit" class="tp-button-secondary">Sign out</button>
             </form>
         @endauth
     </div>

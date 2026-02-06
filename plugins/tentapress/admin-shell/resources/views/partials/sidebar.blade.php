@@ -39,7 +39,7 @@
                             type="button"
                             @click="open = !open"
                             class="rounded px-2 py-2 text-white/60 transition hover:bg-white/5 hover:text-white"
-                            aria-label="Toggle {{ $label }}">
+                            aria-label="Show or hide {{ $label }}">
                             <span x-text="open ? '–' : '+'"></span>
                         </button>
                     </div>
