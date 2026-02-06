@@ -52,7 +52,7 @@
                 <h1 class="tp-page-title">Edit Menu</h1>
                 <p class="tp-description">
                     <span class="font-semibold">{{ $menu->name }}</span>
-                    <span class="tp-muted">— {{ $menu->slug }}</span>
+                    <span class="tp-muted">({{ $menu->slug }})</span>
                 </p>
             </div>
         </div>
@@ -75,7 +75,7 @@
                                 <input name="name" class="tp-input" value="{{ old('name', $menu->name) }}" required />
                             </div>
                             <div class="tp-field">
-                                <label class="tp-label">Slug</label>
+                                <label class="tp-label">Menu key</label>
                                 <input
                                     name="slug"
                                     class="tp-input"
@@ -116,7 +116,7 @@
                                 <div class="space-y-2 rounded border border-black/10 bg-white p-3">
                                     <div class="text-sm font-semibold">Add page</div>
                                     @if (count($pagesArray) === 0)
-                                        <div class="tp-muted text-xs">No published pages yet.</div>
+                                        <div class="tp-muted text-xs">No published pages available.</div>
                                     @else
                                         <div class="space-y-2">
                                             <select class="tp-select" x-model="selectedPageId">
@@ -137,7 +137,7 @@
                                 <div class="space-y-2 rounded border border-black/10 bg-white p-3">
                                     <div class="text-sm font-semibold">Add post</div>
                                     @if (count($postsArray) === 0)
-                                        <div class="tp-muted text-xs">No published posts yet.</div>
+                                        <div class="tp-muted text-xs">No published posts available.</div>
                                     @else
                                         <div class="space-y-2">
                                             <select class="tp-select" x-model="selectedPostId">
@@ -158,7 +158,7 @@
 
                         <template x-if="items.length === 0">
                             <div class="tp-muted rounded border border-dashed border-black/15 bg-white p-4 text-sm">
-                                No items yet. Add a custom link, page, or post above.
+                                No menu items yet. Add a custom link, page, or post above.
                             </div>
                         </template>
 
@@ -255,7 +255,7 @@
                         <div class="tp-metabox__body space-y-2 text-sm">
                             <button type="submit" class="tp-button-primary w-full justify-center">Save Menu</button>
                             <a href="{{ route('tp.menus.index') }}" class="tp-button-secondary w-full justify-center">
-                                Back
+                                Back to menus
                             </a>
                             <button
                                 type="submit"
@@ -263,7 +263,7 @@
                                 class="tp-button-danger w-full justify-center">
                                 Delete
                             </button>
-                            <div class="tp-muted text-xs">Changes to locations affect the active theme.</div>
+                            <div class="tp-muted text-xs">Location changes apply to the active theme.</div>
                         </div>
                     </div>
 
@@ -282,7 +282,7 @@
                                     <div class="space-y-1">
                                         <label class="tp-label">{{ $label }}</label>
                                         <select name="locations[{{ $key }}]" class="tp-select">
-                                            <option value="">— None —</option>
+                                            <option value="">None</option>
                                             @foreach ($menusArray as $menuOption)
                                                 <option
                                                     value="{{ $menuOption['id'] }}"
@@ -312,7 +312,7 @@
                                 <div
                                     class="flex items-center justify-between gap-3 rounded border border-black/10 bg-white px-3 py-2">
                                     <div class="font-semibold">{{ $label }}</div>
-                                    <div class="tp-muted text-xs">{{ $menuName !== '' ? $menuName : 'None' }}</div>
+                                        <div class="tp-muted text-xs">{{ $menuName !== '' ? $menuName : 'Not assigned' }}</div>
                                 </div>
                             @endforeach
                         </div>
@@ -327,7 +327,7 @@
         method="POST"
         action="{{ route('tp.menus.destroy', ['menu' => $menu->id]) }}"
         class="hidden"
-        data-confirm="Delete this menu? This cannot be undone.">
+        data-confirm="Delete this menu? This action cannot be undone.">
         @csrf
         @method('DELETE')
     </form>

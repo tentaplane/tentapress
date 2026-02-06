@@ -6,11 +6,11 @@
     <div class="tp-page-header">
         <div>
             <h1 class="tp-page-title">Menus</h1>
-            <p class="tp-description">Create navigation menus and assign them to theme locations.</p>
+            <p class="tp-description">Create navigation menus and assign them to locations in your theme.</p>
         </div>
 
         <div class="flex gap-2">
-            <a href="{{ route('tp.menus.create') }}" class="tp-button-primary">Add Menu</a>
+            <a href="{{ route('tp.menus.create') }}" class="tp-button-primary">Create menu</a>
         </div>
     </div>
 
@@ -47,14 +47,14 @@
         <div class="tp-metabox__title">All menus</div>
 
         @if ($menus->count() === 0)
-            <div class="tp-metabox__body tp-muted text-sm">No menus yet. Create your first menu.</div>
+            <div class="tp-metabox__body tp-muted text-sm">No menus yet. Create your first one.</div>
         @else
             <div class="tp-table-wrap">
                 <table class="tp-table">
                     <thead class="tp-table__thead">
                         <tr>
                             <th class="tp-table__th">Name</th>
-                            <th class="tp-table__th">Slug</th>
+                            <th class="tp-table__th">Key</th>
                             <th class="tp-table__th">Locations</th>
                             <th class="tp-table__th">Items</th>
                             <th class="tp-table__th">Updated</th>

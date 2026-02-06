@@ -7,7 +7,7 @@ Navigation menu management for TentaPress.
 | Field | Value |
 |-------|-------|
 | ID | `tentapress/menus` |
-| Version | 0.1.3 |
+| Version | 0.1.4 |
 | Provider | `TentaPress\Menus\MenusServiceProvider` |
 
 ## Goal

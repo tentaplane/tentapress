@@ -1,13 +1,13 @@
 @extends('tentapress-admin::layouts.shell')
 
-@section('title', 'Add Menu')
+@section('title', 'Create Menu')
 
 @section('content')
     <div class="tp-editor space-y-6">
         <div class="tp-page-header">
             <div>
-                <h1 class="tp-page-title">Add Menu</h1>
-                <p class="tp-description">Create a new navigation menu.</p>
+                <h1 class="tp-page-title">Create Menu</h1>
+                <p class="tp-description">Create a navigation menu for your site.</p>
             </div>
         </div>
 
@@ -24,7 +24,7 @@
                             </div>
 
                             <div class="tp-field">
-                                <label class="tp-label">Slug</label>
+                                <label class="tp-label">Menu key</label>
                                 <input
                                     name="slug"
                                     class="tp-input"
@@ -46,7 +46,7 @@
                             Create Menu
                         </button>
                         <a href="{{ route('tp.menus.index') }}" class="tp-button-secondary w-full justify-center">
-                            Back
+                            Back to menus
                         </a>
                     </div>
                 </div>
@@ -69,7 +69,7 @@
                                 @endif
                             @endforeach
 
-                            <div class="tp-muted pt-2 text-xs">Assign menus to these locations after creation.</div>
+                            <div class="tp-muted pt-2 text-xs">You can assign menus to these locations after saving.</div>
                         </div>
                     </div>
                 @endif

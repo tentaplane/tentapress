@@ -2,7 +2,7 @@
     "id": "tentapress/menus",
     "name": "Menus",
     "description": "Manage navigation menus and theme locations.",
-    "version": "0.1.3",
+    "version": "0.1.4",
     "provider": "TentaPress\\Menus\\MenusServiceProvider",
     "requires": ["tentapress/users", "tentapress/pages", "tentapress/posts", "tentapress/settings"],
     "admin": {
