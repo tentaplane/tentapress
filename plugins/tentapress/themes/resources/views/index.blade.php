@@ -6,7 +6,7 @@
     <div class="tp-page-header">
         <div>
             <h1 class="tp-page-title">Themes</h1>
-            <p class="tp-description">Only one theme can be active at a time.</p>
+            <p class="tp-description">Choose how your site looks. You can have one active theme at a time.</p>
         </div>
 
         <div class="flex gap-2">
@@ -17,8 +17,8 @@
                 @submit="submitting = true">
                 @csrf
                 <button type="submit" class="tp-button-secondary" :disabled="submitting">
-                    <span x-show="!submitting">Sync themes</span>
-                    <span x-show="submitting" x-cloak>Syncing themes…</span>
+                    <span x-show="!submitting">Refresh theme list</span>
+                    <span x-show="submitting" x-cloak>Refreshing...</span>
                 </button>
             </form>
         </div>
@@ -32,7 +32,7 @@
 
         @if (count($themes) === 0)
             <div class="tp-metabox__body tp-muted text-sm">
-                No themes found. Add a theme under
+                No themes found. Add a theme in
                 <code class="tp-code">themes/vendor/name</code>.
             </div>
         @else
@@ -70,7 +70,7 @@
                                     @else
                                         <div
                                             class="tp-muted flex h-16 w-24 items-center justify-center rounded border border-dashed border-black/20 bg-white text-xs">
-                                            No image
+                                            No preview
                                         </div>
                                     @endif
                                 </td>
@@ -113,7 +113,7 @@
                                             @endforeach
                                         </div>
                                     @else
-                                        <div class="tp-muted mt-2 text-xs">No layouts declared.</div>
+                                        <div class="tp-muted mt-2 text-xs">No layouts listed.</div>
                                     @endif
                                 </td>
                                 <td class="tp-table__td tp-code">{{ $theme['version'] ?? '—' }}</td>

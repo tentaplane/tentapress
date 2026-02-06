@@ -16,7 +16,7 @@
         </div>
 
         <div class="flex gap-2">
-            <a href="{{ route('tp.themes.index') }}" class="tp-button-secondary">Back</a>
+            <a href="{{ route('tp.themes.index') }}" class="tp-button-secondary">Back to themes</a>
 
             @php
                 $isActive = ($activeId !== null && $activeId === $theme['id']);
@@ -54,13 +54,13 @@
                     @if (! empty($theme['description']))
                         <div class="text-sm text-black/80">{{ $theme['description'] }}</div>
                     @else
-                        <div class="tp-muted text-sm">No description provided.</div>
+                        <div class="tp-muted text-sm">No description available.</div>
                     @endif
                 </div>
             </div>
 
             <div class="tp-metabox">
-                <div class="tp-metabox__title">Manifest</div>
+                <div class="tp-metabox__title">Theme configuration</div>
                 <div class="tp-metabox__body">
                     <pre class="tp-pre">{{ $theme['manifest_pretty'] }}</pre>
                 </div>
@@ -72,7 +72,7 @@
                 <div class="tp-metabox__title">Details</div>
                 <div class="tp-metabox__body space-y-2 text-sm">
                     <div>
-                        <span class="tp-muted">Path:</span>
+                        <span class="tp-muted">Folder:</span>
                         <code class="tp-code">{{ $theme['path'] }}</code>
                     </div>
                     <div>
@@ -94,7 +94,7 @@
                     @endphp
 
                     @if (count($layouts) === 0)
-                        <div class="tp-muted text-sm">No layouts declared.</div>
+                        <div class="tp-muted text-sm">No layouts listed.</div>
                     @else
                         <div class="flex flex-wrap gap-2">
                             @foreach ($layouts as $layout)
