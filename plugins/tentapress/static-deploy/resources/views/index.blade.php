@@ -66,7 +66,11 @@
     <div class="tp-metabox mt-5">
         <div class="tp-metabox__title">Generate build</div>
         <div class="tp-metabox__body space-y-4">
-            <form method="POST" action="{{ route('tp.static.generate') }}" class="space-y-4">
+            <form
+                method="POST"
+                action="{{ route('tp.static.generate') }}"
+                class="space-y-4"
+                data-confirm="Generate a new static build now?">
                 @csrf
 
                 <div class="tp-panel space-y-3">
@@ -92,10 +96,7 @@
                 </div>
 
                 <div class="flex gap-2">
-                    <button
-                        type="submit"
-                        class="tp-button-primary"
-                        onclick="return confirm('Generate a new static build now?');">
+                    <button type="submit" class="tp-button-primary">
                         Generate build
                     </button>
                 </div>
