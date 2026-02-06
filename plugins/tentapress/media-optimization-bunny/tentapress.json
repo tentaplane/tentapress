@@ -1,0 +1,8 @@
+{
+    "id": "tentapress/media-optimization-bunny",
+    "name": "Media Optimization (Bunny)",
+    "description": "Bunny Optimizer provider.",
+    "version": "0.1.0",
+    "provider": "TentaPress\\MediaOptimizationBunny\\MediaOptimizationBunnyServiceProvider",
+    "requires": ["tentapress/media"]
+}

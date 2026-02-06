@@ -1,0 +1,24 @@
+{
+    "name": "tentapress/media-optimization-bunny",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "php": "^8.2",
+        "tentapress/media": "<1.0",
+        "tentapress/settings": "<1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "TentaPress\\MediaOptimizationBunny\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "TentaPress\\MediaOptimizationBunny\\MediaOptimizationBunnyServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
