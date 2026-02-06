@@ -56,6 +56,18 @@ final readonly class SettingsController
             $settings[] = 'tentapress-media-optimization-cloudflare::settings';
         }
 
+        if (view()->exists('tentapress-media-optimization-imgix::settings')) {
+            $settings[] = 'tentapress-media-optimization-imgix::settings';
+        }
+
+        if (view()->exists('tentapress-media-optimization-imagekit::settings')) {
+            $settings[] = 'tentapress-media-optimization-imagekit::settings';
+        }
+
+        if (view()->exists('tentapress-media-optimization-bunny::settings')) {
+            $settings[] = 'tentapress-media-optimization-bunny::settings';
+        }
+
         return $settings;
     }
 
@@ -73,6 +85,27 @@ final readonly class SettingsController
             }
         }
 
+        if (class_exists(\TentaPress\MediaOptimizationImgix\Http\Admin\SettingsController::class)) {
+            $controller = resolve(\TentaPress\MediaOptimizationImgix\Http\Admin\SettingsController::class);
+            if (method_exists($controller, 'defaults')) {
+                $data = array_merge($data, $controller->defaults($settings));
+            }
+        }
+
+        if (class_exists(\TentaPress\MediaOptimizationImageKit\Http\Admin\SettingsController::class)) {
+            $controller = resolve(\TentaPress\MediaOptimizationImageKit\Http\Admin\SettingsController::class);
+            if (method_exists($controller, 'defaults')) {
+                $data = array_merge($data, $controller->defaults($settings));
+            }
+        }
+
+        if (class_exists(\TentaPress\MediaOptimizationBunny\Http\Admin\SettingsController::class)) {
+            $controller = resolve(\TentaPress\MediaOptimizationBunny\Http\Admin\SettingsController::class);
+            if (method_exists($controller, 'defaults')) {
+                $data = array_merge($data, $controller->defaults($settings));
+            }
+        }
+
         return $data;
     }
 
@@ -80,6 +113,30 @@ final readonly class SettingsController
     {
         if (class_exists(\TentaPress\MediaOptimizationCloudflare\Http\Admin\SettingsController::class)) {
             $controller = resolve(\TentaPress\MediaOptimizationCloudflare\Http\Admin\SettingsController::class);
+            if (method_exists($controller, 'validate') && method_exists($controller, 'persist')) {
+                $data = $controller->validate($request);
+                $controller->persist($request, $settings, $data);
+            }
+        }
+
+        if (class_exists(\TentaPress\MediaOptimizationImgix\Http\Admin\SettingsController::class)) {
+            $controller = resolve(\TentaPress\MediaOptimizationImgix\Http\Admin\SettingsController::class);
+            if (method_exists($controller, 'validate') && method_exists($controller, 'persist')) {
+                $data = $controller->validate($request);
+                $controller->persist($request, $settings, $data);
+            }
+        }
+
+        if (class_exists(\TentaPress\MediaOptimizationImageKit\Http\Admin\SettingsController::class)) {
+            $controller = resolve(\TentaPress\MediaOptimizationImageKit\Http\Admin\SettingsController::class);
+            if (method_exists($controller, 'validate') && method_exists($controller, 'persist')) {
+                $data = $controller->validate($request);
+                $controller->persist($request, $settings, $data);
+            }
+        }
+
+        if (class_exists(\TentaPress\MediaOptimizationBunny\Http\Admin\SettingsController::class)) {
+            $controller = resolve(\TentaPress\MediaOptimizationBunny\Http\Admin\SettingsController::class);
             if (method_exists($controller, 'validate') && method_exists($controller, 'persist')) {
                 $data = $controller->validate($request);
                 $controller->persist($request, $settings, $data);
