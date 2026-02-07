@@ -7,7 +7,7 @@ Upload and manage media files for TentaPress.
 | Field    | Value                                   |
 |----------|-----------------------------------------|
 | ID       | `tentapress/media`                      |
-| Version  | 0.6.0                                   |
+| Version  | 0.6.1                                   |
 | Provider | `TentaPress\Media\MediaServiceProvider` |
 
 ## Goal
@@ -30,6 +30,7 @@ Provide a first-party media library for uploads, management, and reuse across Pa
 - Alt text and captions
 - Stock library import + attribution (provider plugins)
 - Async stock imports with multi-select bulk add
+- Imported stock items are marked in-place without inline notices
 - Media selector for pages, posts, blocks, SEO
 
 ## Dependencies

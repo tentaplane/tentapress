@@ -9,9 +9,8 @@
             csrfToken: '{{ csrf_token() }}',
             selectedItems: {},
             importingKeys: {},
+            importedKeys: {},
             isBulkImporting: false,
-            feedbackMessage: '',
-            feedbackType: 'success',
             previewOpen: false,
             previewTitle: '',
             previewAuthor: '',
@@ -45,8 +44,17 @@
                 const key = this.itemKey(payload);
                 return this.importingKeys[key] === true;
             },
+            isImported(payload) {
+                const key = this.itemKey(payload);
+                return this.importedKeys[key] === true;
+            },
             setSelected(payload, checked) {
                 const key = this.itemKey(payload);
+                if (this.importedKeys[key] === true) {
+                    delete this.selectedItems[key];
+                    return;
+                }
+
                 if (checked) {
                     this.selectedItems[key] = payload;
                     return;
@@ -60,12 +68,12 @@
             selectedCount() {
                 return Object.keys(this.selectedItems).length;
             },
-            showFeedback(message, type = 'success') {
-                this.feedbackMessage = message;
-                this.feedbackType = type;
-            },
             async importOne(payload) {
                 const key = this.itemKey(payload);
+                if (this.importedKeys[key] === true) {
+                    return true;
+                }
+
                 this.importingKeys[key] = true;
 
                 try {
@@ -82,15 +90,15 @@
 
                     const data = await response.json().catch(() => ({}));
                     if (!response.ok || data.ok !== true) {
-                        this.showFeedback(data.message || 'Import failed.', 'error');
+                        console.error(data.message || 'Import failed.');
                         return false;
                     }
 
-                    this.showFeedback(data.message || 'Asset imported.', 'success');
+                    this.importedKeys[key] = true;
                     delete this.selectedItems[key];
                     return true;
                 } catch (_error) {
-                    this.showFeedback('Import failed (offline?).', 'error');
+                    console.error('Import failed (offline?).');
                     return false;
                 } finally {
                     delete this.importingKeys[key];
@@ -103,19 +111,11 @@
                 }
 
                 this.isBulkImporting = true;
-                let successCount = 0;
-
                 for (const item of items) {
-                    const ok = await this.importOne(item);
-                    if (ok) {
-                        successCount += 1;
-                    }
+                    await this.importOne(item);
                 }
 
                 this.isBulkImporting = false;
-                if (successCount > 0) {
-                    this.showFeedback(`Imported ${successCount} item${successCount === 1 ? '' : 's'} to Media.`, 'success');
-                }
             }
         }"
         x-ref="previewRoot">
@@ -236,14 +236,6 @@
             </button>
         </div>
 
-        <div
-            class="mt-3 rounded-md px-3 py-2 text-sm"
-            x-show="feedbackMessage"
-            x-cloak
-            :class="feedbackType === 'error' ? 'tp-notice-warning' : 'tp-notice-info'">
-            <span x-text="feedbackMessage"></span>
-        </div>
-
         <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mt-4">
             @foreach ($results->items as $item)
                 @php
@@ -269,6 +261,8 @@
                             <input
                                 type="checkbox"
                                 class="tp-checkbox"
+                                :checked="selectedItems[itemKey({{ Js::from($importPayload) }})] !== undefined"
+                                :disabled="isImported({{ Js::from($importPayload) }})"
                                 @change="setSelected({{ Js::from($importPayload) }}, $event.target.checked)" />
                             Select
                         </label>
@@ -305,10 +299,12 @@
 
                         <button
                             type="button"
-                            class="tp-button-primary w-full justify-center"
-                            :disabled="isImporting({{ Js::from($importPayload) }})"
+                            class="w-full justify-center"
+                            :class="isImported({{ Js::from($importPayload) }}) ? 'tp-button-secondary opacity-70 cursor-default' : 'tp-button-primary'"
+                            :disabled="isImporting({{ Js::from($importPayload) }}) || isImported({{ Js::from($importPayload) }})"
                             @click="importOne({{ Js::from($importPayload) }})">
-                            <span x-show="!isImporting({{ Js::from($importPayload) }})">Add to Media</span>
+                            <span x-show="isImported({{ Js::from($importPayload) }})">Imported</span>
+                            <span x-show="!isImporting({{ Js::from($importPayload) }}) && !isImported({{ Js::from($importPayload) }})">Add to Media</span>
                             <span x-show="isImporting({{ Js::from($importPayload) }})">Adding...</span>
                         </button>
                     </div>
