@@ -10,10 +10,11 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use TentaPress\Media\Http\Requests\StoreMediaRequest;
 use TentaPress\Media\Models\TpMedia;
+use TentaPress\Media\Support\LocalImageVariantProcessor;
 
 final class StoreController
 {
-    public function __invoke(StoreMediaRequest $request): RedirectResponse
+    public function __invoke(StoreMediaRequest $request, LocalImageVariantProcessor $processor): RedirectResponse
     {
         $data = $request->validated();
 
@@ -36,7 +37,8 @@ final class StoreController
         $dir = 'media/'.now()->format('Y/m');
         $path = $file->storePubliclyAs($dir, $filename, ['disk' => 'public']);
 
-        [$width, $height] = $this->imageDimensions($file);
+        $mimeType = $file->getMimeType();
+        $processed = $processor->process('public', $path, $mimeType);
 
         $nowUserId = Auth::check() && is_object(Auth::user()) ? (int) (Auth::user()->id ?? 0) : null;
 
@@ -47,10 +49,16 @@ final class StoreController
             'disk' => 'public',
             'path' => $path,
             'original_name' => $originalName,
-            'mime_type' => $file->getMimeType(),
-            'size' => $file->getSize(),
-            'width' => $width,
-            'height' => $height,
+            'mime_type' => $mimeType,
+            'size' => $processed['size'] ?? $file->getSize(),
+            'width' => $processed['width'],
+            'height' => $processed['height'],
+            'source_width' => $processed['source_width'],
+            'source_height' => $processed['source_height'],
+            'variants' => $processed['variants'],
+            'preview_variant' => $processed['preview_variant'],
+            'optimization_status' => $processed['optimization_status'],
+            'optimization_error' => $processed['optimization_error'],
             'created_by' => $nowUserId ?: null,
             'updated_by' => $nowUserId ?: null,
         ]);
@@ -59,29 +67,4 @@ final class StoreController
             ->with('tp_notice_success', 'Media uploaded.');
     }
 
-    /**
-     * @return array{0:int|null,1:int|null}
-     */
-    private function imageDimensions(UploadedFile $file): array
-    {
-        $mime = (string) $file->getMimeType();
-        if ($mime === '' || ! str_starts_with($mime, 'image/')) {
-            return [null, null];
-        }
-
-        $path = $file->getPathname();
-        if ($path === '') {
-            return [null, null];
-        }
-
-        $size = @getimagesize($path);
-        if (! is_array($size)) {
-            return [null, null];
-        }
-
-        $width = isset($size[0]) ? (int) $size[0] : null;
-        $height = isset($size[1]) ? (int) $size[1] : null;
-
-        return [$width, $height];
-    }
 }

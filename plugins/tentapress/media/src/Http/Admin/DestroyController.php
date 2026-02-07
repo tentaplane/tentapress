@@ -14,9 +14,14 @@ final class DestroyController
     {
         $disk = $media->disk !== null && $media->disk !== '' ? $media->disk : 'public';
         $path = (string) ($media->path ?? '');
+        $variantPaths = $this->variantPaths($media);
 
         if ($path !== '') {
             $this->deleteFromDisk($disk, $path);
+        }
+
+        foreach ($variantPaths as $variantPath) {
+            $this->deleteFromDisk($disk, $variantPath);
         }
 
         $media->delete();
@@ -77,5 +82,31 @@ final class DestroyController
         }
 
         return array_values(array_unique(array_filter($normalized, static fn (string $value): bool => $value !== '')));
+    }
+
+    /**
+     * @return array<int,string>
+     */
+    private function variantPaths(TpMedia $media): array
+    {
+        $variants = $media->variants;
+        if (! is_array($variants)) {
+            return [];
+        }
+
+        $paths = [];
+
+        foreach ($variants as $variant) {
+            if (! is_array($variant)) {
+                continue;
+            }
+
+            $path = $variant['path'] ?? null;
+            if (is_string($path) && $path !== '') {
+                $paths[] = $path;
+            }
+        }
+
+        return array_values(array_unique($paths));
     }
 }

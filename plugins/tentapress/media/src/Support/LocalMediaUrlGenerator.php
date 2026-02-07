@@ -28,6 +28,17 @@ final class LocalMediaUrlGenerator implements MediaUrlGenerator
 
     public function imageUrl(TpMedia $media, array $params = []): ?string
     {
+        $variant = isset($params['variant']) ? (string) $params['variant'] : '';
+        if ($variant !== '') {
+            $variantPath = $media->variantPath($variant);
+            if ($variantPath !== null) {
+                $media = clone $media;
+                $media->path = $variantPath;
+            }
+
+            unset($params['variant']);
+        }
+
         $url = $this->url($media);
 
         if ($url === null || $params === []) {

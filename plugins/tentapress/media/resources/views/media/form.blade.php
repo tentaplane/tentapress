@@ -141,6 +141,7 @@
                     $url = $urlGenerator->url($media);
                     $mime = (string) ($media->mime_type ?? '');
                     $isImage = $mime !== '' && str_starts_with($mime, 'image/');
+                    $previewUrl = $isImage ? ($urlGenerator->imageUrl($media, ['variant' => 'medium']) ?? $url) : $url;
                     $size = is_numeric($media->size ?? null) ? (int) $media->size : null;
                     $sizeLabel = $size ? number_format($size / 1024, 1).' KB' : '—';
                     $dimensions = $media->width && $media->height ? $media->width.'×'.$media->height : '—';
@@ -148,8 +149,8 @@
                 <div class="tp-metabox">
                     <div class="tp-metabox__title">Details</div>
                     <div class="tp-metabox__body space-y-3 text-sm">
-                        @if ($url && $isImage)
-                            <img src="{{ $url }}" alt="" class="w-full rounded border border-slate-200 object-cover" />
+                        @if ($previewUrl && $isImage)
+                            <img src="{{ $previewUrl }}" alt="" class="w-full rounded border border-slate-200 object-cover" />
                         @endif
 
                         <div>

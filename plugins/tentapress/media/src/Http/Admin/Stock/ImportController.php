@@ -15,6 +15,7 @@ use TentaPress\Media\Models\TpMedia;
 use TentaPress\Media\Stock\StockManager;
 use TentaPress\Media\Stock\StockSource;
 use TentaPress\Media\Stock\StockResult;
+use TentaPress\Media\Support\LocalImageVariantProcessor;
 use TentaPress\Media\Support\MediaFeatureAvailability;
 use Throwable;
 
@@ -24,6 +25,7 @@ final class ImportController
         Request $request,
         StockManager $manager,
         MediaFeatureAvailability $features,
+        LocalImageVariantProcessor $processor,
     ): RedirectResponse|JsonResponse {
         if (! $features->hasStockSources()) {
             return $this->respondError($request, 'No stock source plugins are enabled.', 422, true);
@@ -83,7 +85,7 @@ final class ImportController
 
         $mimeType = $response->header('Content-Type');
         $mimeType = $mimeType ? trim(explode(';', $mimeType)[0]) : null;
-        [$width, $height] = $this->imageDimensions($path, $mimeType);
+        $processed = $processor->process('public', $path, $mimeType);
 
         $nowUserId = Auth::check() && is_object(Auth::user()) ? (int) (Auth::user()->id ?? 0) : null;
 
@@ -108,9 +110,15 @@ final class ImportController
             'path' => $path,
             'original_name' => $title.($extension !== '' ? '.'.$extension : ''),
             'mime_type' => $mimeType,
-            'size' => Storage::disk('public')->size($path),
-            'width' => $width,
-            'height' => $height,
+            'size' => $processed['size'] ?? Storage::disk('public')->size($path),
+            'width' => $processed['width'],
+            'height' => $processed['height'],
+            'source_width' => $processed['source_width'],
+            'source_height' => $processed['source_height'],
+            'variants' => $processed['variants'],
+            'preview_variant' => $processed['preview_variant'],
+            'optimization_status' => $processed['optimization_status'],
+            'optimization_error' => $processed['optimization_error'],
             'created_by' => $nowUserId ?: null,
             'updated_by' => $nowUserId ?: null,
         ]);
@@ -268,25 +276,4 @@ final class ImportController
         return '';
     }
 
-    /**
-     * @return array{0:int|null,1:int|null}
-     */
-    private function imageDimensions(string $path, ?string $mimeType): array
-    {
-        $mime = (string) ($mimeType ?? '');
-        if ($mime === '' || ! str_starts_with($mime, 'image/')) {
-            return [null, null];
-        }
-
-        $fullPath = Storage::disk('public')->path($path);
-        $size = @getimagesize($fullPath);
-        if (! is_array($size)) {
-            return [null, null];
-        }
-
-        $width = isset($size[0]) ? (int) $size[0] : null;
-        $height = isset($size[1]) ? (int) $size[1] : null;
-
-        return [$width, $height];
-    }
 }

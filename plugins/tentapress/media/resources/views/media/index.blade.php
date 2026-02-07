@@ -130,6 +130,7 @@
                             $url = $urlGenerator->url($item);
                             $mime = (string) ($item->mime_type ?? '');
                             $isImage = $mime !== '' && str_starts_with($mime, 'image/');
+                            $previewUrl = $isImage ? ($urlGenerator->imageUrl($item, ['variant' => 'thumb']) ?? $url) : $url;
                             $size = is_numeric($item->size ?? null) ? (int) $item->size : null;
                             $sizeLabel = $size ? number_format($size / 1024, 1).' KB' : '—';
                             $title = (string) ($item->title ?? '');
@@ -139,9 +140,9 @@
                         @endphp
                         <div class="group overflow-hidden rounded-2xl border border-black/10 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
                             <div class="relative">
-                                @if ($url && $isImage)
+                                @if ($previewUrl && $isImage)
                                     <img
-                                        src="{{ $url }}"
+                                        src="{{ $previewUrl }}"
                                         alt=""
                                         class="aspect-[4/3] w-full object-cover" />
                                 @else
@@ -213,6 +214,7 @@
                             $url = $urlGenerator->url($item);
                                 $mime = (string) ($item->mime_type ?? '');
                                 $isImage = $mime !== '' && str_starts_with($mime, 'image/');
+                                $previewUrl = $isImage ? ($urlGenerator->imageUrl($item, ['variant' => 'thumb']) ?? $url) : $url;
                                 $size = is_numeric($item->size ?? null) ? (int) $item->size : null;
                                 $sizeLabel = $size ? number_format($size / 1024, 1).' KB' : '—';
                                 $title = (string) ($item->title ?? '');
@@ -221,9 +223,9 @@
                             @endphp
                             <tr class="tp-table__row">
                                 <td class="tp-table__td">
-                                    @if ($url && $isImage)
+                                    @if ($previewUrl && $isImage)
                                         <div class="h-28 w-40 overflow-hidden rounded-2xl border border-black/10 bg-slate-50 shadow-sm">
-                                            <img src="{{ $url }}" alt="" class="h-full w-full object-cover" />
+                                            <img src="{{ $previewUrl }}" alt="" class="h-full w-full object-cover" />
                                         </div>
                                     @else
                                         <div

@@ -7,7 +7,7 @@ Upload and manage media files for TentaPress.
 | Field    | Value                                   |
 |----------|-----------------------------------------|
 | ID       | `tentapress/media`                      |
-| Version  | 0.6.2                                   |
+| Version  | 0.7.0                                   |
 | Provider | `TentaPress\Media\MediaServiceProvider` |
 
 ## Goal
@@ -32,6 +32,8 @@ Provide a first-party media library for uploads, management, and reuse across Pa
 - Async stock imports with multi-select bulk add
 - Imported stock items are marked in-place without inline notices
 - Saved media view preference now applies before render to avoid list/grid flash
+- Local image ingest clamp (`2048x2048`) with resize-to-original
+- Generated local image variants (`thumb`, `medium`, `large`) with preview-first admin rendering
 - Media selector for pages, posts, blocks, SEO
 
 ## Dependencies
@@ -51,6 +53,11 @@ Provide a first-party media library for uploads, management, and reuse across Pa
     - `mime_type` (nullable)
     - `size` (nullable)
     - `width`, `height` (nullable)
+    - `source_width`, `source_height` (nullable pre-clamp dimensions)
+    - `variants` (nullable JSON derivative metadata)
+    - `preview_variant` (nullable)
+    - `optimization_status` (nullable)
+    - `optimization_error` (nullable)
     - `source` (nullable)
     - `source_item_id` (nullable)
     - `source_url` (nullable)
@@ -80,7 +87,11 @@ Provide a first-party media library for uploads, management, and reuse across Pa
 ## Storage
 
 - Uses Laravel filesystem; default disk `public`.
-- No generated variants yet (original file only).
+- Oversized image uploads are clamped to `2048x2048` and stored as canonical original.
+- Local image variants are generated for preview/delivery defaults:
+  - `thumb` (320w)
+  - `medium` (768w)
+  - `large` (1600w)
 
 ## Integrations (current)
 
@@ -90,7 +101,6 @@ Provide a first-party media library for uploads, management, and reuse across Pa
 
 ## Open questions
 
-- Do we want image variants/sizes in v1.1?
 - Should we add folders/collections later?
 - Should uploads be restricted by role or file type?
 
