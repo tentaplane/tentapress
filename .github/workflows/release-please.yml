@@ -6,6 +6,9 @@ on:
     paths-ignore:
       - 'plugins/**'
       - 'themes/**'
+      - '.release-please-manifest.json'
+      - 'CHANGELOG.md'
+      - 'composer.json'
   workflow_dispatch:
 
 permissions:
