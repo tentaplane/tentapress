@@ -1,5 +1,5 @@
 <aside
-    class="fixed inset-y-0 left-0 z-40 h-screen w-64 -translate-x-full overflow-y-auto bg-[#1d2327] text-white transition-transform md:translate-x-0"
+    class="fixed inset-y-0 left-0 z-40 h-screen w-64 -translate-x-full overflow-y-auto bg-linear-to-b from-[#172739] to-[#102030] text-white transition-transform md:translate-x-0"
     :class="sidebarOpen ? 'translate-x-0' : ''">
     <div class="flex h-14 items-center border-b border-white/10 px-4">
         <a href="{{ url('/admin') }}" class="flex items-center gap-2 text-sm hover:text-white/90">
@@ -23,7 +23,7 @@
             @if (!$hasChildren)
                 <a
                     href="{{ $url ?: '#' }}"
-                    class="{{ $isActive ? 'bg-white/10 text-white' : 'text-white/75 hover:bg-white/5 hover:text-white' }} block rounded px-3 py-2 text-sm font-semibold transition">
+                    class="{{ $isActive ? 'bg-[#2b7bc7]/25 text-white ring-1 ring-inset ring-[#6eaee6]/35' : 'text-white/75 hover:bg-white/8 hover:text-white' }} block rounded px-3 py-2 text-sm font-semibold transition">
                     {{ $label }}
                 </a>
             @else
@@ -31,7 +31,7 @@
                     <div class="flex items-center gap-1">
                         <a
                             href="{{ $url ?: '#' }}"
-                            class="{{ $isActive ? 'bg-white/10 text-white' : 'text-white/75 hover:bg-white/5 hover:text-white' }} block flex-1 rounded px-3 py-2 text-sm font-semibold transition">
+                            class="{{ $isActive ? 'bg-[#2b7bc7]/25 text-white ring-1 ring-inset ring-[#6eaee6]/35' : 'text-white/75 hover:bg-white/8 hover:text-white' }} block flex-1 rounded px-3 py-2 text-sm font-semibold transition">
                             {{ $label }}
                         </a>
 
@@ -54,7 +54,7 @@
 
                             <a
                                 href="{{ $childUrl ?: '#' }}"
-                                class="{{ $childActive ? 'bg-white/10 text-white' : 'text-white/70 hover:bg-white/5 hover:text-white' }} block rounded px-3 py-2 text-sm transition">
+                                class="{{ $childActive ? 'bg-[#2b7bc7]/20 text-white ring-1 ring-inset ring-[#6eaee6]/25' : 'text-white/70 hover:bg-white/8 hover:text-white' }} block rounded px-3 py-2 text-sm transition">
                                 {{ $childLabel }}
                             </a>
                         @endforeach
