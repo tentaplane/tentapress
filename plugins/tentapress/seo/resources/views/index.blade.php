@@ -178,7 +178,7 @@
                                 </td>
                                 <td class="tp-table__td align-middle py-4">
                                     @if ($isCustom)
-                                        <span class="tp-notice-success mb-0 inline-block px-2 py-1 text-xs">Yes</span>
+                                        <span class="tp-badge tp-badge-success">Yes</span>
                                     @else
                                         <span class="tp-muted text-xs">No</span>
                                     @endif
