@@ -3,6 +3,35 @@
 @section('title', 'Media')
 
 @section('content')
+    <script>
+        (() => {
+            const storageKey = 'tp.media.view';
+            const cookieName = 'tp_media_view';
+            const currentView = '{{ $view }}';
+            const params = new URLSearchParams(window.location.search);
+            const queryView = params.get('view');
+            const setCookie = (view) => {
+                document.cookie = `${cookieName}=${view}; path=/; max-age=31536000; SameSite=Lax`;
+            };
+
+            if (queryView === 'list' || queryView === 'grid') {
+                localStorage.setItem(storageKey, queryView);
+                setCookie(queryView);
+                return;
+            }
+
+            const storedView = localStorage.getItem(storageKey);
+            if (storedView === 'list' || storedView === 'grid') {
+                setCookie(storedView);
+                if (storedView !== currentView) {
+                    params.set('view', storedView);
+                    const query = params.toString();
+                    window.location.replace(query === '' ? window.location.pathname : `${window.location.pathname}?${query}`);
+                }
+            }
+        })();
+    </script>
+
     <div class="tp-page-header">
         <div>
             <h1 class="tp-page-title">Media</h1>
@@ -260,20 +289,16 @@
             }
 
             const storageKey = 'tp.media.view';
+            const cookieName = 'tp_media_view';
+            const setCookie = (view) => {
+                document.cookie = `${cookieName}=${view}; path=/; max-age=31536000; SameSite=Lax`;
+            };
             const params = new URLSearchParams(window.location.search);
             const queryView = params.get('view');
-            const storedView = localStorage.getItem(storageKey);
-            const currentView = root.dataset.currentView;
-
-            if ((queryView === null || queryView === '') && (storedView === 'list' || storedView === 'grid') && storedView !== currentView) {
-                params.set('view', storedView);
-                const query = params.toString();
-                window.location.replace(query === '' ? window.location.pathname : `${window.location.pathname}?${query}`);
-                return;
-            }
 
             if (queryView === 'list' || queryView === 'grid') {
                 localStorage.setItem(storageKey, queryView);
+                setCookie(queryView);
             }
 
             root.querySelectorAll('[data-media-view-link]').forEach((link) => {
@@ -281,6 +306,7 @@
                     const nextView = link.dataset.mediaViewLink;
                     if (nextView === 'list' || nextView === 'grid') {
                         localStorage.setItem(storageKey, nextView);
+                        setCookie(nextView);
                     }
                 });
             });

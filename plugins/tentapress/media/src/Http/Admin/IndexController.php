@@ -16,7 +16,12 @@ final class IndexController
         MediaFeatureAvailability $features,
     ): View {
         $search = trim((string) $request->query('s', ''));
-        $view = (string) $request->query('view', 'list');
+        $preferredView = (string) $request->query('view', '');
+        if ($preferredView === '') {
+            $preferredView = (string) $request->cookie('tp_media_view', '');
+        }
+
+        $view = $preferredView !== '' ? $preferredView : 'list';
         $view = in_array($view, ['list', 'grid'], true) ? $view : 'list';
 
         $query = TpMedia::query()->latest('created_at');
