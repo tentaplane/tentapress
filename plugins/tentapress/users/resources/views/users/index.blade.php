@@ -23,14 +23,14 @@
                 </span>
             </div>
             <form method="GET" class="flex w-full items-center gap-2 md:w-auto">
-                <label class="sr-only" for="roles-search">Search users</label>
+                <label class="sr-only" for="users-search">Search users</label>
                 <input
-                    id="roles-search"
+                    id="users-search"
                     name="s"
                     type="search"
                     value="{{ request('s') }}"
                     placeholder="Search users"
-                    class="w-full rounded-md border border-slate-200 px-3 py-1.5 text-sm md:w-56" />
+                    class="tp-input md:w-56" />
                 <button type="submit" class="tp-button-secondary">Search</button>
             </form>
         </div>

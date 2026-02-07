@@ -30,7 +30,7 @@
                     type="search"
                     value="{{ request('s') }}"
                     placeholder="Search roles"
-                    class="w-full rounded-md border border-slate-200 px-3 py-1.5 text-sm md:w-56" />
+                    class="tp-input md:w-56" />
                 <button type="submit" class="tp-button-secondary">Search</button>
             </form>
         </div>

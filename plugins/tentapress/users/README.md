@@ -7,7 +7,7 @@ User, role, and capability management for TentaPress.
 | Field    | Value                                   |
 |----------|-----------------------------------------|
 | ID       | `tentapress/users`                      |
-| Version  | 0.1.7                                   |
+| Version  | 0.1.8                                   |
 | Provider | `TentaPress\Users\UsersServiceProvider` |
 
 ## Features
