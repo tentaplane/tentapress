@@ -18,7 +18,7 @@
         <div class="tp-metabox__title flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <div class="flex flex-wrap items-center gap-3 text-sm">
                 <span>All users</span>
-                <span class="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-600">
+                <span class="tp-badge tp-badge-neutral">
                     {{ $users->total() }}
                 </span>
             </div>
@@ -68,9 +68,9 @@
                                 </td>
 
                                 <td class="tp-table__td">
-                                    <div class="flex justify-end gap-3 text-xs text-slate-600">
+                                    <div class="tp-muted flex justify-end gap-3 text-xs">
                                         <a
-                                            class="tp-button-link hover:text-slate-900"
+                                            class="tp-button-link"
                                             href="{{ route('tp.users.edit', ['user' => $user->id]) }}">
                                             Edit
                                         </a>
