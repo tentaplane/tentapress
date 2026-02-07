@@ -250,6 +250,10 @@
 		@apply bg-[#f6f7f7] text-xs uppercase text-black/60;
 	}
 
+	.tp-table--sticky-head .tp-table__thead {
+		@apply sticky top-0 z-10;
+	}
+
 	.tp-table__th {
 		@apply px-4 py-3 font-semibold;
 	}
