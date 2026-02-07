@@ -10,8 +10,12 @@
         </div>
 
         <div class="flex gap-2">
-            <a href="{{ route('tp.media.stock') }}" class="tp-button-secondary">Stock Library</a>
-            <a href="{{ route('tp.media.optimizations') }}" class="tp-button-secondary">Optimizations</a>
+            @if ($hasStockSources)
+                <a href="{{ route('tp.media.stock') }}" class="tp-button-secondary">Stock Library</a>
+            @endif
+            @if ($hasOptimizationProviders)
+                <a href="{{ route('tp.media.optimizations') }}" class="tp-button-secondary">Optimizations</a>
+            @endif
             <a href="{{ route('tp.media.create') }}" class="tp-button-primary">Upload file</a>
         </div>
     </div>
@@ -73,11 +77,17 @@
                     </div>
                     <div>
                         <p class="text-sm font-semibold text-[#1d2327]">No media yet</p>
-                        <p class="text-xs text-black/60">Upload files or import from the Stock Library to get started.</p>
+                        @if ($hasStockSources)
+                            <p class="text-xs text-black/60">Upload files or import from the Stock Library to get started.</p>
+                        @else
+                            <p class="text-xs text-black/60">Upload files to get started.</p>
+                        @endif
                     </div>
                     <div class="flex flex-wrap items-center justify-center gap-2">
                         <a href="{{ route('tp.media.create') }}" class="tp-button-primary">Upload Media</a>
-                        <a href="{{ route('tp.media.stock') }}" class="tp-button-secondary">Browse Stock</a>
+                        @if ($hasStockSources)
+                            <a href="{{ route('tp.media.stock') }}" class="tp-button-secondary">Browse Stock</a>
+                        @endif
                     </div>
                 </div>
             </div>

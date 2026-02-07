@@ -7,7 +7,7 @@ Upload and manage media files for TentaPress.
 | Field    | Value                                   |
 |----------|-----------------------------------------|
 | ID       | `tentapress/media`                      |
-| Version  | 0.5.7                                   |
+| Version  | 0.5.10                                  |
 | Provider | `TentaPress\Media\MediaServiceProvider` |
 
 ## Goal
@@ -17,7 +17,7 @@ Provide a first-party media library for uploads, management, and reuse across Pa
 ## Scope (v1)
 
 - Upload + browse media assets (images + generic files).
-- Stock library import (via provider plugins).
+- Stock library import (via enabled provider plugins).
 - Attribution metadata stored with assets.
 - Basic metadata: title, alt text, caption, mime type, size, dimensions.
 - Simple library with search (no folders).
@@ -70,7 +70,9 @@ Provide a first-party media library for uploads, management, and reuse across Pa
 - Media index: grid + list with previews, type, size, and actions.
 - Upload screen: file upload + metadata fields.
 - Edit screen: metadata editing + details panel.
-- Stock library: search and import from external providers (provider plugins).
+- Stock library: available only when at least one stock provider plugin is enabled in plugin state.
+- Optimizations: available only when at least one optimization provider plugin is enabled in plugin state.
+- Active optimization service selector: only enabled optimization plugins are listed.
 
 ## Storage
 

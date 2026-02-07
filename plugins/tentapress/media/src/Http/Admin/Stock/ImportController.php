@@ -14,12 +14,21 @@ use TentaPress\Media\Models\TpMedia;
 use TentaPress\Media\Stock\StockManager;
 use TentaPress\Media\Stock\StockSource;
 use TentaPress\Media\Stock\StockResult;
+use TentaPress\Media\Support\MediaFeatureAvailability;
 use Throwable;
 
 final class ImportController
 {
-    public function __invoke(Request $request, StockManager $manager): RedirectResponse
-    {
+    public function __invoke(
+        Request $request,
+        StockManager $manager,
+        MediaFeatureAvailability $features,
+    ): RedirectResponse {
+        if (! $features->hasStockSources()) {
+            return to_route('tp.media.index')
+                ->with('tp_notice_warning', 'No stock source plugins are enabled.');
+        }
+
         $data = $request->validate([
             'source' => ['required', 'string'],
             'id' => ['required', 'string'],

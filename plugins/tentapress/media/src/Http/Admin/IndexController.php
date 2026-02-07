@@ -7,11 +7,14 @@ namespace TentaPress\Media\Http\Admin;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use TentaPress\Media\Models\TpMedia;
+use TentaPress\Media\Support\MediaFeatureAvailability;
 
 final class IndexController
 {
-    public function __invoke(Request $request): View
-    {
+    public function __invoke(
+        Request $request,
+        MediaFeatureAvailability $features,
+    ): View {
         $search = trim((string) $request->query('s', ''));
         $view = (string) $request->query('view', 'list');
         $view = in_array($view, ['list', 'grid'], true) ? $view : 'list';
@@ -31,6 +34,8 @@ final class IndexController
             'media' => $media,
             'search' => $search,
             'view' => $view,
+            'hasStockSources' => $features->hasStockSources(),
+            'hasOptimizationProviders' => $features->hasOptimizationProviders(),
         ]);
     }
 }

@@ -5,21 +5,32 @@ declare(strict_types=1);
 namespace TentaPress\Media\Http\Admin\Stock;
 
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use TentaPress\Media\Stock\StockManager;
 use TentaPress\Media\Stock\StockQuery;
 use TentaPress\Media\Stock\StockSettings;
+use TentaPress\Media\Support\MediaFeatureAvailability;
 
 final class IndexController
 {
-    public function __invoke(Request $request, StockManager $manager, StockSettings $settings): View
-    {
+    public function __invoke(
+        Request $request,
+        StockManager $manager,
+        StockSettings $settings,
+        MediaFeatureAvailability $features,
+    ): View|RedirectResponse {
         $query = trim((string) $request->query('q', ''));
         $sourceKey = (string) $request->query('source', '');
         $mediaType = (string) $request->query('media_type', '');
         $orientation = (string) $request->query('orientation', '');
         $sort = (string) $request->query('sort', '');
         $page = max(1, (int) $request->query('page', 1));
+
+        if (! $features->hasStockSources()) {
+            return to_route('tp.media.index')
+                ->with('tp_notice_warning', 'No stock source plugins are enabled.');
+        }
 
         $enabledSources = $manager->enabled();
         $defaultSource = $enabledSources[0] ?? null;
