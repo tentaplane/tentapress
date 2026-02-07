@@ -6,7 +6,7 @@ namespace TentaPress\SystemInfo\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-final class PluginActionRequest extends FormRequest
+final class InstallPluginRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -14,23 +14,23 @@ final class PluginActionRequest extends FormRequest
     }
 
     /**
-     * @return array<string, mixed>
+     * @return array<string,mixed>
      */
     public function rules(): array
     {
         return [
-            'id' => ['required', 'string', 'regex:/^[a-z0-9][a-z0-9_.-]*\\/[a-z0-9][a-z0-9_.-]*$/'],
+            'package' => ['required', 'string', 'max:120', 'regex:/^[a-z0-9][a-z0-9_.-]*\/[a-z0-9][a-z0-9_.-]*$/'],
         ];
     }
 
     /**
-     * @return array<string, string>
+     * @return array<string,string>
      */
     public function messages(): array
     {
         return [
-            'id.required' => 'A plugin id is required.',
-            'id.regex' => 'Plugin id must match vendor/name.',
+            'package.required' => 'A package name is required.',
+            'package.regex' => 'Package must match vendor/package.',
         ];
     }
 }

@@ -7,7 +7,7 @@ Diagnostics and plugin management for TentaPress.
 | Field    | Value                                             |
 |----------|---------------------------------------------------|
 | ID       | `tentapress/system-info`                          |
-| Version  | 0.1.8                                             |
+| Version  | 0.2.0                                             |
 | Provider | `TentaPress\SystemInfo\SystemInfoServiceProvider` |
 
 ## Features
@@ -17,6 +17,7 @@ Diagnostics and plugin management for TentaPress.
 - Storage status
 - Cache status
 - Plugin list with enable/disable controls
+- Queue-based Packagist plugin installs from admin
 
 ## Dependencies
 

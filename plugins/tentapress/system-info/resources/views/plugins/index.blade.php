@@ -21,6 +21,89 @@
         <div class="tp-notice-error">{{ $error }}</div>
     @endif
 
+    <div
+        class="tp-panel mb-4"
+        x-data="tpPluginInstaller({
+            token: @js(csrf_token()),
+            canInstallPlugins: @js($canInstallPlugins),
+            installTableExists: @js($installTableExists),
+            installUrl: @js(route('tp.plugins.install')),
+            statusUrlTemplate: @js(route('tp.plugins.install-attempts.show', ['installId' => '__ID__'])),
+            initialAttempts: @js($installAttempts),
+        })">
+        <div class="flex flex-col gap-3">
+            <div>
+                <h2 class="text-base font-semibold">Install plugin from Packagist</h2>
+                <p class="tp-muted mt-1 text-sm">Enter a package in <span class="tp-code">vendor/package</span> format.</p>
+            </div>
+
+            <template x-if="!installTableExists">
+                <div class="tp-notice-warning mb-0">Install tracking table is missing. Run migrations first.</div>
+            </template>
+            <template x-if="installTableExists && !canInstallPlugins">
+                <div class="tp-notice-warning mb-0">Only super administrators can queue plugin installs.</div>
+            </template>
+
+            <form class="flex flex-col gap-2 sm:flex-row sm:items-center" @submit.prevent="submit">
+                <input
+                    type="text"
+                    x-model="packageName"
+                    placeholder="vendor/package"
+                    class="tp-input w-full sm:max-w-sm"
+                    :disabled="!canInstallPlugins || !installTableExists || submitting" />
+                <button
+                    type="submit"
+                    class="tp-button-primary w-full sm:w-auto"
+                    :class="(!canInstallPlugins || !installTableExists || submitting || !packageName.trim()) ? 'tp-button-disabled' : 'tp-button-primary'"
+                    :disabled="!canInstallPlugins || !installTableExists || submitting || !packageName.trim()">
+                    <span x-show="!submitting">Install</span>
+                    <span x-show="submitting">Queueing...</span>
+                </button>
+            </form>
+
+            <div class="mt-2">
+                <div class="mb-2 text-sm font-semibold">Recent install attempts</div>
+                <template x-if="attempts.length === 0">
+                    <div class="tp-muted text-sm">No install attempts yet.</div>
+                </template>
+                <template x-if="attempts.length > 0">
+                    <div class="tp-table-wrap">
+                        <table class="tp-table">
+                            <thead class="tp-table__thead">
+                                <tr>
+                                    <th class="tp-table__th">Package</th>
+                                    <th class="tp-table__th">Status</th>
+                                    <th class="tp-table__th">When</th>
+                                </tr>
+                            </thead>
+                            <tbody class="tp-table__tbody">
+                                <template x-for="attempt in attempts" :key="attempt.id">
+                                    <tr class="tp-table__row">
+                                        <td class="tp-table__td">
+                                            <div class="tp-code text-xs" x-text="attempt.package"></div>
+                                            <template x-if="attempt.error">
+                                                <div class="tp-muted mt-1 text-xs" x-text="attempt.error"></div>
+                                            </template>
+                                        </td>
+                                        <td class="tp-table__td">
+                                            <span
+                                                class="tp-badge"
+                                                :class="badgeClass(attempt.status)"
+                                                x-text="attempt.status"></span>
+                                        </td>
+                                        <td class="tp-table__td">
+                                            <span class="tp-muted text-xs" x-text="formatDate(attempt.created_at)"></span>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </div>
+
     @if (empty($plugins))
         <div class="tp-panel">
             <div class="font-semibold">No plugins found</div>
@@ -165,6 +248,164 @@
                         }
                     } finally {
                         this.loading = false;
+                    }
+                },
+            };
+        };
+
+        window.tpPluginInstaller = function (config) {
+            return {
+                token: String(config.token || ''),
+                installUrl: String(config.installUrl || ''),
+                statusUrlTemplate: String(config.statusUrlTemplate || ''),
+                canInstallPlugins: Boolean(config.canInstallPlugins),
+                installTableExists: Boolean(config.installTableExists),
+                packageName: '',
+                submitting: false,
+                pollTimer: null,
+                attempts: Array.isArray(config.initialAttempts) ? config.initialAttempts : [],
+                init() {
+                    this.startPollingIfNeeded();
+                },
+                badgeClass(status) {
+                    if (status === 'success') {
+                        return 'tp-badge-success';
+                    }
+
+                    if (status === 'failed') {
+                        return 'tp-badge-error';
+                    }
+
+                    if (status === 'running') {
+                        return 'tp-badge-warning';
+                    }
+
+                    return 'tp-badge-neutral';
+                },
+                formatDate(value) {
+                    if (!value) {
+                        return '—';
+                    }
+
+                    const date = new Date(value);
+                    if (Number.isNaN(date.getTime())) {
+                        return String(value);
+                    }
+
+                    return date.toLocaleString();
+                },
+                hasActiveAttempts() {
+                    return this.attempts.some((attempt) => attempt.status === 'pending' || attempt.status === 'running');
+                },
+                startPollingIfNeeded() {
+                    if (!this.hasActiveAttempts()) {
+                        this.stopPolling();
+                        return;
+                    }
+
+                    if (this.pollTimer) {
+                        return;
+                    }
+
+                    this.pollTimer = window.setInterval(() => {
+                        this.pollActiveAttempts();
+                    }, 2500);
+                },
+                stopPolling() {
+                    if (!this.pollTimer) {
+                        return;
+                    }
+
+                    window.clearInterval(this.pollTimer);
+                    this.pollTimer = null;
+                },
+                async pollActiveAttempts() {
+                    const active = this.attempts.filter((attempt) => attempt.status === 'pending' || attempt.status === 'running');
+                    if (active.length === 0) {
+                        this.stopPolling();
+                        return;
+                    }
+
+                    await Promise.all(
+                        active.map(async (attempt) => {
+                            try {
+                                const url = this.statusUrlTemplate.replace('__ID__', String(attempt.id));
+                                const response = await fetch(url, {
+                                    method: 'GET',
+                                    headers: {
+                                        Accept: 'application/json',
+                                        'X-Requested-With': 'XMLHttpRequest',
+                                    },
+                                });
+
+                                if (!response.ok) {
+                                    return;
+                                }
+
+                                const data = await response.json().catch(() => ({}));
+                                if (!data.attempt || typeof data.attempt !== 'object') {
+                                    return;
+                                }
+
+                                const index = this.attempts.findIndex((item) => item.id === data.attempt.id);
+                                if (index >= 0) {
+                                    this.attempts[index] = data.attempt;
+                                }
+                            } catch {
+                            }
+                        }),
+                    );
+
+                    this.startPollingIfNeeded();
+                },
+                async submit() {
+                    if (this.submitting || !this.canInstallPlugins || !this.installTableExists) {
+                        return;
+                    }
+
+                    const packageName = this.packageName.trim().toLowerCase();
+                    if (!packageName) {
+                        return;
+                    }
+
+                    this.submitting = true;
+
+                    try {
+                        const body = new URLSearchParams({
+                            _token: this.token,
+                            package: packageName,
+                        });
+
+                        const response = await fetch(this.installUrl, {
+                            method: 'POST',
+                            headers: {
+                                Accept: 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body,
+                        });
+
+                        const data = await response.json().catch(() => ({}));
+                        if (!response.ok) {
+                            throw new Error(data.message || 'Unable to queue plugin install.');
+                        }
+
+                        if (data.attempt && typeof data.attempt === 'object') {
+                            this.attempts = [data.attempt, ...this.attempts.filter((item) => item.id !== data.attempt.id)].slice(0, 12);
+                            this.startPollingIfNeeded();
+                        }
+
+                        this.packageName = '';
+                        if (window.tpToast) {
+                            window.tpToast(data.message || 'Install queued.', 'success');
+                        }
+                    } catch (error) {
+                        if (window.tpToast) {
+                            window.tpToast(error.message || 'Unable to queue plugin install.', 'error');
+                        }
+                    } finally {
+                        this.submitting = false;
                     }
                 },
             };

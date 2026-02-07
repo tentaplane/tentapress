@@ -9,6 +9,8 @@ use TentaPress\System\Support\AdminRoutes;
 use TentaPress\SystemInfo\Http\Admin\Plugins\DisableController;
 use TentaPress\SystemInfo\Http\Admin\Plugins\EnableController;
 use TentaPress\SystemInfo\Http\Admin\Plugins\IndexController;
+use TentaPress\SystemInfo\Http\Admin\Plugins\InstallController;
+use TentaPress\SystemInfo\Http\Admin\Plugins\InstallStatusController;
 use TentaPress\SystemInfo\Http\Admin\Plugins\SyncController;
 
 AdminRoutes::group(function (): void {
@@ -26,6 +28,15 @@ AdminRoutes::group(function (): void {
 
     Route::post('/plugins/disable', DisableController::class)
         ->name('plugins.disable')
+        ->middleware('tp.can:manage_plugins');
+
+    Route::post('/plugins/install', InstallController::class)
+        ->name('plugins.install')
+        ->middleware('tp.can:manage_plugins');
+
+    Route::get('/plugins/install-attempts/{installId}', InstallStatusController::class)
+        ->whereNumber('installId')
+        ->name('plugins.install-attempts.show')
         ->middleware('tp.can:manage_plugins');
 
     Route::get('/system-info', SystemInfoController::class)
