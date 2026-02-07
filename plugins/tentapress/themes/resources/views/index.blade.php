@@ -54,7 +54,7 @@
                                 $isActive = ($activeId !== null && $activeId === $id);
                             @endphp
 
-                            <tr class="tp-table__row">
+                            <tr class="tp-table__row {{ $isActive ? 'bg-emerald-50/60 ring-1 ring-inset ring-emerald-200' : '' }}">
                                 <td class="tp-table__td">
                                     @php
                                         $id = (string) ($theme['id'] ?? '');
@@ -75,12 +75,18 @@
                                     @endif
                                 </td>
                                 <td class="tp-table__td">
-                                    <div class="font-semibold">
+                                    <div class="flex items-center gap-2 font-semibold">
                                         <a
                                             class="tp-button-link"
                                             href="{{ route('tp.themes.show', ['themePath' => $id]) }}">
                                             {{ $theme['name'] ?? $id }}
                                         </a>
+                                        @if ($isActive)
+                                            <span
+                                                class="inline-flex items-center rounded-full border border-emerald-300 bg-emerald-100 px-2 py-0.5 text-[11px] font-semibold tracking-[0.04em] text-emerald-800 uppercase">
+                                                Current theme
+                                            </span>
+                                        @endif
                                     </div>
 
                                     <div class="tp-muted mt-1 text-xs">
