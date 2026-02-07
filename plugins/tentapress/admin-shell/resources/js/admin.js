@@ -16,6 +16,15 @@ const ensureToastRoot = () => {
     return root;
 };
 
+const normalizeToastMessage = (message) => {
+    const value = String(message ?? '').trim();
+    if (value === '') {
+        return '';
+    }
+
+    return value.replace(/\.+$/u, '');
+};
+
 const addToast = (toast) => {
     const toastRoot = ensureToastRoot();
     const node = document.createElement('div');
@@ -23,7 +32,7 @@ const addToast = (toast) => {
 
     const message = document.createElement('div');
     message.className = 'tp-toast-message';
-    message.textContent = toast.message || '';
+    message.textContent = normalizeToastMessage(toast.message);
 
     const close = document.createElement('button');
     close.type = 'button';
@@ -43,7 +52,7 @@ const addToast = (toast) => {
 };
 
 window.tpToast = (message, type = 'info') => {
-    addToast({ message, type });
+    addToast({ message: normalizeToastMessage(message), type });
 };
 
 const toastRoot = document.getElementById('tp-toast-root');
