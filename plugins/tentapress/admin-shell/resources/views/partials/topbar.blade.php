@@ -20,6 +20,10 @@
     </div>
 
     <div class="flex items-center gap-3">
+        <a href="{{ url('/') }}" target="_blank" rel="noopener noreferrer" class="tp-button-secondary">
+            View site
+        </a>
+
         @auth
             <span class="tp-muted text-sm">Signed in as {{ auth()->user()->name ?? 'User' }}</span>
             <form method="POST" action="{{ route('tp.logout') }}">
