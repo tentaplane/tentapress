@@ -223,19 +223,46 @@
                                             </div>
 
                                             <div class="flex items-end gap-2 xl:col-span-10 xl:justify-end">
-                                                <button type="button" class="tp-button-link" :disabled="index === 0" @click="move(index, -1)">
-                                                    Move up
+                                                <button
+                                                    type="button"
+                                                    class="inline-flex h-8 w-8 items-center justify-center rounded-md border border-black/15 bg-white text-black/70 transition hover:border-black/25 hover:bg-black/[0.03] hover:text-black disabled:cursor-not-allowed disabled:opacity-40"
+                                                    :disabled="index === 0"
+                                                    title="Move up"
+                                                    aria-label="Move up"
+                                                    @click="move(index, -1)">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4">
+                                                        <path
+                                                            fill-rule="evenodd"
+                                                            d="M9.47 4.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1-1.06 1.06L10.75 6.56V15a.75.75 0 0 1-1.5 0V6.56L6.28 9.53a.75.75 0 0 1-1.06-1.06l4.25-4.25Z"
+                                                            clip-rule="evenodd" />
+                                                    </svg>
                                                 </button>
                                                 <button
                                                     type="button"
-                                                    class="tp-button-link"
+                                                    class="inline-flex h-8 w-8 items-center justify-center rounded-md border border-black/15 bg-white text-black/70 transition hover:border-black/25 hover:bg-black/[0.03] hover:text-black disabled:cursor-not-allowed disabled:opacity-40"
                                                     :disabled="index === items.length - 1"
+                                                    title="Move down"
+                                                    aria-label="Move down"
                                                     @click="move(index, 1)">
-                                                    Move down
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4">
+                                                        <path
+                                                            fill-rule="evenodd"
+                                                            d="M10.53 15.78a.75.75 0 0 1-1.06 0l-4.25-4.25a.75.75 0 1 1 1.06-1.06l2.97 2.97V5a.75.75 0 0 1 1.5 0v8.44l2.97-2.97a.75.75 0 1 1 1.06 1.06l-4.25 4.25Z"
+                                                            clip-rule="evenodd" />
+                                                    </svg>
                                                 </button>
-                                                <span class="text-slate-300">|</span>
-                                                <button type="button" class="tp-button-link text-red-600 hover:text-red-700" @click="remove(index)">
-                                                    Remove
+                                                <button
+                                                    type="button"
+                                                    class="inline-flex h-8 w-8 items-center justify-center rounded-md border border-red-200 bg-white text-red-600 transition hover:bg-red-50 hover:text-red-700"
+                                                    title="Remove item"
+                                                    aria-label="Remove item"
+                                                    @click="remove(index)">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4">
+                                                        <path
+                                                            fill-rule="evenodd"
+                                                            d="M8.75 3.5a1.75 1.75 0 0 0-1.738 1.545L6.92 6H4.75a.75.75 0 0 0 0 1.5h.314l.69 8.278A2.75 2.75 0 0 0 8.494 18.5h3.012a2.75 2.75 0 0 0 2.74-2.722l.69-8.278h.314a.75.75 0 0 0 0-1.5h-2.17l-.092-.955A1.75 1.75 0 0 0 11.25 3.5h-2.5Zm2.732 2.5-.092-.955a.25.25 0 0 0-.248-.22h-2.284a.25.25 0 0 0-.248.22L8.518 6h2.964Z"
+                                                            clip-rule="evenodd" />
+                                                    </svg>
                                                 </button>
                                             </div>
                                         </div>
