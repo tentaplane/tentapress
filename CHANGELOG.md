@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.29.0](https://github.com/tentaplane/tentapress/compare/v0.28.0...v0.29.0) (2026-02-07)
+
+
+### Features
+
+* **admin-shell:** ship distributable plugin-local admin assets ([6f3e9d3](https://github.com/tentaplane/tentapress/commit/6f3e9d354d34615d4f2063b0629d9b8d8dc257c3))
+
 ## [0.28.0](https://github.com/tentaplane/tentapress/compare/v0.27.0...v0.28.0) (2026-02-07)
 
 
