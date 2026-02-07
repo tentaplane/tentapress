@@ -187,8 +187,8 @@
                                     {{ $updatedAt?->diffForHumans() ?? '—' }}
                                 </td>
                                 <td class="tp-table__td align-middle py-4">
-                                    <div class="flex justify-end gap-3 text-xs text-slate-600">
-                                        <a class="tp-button-link hover:text-slate-900" href="{{ $entry['edit_url'] }}">
+                                    <div class="tp-muted flex justify-end gap-3 text-xs">
+                                        <a class="tp-button-link" href="{{ $entry['edit_url'] }}">
                                             Edit
                                         </a>
                                     </div>
