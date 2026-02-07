@@ -2,7 +2,7 @@
     "name": "tentapress/system",
     "type": "library",
     "license": "MIT",
-    "version": "0.1.2",
+    "version": "0.2.0",
     "autoload": {
         "psr-4": {
             "TentaPress\\System\\": "src/"
@@ -11,7 +11,8 @@
     "extra": {
         "laravel": {
             "providers": [
-                "TentaPress\\System\\SystemServiceProvider"
+                "TentaPress\\System\\SystemServiceProvider",
+                "TentaPress\\System\\SystemBladeServiceProvider"
             ]
         }
     }
