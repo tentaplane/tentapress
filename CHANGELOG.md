@@ -4,6 +4,40 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.21.0](https://github.com/tentaplane/tentapress/compare/v0.20.0...v0.21.0) (2026-02-07)
+
+
+### Features
+
+* **blocks:** add repeater-based editors for list fields ([5c94983](https://github.com/tentaplane/tentapress/commit/5c949833838b319ce627eca216e5e3f37edbe549))
+
+
+### Bug Fixes
+
+* **admin-shell:** simplify shell copy and bump patch version ([30a1ca0](https://github.com/tentaplane/tentapress/commit/30a1ca07d15bdae9b211d78f9b71703bf8ca676c))
+* **blocks:** simplify blocks editor copy ([71c0ee9](https://github.com/tentaplane/tentapress/commit/71c0ee9af31f4e2fbbcb2263e8b923dfcb4c54f2))
+* **export:** simplify export copy and bump patch version ([568528c](https://github.com/tentaplane/tentapress/commit/568528c346e5c4d6b1a73a2268796f0287eb6f5c))
+* **import:** simplify import copy and bump patch version ([d3f2e92](https://github.com/tentaplane/tentapress/commit/d3f2e92b5ada20fbb9fee72e60682ed93afa5406))
+* **media-stock-pexels:** simplify settings copy ([c75a916](https://github.com/tentaplane/tentapress/commit/c75a916ff6a54df2b16c217cc9d9b9e6f34f8949))
+* **media-stock-unsplash:** simplify settings copy ([4db4e8e](https://github.com/tentaplane/tentapress/commit/4db4e8e5ff61adc57035d5d91a004adc109ca138))
+* **media:** correct pexels video preview in stock modal ([fd78658](https://github.com/tentaplane/tentapress/commit/fd7865839c794195826a7de460cdd9a49d8c1e6e))
+* **media:** simplify media admin copy ([1921caa](https://github.com/tentaplane/tentapress/commit/1921caa022d3001aaf842638d64655694a3cc77b))
+* **menus:** simplify menu admin copy ([d2d4ad9](https://github.com/tentaplane/tentapress/commit/d2d4ad9c9af41b21b3504243cb5b5705fb8b46c7))
+* **page-editor:** simplify editor copy ([09c0ef8](https://github.com/tentaplane/tentapress/commit/09c0ef8b1c8c6f958cf636ebd1b6a8acc9febe3a))
+* **pages:** simplify admin page copy ([ac99401](https://github.com/tentaplane/tentapress/commit/ac994013ef3a0ce6319b6eca78c2d26fb59c2a66))
+* **posts:** simplify admin post copy ([15791a4](https://github.com/tentaplane/tentapress/commit/15791a4478c219f3bad65aedecdde0d2773b8b77))
+* **seo:** simplify seo admin copy ([dd8bb7a](https://github.com/tentaplane/tentapress/commit/dd8bb7abab4f69ffb6aa149b98fbb7715e023e6e))
+* **settings:** simplify settings copy and bump patch version ([734646e](https://github.com/tentaplane/tentapress/commit/734646ee0abdc1aa52a109f020c5ff12697925a9))
+* **static-deploy:** simplify deploy admin copy ([55c285f](https://github.com/tentaplane/tentapress/commit/55c285fc4d296383c64af965b7cb97bbc3770102))
+* **system-info:** simplify admin copy and bump patch version ([db8f030](https://github.com/tentaplane/tentapress/commit/db8f0304a90374d5419afdc55d2e218e8a9732fc))
+* **themes:** simplify themes copy and bump patch version ([a644dd4](https://github.com/tentaplane/tentapress/commit/a644dd4553622baee4992c1c9e74063144389c72))
+* **users:** simplify users and roles admin copy ([681fba2](https://github.com/tentaplane/tentapress/commit/681fba28a325a19472f5d099ac89df9ce7e4058e))
+
+
+### Miscellaneous Chores
+
+* **admin-shell:** build assets ([b9feebd](https://github.com/tentaplane/tentapress/commit/b9feebdb105a86d293ff8d68a59e1d18f5746e42))
+
 ## [0.20.0](https://github.com/tentaplane/tentapress/compare/v0.19.0...v0.20.0) (2026-02-06)
 
 
