@@ -36,7 +36,8 @@
                 <h2 class="text-base font-semibold">Install plugin</h2>
                 <p class="tp-muted mt-1 text-sm">
                     Enter <span class="tp-code">vendor/package</span> or
-                    <span class="tp-code">https://github.com/vendor/package</span>.
+                    <span class="tp-code">https://github.com/vendor/package</span> or
+                    <span class="tp-code">https://packagist.org/packages/vendor/package</span>.
                 </p>
             </div>
 
@@ -51,7 +52,7 @@
                 <input
                     type="text"
                     x-model="packageName"
-                    placeholder="vendor/package or github.com/vendor/package"
+                    placeholder="vendor/package, github.com/vendor/package, or packagist URL"
                     class="tp-input w-full sm:max-w-sm"
                     :disabled="!canInstallPlugins || !installTableExists || submitting" />
                 <button

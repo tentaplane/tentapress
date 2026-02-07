@@ -81,7 +81,10 @@ final class InstallController
         }
 
         $rawUrl = $value;
-        if (! str_contains($rawUrl, '://') && str_starts_with(strtolower($rawUrl), 'github.com/')) {
+        if (
+            ! str_contains($rawUrl, '://')
+            && (str_starts_with(strtolower($rawUrl), 'github.com/') || str_starts_with(strtolower($rawUrl), 'packagist.org/'))
+        ) {
             $rawUrl = 'https://' . $rawUrl;
         }
 
@@ -89,8 +92,22 @@ final class InstallController
         throw_if(! is_array($parts), RuntimeException::class, 'Invalid package format.');
 
         $host = strtolower((string) ($parts['host'] ?? ''));
-        throw_if($host !== 'github.com' && $host !== 'www.github.com', RuntimeException::class, 'Use vendor/package or a GitHub URL like https://github.com/vendor/package.');
+        if ($host === 'github.com' || $host === 'www.github.com') {
+            return $this->normalizeFromGithubParts($parts);
+        }
 
+        if ($host === 'packagist.org' || $host === 'www.packagist.org') {
+            return $this->normalizeFromPackagistParts($parts);
+        }
+
+        throw new RuntimeException('Use vendor/package, a GitHub URL, or a Packagist package URL.');
+    }
+
+    /**
+     * @param  array<string,mixed>  $parts
+     */
+    private function normalizeFromGithubParts(array $parts): string
+    {
         throw_if(isset($parts['query']) || isset($parts['fragment']), RuntimeException::class, 'GitHub URL cannot include query or fragment.');
 
         $path = trim((string) ($parts['path'] ?? ''), '/');
@@ -100,12 +117,30 @@ final class InstallController
         $owner = $segments[0];
         $repo = preg_replace('/\.git$/i', '', $segments[1]) ?? $segments[1];
 
-        $package = strtolower("{$owner}/{$repo}");
+        return $this->validatePackageName(strtolower("{$owner}/{$repo}"), 'GitHub URL owner/repo is invalid.');
+    }
+
+    /**
+     * @param  array<string,mixed>  $parts
+     */
+    private function normalizeFromPackagistParts(array $parts): string
+    {
+        throw_if(isset($parts['query']) || isset($parts['fragment']), RuntimeException::class, 'Packagist URL cannot include query or fragment.');
+
+        $path = trim((string) ($parts['path'] ?? ''), '/');
+        $segments = array_values(array_filter(explode('/', $path), static fn (string $segment): bool => $segment !== ''));
         throw_if(
-            preg_match('/^[a-z0-9][a-z0-9_.-]*\/[a-z0-9][a-z0-9_.-]*$/', $package) !== 1,
+            count($segments) !== 3 || strtolower($segments[0]) !== 'packages',
             RuntimeException::class,
-            'GitHub URL owner/repo is invalid.'
+            'Packagist URL must be in the form packagist.org/packages/vendor/package.'
         );
+
+        return $this->validatePackageName(strtolower($segments[1] . '/' . $segments[2]), 'Packagist URL vendor/package is invalid.');
+    }
+
+    private function validatePackageName(string $package, string $error): string
+    {
+        throw_if(preg_match('/^[a-z0-9][a-z0-9_.-]*\/[a-z0-9][a-z0-9_.-]*$/', $package) !== 1, RuntimeException::class, $error);
 
         return $package;
     }
