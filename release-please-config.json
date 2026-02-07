@@ -5,7 +5,8 @@
             "changelog-path": "CHANGELOG.md",
             "exclude-paths": [
                 "plugins/**",
-                "themes/**"
+                "themes/**",
+                "packages/**"
             ],
             "extra-files": [
                 "composer.json"
