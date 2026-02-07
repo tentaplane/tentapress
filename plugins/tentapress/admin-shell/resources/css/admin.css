@@ -208,6 +208,14 @@
 		@apply border-sky-200 bg-sky-50 text-sky-800;
 	}
 
+	.tp-badge-warning {
+		@apply border-amber-200 bg-amber-50 text-amber-800;
+	}
+
+	.tp-badge-error {
+		@apply border-red-200 bg-red-50 text-red-800;
+	}
+
 	.tp-badge-neutral {
 		@apply border-black/10 bg-black/5 text-black/70;
 	}
