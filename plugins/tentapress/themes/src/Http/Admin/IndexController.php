@@ -30,6 +30,20 @@ final class IndexController
             return $t;
         }, $themes);
 
+        usort($themes, function (array $left, array $right): int {
+            $leftActive = (bool) ($left['is_active'] ?? false);
+            $rightActive = (bool) ($right['is_active'] ?? false);
+
+            if ($leftActive !== $rightActive) {
+                return $leftActive ? -1 : 1;
+            }
+
+            $leftName = strtolower((string) ($left['name'] ?? $left['id'] ?? ''));
+            $rightName = strtolower((string) ($right['name'] ?? $right['id'] ?? ''));
+
+            return $leftName <=> $rightName;
+        });
+
         return view('tentapress-themes::index', [
             'themes' => $themes,
             'activeId' => $activeId,
