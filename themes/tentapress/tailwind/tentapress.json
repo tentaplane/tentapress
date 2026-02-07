@@ -2,7 +2,7 @@
     "type": "theme",
     "id": "tentapress/tailwind",
     "name": "Tailwind by TentaPress",
-    "version": "0.2.3",
+    "version": "0.2.4",
     "description": "A Tailwind v4 theme for TentaPress.",
     "provider": "TentaPress\\Themes\\Tailwind\\TailwindThemeServiceProvider",
     "provider_path": "src/TailwindThemeServiceProvider.php",
