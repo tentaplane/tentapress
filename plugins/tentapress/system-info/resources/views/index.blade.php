@@ -31,7 +31,7 @@
                         <div class="tp-muted mt-2 text-sm">No plugins are currently enabled.</div>
                     @else
                         <div class="tp-table-wrap mt-2">
-                            <table class="tp-table">
+                            <table class="tp-table tp-table--sticky-head">
                                 <thead class="tp-table__thead">
                                     <tr>
                                         <th class="tp-table__th">Plugin</th>
@@ -140,7 +140,7 @@
                 <div>
                     <div class="tp-muted text-xs font-semibold uppercase">Key extensions</div>
                     <div class="tp-table-wrap mt-2">
-                        <table class="tp-table">
+                        <table class="tp-table tp-table--sticky-head">
                             <thead class="tp-table__thead">
                                 <tr>
                                     <th class="tp-table__th">Extension</th>

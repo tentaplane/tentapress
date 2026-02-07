@@ -39,7 +39,7 @@
             <div class="tp-metabox__body tp-muted text-sm">No roles yet. Create your first role.</div>
         @else
             <div class="tp-table-wrap">
-                <table class="tp-table">
+                <table class="tp-table tp-table--sticky-head">
                     <thead class="tp-table__thead">
                         <tr>
                             <th class="tp-table__th">Name</th>
