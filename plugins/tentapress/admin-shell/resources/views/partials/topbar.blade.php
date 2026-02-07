@@ -1,4 +1,4 @@
-<header class="flex h-14 items-center gap-3 border-b border-black/10 bg-white px-4 lg:px-6">
+<header class="flex h-14 items-center gap-3 border-b border-black/10 bg-linear-to-r from-white to-[#f6f9fc] px-4 lg:px-6">
     <button
         type="button"
         class="inline-flex h-9 w-9 items-center justify-center rounded border border-black/10 text-sm text-black/70 transition hover:bg-black/5 md:hidden"

@@ -15,6 +15,25 @@
 @source '../../../../../plugins/**/resources/js/**/*.js';
 
 @layer base {
+	:root {
+		--tp-brand-600: #2271b1;
+		--tp-brand-700: #1f6fb6;
+		--tp-brand-ink: #1a2f43;
+		--tp-surface-soft: #f3f6f9;
+	}
+
+	body {
+		font-family:
+			'Segoe UI Variable',
+			'Segoe UI',
+			-apple-system,
+			BlinkMacSystemFont,
+			'Helvetica Neue',
+			Arial,
+			'Noto Sans',
+			sans-serif;
+	}
+
 	button:not(:disabled),
 	[role="button"]:not(:disabled) {
 		cursor: pointer;
@@ -45,7 +64,7 @@
 	}
 
 	.tp-page-title {
-		@apply text-2xl font-semibold text-[#1d2327];
+		@apply text-2xl font-semibold text-[var(--tp-brand-ink)];
 	}
 
 	.tp-description {
@@ -155,7 +174,7 @@
 	------------------------------ */
 	.tp-button-primary {
 		@apply inline-flex items-center rounded-md px-3 py-2 text-sm font-semibold transition
-		bg-[#2271b1] text-white hover:brightness-95 shadow-sm cursor-pointer;
+		bg-linear-to-b from-[#2b7bc7] to-[var(--tp-brand-700)] text-white hover:brightness-95 shadow-sm cursor-pointer;
 	}
 
 	.tp-button-primary:focus-visible {
@@ -228,7 +247,7 @@
 	}
 
 	.tp-metabox__title {
-		@apply border-b border-black/10 bg-[#f6f7f7]/70 px-4 py-3 text-sm font-semibold;
+		@apply border-b border-black/10 bg-[var(--tp-surface-soft)]/80 px-4 py-3 text-sm font-semibold;
 	}
 
 	.tp-metabox__body {
@@ -247,7 +266,7 @@
 	}
 
 	.tp-table__thead {
-		@apply bg-[#f6f7f7] text-xs uppercase text-black/60;
+		@apply bg-[var(--tp-surface-soft)] text-xs uppercase text-black/60;
 	}
 
 	.tp-table--sticky-head .tp-table__thead {
