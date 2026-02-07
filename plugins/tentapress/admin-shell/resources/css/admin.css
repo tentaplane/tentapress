@@ -158,9 +158,17 @@
 		bg-[#2271b1] text-white hover:brightness-95 shadow-sm cursor-pointer;
 	}
 
+	.tp-button-primary:focus-visible {
+		@apply ring-2 ring-[#2271b1]/40 ring-offset-2 ring-offset-white outline-none;
+	}
+
 	.tp-button-secondary {
 		@apply inline-flex items-center rounded-md px-3 py-2 text-sm font-semibold transition
 		border border-black/20 bg-white text-black/80 hover:bg-black/5 cursor-pointer;
+	}
+
+	.tp-button-secondary:focus-visible {
+		@apply ring-2 ring-[#2271b1]/30 ring-offset-2 ring-offset-white outline-none;
 	}
 
 	.tp-button-danger {
@@ -168,8 +176,16 @@
 		bg-red-600 text-white hover:brightness-95 shadow-sm cursor-pointer;
 	}
 
+	.tp-button-danger:focus-visible {
+		@apply ring-2 ring-red-500/35 ring-offset-2 ring-offset-white outline-none;
+	}
+
 	.tp-button-link {
 		@apply inline-flex items-center text-sm font-semibold text-[#2271b1] hover:underline cursor-pointer;
+	}
+
+	.tp-button-link:focus-visible {
+		@apply rounded-sm underline ring-2 ring-[#2271b1]/35 ring-offset-1 ring-offset-white outline-none;
 	}
 
 	.tp-button-disabled {
