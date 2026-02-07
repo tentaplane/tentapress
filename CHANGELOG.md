@@ -4,6 +4,35 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.24.0](https://github.com/tentaplane/tentapress/compare/v0.23.0...v0.24.0) (2026-02-07)
+
+
+### Features
+
+* **admin-shell:** add sticky header utility for admin tables ([e38c04e](https://github.com/tentaplane/tentapress/commit/e38c04e5b21a0cbf0d6795a3a19a998f4a6c019c))
+* **admin-shell:** add topbar link to view site in new tab ([55a078a](https://github.com/tentaplane/tentapress/commit/55a078aa83e3b081075d971847753f776f5d4aee))
+
+
+### Bug Fixes
+
+* **admin-shell:** remove trailing full stops from toast messages ([670ac53](https://github.com/tentaplane/tentapress/commit/670ac539fa68983a6856d6e701789c149cc207fc))
+* **media,menus,seo,system-info,themes,users:** enable sticky headers on list tables ([df5a6d9](https://github.com/tentaplane/tentapress/commit/df5a6d9cda434241d155c7329e31cc525de88de4))
+* **media:** align grid overlay actions with shared button primitives ([af82600](https://github.com/tentaplane/tentapress/commit/af8260072c61408f807a38798fb46ac19b7a2383))
+* **media:** normalize row action styling in media list ([968b1c8](https://github.com/tentaplane/tentapress/commit/968b1c881ca4375bd257976af4c7cc97fab8e9a6))
+* **media:** restrict optimization services to enabled plugins ([0c74f1a](https://github.com/tentaplane/tentapress/commit/0c74f1a433a293e3bf1d056df3318f4678ca6452))
+* **menus:** normalize row action styling in menus list ([7b69ae6](https://github.com/tentaplane/tentapress/commit/7b69ae615072fe058ae0cd729d48d9425b0d0857))
+* **pages:** handle missing optional content and editor_driver attributes ([155de9b](https://github.com/tentaplane/tentapress/commit/155de9b530b20de2faf6438035b23bcc8216e058))
+* **pages:** normalize row action styling in pages list ([5305ebf](https://github.com/tentaplane/tentapress/commit/5305ebf7b20444ed9eff22efb36bcb450a60af48))
+* **posts,pages:** enable sticky headers on content list tables ([909b372](https://github.com/tentaplane/tentapress/commit/909b37201fb83c54a8159c0e483ecf2a4d710efc))
+* **posts:** handle missing optional content and editor_driver attributes ([374a2a7](https://github.com/tentaplane/tentapress/commit/374a2a73adf1adc3443284829a8b52377f27db66))
+* **posts:** normalize row action styling in posts list ([714ed89](https://github.com/tentaplane/tentapress/commit/714ed89459220bf69e42e191d7562a6ebd5c6e88))
+* **seo:** normalize row action styling in seo list ([26190e3](https://github.com/tentaplane/tentapress/commit/26190e39c35edae0d53fdc18a8a9f065ff3cd18e))
+* **seo:** use status badge primitive in seo index list ([c2f67fc](https://github.com/tentaplane/tentapress/commit/c2f67fcef998858af559bf117d4e72e372ce3cfd))
+* **system-info:** use status badge primitives in diagnostics tables ([3538ebb](https://github.com/tentaplane/tentapress/commit/3538ebb27a1a707c3e4d2d89c423a6112823c675))
+* **themes:** normalize row action styling in themes list ([5549390](https://github.com/tentaplane/tentapress/commit/55493908702b6f98ce935845931c827142540821))
+* **themes:** use status badge primitives in themes list ([cbe7f74](https://github.com/tentaplane/tentapress/commit/cbe7f74eae4f46a82bed1c5696d13f188a5f2b5b))
+* **users:** normalize list action and neutral badge styling ([ac131bc](https://github.com/tentaplane/tentapress/commit/ac131bc306089036965d7ca96c1b636e6fcf2533))
+
 ## [0.23.0](https://github.com/tentaplane/tentapress/compare/v0.22.0...v0.23.0) (2026-02-07)
 
 
