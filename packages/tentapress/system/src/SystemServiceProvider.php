@@ -4,13 +4,8 @@ declare(strict_types=1);
 
 namespace TentaPress\System;
 
-use Illuminate\Cache\RateLimiting\Limit;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
-use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Str;
 use TentaPress\System\Console\PluginsCommand;
 use TentaPress\System\Console\SeedDemoHomeCommand;
 use TentaPress\System\Console\ThemesCommand;
@@ -18,6 +13,7 @@ use TentaPress\System\Http\AdminAuthMiddleware;
 use TentaPress\System\Http\AdminErrorPagesMiddleware;
 use TentaPress\System\Http\AdminMiddleware;
 use TentaPress\System\Http\CanMiddleware;
+use TentaPress\System\Http\SecurityHeadersMiddleware;
 use TentaPress\System\Plugin\PluginAssetPublisher;
 use TentaPress\System\Plugin\PluginAssetRegistry;
 use TentaPress\System\Plugin\PluginManager;
@@ -47,19 +43,10 @@ final class SystemServiceProvider extends ServiceProvider
     {
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
 
-        Model::preventLazyLoading(! $this->app->isProduction());
-        Model::preventSilentlyDiscardingAttributes($this->app->isLocal());
-        Model::preventAccessingMissingAttributes(! $this->app->isProduction());
-
-        RateLimiter::for('tp-login', function (Request $request): Limit {
-            $email = Str::lower((string) $request->input('email', ''));
-
-            return Limit::perMinute(5)->by($email.'|'.$request->ip());
-        });
-
         $this->app->make(Router::class)->aliasMiddleware('tp.auth', AdminAuthMiddleware::class);
         $this->app->make(Router::class)->aliasMiddleware('tp.can', CanMiddleware::class);
         $this->app->make(Router::class)->aliasMiddleware('tp.admin.errors', AdminErrorPagesMiddleware::class);
+        $this->app->make(Router::class)->aliasMiddleware('tp.security.headers', SecurityHeadersMiddleware::class);
 
         $this->app->make(AdminMiddleware::class)->ensureGroup();
 

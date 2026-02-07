@@ -21,6 +21,7 @@ final readonly class AdminMiddleware
     public function ensureGroup(array $baseMiddleware = ['web']): void
     {
         $stack = array_values(array_unique(array_merge($baseMiddleware, [
+            'tp.security.headers',
             'tp.auth',
             'tp.admin.errors',
         ])));
