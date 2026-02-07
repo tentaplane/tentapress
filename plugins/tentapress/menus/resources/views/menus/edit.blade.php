@@ -171,11 +171,32 @@
 
                             <div class="space-y-3" x-show="items.length > 0" x-cloak>
                                 <template x-for="(item, index) in items" :key="item._key">
-                                    <div class="rounded-xl border border-black/10 bg-white p-4" :class="depthFor(item) > 0 ? 'border-sky-200 bg-sky-50/40' : ''">
+                                    <div
+                                        class="rounded-xl border border-black/10 bg-white p-4 transition-shadow"
+                                        :class="{
+                                            'border-sky-200 bg-sky-50/40': depthFor(item) > 0,
+                                            'opacity-70': dragIndex === index,
+                                            'ring-2 ring-black/10 shadow-sm': dragOverIndex === index && dragIndex !== index,
+                                        }"
+                                        @dragover.prevent.stop="dragOver(index)"
+                                        @dragleave.stop="dragLeave(index, $event)"
+                                        @drop.stop="dropOn(index)"
+                                        @dragend="dragEnd()">
                                         <input type="hidden" :name="`items[${index}][id]`" :value="item.id || ''" />
 
                                         <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
                                             <div class="flex items-center gap-2">
+                                                <button
+                                                    type="button"
+                                                    class="tp-button-link cursor-move rounded-full p-1 text-slate-500 hover:text-slate-700"
+                                                    draggable="true"
+                                                    aria-label="Drag to reorder"
+                                                    @dragstart="dragStart(index, $event)"
+                                                    @dragend="dragEnd()">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                                                    </svg>
+                                                </button>
                                                 <span class="rounded-full bg-black/5 px-2 py-0.5 text-xs font-semibold text-black/70" x-text="`#${index + 1}`"></span>
                                                 <span class="rounded-full border border-black/10 bg-white px-2 py-0.5 text-xs text-black/70" x-text="itemType(item)"></span>
                                                 <span class="tp-muted text-xs" x-show="depthFor(item) > 0" x-text="`Nested level ${depthFor(item)}`"></span>
@@ -225,7 +246,7 @@
                                             <div class="flex items-end gap-2 xl:col-span-10 xl:justify-end">
                                                 <button
                                                     type="button"
-                                                    class="inline-flex h-8 w-8 items-center justify-center rounded-md border border-black/15 bg-white text-black/70 transition hover:border-black/25 hover:bg-black/[0.03] hover:text-black disabled:cursor-not-allowed disabled:opacity-40"
+                                                    class="tp-button-link inline-flex items-center justify-center rounded-full p-1 text-slate-500 hover:text-slate-700 disabled:cursor-not-allowed disabled:opacity-40"
                                                     :disabled="index === 0"
                                                     title="Move up"
                                                     aria-label="Move up"
@@ -236,7 +257,7 @@
                                                 </button>
                                                 <button
                                                     type="button"
-                                                    class="inline-flex h-8 w-8 items-center justify-center rounded-md border border-black/15 bg-white text-black/70 transition hover:border-black/25 hover:bg-black/[0.03] hover:text-black disabled:cursor-not-allowed disabled:opacity-40"
+                                                    class="tp-button-link inline-flex items-center justify-center rounded-full p-1 text-slate-500 hover:text-slate-700 disabled:cursor-not-allowed disabled:opacity-40"
                                                     :disabled="index === items.length - 1"
                                                     title="Move down"
                                                     aria-label="Move down"
@@ -247,7 +268,7 @@
                                                 </button>
                                                 <button
                                                     type="button"
-                                                    class="inline-flex h-8 w-8 items-center justify-center rounded-md border border-red-200 bg-white text-red-600 transition hover:bg-red-50 hover:text-red-700"
+                                                    class="tp-button-link inline-flex items-center justify-center rounded-full p-1 text-red-500 hover:text-red-700"
                                                     title="Remove item"
                                                     aria-label="Remove item"
                                                     @click="remove(index)">
@@ -356,6 +377,8 @@
 
                 selectedPageId: '',
                 selectedPostId: '',
+                dragIndex: null,
+                dragOverIndex: null,
 
                 init() {
                     const initial = Array.isArray(opts.initialItems) ? opts.initialItems : [];
@@ -402,6 +425,54 @@
                     copy.splice(next, 0, item);
                     this.items = copy;
                     this.syncSortOrders();
+                },
+
+                dragStart(index, event) {
+                    this.dragIndex = index;
+                    this.dragOverIndex = index;
+                    if (event?.dataTransfer) {
+                        event.dataTransfer.effectAllowed = 'move';
+                        event.dataTransfer.setData('text/plain', String(index));
+                    }
+                },
+
+                dragOver(index) {
+                    if (this.dragIndex === null || this.dragIndex === index) {
+                        return;
+                    }
+
+                    this.dragOverIndex = index;
+                },
+
+                dragLeave(index, event) {
+                    const currentTarget = event?.currentTarget;
+                    const relatedTarget = event?.relatedTarget;
+                    if (currentTarget && relatedTarget && currentTarget.contains(relatedTarget)) {
+                        return;
+                    }
+
+                    if (this.dragOverIndex === index) {
+                        this.dragOverIndex = null;
+                    }
+                },
+
+                dropOn(index) {
+                    if (this.dragIndex === null || this.dragIndex === index) {
+                        this.dragEnd();
+                        return;
+                    }
+
+                    const copy = [...this.items];
+                    const [dragged] = copy.splice(this.dragIndex, 1);
+                    copy.splice(index, 0, dragged);
+                    this.items = copy;
+                    this.syncSortOrders();
+                    this.dragEnd();
+                },
+
+                dragEnd() {
+                    this.dragIndex = null;
+                    this.dragOverIndex = null;
                 },
 
                 remove(index) {
