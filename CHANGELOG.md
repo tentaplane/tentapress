@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.25.1](https://github.com/tentaplane/tentapress/compare/v0.25.0...v0.25.1) (2026-02-07)
+
+
+### Miscellaneous Chores
+
+* **theme-tailwind:** updated screenshot ([d636e55](https://github.com/tentaplane/tentapress/commit/d636e559fb0f9ec950a8cb72a4023b5f27fb78cc))
+
 ## [0.25.0](https://github.com/tentaplane/tentapress/compare/v0.24.0...v0.25.0) (2026-02-07)
 
 
