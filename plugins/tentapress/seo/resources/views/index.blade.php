@@ -158,7 +158,7 @@
                     <tbody class="tp-table__tbody">
                         @foreach ($entries as $entry)
                             @php
-                                $title = $entry['title'] !== '' ? $entry['title'] : '(Untitled)';
+                                $entryTitle = $entry['title'] !== '' ? $entry['title'] : '(Untitled)';
                                 $slug = $entry['slug'];
                                 $typeLabel = $entry['type'] === 'post' ? 'Post' : 'Page';
                                 $isCustom = (bool) $entry['has_seo'];
@@ -171,7 +171,7 @@
                                 <td class="tp-table__td align-middle py-4">
                                     <div class="flex items-center gap-4 whitespace-nowrap">
                                         <a class="tp-button-link" href="{{ $entry['edit_url'] }}">
-                                            {{ $title }}
+                                            {{ $entryTitle }}
                                         </a>
                                         <span class="tp-code">/{{ $slug }}</span>
                                     </div>
