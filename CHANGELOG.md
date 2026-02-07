@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.27.0](https://github.com/tentaplane/tentapress/compare/v0.26.0...v0.27.0) (2026-02-07)
+
+
+### Features
+
+* **admin-shell:** add subtle tentapress brand accents to admin chrome ([e1ddec2](https://github.com/tentaplane/tentapress/commit/e1ddec242578829f34ac7e8a698dff27ef456411))
+* **admin-shell:** refine root typography and sidebar brand palette ([c9a4884](https://github.com/tentaplane/tentapress/commit/c9a4884a63e4959ef98fdf3ad1eabeacb5a0a67a))
+* **media:** add local ingest clamp and image variants ([d6b540d](https://github.com/tentaplane/tentapress/commit/d6b540ddce0e7a53830c8fa377c2206d54fb3eb9))
+* **media:** add maintenance commands for local variants ([8eac6ef](https://github.com/tentaplane/tentapress/commit/8eac6ef2c58e2f125ad6572b855112cd732e7e82))
+* **system-info:** accept GitHub URLs for plugin install input ([d09109a](https://github.com/tentaplane/tentapress/commit/d09109a129bf2ba7a500ad7ad6f521104dcc6016))
+* **system-info:** add queued Packagist plugin installs in admin ([56e3b06](https://github.com/tentaplane/tentapress/commit/56e3b06a4ec9749c5560a326e8610e74ab40dc8c))
+
+
+### Bug Fixes
+
+* **media:** top bar title displaying incorrectly ([f61b92c](https://github.com/tentaplane/tentapress/commit/f61b92ccb68892e3aae56bf3fd496d7e7c053555))
+* **seo:** top bar title displaying incorrectly ([7082a36](https://github.com/tentaplane/tentapress/commit/7082a36cc19c2a44fa7c2a18ced2e4666c9d6348))
+
 ## [0.26.0](https://github.com/tentaplane/tentapress/compare/v0.25.1...v0.26.0) (2026-02-07)
 
 
