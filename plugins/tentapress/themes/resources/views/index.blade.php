@@ -125,11 +125,11 @@
                                 <td class="tp-table__td tp-code">{{ $theme['version'] ?? '—' }}</td>
                                 <td class="tp-table__td">
                                     @if ($isActive)
-                                        <span class="tp-notice-success mb-0 inline-block px-2 py-1 text-xs">
+                                        <span class="tp-badge tp-badge-success">
                                             Active
                                         </span>
                                     @else
-                                        <span class="tp-notice-info mb-0 inline-block px-2 py-1 text-xs">Inactive</span>
+                                        <span class="tp-badge tp-badge-info">Inactive</span>
                                     @endif
                                 </td>
                                 <td class="tp-table__td">
