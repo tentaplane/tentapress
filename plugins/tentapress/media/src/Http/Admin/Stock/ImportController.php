@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TentaPress\Media\Http\Admin\Stock;
 
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
@@ -23,10 +24,9 @@ final class ImportController
         Request $request,
         StockManager $manager,
         MediaFeatureAvailability $features,
-    ): RedirectResponse {
+    ): RedirectResponse|JsonResponse {
         if (! $features->hasStockSources()) {
-            return to_route('tp.media.index')
-                ->with('tp_notice_warning', 'No stock source plugins are enabled.');
+            return $this->respondError($request, 'No stock source plugins are enabled.', 422, true);
         }
 
         $data = $request->validate([
@@ -38,25 +38,25 @@ final class ImportController
         $sourceKey = (string) $data['source'];
         $source = $manager->get($sourceKey);
         if ($source === null || ! $source->isEnabled()) {
-            return back()->with('tp_notice_error', 'Stock source is not available.');
+            return $this->respondError($request, 'Stock source is not available.');
         }
 
         $mediaType = isset($data['media_type']) ? (string) $data['media_type'] : null;
         try {
             $result = $source->find((string) $data['id'], $mediaType);
         } catch (Throwable) {
-            return back()->with('tp_notice_error', 'Unable to reach stock provider (offline?).');
+            return $this->respondError($request, 'Unable to reach stock provider (offline?).');
         }
         if ($result === null || $result->downloadUrl === null || $result->downloadUrl === '') {
-            return back()->with('tp_notice_error', 'Unable to download this asset.');
+            return $this->respondError($request, 'Unable to download this asset.');
         }
 
         $downloadUrl = $this->resolveDownloadUrl($source, $result);
         if ($downloadUrl === null) {
-            return back()->with('tp_notice_error', 'Unable to resolve download URL.');
+            return $this->respondError($request, 'Unable to resolve download URL.');
         }
         if (! $this->isAllowedDownloadUrl($downloadUrl)) {
-            return back()->with('tp_notice_error', 'Download URL is not allowed.');
+            return $this->respondError($request, 'Download URL is not allowed.');
         }
 
         try {
@@ -65,10 +65,10 @@ final class ImportController
                 ->withOptions(['stream' => true])
                 ->get($downloadUrl);
         } catch (Throwable) {
-            return back()->with('tp_notice_error', 'Download failed (offline?).');
+            return $this->respondError($request, 'Download failed (offline?).');
         }
         if (! $response->ok()) {
-            return back()->with('tp_notice_error', 'Download failed.');
+            return $this->respondError($request, 'Download failed.');
         }
 
         $extension = $this->guessExtension($response->header('Content-Type'), $downloadUrl);
@@ -115,7 +115,44 @@ final class ImportController
             'updated_by' => $nowUserId ?: null,
         ]);
 
-        return to_route('tp.media.edit', ['media' => $media->id])
+        return $this->respondSuccess($request, (int) $media->id);
+    }
+
+    private function respondError(
+        Request $request,
+        string $message,
+        int $status = 422,
+        bool $redirectToMedia = false,
+    ): RedirectResponse|JsonResponse {
+        if ($request->expectsJson() || $request->wantsJson()) {
+            return response()->json([
+                'ok' => false,
+                'message' => $message,
+            ], $status);
+        }
+
+        if ($redirectToMedia) {
+            return to_route('tp.media.index')
+                ->with('tp_notice_warning', $message);
+        }
+
+        return back()->with('tp_notice_error', $message);
+    }
+
+    private function respondSuccess(Request $request, int $mediaId): RedirectResponse|JsonResponse
+    {
+        if ($request->expectsJson() || $request->wantsJson()) {
+            return response()->json([
+                'ok' => true,
+                'message' => 'Stock asset imported.',
+                'media' => [
+                    'id' => $mediaId,
+                    'edit_url' => route('tp.media.edit', ['media' => $mediaId]),
+                ],
+            ]);
+        }
+
+        return to_route('tp.media.edit', ['media' => $mediaId])
             ->with('tp_notice_success', 'Stock asset imported.');
     }
 

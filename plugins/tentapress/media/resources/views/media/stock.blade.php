@@ -5,6 +5,13 @@
 @section('content')
     <div
         x-data="{
+            importUrl: '{{ route('tp.media.stock.import') }}',
+            csrfToken: '{{ csrf_token() }}',
+            selectedItems: {},
+            importingKeys: {},
+            isBulkImporting: false,
+            feedbackMessage: '',
+            feedbackType: 'success',
             previewOpen: false,
             previewTitle: '',
             previewAuthor: '',
@@ -30,6 +37,85 @@
                 this.previewUrl = '';
                 this.previewVideoUrl = '';
                 this.previewPosterUrl = '';
+            },
+            itemKey(payload) {
+                return [payload.source || '', payload.id || '', payload.media_type || ''].join(':');
+            },
+            isImporting(payload) {
+                const key = this.itemKey(payload);
+                return this.importingKeys[key] === true;
+            },
+            setSelected(payload, checked) {
+                const key = this.itemKey(payload);
+                if (checked) {
+                    this.selectedItems[key] = payload;
+                    return;
+                }
+
+                delete this.selectedItems[key];
+            },
+            clearSelection() {
+                this.selectedItems = {};
+            },
+            selectedCount() {
+                return Object.keys(this.selectedItems).length;
+            },
+            showFeedback(message, type = 'success') {
+                this.feedbackMessage = message;
+                this.feedbackType = type;
+            },
+            async importOne(payload) {
+                const key = this.itemKey(payload);
+                this.importingKeys[key] = true;
+
+                try {
+                    const response = await fetch(this.importUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': this.csrfToken,
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: JSON.stringify(payload),
+                    });
+
+                    const data = await response.json().catch(() => ({}));
+                    if (!response.ok || data.ok !== true) {
+                        this.showFeedback(data.message || 'Import failed.', 'error');
+                        return false;
+                    }
+
+                    this.showFeedback(data.message || 'Asset imported.', 'success');
+                    delete this.selectedItems[key];
+                    return true;
+                } catch (_error) {
+                    this.showFeedback('Import failed (offline?).', 'error');
+                    return false;
+                } finally {
+                    delete this.importingKeys[key];
+                }
+            },
+            async importSelected() {
+                const items = Object.values(this.selectedItems);
+                if (items.length === 0) {
+                    return;
+                }
+
+                this.isBulkImporting = true;
+                let successCount = 0;
+
+                for (const item of items) {
+                    const ok = await this.importOne(item);
+                    if (ok) {
+                        successCount += 1;
+                    }
+                }
+
+                this.isBulkImporting = false;
+                if (successCount > 0) {
+                    this.showFeedback(`Imported ${successCount} item${successCount === 1 ? '' : 's'} to Media.`, 'success');
+                }
             }
         }"
         x-ref="previewRoot">
@@ -138,9 +224,34 @@
             </div>
         @endif
 
+        <div class="mt-4 flex flex-wrap items-center justify-between gap-2">
+            <div class="text-xs text-black/60" x-text="`${selectedCount()} selected`"></div>
+            <button
+                type="button"
+                class="tp-button-primary"
+                :disabled="selectedCount() === 0 || isBulkImporting"
+                @click="importSelected()">
+                <span x-show="!isBulkImporting">Add selected to Media</span>
+                <span x-show="isBulkImporting">Adding selected...</span>
+            </button>
+        </div>
+
+        <div
+            class="mt-3 rounded-md px-3 py-2 text-sm"
+            x-show="feedbackMessage"
+            x-cloak
+            :class="feedbackType === 'error' ? 'tp-notice-warning' : 'tp-notice-info'">
+            <span x-text="feedbackMessage"></span>
+        </div>
+
         <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mt-4">
             @foreach ($results->items as $item)
                 @php
+                    $importPayload = [
+                        'source' => $item->provider,
+                        'id' => $item->id,
+                        'media_type' => $item->mediaType,
+                    ];
                     $previewPayload = [
                         'title' => $item->title !== '' ? $item->title : 'Untitled',
                         'author' => $item->author,
@@ -153,6 +264,15 @@
                     ];
                 @endphp
                 <div class="rounded-lg border border-black/10 bg-white shadow-sm overflow-hidden">
+                    <div class="px-3 pt-3">
+                        <label class="inline-flex items-center gap-2 text-xs text-black/70">
+                            <input
+                                type="checkbox"
+                                class="tp-checkbox"
+                                @change="setSelected({{ Js::from($importPayload) }}, $event.target.checked)" />
+                            Select
+                        </label>
+                    </div>
                     <button
                         type="button"
                         class="border-b border-black/10 bg-slate-50 text-left w-full"
@@ -183,15 +303,14 @@
                             </div>
                         @endif
 
-                        <form method="POST" action="{{ route('tp.media.stock.import') }}">
-                            @csrf
-                            <input type="hidden" name="source" value="{{ $item->provider }}" />
-                            <input type="hidden" name="id" value="{{ $item->id }}" />
-                            <input type="hidden" name="media_type" value="{{ $item->mediaType }}" />
-                            <button type="submit" class="tp-button-primary w-full justify-center">
-                                Add to Media
-                            </button>
-                        </form>
+                        <button
+                            type="button"
+                            class="tp-button-primary w-full justify-center"
+                            :disabled="isImporting({{ Js::from($importPayload) }})"
+                            @click="importOne({{ Js::from($importPayload) }})">
+                            <span x-show="!isImporting({{ Js::from($importPayload) }})">Add to Media</span>
+                            <span x-show="isImporting({{ Js::from($importPayload) }})">Adding...</span>
+                        </button>
                     </div>
                 </div>
             @endforeach
