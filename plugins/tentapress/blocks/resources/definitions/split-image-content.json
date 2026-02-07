@@ -1,0 +1,41 @@
+{
+    "type": "blocks/split-image-content",
+    "name": "Split Image + Content",
+    "description": "Full-bleed split block with an image and supporting content.",
+    "version": 1,
+    "view": "blocks.split-image-content",
+    "fields": [
+        { "key": "image", "label": "Image", "type": "media" },
+        {
+            "key": "image_position",
+            "label": "Image Position",
+            "type": "select",
+            "options": [
+                { "value": "left", "label": "Left" },
+                { "value": "right", "label": "Right" }
+            ]
+        },
+        { "key": "eyebrow", "label": "Eyebrow", "type": "text" },
+        { "key": "heading", "label": "Heading", "type": "text" },
+        { "key": "subheading", "label": "Subheading", "type": "text" },
+        { "key": "body", "label": "Body", "type": "textarea", "rows": 5 }
+    ],
+    "defaults": {
+        "image": "",
+        "image_position": "left",
+        "eyebrow": "Spotlight",
+        "heading": "Split content that highlights the story",
+        "subheading": "Support the headline with a concise, confident message.",
+        "body": "Pair a visual moment with clear messaging. Use the body field for context, value, or next steps."
+    },
+    "example": {
+        "props": {
+            "image": "",
+            "image_position": "left",
+            "eyebrow": "Spotlight",
+            "heading": "Split content that highlights the story",
+            "subheading": "Support the headline with a concise, confident message.",
+            "body": "Pair a visual moment with clear messaging. Use the body field for context, value, or next steps."
+        }
+    }
+}
