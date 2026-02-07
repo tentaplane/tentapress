@@ -3,6 +3,10 @@
         ".": {
             "release-type": "php",
             "changelog-path": "CHANGELOG.md",
+            "exclude-paths": [
+                "plugins/**",
+                "themes/**"
+            ],
             "extra-files": [
                 "composer.json"
             ]
