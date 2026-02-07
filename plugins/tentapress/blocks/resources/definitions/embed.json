@@ -2,7 +2,7 @@
     "type": "blocks/embed",
     "name": "Embed",
     "description": "Embed external content via iframe.",
-    "version": 1,
+    "version": 2,
     "view": "blocks.embed",
     "fields": [
         { "key": "title", "label": "Title", "type": "text" },
@@ -20,6 +20,26 @@
         },
         { "key": "height", "label": "Height (px)", "type": "number", "min": 200, "max": 1200, "step": 10 },
         { "key": "allow_fullscreen", "label": "Allow fullscreen", "type": "toggle" },
+        { "key": "youtube_privacy_mode", "label": "YouTube privacy mode (no-cookie)", "type": "toggle" },
+        { "key": "youtube_controls", "label": "YouTube: show player controls", "type": "toggle" },
+        { "key": "youtube_fs", "label": "YouTube: show fullscreen button", "type": "toggle" },
+        { "key": "youtube_disablekb", "label": "YouTube: disable keyboard shortcuts", "type": "toggle" },
+        { "key": "youtube_captions", "label": "YouTube: show captions by default", "type": "toggle" },
+        { "key": "youtube_caption_lang", "label": "YouTube: caption language (e.g. en)", "type": "text" },
+        { "key": "youtube_playsinline", "label": "YouTube: play inline on mobile", "type": "toggle" },
+        { "key": "youtube_autoplay", "label": "YouTube: autoplay on load", "type": "toggle" },
+        { "key": "youtube_start", "label": "YouTube: start time (seconds)", "type": "number", "min": 0, "max": 86400, "step": 1 },
+        { "key": "youtube_end", "label": "YouTube: end time (seconds)", "type": "number", "min": 0, "max": 86400, "step": 1 },
+        { "key": "youtube_loop", "label": "YouTube: loop video", "type": "toggle" },
+        {
+            "key": "youtube_related",
+            "label": "YouTube: related videos",
+            "type": "select",
+            "options": [
+                { "value": "same_channel", "label": "Same channel only" },
+                { "value": "all", "label": "All related videos" }
+            ]
+        },
         { "key": "caption", "label": "Caption", "type": "textarea", "rows": 2 }
     ],
     "defaults": {
@@ -28,6 +48,18 @@
         "aspect": "16:9",
         "height": 480,
         "allow_fullscreen": true,
+        "youtube_privacy_mode": true,
+        "youtube_controls": true,
+        "youtube_fs": true,
+        "youtube_disablekb": false,
+        "youtube_captions": false,
+        "youtube_caption_lang": "",
+        "youtube_playsinline": true,
+        "youtube_autoplay": false,
+        "youtube_start": "",
+        "youtube_end": "",
+        "youtube_loop": false,
+        "youtube_related": "same_channel",
         "caption": ""
     },
     "example": {
@@ -37,6 +69,18 @@
             "aspect": "16:9",
             "height": 480,
             "allow_fullscreen": true,
+            "youtube_privacy_mode": true,
+            "youtube_controls": true,
+            "youtube_fs": true,
+            "youtube_disablekb": false,
+            "youtube_captions": false,
+            "youtube_caption_lang": "",
+            "youtube_playsinline": true,
+            "youtube_autoplay": false,
+            "youtube_start": "",
+            "youtube_end": "",
+            "youtube_loop": false,
+            "youtube_related": "same_channel",
             "caption": ""
         }
     }
