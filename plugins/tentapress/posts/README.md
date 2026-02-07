@@ -7,7 +7,7 @@ Blog post management for TentaPress.
 | Field    | Value                                   |
 |----------|-----------------------------------------|
 | ID       | `tentapress/posts`                      |
-| Version  | 0.2.7                                   |
+| Version  | 0.2.8                                   |
 | Provider | `TentaPress\Posts\PostsServiceProvider` |
 
 ## Features
