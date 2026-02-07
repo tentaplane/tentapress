@@ -5,6 +5,7 @@ on:
   push:
     branches: [ main ]
     paths:
+      - 'packages/**'
       - 'plugins/**'
       - 'themes/**'
       - '.github/workflows/split-publish.yml'
@@ -48,6 +49,7 @@ jobs:
         env:
           SPLIT_TOKEN: ${{ secrets.SPLIT_TOKEN }}
           SPLIT_ORG: ${{ secrets.SPLIT_ORG }}
+          SPLIT_PACKAGE_PREFIX: ${{ vars.SPLIT_PACKAGE_PREFIX }}
           SPLIT_PLUGIN_PREFIX: ${{ vars.SPLIT_PLUGIN_PREFIX }}
           SPLIT_THEME_PREFIX: ${{ vars.SPLIT_THEME_PREFIX }}
         run: |
@@ -59,6 +61,7 @@ jobs:
           fi
 
           ORG="${SPLIT_ORG:-${GITHUB_REPOSITORY_OWNER}}"
+          PACKAGE_PREFIX="${SPLIT_PACKAGE_PREFIX:-package-}"
           PLUGIN_PREFIX="${SPLIT_PLUGIN_PREFIX:-plugin-}"
           THEME_PREFIX="${SPLIT_THEME_PREFIX:-theme-}"
 
@@ -90,6 +93,11 @@ jobs:
 
           read_version_stdin() {
             python3 -c 'import json,sys; data=json.load(sys.stdin); print((data.get("version") or "").strip())' 2>/dev/null || true
+          }
+
+          read_composer_version_file() {
+            local path="$1"
+            python3 -c 'import json,sys; p=sys.argv[1]; data=json.load(open(p,"r",encoding="utf-8")); print((data.get("version") or "").strip())' "$path" 2>/dev/null || true
           }
 
           tag_version() {
@@ -149,6 +157,24 @@ jobs:
 
             rm -f "$notes_file"
           }
+
+          for path in packages/*/*; do
+            [ -f "$path/composer.json" ] || continue
+            name="$(basename "$path")"
+            repo="${PACKAGE_PREFIX}${name}"
+            version="$(read_composer_version_file "$path/composer.json")"
+            prev_version=""
+            if [ -n "${BEFORE:-}" ]; then
+              prev_version="$(git show "${BEFORE}:${path}/composer.json" 2>/dev/null | read_version_stdin || true)"
+            fi
+            if [ -z "${version:-}" ]; then
+              echo "Missing version in ${path}/composer.json for ${repo}."
+              exit 1
+            fi
+            echo "Version for ${repo}: ${version} (prev: ${prev_version:-none})"
+            sha="$(split_push "$path" "$repo")"
+            tag_version "$repo" "$version" "$sha" "$prev_version"
+          done
 
           for path in plugins/*/*; do
             [ -f "$path/composer.json" ] || continue

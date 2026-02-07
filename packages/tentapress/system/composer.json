@@ -2,7 +2,10 @@
     "name": "tentapress/system",
     "type": "library",
     "license": "MIT",
-    "version": "0.2.1",
+    "version": "0.3.0",
+    "replace": {
+        "tentapress/package-system": "self.version"
+    },
     "autoload": {
         "psr-4": {
             "TentaPress\\System\\": "src/"
