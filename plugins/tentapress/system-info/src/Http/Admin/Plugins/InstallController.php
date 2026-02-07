@@ -34,9 +34,10 @@ final class InstallController
             );
         }
 
-        $package = strtolower(trim((string) $request->validated('package')));
+        $package = trim((string) $request->validated('package'));
 
         try {
+            $package = $this->normalizePackageInput($package);
             $this->assertPackagistPackageExists($package);
 
             $attempt = TpPluginInstall::query()->create([
@@ -68,6 +69,45 @@ final class InstallController
             ->get("https://repo.packagist.org/p2/{$package}.json");
 
         throw_unless($response->successful(), RuntimeException::class, 'Package not found on Packagist.');
+    }
+
+    private function normalizePackageInput(string $input): string
+    {
+        $value = trim($input);
+        throw_if($value === '', RuntimeException::class, 'Package is required.');
+
+        if (preg_match('/^[a-z0-9][a-z0-9_.-]*\/[a-z0-9][a-z0-9_.-]*$/i', $value) === 1) {
+            return strtolower($value);
+        }
+
+        $rawUrl = $value;
+        if (! str_contains($rawUrl, '://') && str_starts_with(strtolower($rawUrl), 'github.com/')) {
+            $rawUrl = 'https://' . $rawUrl;
+        }
+
+        $parts = parse_url($rawUrl);
+        throw_if(! is_array($parts), RuntimeException::class, 'Invalid package format.');
+
+        $host = strtolower((string) ($parts['host'] ?? ''));
+        throw_if($host !== 'github.com' && $host !== 'www.github.com', RuntimeException::class, 'Use vendor/package or a GitHub URL like https://github.com/vendor/package.');
+
+        throw_if(isset($parts['query']) || isset($parts['fragment']), RuntimeException::class, 'GitHub URL cannot include query or fragment.');
+
+        $path = trim((string) ($parts['path'] ?? ''), '/');
+        $segments = array_values(array_filter(explode('/', $path), static fn (string $segment): bool => $segment !== ''));
+        throw_if(count($segments) !== 2, RuntimeException::class, 'GitHub URL must be in the form github.com/vendor/package.');
+
+        $owner = $segments[0];
+        $repo = preg_replace('/\.git$/i', '', $segments[1]) ?? $segments[1];
+
+        $package = strtolower("{$owner}/{$repo}");
+        throw_if(
+            preg_match('/^[a-z0-9][a-z0-9_.-]*\/[a-z0-9][a-z0-9_.-]*$/', $package) !== 1,
+            RuntimeException::class,
+            'GitHub URL owner/repo is invalid.'
+        );
+
+        return $package;
     }
 
     /**

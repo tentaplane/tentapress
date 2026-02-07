@@ -19,7 +19,7 @@ final class InstallPluginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'package' => ['required', 'string', 'max:120', 'regex:/^[a-z0-9][a-z0-9_.-]*\/[a-z0-9][a-z0-9_.-]*$/'],
+            'package' => ['required', 'string', 'max:255'],
         ];
     }
 
@@ -30,7 +30,6 @@ final class InstallPluginRequest extends FormRequest
     {
         return [
             'package.required' => 'A package name is required.',
-            'package.regex' => 'Package must match vendor/package.',
         ];
     }
 }

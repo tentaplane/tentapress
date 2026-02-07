@@ -33,8 +33,11 @@
         })">
         <div class="flex flex-col gap-3">
             <div>
-                <h2 class="text-base font-semibold">Install plugin from Packagist</h2>
-                <p class="tp-muted mt-1 text-sm">Enter a package in <span class="tp-code">vendor/package</span> format.</p>
+                <h2 class="text-base font-semibold">Install plugin</h2>
+                <p class="tp-muted mt-1 text-sm">
+                    Enter <span class="tp-code">vendor/package</span> or
+                    <span class="tp-code">https://github.com/vendor/package</span>.
+                </p>
             </div>
 
             <template x-if="!installTableExists">
@@ -48,7 +51,7 @@
                 <input
                     type="text"
                     x-model="packageName"
-                    placeholder="vendor/package"
+                    placeholder="vendor/package or github.com/vendor/package"
                     class="tp-input w-full sm:max-w-sm"
                     :disabled="!canInstallPlugins || !installTableExists || submitting" />
                 <button
