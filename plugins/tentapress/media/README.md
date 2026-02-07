@@ -7,7 +7,7 @@ Upload and manage media files for TentaPress.
 | Field    | Value                                   |
 |----------|-----------------------------------------|
 | ID       | `tentapress/media`                      |
-| Version  | 0.5.4                                   |
+| Version  | 0.5.5                                   |
 | Provider | `TentaPress\Media\MediaServiceProvider` |
 
 ## Goal

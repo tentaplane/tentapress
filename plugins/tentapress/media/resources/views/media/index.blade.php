@@ -209,9 +209,9 @@
                                 <td class="tp-table__td tp-muted">{{ $sizeLabel }}</td>
                                 <td class="tp-table__td tp-muted">{{ $item->created_at?->format('Y-m-d') ?? '—' }}</td>
                                 <td class="tp-table__td">
-                                    <div class="flex justify-end gap-3 text-xs text-slate-600">
+                                    <div class="tp-muted flex justify-end gap-3 text-xs">
                                         <a
-                                            class="tp-button-link hover:text-slate-900"
+                                            class="tp-button-link"
                                             href="{{ route('tp.media.edit', ['media' => $item->id]) }}">
                                             Edit
                                         </a>
