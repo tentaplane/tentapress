@@ -133,9 +133,9 @@
                                     @endif
                                 </td>
                                 <td class="tp-table__td">
-                                    <div class="flex justify-end gap-3 text-xs text-slate-600">
+                                    <div class="tp-muted flex justify-end gap-3 text-xs">
                                         <a
-                                            class="tp-button-link hover:text-slate-900"
+                                            class="tp-button-link"
                                             href="{{ route('tp.themes.show', ['themePath' => $id]) }}">
                                             Details
                                         </a>
