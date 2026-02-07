@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.28.0](https://github.com/tentaplane/tentapress/compare/v0.27.0...v0.28.0) (2026-02-07)
+
+
+### Features
+
+* **system-info:** support Packagist URLs in plugin installer ([b497dd7](https://github.com/tentaplane/tentapress/commit/b497dd7a118ffe5ffd78dcd6f549cca5ef731352))
+
+
+### Bug Fixes
+
+* **ci:** quote release-please job condition ([1574eee](https://github.com/tentaplane/tentapress/commit/1574eee8d9e30177dac610db343d654c3181aa59))
+* **release:** ignore package-only changes for monorepo release ([410ae30](https://github.com/tentaplane/tentapress/commit/410ae30b89ac6f083156763b8bc9d9cc4c0c1acf))
+
 ## [0.27.0](https://github.com/tentaplane/tentapress/compare/v0.26.0...v0.27.0) (2026-02-07)
 
 
