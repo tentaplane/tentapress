@@ -7,7 +7,7 @@ Upload and manage media files for TentaPress.
 | Field    | Value                                   |
 |----------|-----------------------------------------|
 | ID       | `tentapress/media`                      |
-| Version  | 0.7.0                                   |
+| Version  | 0.7.1                                   |
 | Provider | `TentaPress\Media\MediaServiceProvider` |
 
 ## Goal
@@ -89,9 +89,9 @@ Provide a first-party media library for uploads, management, and reuse across Pa
 - Uses Laravel filesystem; default disk `public`.
 - Oversized image uploads are clamped to `2048x2048` and stored as canonical original.
 - Local image variants are generated for preview/delivery defaults:
-  - `thumb` (320w)
-  - `medium` (768w)
-  - `large` (1600w)
+    - `thumb` (320w)
+    - `medium` (768w)
+    - `large` (1600w)
 
 ## Integrations (current)
 

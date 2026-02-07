@@ -133,7 +133,7 @@
                             $previewUrl = $isImage ? ($urlGenerator->imageUrl($item, ['variant' => 'thumb']) ?? $url) : $url;
                             $size = is_numeric($item->size ?? null) ? (int) $item->size : null;
                             $sizeLabel = $size ? number_format($size / 1024, 1).' KB' : '—';
-                            $title = (string) ($item->title ?? '');
+                            $itemTitle = (string) ($item->title ?? '');
                             $originalName = (string) ($item->original_name ?? '');
                             $typeLabel = $mime !== '' ? strtoupper(strtok($mime, '/')) : 'FILE';
                             $dateLabel = $item->created_at?->format('Y-m-d') ?? '—';
@@ -174,7 +174,7 @@
                                     <a
                                         href="{{ route('tp.media.edit', ['media' => $item->id]) }}"
                                         class="text-sm font-semibold text-[#1d2327] hover:underline truncate">
-                                        {{ $title !== '' ? $title : ($originalName !== '' ? $originalName : 'Untitled') }}
+                                        {{ $itemTitle !== '' ? $itemTitle : ($originalName !== '' ? $originalName : 'Untitled') }}
                                     </a>
                                     <span class="rounded-full bg-black/5 px-2 py-0.5 text-[11px] font-semibold text-black/60">
                                         {{ $typeLabel }}
@@ -211,13 +211,13 @@
                             @php
                                 $disk = (string) ($item->disk ?? 'public');
                                 $path = (string) ($item->path ?? '');
-                            $url = $urlGenerator->url($item);
+                                $url = $urlGenerator->url($item);
                                 $mime = (string) ($item->mime_type ?? '');
                                 $isImage = $mime !== '' && str_starts_with($mime, 'image/');
                                 $previewUrl = $isImage ? ($urlGenerator->imageUrl($item, ['variant' => 'thumb']) ?? $url) : $url;
                                 $size = is_numeric($item->size ?? null) ? (int) $item->size : null;
                                 $sizeLabel = $size ? number_format($size / 1024, 1).' KB' : '—';
-                                $title = (string) ($item->title ?? '');
+                                $itemTitle = (string) ($item->title ?? '');
                                 $originalName = (string) ($item->original_name ?? '');
                                 $typeLabel = $mime !== '' ? strtoupper(strtok($mime, '/')) : 'FILE';
                             @endphp
@@ -238,7 +238,7 @@
                                     <a
                                         class="tp-button-link"
                                         href="{{ route('tp.media.edit', ['media' => $item->id]) }}">
-                                        {{ $title !== '' ? $title : ($originalName !== '' ? $originalName : 'Untitled') }}
+                                        {{ $itemTitle !== '' ? $itemTitle : ($originalName !== '' ? $originalName : 'Untitled') }}
                                     </a>
                                 </td>
                                 <td class="tp-table__td tp-muted">
