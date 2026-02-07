@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.23.0](https://github.com/tentaplane/tentapress/compare/v0.22.0...v0.23.0) (2026-02-07)
+
+
+### Features
+
+* **blocks:** promoted split image/content block to first party ([bb9c904](https://github.com/tentaplane/tentapress/commit/bb9c904f23d18502170f2a63f0615b11e8006c29))
+* **system:** updated and released system package ([6f27e6a](https://github.com/tentaplane/tentapress/commit/6f27e6a1ccf455acbeff284e6e70aaaa921aee17))
+
 ## [0.22.0](https://github.com/tentaplane/tentapress/compare/v0.21.0...v0.22.0) (2026-02-07)
 
 
