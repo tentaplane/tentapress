@@ -144,11 +144,11 @@
                                 </td>
                                 <td class="tp-table__td align-middle py-4">
                                     @if ($post->status === 'published')
-                                        <span class="tp-notice-success mb-0 inline-block px-2 py-1 text-xs">
+                                        <span class="tp-badge tp-badge-success">
                                             Published
                                         </span>
                                     @else
-                                        <span class="tp-notice-info mb-0 inline-block px-2 py-1 text-xs">Draft</span>
+                                        <span class="tp-badge tp-badge-info">Draft</span>
                                     @endif
                                 </td>
                                 <td class="tp-table__td tp-muted align-middle py-4">
