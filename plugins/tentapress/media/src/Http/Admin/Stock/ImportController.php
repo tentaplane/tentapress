@@ -46,9 +46,15 @@ final class ImportController
         if ($downloadUrl === null) {
             return back()->with('tp_notice_error', 'Unable to resolve download URL.');
         }
+        if (! $this->isAllowedDownloadUrl($downloadUrl)) {
+            return back()->with('tp_notice_error', 'Download URL is not allowed.');
+        }
 
         try {
-            $response = Http::withOptions(['stream' => true])->get($downloadUrl);
+            $response = Http::connectTimeout(5)
+                ->timeout(20)
+                ->withOptions(['stream' => true])
+                ->get($downloadUrl);
         } catch (Throwable) {
             return back()->with('tp_notice_error', 'Download failed (offline?).');
         }
@@ -116,6 +122,68 @@ final class ImportController
         }
 
         return $result->downloadUrl;
+    }
+
+    private function isAllowedDownloadUrl(string $url): bool
+    {
+        $parts = parse_url($url);
+
+        if (! is_array($parts)) {
+            return false;
+        }
+
+        $scheme = strtolower((string) ($parts['scheme'] ?? ''));
+        $host = strtolower(trim((string) ($parts['host'] ?? '')));
+
+        if ($scheme !== 'https' || $host === '') {
+            return false;
+        }
+
+        if (in_array($host, ['localhost', '127.0.0.1', '::1'], true)) {
+            return false;
+        }
+
+        if (filter_var($host, FILTER_VALIDATE_IP)) {
+            return $this->isPublicIp($host);
+        }
+
+        $resolvedIps = gethostbynamel($host);
+        if (! is_array($resolvedIps) || $resolvedIps === []) {
+            $dnsRecords = function_exists('dns_get_record')
+                ? dns_get_record($host, DNS_A + DNS_AAAA)
+                : [];
+
+            $resolvedIps = [];
+            if (is_array($dnsRecords)) {
+                foreach ($dnsRecords as $record) {
+                    if (! is_array($record)) {
+                        continue;
+                    }
+
+                    $ip = $record['ip'] ?? $record['ipv6'] ?? null;
+                    if (is_string($ip) && $ip !== '') {
+                        $resolvedIps[] = $ip;
+                    }
+                }
+            }
+        }
+
+        if ($resolvedIps === []) {
+            return false;
+        }
+
+        foreach ($resolvedIps as $ip) {
+            if (! is_string($ip) || ! $this->isPublicIp($ip)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private function isPublicIp(string $ip): bool
+    {
+        return filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) !== false;
     }
 
     private function guessExtension(?string $contentType, string $downloadUrl): string

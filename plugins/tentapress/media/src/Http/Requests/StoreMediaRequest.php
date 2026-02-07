@@ -19,7 +19,12 @@ final class StoreMediaRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'file' => ['required', 'file', 'max:51200'],
+            'file' => [
+                'required',
+                'file',
+                'max:51200',
+                'mimetypes:image/jpeg,image/png,image/webp,image/gif,image/avif,video/mp4,video/webm,audio/mpeg,audio/wav,audio/ogg',
+            ],
             'title' => ['nullable', 'string', 'max:255'],
             'alt_text' => ['nullable', 'string', 'max:255'],
             'caption' => ['nullable', 'string', 'max:2000'],
@@ -35,6 +40,7 @@ final class StoreMediaRequest extends FormRequest
             'file.required' => 'Choose a file to upload.',
             'file.file' => 'The upload must be a valid file.',
             'file.max' => 'Files may not be larger than 50 MB.',
+            'file.mimetypes' => 'Only common image, video, and audio file types are allowed.',
             'title.max' => 'Title may not be longer than 255 characters.',
             'alt_text.max' => 'Alt text may not be longer than 255 characters.',
             'caption.max' => 'Caption may not be longer than 2000 characters.',
