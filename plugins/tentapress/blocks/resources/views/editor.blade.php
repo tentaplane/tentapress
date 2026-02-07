@@ -437,23 +437,88 @@
                                                     <template
                                                         x-if="field.type === 'repeater'">
                                                         <div class="space-y-3">
+                                                            <div class="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-black/10 bg-slate-50 px-3 py-2">
+                                                                <div class="text-xs font-semibold tracking-[0.12em] text-slate-500 uppercase">
+                                                                    Rows
+                                                                    <span
+                                                                        class="ml-1 rounded-full border border-slate-200 bg-white px-2 py-0.5 text-[11px] tracking-normal normal-case"
+                                                                        x-text="repeaterItems(index, field.key, field).length"></span>
+                                                                </div>
+                                                                <div class="flex items-center gap-3 text-xs">
+                                                                    <button
+                                                                        type="button"
+                                                                        class="tp-button-link"
+                                                                        @click="repeaterSetCollapsedAll(index, field.key, field, false)">
+                                                                        Expand all
+                                                                    </button>
+                                                                    <button
+                                                                        type="button"
+                                                                        class="tp-button-link"
+                                                                        @click="repeaterSetCollapsedAll(index, field.key, field, true)">
+                                                                        Collapse all
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+
+                                                            <div
+                                                                class="tp-muted rounded-lg border border-dashed border-black/15 bg-white p-4 text-sm"
+                                                                x-show="repeaterItems(index, field.key, field).length === 0">
+                                                                No rows yet. Use Add row to create the first item.
+                                                            </div>
+
                                                             <template
                                                                 x-for="(item, rowIndex) in repeaterItems(index, field.key, field)"
                                                                 :key="field.key + ':' + rowIndex">
                                                                 <div class="space-y-3 rounded-lg border border-black/10 bg-white p-3">
-                                                                    <div class="flex items-center justify-between gap-2">
-                                                                        <div class="text-xs font-semibold tracking-[0.12em] text-slate-500 uppercase">
-                                                                            Row <span x-text="rowIndex + 1"></span>
+                                                                    <div class="flex flex-wrap items-center justify-between gap-2">
+                                                                        <div class="min-w-0">
+                                                                            <div class="text-xs font-semibold tracking-[0.12em] text-slate-500 uppercase">
+                                                                                Row <span x-text="rowIndex + 1"></span>
+                                                                            </div>
+                                                                            <div
+                                                                                class="truncate text-sm font-semibold text-slate-700"
+                                                                                x-text="repeaterRowSummary(item, field, rowIndex)"></div>
                                                                         </div>
-                                                                        <button
-                                                                            type="button"
-                                                                            class="tp-button-link text-red-600 hover:text-red-700"
-                                                                            @click="repeaterRemoveRow(index, field.key, field, rowIndex)">
-                                                                            Remove
-                                                                        </button>
+                                                                        <div class="flex items-center gap-3 text-xs">
+                                                                            <button
+                                                                                type="button"
+                                                                                class="tp-button-link"
+                                                                                @click="repeaterToggleCollapse(index, field.key, rowIndex)"
+                                                                                x-text="repeaterIsCollapsed(index, field.key, rowIndex) ? 'Expand' : 'Collapse'"></button>
+                                                                            <button
+                                                                                type="button"
+                                                                                class="tp-button-link"
+                                                                                :disabled="rowIndex === 0"
+                                                                                :class="rowIndex === 0 ? 'opacity-30 cursor-not-allowed' : ''"
+                                                                                @click="repeaterMoveRow(index, field.key, field, rowIndex, -1)">
+                                                                                Up
+                                                                            </button>
+                                                                            <button
+                                                                                type="button"
+                                                                                class="tp-button-link"
+                                                                                :disabled="rowIndex === repeaterItems(index, field.key, field).length - 1"
+                                                                                :class="rowIndex === repeaterItems(index, field.key, field).length - 1 ? 'opacity-30 cursor-not-allowed' : ''"
+                                                                                @click="repeaterMoveRow(index, field.key, field, rowIndex, 1)">
+                                                                                Down
+                                                                            </button>
+                                                                            <button
+                                                                                type="button"
+                                                                                class="tp-button-link"
+                                                                                @click="repeaterDuplicateRow(index, field.key, field, rowIndex)">
+                                                                                Duplicate
+                                                                            </button>
+                                                                            <button
+                                                                                type="button"
+                                                                                class="tp-button-link text-red-600 hover:text-red-700"
+                                                                                @click="repeaterRemoveRow(index, field.key, field, rowIndex)">
+                                                                                Remove
+                                                                            </button>
+                                                                        </div>
                                                                     </div>
 
-                                                                    <div class="grid gap-3 sm:grid-cols-2">
+                                                                    <div
+                                                                        class="grid gap-3 sm:grid-cols-2"
+                                                                        x-show="!repeaterIsCollapsed(index, field.key, rowIndex)">
                                                                         <template
                                                                             x-for="col in repeaterColumns(field)"
                                                                             :key="col.key">
@@ -992,6 +1057,7 @@
                 savePending: false,
                 boundEditorKeydown: null,
                 textareaDrafts: {},
+                repeaterCollapsed: {},
                 addType: '',
                 insertIndex: null,
                 insertType: '',
@@ -2317,6 +2383,88 @@
                     const nextRow = this.repeaterNormalizeRow(field, items[rowIndex]);
                     nextRow[key] = value === null || value === undefined ? '' : String(value);
                     items[rowIndex] = nextRow;
+                    this.setProp(index, path, items);
+                },
+
+                repeaterRowStateKey(index, path, rowIndex) {
+                    const block = this.blocks[index];
+                    const blockKey = block && block._key ? String(block._key) : String(index);
+                    return `${blockKey}:${String(path)}:${rowIndex}`;
+                },
+
+                repeaterIsCollapsed(index, path, rowIndex) {
+                    if (!this.repeaterCollapsed || typeof this.repeaterCollapsed !== 'object') {
+                        return false;
+                    }
+                    return !!this.repeaterCollapsed[this.repeaterRowStateKey(index, path, rowIndex)];
+                },
+
+                repeaterToggleCollapse(index, path, rowIndex) {
+                    const stateKey = this.repeaterRowStateKey(index, path, rowIndex);
+                    const next = { ...(this.repeaterCollapsed || {}) };
+                    next[stateKey] = !next[stateKey];
+                    this.repeaterCollapsed = next;
+                },
+
+                repeaterSetCollapsedAll(index, path, field, collapsed) {
+                    const items = this.repeaterItems(index, path, field);
+                    const next = { ...(this.repeaterCollapsed || {}) };
+                    items.forEach((_, rowIndex) => {
+                        next[this.repeaterRowStateKey(index, path, rowIndex)] = !!collapsed;
+                    });
+                    this.repeaterCollapsed = next;
+                },
+
+                repeaterRowSummary(item, field, rowIndex) {
+                    const columns = this.repeaterColumns(field);
+                    const pieces = [];
+
+                    columns.forEach((column) => {
+                        if (pieces.length >= 2) {
+                            return;
+                        }
+                        const key = String(column.key || '').trim();
+                        if (key === '') {
+                            return;
+                        }
+                        const value = String(item?.[key] ?? '').trim();
+                        if (value !== '') {
+                            pieces.push(value);
+                        }
+                    });
+
+                    if (pieces.length === 0) {
+                        return `Row ${rowIndex + 1}`;
+                    }
+
+                    return pieces.join(' - ');
+                },
+
+                repeaterMoveRow(index, path, field, rowIndex, delta) {
+                    const items = this.repeaterItems(index, path, field);
+                    const targetIndex = rowIndex + delta;
+                    if (
+                        rowIndex < 0 ||
+                        rowIndex >= items.length ||
+                        targetIndex < 0 ||
+                        targetIndex >= items.length
+                    ) {
+                        return;
+                    }
+
+                    const [row] = items.splice(rowIndex, 1);
+                    items.splice(targetIndex, 0, row);
+                    this.setProp(index, path, items);
+                },
+
+                repeaterDuplicateRow(index, path, field, rowIndex) {
+                    const items = this.repeaterItems(index, path, field);
+                    if (rowIndex < 0 || rowIndex >= items.length) {
+                        return;
+                    }
+
+                    const copy = this.repeaterNormalizeRow(field, items[rowIndex]);
+                    items.splice(rowIndex + 1, 0, copy);
                     this.setProp(index, path, items);
                 },
 
