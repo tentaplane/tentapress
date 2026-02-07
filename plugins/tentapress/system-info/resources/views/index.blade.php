@@ -153,11 +153,11 @@
                                         <td class="tp-table__td tp-code">{{ $ext['key'] }}</td>
                                         <td class="tp-table__td">
                                             @if (!empty($ext['loaded']))
-                                                <span class="tp-notice-success mb-0 inline-block px-2 py-1 text-xs">
+                                                <span class="tp-badge tp-badge-success">
                                                     Yes
                                                 </span>
                                             @else
-                                                <span class="tp-notice-error mb-0 inline-block px-2 py-1 text-xs">
+                                                <span class="tp-badge tp-badge-error">
                                                     No
                                                 </span>
                                             @endif

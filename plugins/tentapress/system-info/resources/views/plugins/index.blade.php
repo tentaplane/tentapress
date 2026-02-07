@@ -70,8 +70,8 @@
                                 @endif
                             </td>
                             <td class="tp-table__td">
-                                <span x-show="enabled" class="tp-notice-success mb-0 inline-block px-2 py-1 text-xs">Enabled</span>
-                                <span x-show="!enabled" class="tp-notice-warning mb-0 inline-block px-2 py-1 text-xs">Disabled</span>
+                                <span x-show="enabled" class="tp-badge tp-badge-success">Enabled</span>
+                                <span x-show="!enabled" class="tp-badge tp-badge-warning">Disabled</span>
 
                                 @if (! $isInstalled)
                                     <div class="tp-muted mt-2 text-xs">Not installed. Add it to Composer first.</div>
