@@ -3,8 +3,11 @@
 @section('title', 'Dashboard')
 
 @section('content')
-    <div class="mb-5">
-        <h1 class="text-2xl font-semibold">Dashboard</h1>
+    <div class="tp-page-header">
+        <div>
+            <h1 class="tp-page-title">Dashboard</h1>
+            <p class="tp-description">View a snapshot of your site and jump into common admin tasks.</p>
+        </div>
     </div>
 
     @if (count($widgets) > 0)
