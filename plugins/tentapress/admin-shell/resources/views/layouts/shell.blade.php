@@ -6,7 +6,8 @@
         <title>@yield('title', 'Admin') - TentaPress</title>
 
         @stack('head-prepend')
-        @vite(['plugins/tentapress/admin-shell/resources/css/admin.css', 'plugins/tentapress/admin-shell/resources/js/admin.js'])
+        @tpPluginStyles('tentapress/admin-shell')
+        @tpPluginScripts('tentapress/admin-shell')
         @stack('head')
     </head>
     @php

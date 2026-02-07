@@ -1,0 +1,17 @@
+{
+  "resources/css/admin.css": {
+    "file": "admin-styles-BIPE7d4c.css",
+    "src": "resources/css/admin.css",
+    "isEntry": true,
+    "name": "admin-styles",
+    "names": [
+      "admin-styles.css"
+    ]
+  },
+  "resources/js/admin.js": {
+    "file": "admin-BsvuGi0g.js",
+    "name": "admin",
+    "src": "resources/js/admin.js",
+    "isEntry": true
+  }
+}
