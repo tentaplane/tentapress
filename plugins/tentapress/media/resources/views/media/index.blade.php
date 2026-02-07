@@ -136,6 +136,7 @@
                             $itemTitle = (string) ($item->title ?? '');
                             $originalName = (string) ($item->original_name ?? '');
                             $typeLabel = $mime !== '' ? strtoupper(strtok($mime, '/')) : 'FILE';
+                            $optimizationStatus = strtolower((string) ($item->optimization_status ?? 'skipped'));
                             $dateLabel = $item->created_at?->format('Y-m-d') ?? '—';
                         @endphp
                         <div class="group overflow-hidden rounded-2xl border border-black/10 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
@@ -181,6 +182,12 @@
                                     </span>
                                 </div>
                                 <div class="text-xs text-black/60 flex flex-wrap items-center gap-2">
+                                    <span
+                                        class="rounded-full px-2 py-0.5 font-semibold {{ $optimizationStatus === 'ready' ? 'bg-emerald-100 text-emerald-700' : ($optimizationStatus === 'failed' ? 'bg-red-100 text-red-700' : 'bg-slate-100 text-slate-600') }}"
+                                        title="Optimization status">
+                                        {{ strtoupper($optimizationStatus) }}
+                                    </span>
+                                    <span>·</span>
                                     <span>{{ $mime !== '' ? $mime : '—' }}</span>
                                     <span>·</span>
                                     <span>{{ $sizeLabel }}</span>
@@ -201,6 +208,7 @@
                             <th class="tp-table__th">Title</th>
                             <th class="tp-table__th">File</th>
                             <th class="tp-table__th">Type</th>
+                            <th class="tp-table__th">Optimization</th>
                             <th class="tp-table__th">Size</th>
                             <th class="tp-table__th">Uploaded</th>
                             <th class="tp-table__th text-right">Actions</th>
@@ -220,6 +228,7 @@
                                 $itemTitle = (string) ($item->title ?? '');
                                 $originalName = (string) ($item->original_name ?? '');
                                 $typeLabel = $mime !== '' ? strtoupper(strtok($mime, '/')) : 'FILE';
+                                $optimizationStatus = strtolower((string) ($item->optimization_status ?? 'skipped'));
                             @endphp
                             <tr class="tp-table__row">
                                 <td class="tp-table__td">
@@ -246,6 +255,12 @@
                                 </td>
                                 <td class="tp-table__td tp-muted">
                                     {{ $mime !== '' ? $mime : '—' }}
+                                </td>
+                                <td class="tp-table__td tp-muted">
+                                    <span
+                                        class="rounded-full px-2 py-0.5 text-xs font-semibold {{ $optimizationStatus === 'ready' ? 'bg-emerald-100 text-emerald-700' : ($optimizationStatus === 'failed' ? 'bg-red-100 text-red-700' : 'bg-slate-100 text-slate-600') }}">
+                                        {{ strtoupper($optimizationStatus) }}
+                                    </span>
                                 </td>
                                 <td class="tp-table__td tp-muted">{{ $sizeLabel }}</td>
                                 <td class="tp-table__td tp-muted">{{ $item->created_at?->format('Y-m-d') ?? '—' }}</td>

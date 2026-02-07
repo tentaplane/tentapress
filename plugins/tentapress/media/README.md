@@ -7,7 +7,7 @@ Upload and manage media files for TentaPress.
 | Field    | Value                                   |
 |----------|-----------------------------------------|
 | ID       | `tentapress/media`                      |
-| Version  | 0.7.1                                   |
+| Version  | 0.8.0                                   |
 | Provider | `TentaPress\Media\MediaServiceProvider` |
 
 ## Goal
@@ -34,6 +34,8 @@ Provide a first-party media library for uploads, management, and reuse across Pa
 - Saved media view preference now applies before render to avoid list/grid flash
 - Local image ingest clamp (`2048x2048`) with resize-to-original
 - Generated local image variants (`thumb`, `medium`, `large`) with preview-first admin rendering
+- Media maintenance commands for optimize/backfill/verification workflows
+- Optimization status badges in media index and details
 - Media selector for pages, posts, blocks, SEO
 
 ## Dependencies
@@ -119,4 +121,12 @@ Media URL driver configured in `config/tentapress.php`:
 ```bash
 php artisan tp:plugins sync
 php artisan tp:plugins enable tentapress/media
+```
+
+## Commands
+
+```bash
+php artisan tp:media:optimise --limit=200
+php artisan tp:media:backfill-variants --limit=200
+php artisan tp:media:verify-variants --limit=500
 ```

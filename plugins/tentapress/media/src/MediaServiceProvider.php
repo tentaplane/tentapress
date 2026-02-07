@@ -4,17 +4,20 @@ declare(strict_types=1);
 
 namespace TentaPress\Media;
 
+use Illuminate\Support\ServiceProvider;
+use TentaPress\Media\Console\BackfillMediaVariantsCommand;
+use TentaPress\Media\Console\OptimizeMediaCommand;
+use TentaPress\Media\Console\VerifyMediaVariantsCommand;
+use TentaPress\Media\Contracts\MediaUrlGenerator;
 use TentaPress\Media\Optimization\OptimizationManager;
 use TentaPress\Media\Optimization\OptimizationProviderRegistry;
 use TentaPress\Media\Optimization\OptimizationSettings;
-use TentaPress\Settings\Services\SettingsStore;
-use Illuminate\Support\ServiceProvider;
-use TentaPress\Media\Contracts\MediaUrlGenerator;
 use TentaPress\Media\Stock\StockManager;
 use TentaPress\Media\Stock\StockSourceRegistry;
 use TentaPress\Media\Support\LocalMediaUrlGenerator;
 use TentaPress\Media\Support\NullMediaUrlGenerator;
 use TentaPress\Media\Support\OptimizedMediaUrlGenerator;
+use TentaPress\Settings\Services\SettingsStore;
 
 final class MediaServiceProvider extends ServiceProvider
 {
@@ -70,5 +73,13 @@ final class MediaServiceProvider extends ServiceProvider
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'tentapress-media');
         $this->loadRoutesFrom(__DIR__.'/../routes/admin.php');
+
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                OptimizeMediaCommand::class,
+                BackfillMediaVariantsCommand::class,
+                VerifyMediaVariantsCommand::class,
+            ]);
+        }
     }
 }

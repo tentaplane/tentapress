@@ -145,6 +145,9 @@
                     $size = is_numeric($media->size ?? null) ? (int) $media->size : null;
                     $sizeLabel = $size ? number_format($size / 1024, 1).' KB' : '—';
                     $dimensions = $media->width && $media->height ? $media->width.'×'.$media->height : '—';
+                    $sourceDimensions = $media->source_width && $media->source_height ? $media->source_width.'×'.$media->source_height : '—';
+                    $optimizationStatus = (string) ($media->optimization_status ?? 'skipped');
+                    $variantCount = is_array($media->variants) ? count($media->variants) : 0;
                 @endphp
                 <div class="tp-metabox">
                     <div class="tp-metabox__title">Details</div>
@@ -169,6 +172,24 @@
                             <span class="tp-muted">Dimensions:</span>
                             <span class="tp-code">{{ $dimensions }}</span>
                         </div>
+                        <div>
+                            <span class="tp-muted">Source dimensions:</span>
+                            <span class="tp-code">{{ $sourceDimensions }}</span>
+                        </div>
+                        <div>
+                            <span class="tp-muted">Optimization:</span>
+                            <span class="tp-code">{{ strtoupper($optimizationStatus) }}</span>
+                        </div>
+                        <div>
+                            <span class="tp-muted">Variants:</span>
+                            <span class="tp-code">{{ $variantCount }}</span>
+                        </div>
+                        @if ($media->optimization_error)
+                            <div>
+                                <span class="tp-muted">Optimization error:</span>
+                                <div class="tp-pre">{{ $media->optimization_error }}</div>
+                            </div>
+                        @endif
                         <div>
                             <span class="tp-muted">Uploaded:</span>
                             <span class="tp-code">{{ $media->created_at?->toDateTimeString() ?? '—' }}</span>
