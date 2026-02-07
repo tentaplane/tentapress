@@ -30,6 +30,33 @@ final class TpPage extends Model
         'published_at' => 'datetime',
     ];
 
+    /**
+     * @return array<string,mixed>|null
+     */
+    protected function getContentAttribute(mixed $value): ?array
+    {
+        $raw = $this->attributes['content'] ?? $value;
+
+        if (is_array($raw)) {
+            return $raw;
+        }
+
+        if (! is_string($raw) || $raw === '') {
+            return null;
+        }
+
+        $decoded = json_decode($raw, true);
+
+        return is_array($decoded) ? $decoded : null;
+    }
+
+    protected function getEditorDriverAttribute(mixed $value): string
+    {
+        $raw = $this->attributes['editor_driver'] ?? $value;
+
+        return is_string($raw) && $raw !== '' ? $raw : 'blocks';
+    }
+
     public function isPublished(): bool
     {
         return (string) $this->status === 'published';
