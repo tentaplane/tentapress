@@ -45,7 +45,17 @@
                             $isProtected = ! empty($plugin['protected']);
                             $id = (string) ($plugin['id'] ?? '');
                         @endphp
-                        <tr class="tp-table__row">
+                        <tr
+                            class="tp-table__row"
+                            x-data="tpPluginToggle({
+                                id: @js($id),
+                                enabled: @js($isEnabled),
+                                installed: @js($isInstalled),
+                                protectedPlugin: @js($isProtected),
+                                token: @js(csrf_token()),
+                                enableUrl: @js(route('tp.plugins.enable')),
+                                disableUrl: @js(route('tp.plugins.disable')),
+                            })">
                             <td class="tp-table__td">
                                 <div class="font-semibold">{{ $plugin['name'] }}</div>
                                 <div class="tp-muted text-xs">{{ $id }}</div>
@@ -60,11 +70,8 @@
                                 @endif
                             </td>
                             <td class="tp-table__td">
-                                @if ($isEnabled)
-                                    <span class="tp-notice-success mb-0 inline-block px-2 py-1 text-xs">Enabled</span>
-                                @else
-                                    <span class="tp-notice-warning mb-0 inline-block px-2 py-1 text-xs">Disabled</span>
-                                @endif
+                                <span x-show="enabled" class="tp-notice-success mb-0 inline-block px-2 py-1 text-xs">Enabled</span>
+                                <span x-show="!enabled" class="tp-notice-warning mb-0 inline-block px-2 py-1 text-xs">Disabled</span>
 
                                 @if (! $isInstalled)
                                     <div class="tp-muted mt-2 text-xs">Not installed. Add it to Composer first.</div>
@@ -79,29 +86,24 @@
                             </td>
                             <td class="tp-table__td text-right">
                                 <div class="flex justify-end gap-2">
-                                    @if ($isEnabled)
-                                        <form method="POST" action="{{ route('tp.plugins.disable') }}">
-                                            @csrf
-                                            <input type="hidden" name="id" value="{{ $id }}" />
-                                            <button
-                                                type="submit"
-                                                class="{{ $isProtected ? 'tp-button-disabled' : 'tp-button-secondary' }}"
-                                                {{ $isProtected ? 'disabled' : '' }}>
-                                                Disable
-                                            </button>
-                                        </form>
-                                    @else
-                                        <form method="POST" action="{{ route('tp.plugins.enable') }}">
-                                            @csrf
-                                            <input type="hidden" name="id" value="{{ $id }}" />
-                                            <button
-                                                type="submit"
-                                                class="{{ $isInstalled ? 'tp-button-primary' : 'tp-button-disabled' }}"
-                                                {{ $isInstalled ? '' : 'disabled' }}>
-                                                Enable
-                                            </button>
-                                        </form>
-                                    @endif
+                                    <button
+                                        x-show="enabled"
+                                        type="button"
+                                        :class="protectedPlugin || loading ? 'tp-button-disabled' : 'tp-button-secondary'"
+                                        :disabled="protectedPlugin || loading"
+                                        @click="submit('disable')">
+                                        <span x-show="!loading">Disable</span>
+                                        <span x-show="loading">Working...</span>
+                                    </button>
+                                    <button
+                                        x-show="!enabled"
+                                        type="button"
+                                        :class="installed && !loading ? 'tp-button-primary' : 'tp-button-disabled'"
+                                        :disabled="!installed || loading"
+                                        @click="submit('enable')">
+                                        <span x-show="!loading">Enable</span>
+                                        <span x-show="loading">Working...</span>
+                                    </button>
                                 </div>
                             </td>
                         </tr>
@@ -111,3 +113,61 @@
         </div>
     @endif
 @endsection
+
+@push('scripts')
+    <script>
+        window.tpPluginToggle = function (config) {
+            return {
+                id: config.id,
+                enabled: Boolean(config.enabled),
+                installed: Boolean(config.installed),
+                protectedPlugin: Boolean(config.protectedPlugin),
+                token: String(config.token || ''),
+                enableUrl: String(config.enableUrl || ''),
+                disableUrl: String(config.disableUrl || ''),
+                loading: false,
+                async submit(action) {
+                    if (this.loading) {
+                        return;
+                    }
+
+                    this.loading = true;
+
+                    try {
+                        const url = action === 'enable' ? this.enableUrl : this.disableUrl;
+                        const body = new URLSearchParams({
+                            _token: this.token,
+                            id: this.id,
+                        });
+
+                        const response = await fetch(url, {
+                            method: 'POST',
+                            headers: {
+                                Accept: 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body,
+                        });
+
+                        const data = await response.json().catch(() => ({}));
+                        if (!response.ok) {
+                            throw new Error(data.message || 'Unable to update plugin status.');
+                        }
+
+                        this.enabled = Boolean(data.enabled);
+                        if (window.tpToast) {
+                            window.tpToast(data.message || 'Plugin updated.', 'success');
+                        }
+                    } catch (error) {
+                        if (window.tpToast) {
+                            window.tpToast(error.message || 'Unable to update plugin status.', 'error');
+                        }
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+            };
+        };
+    </script>
+@endpush
