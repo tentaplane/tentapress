@@ -113,7 +113,7 @@
                                 <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent opacity-0 transition group-hover:opacity-100"></div>
                                 <div class="absolute inset-x-0 bottom-0 flex items-center justify-between gap-2 p-3 text-white opacity-0 transition group-hover:opacity-100">
                                     <a
-                                        class="inline-flex items-center rounded-md bg-white/90 px-2.5 py-1 text-xs font-semibold text-[#1d2327] shadow-sm"
+                                        class="tp-button-secondary bg-white/90 px-2.5 py-1 text-xs shadow-sm backdrop-blur-sm"
                                         href="{{ route('tp.media.edit', ['media' => $item->id]) }}">
                                         Edit
                                     </a>
@@ -123,7 +123,7 @@
                                         data-confirm="Delete this media file? This action cannot be undone.">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="inline-flex items-center rounded-md bg-red-600 px-2.5 py-1 text-xs font-semibold text-white shadow-sm">
+                                        <button type="submit" class="tp-button-danger px-2.5 py-1 text-xs shadow-sm">
                                             Delete
                                         </button>
                                     </form>
