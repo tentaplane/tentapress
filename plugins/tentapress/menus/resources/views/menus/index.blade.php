@@ -199,8 +199,8 @@
                                 </td>
                                 <td class="tp-table__td tp-muted align-middle py-4">{{ $menu->updated_at?->diffForHumans() ?? '—' }}</td>
                                 <td class="tp-table__td align-middle py-4">
-                                    <div class="flex justify-end gap-3 text-xs text-slate-600">
-                                        <a class="tp-button-link hover:text-slate-900" href="{{ route('tp.menus.edit', ['menu' => $menu->id]) }}">
+                                    <div class="tp-muted flex justify-end gap-3 text-xs">
+                                        <a class="tp-button-link" href="{{ route('tp.menus.edit', ['menu' => $menu->id]) }}">
                                             Edit
                                         </a>
 
