@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.25.0](https://github.com/tentaplane/tentapress/compare/v0.24.0...v0.25.0) (2026-02-07)
+
+
+### Features
+
+* **blocks:** better YouTube controls and support ([a83fa90](https://github.com/tentaplane/tentapress/commit/a83fa9022ccbab7e5c601f1f42e53065b5680ebe))
+
 ## [0.24.0](https://github.com/tentaplane/tentapress/compare/v0.23.0...v0.24.0) (2026-02-07)
 
 
