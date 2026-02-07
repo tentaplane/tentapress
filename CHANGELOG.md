@@ -4,6 +4,42 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.22.0](https://github.com/tentaplane/tentapress/compare/v0.21.0...v0.22.0) (2026-02-07)
+
+
+### Features
+
+* **admin-shell:** add compact badge primitives for admin status chips ([5b3ad3b](https://github.com/tentaplane/tentapress/commit/5b3ad3bf2a2f1264b698472943ce0054cda7d46c))
+* **menus:** add drag-and-drop sorting to menu items ([f677c92](https://github.com/tentaplane/tentapress/commit/f677c921e45fe2d0fcf2da762d5eab0ad8adc6da))
+* **menus:** modernize menus index experience ([dd2f302](https://github.com/tentaplane/tentapress/commit/dd2f30265d2d42505117af75901e1b169f946aab))
+* **system:** better loading of Blade directives, some security best practices and rate limiting login ([ca7b383](https://github.com/tentaplane/tentapress/commit/ca7b383512eeccd64cd2b2076027a510c510aad6))
+
+
+### Bug Fixes
+
+* **admin-shell:** add focus-visible states to admin button primitives ([a8bf65c](https://github.com/tentaplane/tentapress/commit/a8bf65cbc972d1ece003cf41edbd3e647af8d08f))
+* **admin-shell:** align dashboard header with shared page primitives ([31b128b](https://github.com/tentaplane/tentapress/commit/31b128b013d6c45efc7f8ddbddeb85318a9fccfa))
+* **admin-shell:** improving the Admin UI ([72f2d8d](https://github.com/tentaplane/tentapress/commit/72f2d8d5b6390a0f79e2d219e13052af2226b8a4))
+* **import:** adopt media upload component for bundle input ([558bc6a](https://github.com/tentaplane/tentapress/commit/558bc6ac329d11a46f0b372dacbf5e8309eb659f))
+* **media:** delete storage file when removing media ([51dec3e](https://github.com/tentaplane/tentapress/commit/51dec3e59837b76034c354a7c5cf804655bbf4af))
+* **media:** hardening the media requests for third parties ([7a93d2b](https://github.com/tentaplane/tentapress/commit/7a93d2b8db55f0f504e593ce049389ada41cfd17))
+* **menus:** match block editor action icons ([394b910](https://github.com/tentaplane/tentapress/commit/394b91003700736e1007ae141bc69d5f0c67e9ea))
+* **menus:** use icon controls for menu item actions ([18d0491](https://github.com/tentaplane/tentapress/commit/18d0491c44bd1fb364522c4a50e64a5026a0887e))
+* **pages:** use status badge primitives in pages list ([87a1920](https://github.com/tentaplane/tentapress/commit/87a19206127bca2584f662b8fd98d37af22328de))
+* **posts:** use status badge primitives in posts list ([0a2334d](https://github.com/tentaplane/tentapress/commit/0a2334dc37a4276c6916d107b20577c12d642f75))
+* **system-info:** plugin enable/disable is now async ([4143bac](https://github.com/tentaplane/tentapress/commit/4143bac2f56164cc5b0843745437f9cf69eeb405))
+* **system:** increase the hardening and defaults for the system ([5a63633](https://github.com/tentaplane/tentapress/commit/5a6363343f9d5f7a42f043b1f1d8458b29856965))
+* **themes:** highlight active theme row ([06e0128](https://github.com/tentaplane/tentapress/commit/06e01284f27dd854c3491e60cec00a43ccae7b19))
+* **themes:** pin active theme to top of list ([bcb642e](https://github.com/tentaplane/tentapress/commit/bcb642e1c7d934b30e7c3fbfdced8dfe6997ef4f))
+* **users:** include rate limiting via system for the login endpoint ([a6ef00a](https://github.com/tentaplane/tentapress/commit/a6ef00ac0c078db9ec6d6a6667ab17d7de7ee331))
+* **users:** normalize users and roles search fields to shared input styles ([4169041](https://github.com/tentaplane/tentapress/commit/41690411a90151fac78d78c11d462da7c2afca4e))
+
+
+### Miscellaneous Chores
+
+* **admin-shell:** admin UI assets ([34fa6aa](https://github.com/tentaplane/tentapress/commit/34fa6aa6afb0470d08320ded7751f14f8d116af0))
+* **theme-tailwind:** update theme screenshot ([61f7d6a](https://github.com/tentaplane/tentapress/commit/61f7d6a4d0561fb7e6baff1b0e65fad916354c1b))
+
 ## [0.21.0](https://github.com/tentaplane/tentapress/compare/v0.20.0...v0.21.0) (2026-02-07)
 
 
