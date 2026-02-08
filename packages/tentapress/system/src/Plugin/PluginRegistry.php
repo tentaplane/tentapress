@@ -122,6 +122,33 @@ final class PluginRegistry
         return $rows;
     }
 
+    public function isInstalled(string $id): bool
+    {
+        try {
+            $plugin = $this->pluginForId($id);
+        } catch (\Throwable) {
+            return false;
+        }
+
+        return $this->isPluginInstalled($plugin);
+    }
+
+    /**
+     * @param  array<string,mixed>  $plugin
+     */
+    public function isPluginInstalled(array $plugin): bool
+    {
+        $provider = trim((string) ($plugin['provider'] ?? ''));
+        $path = (string) ($plugin['path'] ?? '');
+        $manifest = $this->decodeManifest($plugin['manifest'] ?? null);
+
+        if ($provider === '') {
+            return false;
+        }
+
+        return $this->providerClassAvailable($provider, $path, $manifest);
+    }
+
     public function enable(string $id): void
     {
         $this->assertId($id);
@@ -168,14 +195,11 @@ final class PluginRegistry
 
         foreach ($plugins as $plugin) {
             $id = (string) ($plugin['id'] ?? '');
-            $provider = trim((string) ($plugin['provider'] ?? ''));
-            $path = (string) ($plugin['path'] ?? '');
-            $manifest = $this->decodeManifest($plugin['manifest'] ?? null);
-            if ($id === '' || $provider === '') {
+            if ($id === '') {
                 continue;
             }
 
-            if (! $this->providerClassAvailable($provider, $path, $manifest)) {
+            if (! $this->isPluginInstalled($plugin)) {
                 continue;
             }
 
@@ -222,14 +246,11 @@ final class PluginRegistry
 
         foreach ($plugins as $plugin) {
             $id = (string) ($plugin['id'] ?? '');
-            $provider = trim((string) ($plugin['provider'] ?? ''));
-            $path = (string) ($plugin['path'] ?? '');
-            $manifest = $this->decodeManifest($plugin['manifest'] ?? null);
-            if ($id === '' || $provider === '') {
+            if ($id === '') {
                 continue;
             }
 
-            if (! $this->providerClassAvailable($provider, $path, $manifest)) {
+            if (! $this->isPluginInstalled($plugin)) {
                 $skippedIds[] = $id;
 
                 continue;
@@ -346,7 +367,7 @@ final class PluginRegistry
                 $manifest = [];
             }
 
-            if (! $this->providerClassAvailable($provider, $path, $manifest)) {
+            if (! $this->isPluginInstalled($data)) {
                 continue;
             }
 
@@ -454,8 +475,11 @@ final class PluginRegistry
                 continue;
             }
 
-            $provider = trim($manifest->provider);
-            if ($provider === '' || ! $this->providerClassAvailable($provider, $manifest->path, $manifest->data)) {
+            if (! $this->isPluginInstalled([
+                'provider' => $manifest->provider,
+                'path' => $manifest->path,
+                'manifest' => $manifest->data,
+            ])) {
                 continue;
             }
 
@@ -533,7 +557,11 @@ final class PluginRegistry
     private function assertProviderAvailable(string $id, string $provider, string $path, array $manifest): void
     {
         throw_if($provider === '', RuntimeException::class, "Plugin {$id} does not declare a service provider.");
-        throw_if(! $this->providerClassAvailable($provider, $path, $manifest), RuntimeException::class, "Plugin {$id} is not installed. Run: composer require {$id}");
+        throw_if(! $this->isPluginInstalled([
+            'provider' => $provider,
+            'path' => $path,
+            'manifest' => $manifest,
+        ]), RuntimeException::class, "Plugin {$id} is not installed. Run: composer require {$id}");
     }
 
 

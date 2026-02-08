@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace TentaPress\System\Plugin;
 
 use Illuminate\Contracts\Foundation\Application;
-use RuntimeException;
 
 final class PluginManager
 {
@@ -51,8 +50,10 @@ final class PluginManager
             return;
         }
 
-        throw_unless(class_exists($providerClass), RuntimeException::class, "Enabled plugin '{$pluginId}' provider class not found: {$providerClass}. ".
-        'Did you run `composer dump-autoload` after adding the plugin package?');
+        if (! class_exists($providerClass)) {
+            logger()->warning("Skipping enabled plugin '{$pluginId}' because provider class was not found: {$providerClass}");
+            return;
+        }
 
         $this->app->register($providerClass);
         $this->registeredProviders[$providerClass] = true;

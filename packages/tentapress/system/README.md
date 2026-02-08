@@ -7,7 +7,7 @@ Core platform layer for TentaPress plugin and theme management.
 | Field    | Value                                     |
 |----------|-------------------------------------------|
 | Name     | `tentapress/system`                       |
-| Version  | 0.3.2                                     |
+| Version  | 0.3.3                                     |
 | Provider | `TentaPress\System\SystemServiceProvider` |
 
 ## Overview
@@ -67,6 +67,9 @@ php artisan tp:plugins defaults    # Enable default plugins
 php artisan tp:plugins cache       # Rebuild plugin cache
 php artisan tp:plugins clear-cache # Clear plugin cache
 ```
+
+Plugin commands no longer run migrations automatically. Run `php artisan migrate` explicitly after plugin installs or
+upgrades.
 
 ### Theme Commands
 

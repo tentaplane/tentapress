@@ -33,10 +33,7 @@ final class SystemServiceProvider extends ServiceProvider
 
         $this->app->singleton(ThemeRegistry::class);
         $this->app->singleton(ThemeManager::class);
-
-        $this->app->afterResolving(PluginManager::class, function (PluginManager $manager): void {
-            $manager->registerEnabledPluginProviders();
-        });
+        $this->app->make(PluginManager::class)->registerEnabledPluginProviders();
     }
 
     public function boot(): void
