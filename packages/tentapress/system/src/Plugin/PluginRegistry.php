@@ -126,8 +126,12 @@ final class PluginRegistry
     {
         $this->assertId($id);
 
-        $provider = $this->providerForId($id);
-        $this->assertProviderAvailable($id, $provider);
+        $plugin = $this->pluginForId($id);
+        $provider = trim((string) ($plugin['provider'] ?? ''));
+        $path = (string) ($plugin['path'] ?? '');
+        $manifest = $this->decodeManifest($plugin['manifest'] ?? null);
+
+        $this->assertProviderAvailable($id, $provider, $path, $manifest);
 
         $updated = DB::table('tp_plugins')
             ->where('id', $id)
@@ -155,7 +159,7 @@ final class PluginRegistry
 
     public function enableAll(): int
     {
-        $plugins = DB::table('tp_plugins')->get(['id', 'provider'])->map(fn ($row): array => (array) $row)->all();
+        $plugins = DB::table('tp_plugins')->get(['id', 'provider', 'path', 'manifest'])->map(fn ($row): array => (array) $row)->all();
         if ($plugins === []) {
             return 0;
         }
@@ -165,11 +169,13 @@ final class PluginRegistry
         foreach ($plugins as $plugin) {
             $id = (string) ($plugin['id'] ?? '');
             $provider = trim((string) ($plugin['provider'] ?? ''));
+            $path = (string) ($plugin['path'] ?? '');
+            $manifest = $this->decodeManifest($plugin['manifest'] ?? null);
             if ($id === '' || $provider === '') {
                 continue;
             }
 
-            if (! class_exists($provider)) {
+            if (! $this->providerClassAvailable($provider, $path, $manifest)) {
                 continue;
             }
 
@@ -203,7 +209,7 @@ final class PluginRegistry
 
         $plugins = DB::table('tp_plugins')
             ->whereIn('id', $defaults)
-            ->get(['id', 'provider'])
+            ->get(['id', 'provider', 'path', 'manifest'])
             ->map(fn ($row): array => (array) $row)
             ->all();
 
@@ -217,11 +223,13 @@ final class PluginRegistry
         foreach ($plugins as $plugin) {
             $id = (string) ($plugin['id'] ?? '');
             $provider = trim((string) ($plugin['provider'] ?? ''));
+            $path = (string) ($plugin['path'] ?? '');
+            $manifest = $this->decodeManifest($plugin['manifest'] ?? null);
             if ($id === '' || $provider === '') {
                 continue;
             }
 
-            if (! class_exists($provider)) {
+            if (! $this->providerClassAvailable($provider, $path, $manifest)) {
                 $skippedIds[] = $id;
 
                 continue;
@@ -447,7 +455,7 @@ final class PluginRegistry
             }
 
             $provider = trim($manifest->provider);
-            if ($provider === '' || ! class_exists($provider)) {
+            if ($provider === '' || ! $this->providerClassAvailable($provider, $manifest->path, $manifest->data)) {
                 continue;
             }
 
@@ -486,21 +494,49 @@ final class PluginRegistry
         return Paths::pluginSearchRoots();
     }
 
-    private function providerForId(string $id): string
+    /**
+     * @return array<string,mixed>
+     */
+    private function pluginForId(string $id): array
     {
-        $plugin = DB::table('tp_plugins')->where('id', $id)->first(['provider']);
+        $plugin = DB::table('tp_plugins')->where('id', $id)->first(['provider', 'path', 'manifest']);
         throw_if($plugin === null, RuntimeException::class, "Plugin not found in tp_plugins: {$id}. Did you run `php artisan tp:plugins sync`?");
 
-        $provider = trim((string) ($plugin->provider ?? ''));
-        throw_if($provider === '', RuntimeException::class, "Plugin {$id} does not declare a service provider.");
-
-        return $provider;
+        return (array) $plugin;
     }
 
-    private function assertProviderAvailable(string $id, string $provider): void
+    /**
+     * @return array<string,mixed>
+     */
+    private function decodeManifest(mixed $raw): array
     {
-        throw_if(! class_exists($provider), RuntimeException::class, "Plugin {$id} is not installed. Run: composer require {$id}");
+        if (is_array($raw)) {
+            return $raw;
+        }
+
+        if (! is_string($raw) || $raw === '') {
+            return [];
+        }
+
+        try {
+            $decoded = json_decode($raw, true, 512, JSON_THROW_ON_ERROR);
+        } catch (\Throwable) {
+            return [];
+        }
+
+        return is_array($decoded) ? $decoded : [];
     }
+
+    /**
+     * @param  array<string,mixed>  $manifest
+     */
+    private function assertProviderAvailable(string $id, string $provider, string $path, array $manifest): void
+    {
+        throw_if($provider === '', RuntimeException::class, "Plugin {$id} does not declare a service provider.");
+        throw_if(! $this->providerClassAvailable($provider, $path, $manifest), RuntimeException::class, "Plugin {$id} is not installed. Run: composer require {$id}");
+    }
+
+
 
     private function assertId(string $id): void
     {
