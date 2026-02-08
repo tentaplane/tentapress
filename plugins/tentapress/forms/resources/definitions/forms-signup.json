@@ -1,0 +1,125 @@
+{
+    "type": "forms/signup",
+    "name": "Form",
+    "description": "Configurable form block with Mailchimp and TentaForms targets.",
+    "version": 1,
+    "view": "blocks.forms-signup",
+    "fields": [
+        { "key": "form_key", "label": "Form Key", "type": "text", "placeholder": "newsletter-signup" },
+        { "key": "title", "label": "Title", "type": "text" },
+        { "key": "description", "label": "Description", "type": "textarea", "rows": 3 },
+        {
+            "key": "fields",
+            "label": "Fields",
+            "type": "repeater",
+            "help": "Define form fields. For select options, use one per line as value|label.",
+            "columns": [
+                { "key": "key", "label": "Key", "type": "text", "placeholder": "email" },
+                { "key": "label", "label": "Label", "type": "text", "placeholder": "Email" },
+                {
+                    "key": "type",
+                    "label": "Type",
+                    "type": "select",
+                    "options": [
+                        { "value": "email", "label": "Email" },
+                        { "value": "text", "label": "Text" },
+                        { "value": "textarea", "label": "Textarea" },
+                        { "value": "checkbox", "label": "Checkbox" },
+                        { "value": "select", "label": "Select" },
+                        { "value": "hidden", "label": "Hidden" }
+                    ]
+                },
+                { "key": "required", "label": "Required", "type": "select", "options": [{ "value": "1", "label": "Yes" }, { "value": "0", "label": "No" }] },
+                { "key": "placeholder", "label": "Placeholder", "type": "text", "placeholder": "you@example.com" },
+                { "key": "default", "label": "Default", "type": "text", "placeholder": "" },
+                { "key": "options", "label": "Options", "type": "textarea", "placeholder": "option-a|Option A" },
+                { "key": "merge_tag", "label": "Merge Tag", "type": "text", "placeholder": "EMAIL" }
+            ]
+        },
+        { "key": "submit_label", "label": "Submit Label", "type": "text" },
+        { "key": "success_message", "label": "Success Message", "type": "textarea", "rows": 2 },
+        { "key": "error_message", "label": "Error Message", "type": "textarea", "rows": 2 },
+        { "key": "redirect_url", "label": "Redirect URL", "type": "url", "placeholder": "/thank-you" },
+        { "key": "privacy_notice", "label": "Privacy Notice", "type": "textarea", "rows": 2 },
+        {
+            "key": "provider",
+            "label": "Provider",
+            "type": "select",
+            "options": [
+                { "value": "mailchimp", "label": "Mailchimp" },
+                { "value": "tentafor.ms", "label": "TentaForms" }
+            ]
+        },
+        { "key": "mailchimp_action_url", "label": "Mailchimp Action URL", "type": "text", "placeholder": "https://...list-manage.com/subscribe/post?..." },
+        { "key": "mailchimp_list_id", "label": "Mailchimp List ID (optional)", "type": "text", "placeholder": "abc123" },
+        { "key": "tentaforms_form_id", "label": "TentaForms Form ID", "type": "text", "placeholder": "contact-us" },
+        {
+            "key": "tentaforms_environment",
+            "label": "TentaForms Environment",
+            "type": "select",
+            "options": [
+                { "value": "production", "label": "Production" },
+                { "value": "staging", "label": "Staging" }
+            ]
+        },
+        { "key": "provider_config", "label": "Provider Config JSON (optional override)", "type": "textarea", "rows": 4, "placeholder": "{\"action_url\":\"...\"}" }
+    ],
+    "defaults": {
+        "form_key": "signup",
+        "title": "Stay in the loop",
+        "description": "Monthly updates, no spam.",
+        "fields": [
+            {
+                "key": "email",
+                "label": "Email",
+                "type": "email",
+                "required": "1",
+                "placeholder": "you@example.com",
+                "default": "",
+                "options": "",
+                "merge_tag": "EMAIL"
+            }
+        ],
+        "submit_label": "Subscribe",
+        "success_message": "Thanks for subscribing.",
+        "error_message": "We could not submit your form. Please try again.",
+        "redirect_url": "",
+        "privacy_notice": "By submitting this form, you agree to our privacy policy.",
+        "provider": "mailchimp",
+        "mailchimp_action_url": "",
+        "mailchimp_list_id": "",
+        "tentaforms_form_id": "",
+        "tentaforms_environment": "production",
+        "provider_config": ""
+    },
+    "example": {
+        "props": {
+            "form_key": "signup",
+            "title": "Stay in the loop",
+            "description": "Monthly updates, no spam.",
+            "fields": [
+                {
+                    "key": "email",
+                    "label": "Email",
+                    "type": "email",
+                    "required": "1",
+                    "placeholder": "you@example.com",
+                    "default": "",
+                    "options": "",
+                    "merge_tag": "EMAIL"
+                }
+            ],
+            "submit_label": "Subscribe",
+            "success_message": "Thanks for subscribing.",
+            "error_message": "We could not submit your form. Please try again.",
+            "redirect_url": "",
+            "privacy_notice": "By submitting this form, you agree to our privacy policy.",
+            "provider": "mailchimp",
+            "mailchimp_action_url": "",
+            "mailchimp_list_id": "",
+            "tentaforms_form_id": "",
+            "tentaforms_environment": "production",
+            "provider_config": ""
+        }
+    }
+}
