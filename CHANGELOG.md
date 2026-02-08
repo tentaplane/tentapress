@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.31.0](https://github.com/tentaplane/tentapress/compare/v0.30.3...v0.31.0) (2026-02-08)
+
+
+### Features
+
+* **setup:** prompt app name/url and enforce production env defaults ([0e53af6](https://github.com/tentaplane/tentapress/commit/0e53af6968be61d46f364084141232e6961ce8d7))
+* **system-info:** add queued plugin update action with guardrails ([7f88708](https://github.com/tentaplane/tentapress/commit/7f88708a9031d24bb008685ef52622fc8b366ebe))
+
+
+### Bug Fixes
+
+* **theme-tailwind:** split image/content block included as first-party block ([321f3ff](https://github.com/tentaplane/tentapress/commit/321f3ff6a1dfb7b5ec293099a94e6302afb55e2d))
+* **themes:** refresh runtime cache after sync and activation ([1a32cc0](https://github.com/tentaplane/tentapress/commit/1a32cc0a09cf4721488f6e3a52ca705d5264e3c1))
+
 ## [0.30.3](https://github.com/tentaplane/tentapress/compare/v0.30.2...v0.30.3) (2026-02-08)
 
 
