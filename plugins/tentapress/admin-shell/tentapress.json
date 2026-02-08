@@ -2,16 +2,12 @@
     "id": "tentapress/admin-shell",
     "name": "Admin Shell",
     "description": "Admin UI shell, layout, navigation and base admin routes.",
-    "version": "0.6.0",
+    "version": "0.6.1",
     "provider": "TentaPress\\AdminShell\\AdminShellServiceProvider",
     "assets": {
         "admin": {
-            "scripts": [
-                "resources/js/admin.js"
-            ],
-            "styles": [
-                "resources/css/admin.css"
-            ]
+            "scripts": ["resources/js/admin.js"],
+            "styles": ["resources/css/admin.css"]
         }
     },
     "requires": []
