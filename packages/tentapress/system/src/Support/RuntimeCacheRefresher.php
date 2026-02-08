@@ -23,6 +23,20 @@ final class RuntimeCacheRefresher
     }
 
     /**
+     * Refreshes runtime caches after theme sync/activation.
+     *
+     * @return array{opcache_available:bool,opcache_reset:bool,invalidated_files:int}
+     */
+    public function refreshAfterThemeChange(): array
+    {
+        clearstatcache();
+
+        return $this->refreshOpcache([
+            base_path('bootstrap/cache/tp_theme.php'),
+        ]);
+    }
+
+    /**
      * @param  array<int,string>  $paths
      * @return array{opcache_available:bool,opcache_reset:bool,invalidated_files:int}
      */

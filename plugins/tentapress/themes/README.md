@@ -7,7 +7,7 @@ Theme management UI for TentaPress.
 | Field    | Value                                     |
 |----------|-------------------------------------------|
 | ID       | `tentapress/themes`                       |
-| Version  | 0.1.12                                    |
+| Version  | 0.1.13                                    |
 | Provider | `TentaPress\Themes\ThemesServiceProvider` |
 
 ## Features
@@ -16,6 +16,7 @@ Theme management UI for TentaPress.
 - Activate/deactivate themes
 - View theme details (layouts, menu locations)
 - Theme screenshots
+- Runtime cache refresh after theme sync/activation for OPCache-backed hosts
 
 ## Dependencies
 

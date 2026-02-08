@@ -7,7 +7,7 @@ Core platform layer for TentaPress plugin and theme management.
 | Field    | Value                                     |
 |----------|-------------------------------------------|
 | Name     | `tentapress/system`                       |
-| Version  | 0.3.4                                     |
+| Version  | 0.3.5                                     |
 | Provider | `TentaPress\System\SystemServiceProvider` |
 
 ## Overview
@@ -92,6 +92,8 @@ php artisan tp:themes activate <id> # Activate a theme
 |----------------------------------|--------------------------------|
 | `bootstrap/cache/tp_plugins.php` | Enabled plugins and boot order |
 | `bootstrap/cache/tp_theme.php`   | Active theme metadata          |
+
+For OPCache-backed hosts, runtime cache refresh helpers invalidate these files after plugin/theme lifecycle actions.
 
 ## Discovery
 
