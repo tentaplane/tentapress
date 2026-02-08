@@ -18,6 +18,7 @@ use TentaPress\System\Plugin\PluginAssetPublisher;
 use TentaPress\System\Plugin\PluginAssetRegistry;
 use TentaPress\System\Plugin\PluginManager;
 use TentaPress\System\Plugin\PluginRegistry;
+use TentaPress\System\Support\RuntimeCacheRefresher;
 use TentaPress\System\Theme\ThemeManager;
 use TentaPress\System\Theme\ThemeRegistry;
 
@@ -29,6 +30,7 @@ final class SystemServiceProvider extends ServiceProvider
         $this->app->singleton(PluginManager::class);
         $this->app->singleton(PluginAssetRegistry::class);
         $this->app->singleton(PluginAssetPublisher::class);
+        $this->app->singleton(RuntimeCacheRefresher::class);
         $this->app->singleton(AdminMiddleware::class);
 
         $this->app->singleton(ThemeRegistry::class);
