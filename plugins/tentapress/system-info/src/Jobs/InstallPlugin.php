@@ -97,9 +97,21 @@ final class InstallPlugin implements ShouldQueue
             return [PHP_BINARY, $projectComposer, 'require', $package, '--no-interaction', '--no-progress'];
         }
 
-        $herd = $finder->find('herd');
-        if (is_string($herd) && $herd !== '') {
-            return [$herd, 'composer', 'require', $package, '--no-interaction', '--no-progress'];
+        $configuredBinary = trim((string) env('TP_COMPOSER_BINARY', ''));
+        if ($configuredBinary !== '' && is_file($configuredBinary) && is_executable($configuredBinary)) {
+            return [$configuredBinary, 'require', $package, '--no-interaction', '--no-progress'];
+        }
+
+        $commonComposerPaths = [
+            '/usr/local/bin/composer',
+            '/opt/homebrew/bin/composer',
+            '/usr/bin/composer',
+        ];
+
+        foreach ($commonComposerPaths as $composerPath) {
+            if (is_file($composerPath) && is_executable($composerPath)) {
+                return [$composerPath, 'require', $package, '--no-interaction', '--no-progress'];
+            }
         }
 
         $composer = $finder->find('composer');
@@ -107,7 +119,7 @@ final class InstallPlugin implements ShouldQueue
             return [$composer, 'require', $package, '--no-interaction', '--no-progress'];
         }
 
-        throw new RuntimeException('Composer binary not found for queue worker.');
+        throw new RuntimeException('Composer binary not found. Install Composer or set TP_COMPOSER_BINARY to an absolute composer path.');
     }
 
     /**
