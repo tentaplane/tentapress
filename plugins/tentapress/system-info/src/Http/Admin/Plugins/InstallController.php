@@ -6,7 +6,6 @@ namespace TentaPress\SystemInfo\Http\Admin\Plugins;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Schema;
 use RuntimeException;
 use Throwable;
@@ -38,7 +37,6 @@ final class InstallController
 
         try {
             $package = $this->normalizePackageInput($package);
-            $this->assertPackagistPackageExists($package);
 
             $attempt = TpPluginInstall::query()->create([
                 'package' => $package,
@@ -60,15 +58,6 @@ final class InstallController
         } catch (Throwable $e) {
             return $this->errorResponse($request, $e->getMessage(), 422);
         }
-    }
-
-    private function assertPackagistPackageExists(string $package): void
-    {
-        $response = Http::acceptJson()
-            ->timeout(8)
-            ->get("https://repo.packagist.org/p2/{$package}.json");
-
-        throw_unless($response->successful(), RuntimeException::class, 'Package not found on Packagist.');
     }
 
     private function normalizePackageInput(string $input): string

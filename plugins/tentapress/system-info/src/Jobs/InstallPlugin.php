@@ -8,6 +8,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\Middleware\WithoutOverlapping;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Process;
 use RuntimeException;
@@ -27,6 +28,16 @@ final class InstallPlugin implements ShouldQueue
     public function __construct(
         public readonly int $installId,
     ) {
+    }
+
+    /**
+     * @return array<int,mixed>
+     */
+    public function middleware(): array
+    {
+        return [
+            (new WithoutOverlapping('tp_plugin_install_jobs'))->expireAfter($this->timeout + 60),
+        ];
     }
 
     public function handle(): void
@@ -55,6 +66,7 @@ final class InstallPlugin implements ShouldQueue
             $this->runCommand($this->composerRequireCommand($package, $phpBinary), $log);
             $this->runCommand([$phpBinary, 'artisan', 'tp:plugins', 'sync', '--no-interaction'], $log);
             $this->runCommand([$phpBinary, 'artisan', 'tp:plugins', 'enable', $package, '--no-interaction'], $log);
+            $this->runCommand([$phpBinary, 'artisan', 'migrate', '--force', '--no-interaction'], $log);
 
             $install->status = 'success';
             $install->output = $this->truncateLog($log);

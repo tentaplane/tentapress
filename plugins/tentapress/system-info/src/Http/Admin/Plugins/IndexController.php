@@ -28,7 +28,7 @@ final class IndexController
             if (! Schema::hasTable('tp_plugins')) {
                 $error = 'Plugin table not found. Run migrations to manage plugins.';
             } else {
-                $plugins = $this->buildPlugins($registry->listAll());
+                $plugins = $this->buildPlugins($registry->listAll(), $registry);
             }
 
             if ($installTableExists) {
@@ -66,7 +66,7 @@ final class IndexController
      * @param  array<int,array<string,mixed>>  $rows
      * @return array<int,array<string,mixed>>
      */
-    private function buildPlugins(array $rows): array
+    private function buildPlugins(array $rows, PluginRegistry $registry): array
     {
         $plugins = [];
 
@@ -81,7 +81,7 @@ final class IndexController
             $version = (string) ($data['version'] ?? ($manifest['version'] ?? ''));
             $enabled = ((int) ($data['enabled'] ?? 0)) === 1;
             $path = trim((string) ($data['path'] ?? ''));
-            $installed = $path !== '' ? is_dir(base_path($path)) : ($provider !== '' && class_exists($provider));
+            $installed = $registry->isPluginInstalled($data);
             $protected = in_array($id, PluginRegistry::PROTECTED_PLUGIN_IDS, true);
 
             $plugins[] = [
