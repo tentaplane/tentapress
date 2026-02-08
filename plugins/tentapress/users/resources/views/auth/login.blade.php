@@ -6,7 +6,8 @@
 
         <title>TentaPress</title>
 
-        @vite(['plugins/tentapress/admin-shell/resources/css/admin.css', 'plugins/tentapress/admin-shell/resources/js/admin.js'])
+        @tpPluginStyles('tentapress/admin-shell')
+        @tpPluginScripts('tentapress/admin-shell')
     </head>
     <body class="flex min-h-screen items-center justify-center bg-[#f0f0f1] p-6 text-[#1d2327]">
         <div class="w-full max-w-md">
