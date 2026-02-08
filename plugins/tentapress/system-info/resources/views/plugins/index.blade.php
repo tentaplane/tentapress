@@ -88,6 +88,12 @@
                                             <template x-if="attempt.error">
                                                 <div class="tp-muted mt-1 text-xs" x-text="attempt.error"></div>
                                             </template>
+                                            <template x-if="attempt.status === 'failed' && attempt.package">
+                                                <div class="mt-1 text-xs">
+                                                    <span class="tp-muted">Manual step:</span>
+                                                    <span class="tp-code">composer require </span><span class="tp-code" x-text="attempt.package"></span>
+                                                </div>
+                                            </template>
                                         </td>
                                         <td class="tp-table__td">
                                             <span
