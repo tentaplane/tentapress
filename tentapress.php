@@ -365,6 +365,72 @@ $confirm = static function (string $label, bool $defaultYes) use ($prompt, $assu
     return in_array($choice, ['y', 'yes'], true);
 };
 
+$ensureEnvFile = static function () use ($root, $run, $info): ?string {
+    $envFile = $root . '/.env';
+    $exampleEnvFile = $root . '/.env.example';
+
+    if (! file_exists($envFile) && file_exists($exampleEnvFile)) {
+        $run(
+            escapeshellarg(PHP_BINARY) . ' -r ' . escapeshellarg("file_exists('.env') || copy('.env.example', '.env');"),
+            'Preparing environment (.env)'
+        );
+    }
+
+    if (! file_exists($envFile)) {
+        $info('Warning: no .env file found and .env.example is missing. Skipping environment configuration.');
+        return null;
+    }
+
+    return $envFile;
+};
+
+$readEnvValue = static function (string $envContent, string $key): ?string {
+    $pattern = '/^' . preg_quote($key, '/') . '=(.*)$/m';
+    if (! preg_match($pattern, $envContent, $matches)) {
+        return null;
+    }
+
+    $rawValue = trim($matches[1]);
+    if ($rawValue === '') {
+        return '';
+    }
+
+    if (
+        strlen($rawValue) >= 2
+        && (($rawValue[0] === '"' && $rawValue[strlen($rawValue) - 1] === '"')
+            || ($rawValue[0] === "'" && $rawValue[strlen($rawValue) - 1] === "'"))
+    ) {
+        return substr($rawValue, 1, -1);
+    }
+
+    return $rawValue;
+};
+
+$formatEnvValue = static function (string $value): string {
+    if ($value === '') {
+        return '""';
+    }
+
+    if (preg_match('/^[A-Za-z0-9._:\/-]+$/', $value)) {
+        return $value;
+    }
+
+    return '"' . addcslashes($value, "\\\"") . '"';
+};
+
+$upsertEnvValue = static function (string &$envContent, string $key, string $value) use ($formatEnvValue): void {
+    $formattedValue = $formatEnvValue($value);
+    $replacement = $key . '=' . $formattedValue;
+    $pattern = '/^' . preg_quote($key, '/') . '=.*$/m';
+
+    if (preg_match($pattern, $envContent) === 1) {
+        $envContent = (string) preg_replace($pattern, $replacement, $envContent, 1);
+        return;
+    }
+
+    $envContent = rtrim($envContent) . PHP_EOL . $replacement . PHP_EOL;
+};
+
 $copyThemeFromVendor = static function (string $packageName) use ($prompt, $resolvePackagePath, $root): array|string|null {
     $installPath = $resolvePackagePath($packageName);
 
@@ -477,17 +543,39 @@ if ($composerPath !== '') {
 $hasComposerLock = file_exists($root . '/composer.lock');
 $hasVendorFolder = is_dir($root . '/vendor');
 
-if (! $hasComposerLock && ! $hasVendorFolder) {
-    $envFile = $root . '/.env';
-    $exampleEnvFile = $root . '/.env.example';
+$envFile = $ensureEnvFile();
+if ($envFile !== null) {
+    $envContent = file_get_contents($envFile);
 
-    if (! file_exists($envFile) && file_exists($exampleEnvFile)) {
-        $run(
-            escapeshellarg(PHP_BINARY) . ' -r ' . escapeshellarg("file_exists('.env') || copy('.env.example', '.env');"),
-            'Preparing environment (.env)'
-        );
+    if (! is_string($envContent)) {
+        fwrite(STDERR, "Unable to read {$envFile}.\n");
+        exit(1);
     }
 
+    $existingAppName = $readEnvValue($envContent, 'APP_NAME') ?? 'TentaPress';
+    $existingAppUrl = $readEnvValue($envContent, 'APP_URL') ?? 'http://localhost';
+
+    if ($assumeDefaults) {
+        $appName = $existingAppName;
+        $appUrl = $existingAppUrl;
+    } else {
+        $appNameInput = $prompt("Application name [{$existingAppName}]: ");
+        $appUrlInput = $prompt("Application URL [{$existingAppUrl}]: ");
+
+        $appName = $appNameInput === '' ? $existingAppName : $appNameInput;
+        $appUrl = $appUrlInput === '' ? $existingAppUrl : $appUrlInput;
+    }
+
+    $upsertEnvValue($envContent, 'APP_NAME', $appName);
+    $upsertEnvValue($envContent, 'APP_URL', $appUrl);
+    $upsertEnvValue($envContent, 'APP_ENV', 'production');
+    $upsertEnvValue($envContent, 'APP_DEBUG', 'false');
+
+    file_put_contents($envFile, $envContent);
+    $info('Configured .env values for APP_NAME, APP_URL, APP_ENV=production, APP_DEBUG=false.');
+}
+
+if (! $hasComposerLock && ! $hasVendorFolder) {
     $sqlitePath = $root . '/database/database.sqlite';
 
     if (! file_exists($sqlitePath)) {

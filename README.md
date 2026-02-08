@@ -16,7 +16,8 @@ or
 ```
 
 This runs the full setup flow (composer install, migrations, plugins sync) and then prompts you to create your first
-super admin user.
+super admin user. During setup, you will also be asked for `APP_NAME` and `APP_URL`, and `.env` defaults are set for
+production (`APP_ENV=production`, `APP_DEBUG=false`).
 
 ### Clean install from latest release archive
 
