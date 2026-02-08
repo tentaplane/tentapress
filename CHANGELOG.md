@@ -4,6 +4,29 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.29.1](https://github.com/tentaplane/tentapress/compare/v0.29.0...v0.29.1) (2026-02-08)
+
+
+### Bug Fixes
+
+* **ci:** restrict release-please to core source paths ([61078ba](https://github.com/tentaplane/tentapress/commit/61078ba67fe00eb36eb4c2f3b4e806ff97549cce))
+* **ci:** run release-please on release commits ([3141727](https://github.com/tentaplane/tentapress/commit/31417273a6a659e04ad7aee341b767afe6c6a9e6))
+* **core:** disable auto-discovery for optional plugins ([c44bd9a](https://github.com/tentaplane/tentapress/commit/c44bd9aca660a490eaa534abe543d4ec238a5a75))
+* **system-info:** avoid false not-installed and cache auto-disable ([828706f](https://github.com/tentaplane/tentapress/commit/828706f42b8df6235ee1446306137c5851d1166c))
+* **system-info:** detect composer binary on clean installs ([212c57a](https://github.com/tentaplane/tentapress/commit/212c57ae33ddd4663a3e3042f58d1b49b47d3835))
+* **system-info:** resolve composer binary and env for queued installs ([1d1025d](https://github.com/tentaplane/tentapress/commit/1d1025db3e05cf3e0bf04f8114545ebb641c54ac))
+* **system-info:** show manual composer fallback for failed installs ([bac2975](https://github.com/tentaplane/tentapress/commit/bac297516cd99f50005d27f14a324972cc56e1f5))
+* **system-info:** simplify plugin install flow and status checks ([4b85e85](https://github.com/tentaplane/tentapress/commit/4b85e8587b21d4767e044427790168762f6abe0d))
+* **system-info:** use php CLI binary for queued artisan commands ([4892ce0](https://github.com/tentaplane/tentapress/commit/4892ce0bd893c7d6de5eb0732fd42693078aadbc))
+* **system:** bump package version metadata to 0.3.2 ([f20e032](https://github.com/tentaplane/tentapress/commit/f20e0327a7a3d311e2e737633fad86df4088edfe))
+* **system:** harden plugin lifecycle and remove implicit migrations ([adf8a47](https://github.com/tentaplane/tentapress/commit/adf8a47bcf47f081ce41f32026ca85bce8fbe0d6))
+* **system:** use provider fallback when enabling discovered plugins ([584dab9](https://github.com/tentaplane/tentapress/commit/584dab985852205b74e2b9cf02450fc3916adecb))
+
+
+### Miscellaneous Chores
+
+* **setup:** updated instructions for a clean installation from the latest release ([c6176b6](https://github.com/tentaplane/tentapress/commit/c6176b621eade9fe627c061e5b6063aa0b03dc95))
+
 ## [0.29.0](https://github.com/tentaplane/tentapress/compare/v0.28.0...v0.29.0) (2026-02-07)
 
 
