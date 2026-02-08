@@ -36,7 +36,3 @@ config.json
 /storage/pail
 /themes/**/node_modules
 /vendor
-!/themes/
-/themes/**
-!/themes/tentapress/
-!/themes/tentapress/tailwind/
