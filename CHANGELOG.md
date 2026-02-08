@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.30.2](https://github.com/tentaplane/tentapress/compare/v0.30.1...v0.30.2) (2026-02-08)
+
+
+### Bug Fixes
+
+* **users:** load login assets from admin-shell plugin manifest ([ba032f8](https://github.com/tentaplane/tentapress/commit/ba032f8c12ec5bc326cf7d3912876d24b83352fc))
+
 ## [0.30.1](https://github.com/tentaplane/tentapress/compare/v0.30.0...v0.30.1) (2026-02-08)
 
 
