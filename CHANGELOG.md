@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.30.3](https://github.com/tentaplane/tentapress/compare/v0.30.2...v0.30.3) (2026-02-08)
+
+
+### Bug Fixes
+
+* **admin-shell:** bumping the admin assets ([74170be](https://github.com/tentaplane/tentapress/commit/74170beb3718bc3cdd285260c85214b07f6e3a7d))
+* **system-info:** refresh runtime cache after plugin lifecycle actions ([f4bdf12](https://github.com/tentaplane/tentapress/commit/f4bdf12e7622653bac01002e853aca941b1c7360))
+* **system:** add runtime cache refresher for opcache hosts ([2243f59](https://github.com/tentaplane/tentapress/commit/2243f59bf4a082670bd93a8e140eef24a7db9a4c))
+
 ## [0.30.2](https://github.com/tentaplane/tentapress/compare/v0.30.1...v0.30.2) (2026-02-08)
 
 
