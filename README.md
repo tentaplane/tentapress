@@ -47,6 +47,9 @@ php artisan tp:plugins clear-cache       # Clear plugin cache
 Optional plugin packages are intentionally excluded from Laravel package auto-discovery. Install with Composer, then
 enable explicitly via `tp:plugins enable <id>` (or from the admin Plugins screen).
 
+On hosts with aggressive OPCache settings, the admin plugin actions refresh runtime cache metadata so newly installed
+plugins are available in the UI immediately.
+
 ### Theme Management
 
 ```bash

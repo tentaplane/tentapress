@@ -5,17 +5,22 @@ declare(strict_types=1);
 namespace TentaPress\SystemInfo\Http\Admin\Plugins;
 
 use Illuminate\Http\JsonResponse;
+use TentaPress\System\Support\RuntimeCacheRefresher;
 use TentaPress\SystemInfo\Models\TpPluginInstall;
 
 final class InstallStatusController
 {
-    public function __invoke(int $installId): JsonResponse
+    public function __invoke(int $installId, RuntimeCacheRefresher $runtimeCacheRefresher): JsonResponse
     {
         $attempt = TpPluginInstall::query()->find($installId);
         if (! $attempt instanceof TpPluginInstall) {
             return response()->json([
                 'message' => 'Install attempt not found.',
             ], 404);
+        }
+
+        if ((string) $attempt->status === 'success') {
+            $runtimeCacheRefresher->refreshAfterPluginChange();
         }
 
         return response()->json([

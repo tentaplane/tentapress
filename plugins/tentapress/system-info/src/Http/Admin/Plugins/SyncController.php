@@ -8,10 +8,11 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Schema;
 use Throwable;
 use TentaPress\System\Plugin\PluginRegistry;
+use TentaPress\System\Support\RuntimeCacheRefresher;
 
 final class SyncController
 {
-    public function __invoke(PluginRegistry $registry): RedirectResponse
+    public function __invoke(PluginRegistry $registry, RuntimeCacheRefresher $runtimeCacheRefresher): RedirectResponse
     {
         if (! Schema::hasTable('tp_plugins')) {
             return to_route('tp.plugins.index')
@@ -21,6 +22,7 @@ final class SyncController
         try {
             $count = $registry->sync();
             $registry->writeCache();
+            $runtimeCacheRefresher->refreshAfterPluginChange();
 
             return to_route('tp.plugins.index')
                 ->with('tp_notice_success', "Synced {$count} plugin(s).");
