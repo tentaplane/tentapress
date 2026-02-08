@@ -54,7 +54,20 @@
     },
     "extra": {
         "laravel": {
-            "dont-discover": []
+            "dont-discover": [
+                "tentapress/import",
+                "tentapress/export",
+                "tentapress/static-deploy",
+                "tentapress/custom-blocks",
+                "tentapress/block-markdown-editor",
+                "tentapress/page-editor",
+                "tentapress/media-optimization-bunny",
+                "tentapress/media-optimization-cloudflare",
+                "tentapress/media-optimization-imagekit",
+                "tentapress/media-optimization-imgix",
+                "tentapress/media-stock-pexels",
+                "tentapress/media-stock-unsplash"
+            ]
         }
     },
     "config": {
