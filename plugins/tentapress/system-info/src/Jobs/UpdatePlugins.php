@@ -14,16 +14,17 @@ use Illuminate\Support\Facades\Process;
 use RuntimeException;
 use Symfony\Component\Process\ExecutableFinder;
 use Throwable;
+use TentaPress\System\Plugin\PluginRegistry;
 use TentaPress\SystemInfo\Models\TpPluginInstall;
 
-final class InstallPlugin implements ShouldQueue
+final class UpdatePlugins implements ShouldQueue
 {
     use Dispatchable;
     use InteractsWithQueue;
     use Queueable;
     use SerializesModels;
 
-    public int $timeout = 1800;
+    public int $timeout = 3600;
 
     public function __construct(
         public readonly int $installId,
@@ -40,17 +41,10 @@ final class InstallPlugin implements ShouldQueue
         ];
     }
 
-    public function handle(): void
+    public function handle(PluginRegistry $registry): void
     {
         $install = TpPluginInstall::query()->find($this->installId);
         if (! $install instanceof TpPluginInstall) {
-            return;
-        }
-
-        $package = trim((string) $install->package);
-        if ($package === '') {
-            $this->markFailed($install, 'Missing package name.', '');
-
             return;
         }
 
@@ -60,12 +54,11 @@ final class InstallPlugin implements ShouldQueue
         $install->save();
 
         $log = '';
-        $phpBinary = $this->phpCliBinary();
 
         try {
-            $this->runCommand($this->composerRequireCommand($package, $phpBinary), $log);
+            $phpBinary = $this->phpCliBinary();
+            $this->runCommand($this->composerUpdateCommand($install, $registry, $phpBinary), $log);
             $this->runCommand([$phpBinary, 'artisan', 'tp:plugins', 'sync', '--no-interaction'], $log);
-            $this->runCommand([$phpBinary, 'artisan', 'tp:plugins', 'enable', $package, '--no-interaction'], $log);
             $this->runCommand([$phpBinary, 'artisan', 'migrate', '--force', '--no-interaction'], $log);
 
             $install->status = 'success';
@@ -102,17 +95,41 @@ final class InstallPlugin implements ShouldQueue
     /**
      * @return array<int,string>
      */
-    private function composerRequireCommand(string $package, string $phpBinary): array
+    private function composerUpdateCommand(TpPluginInstall $install, PluginRegistry $registry, string $phpBinary): array
+    {
+        $baseCommand = $this->composerBaseCommand($phpBinary);
+        if ((string) $install->package === TpPluginInstall::UPDATE_FULL_SENTINEL) {
+            return [...$baseCommand, 'update', '--with-all-dependencies', '--no-interaction', '--no-progress'];
+        }
+
+        $pluginPackages = collect($registry->listAll())
+            ->map(static fn (mixed $row): array => is_array($row) ? $row : (array) $row)
+            ->filter(static fn (array $row): bool => $registry->isPluginInstalled($row))
+            ->map(static fn (array $row): string => strtolower(trim((string) ($row['id'] ?? ''))))
+            ->filter(static fn (string $id): bool => preg_match('/^[a-z0-9][a-z0-9_.-]*\/[a-z0-9][a-z0-9_.-]*$/', $id) === 1)
+            ->unique()
+            ->values()
+            ->all();
+
+        throw_if($pluginPackages === [], RuntimeException::class, 'No installed plugins were found to update.');
+
+        return [...$baseCommand, 'update', ...$pluginPackages, '--with-all-dependencies', '--no-interaction', '--no-progress'];
+    }
+
+    /**
+     * @return array<int,string>
+     */
+    private function composerBaseCommand(string $phpBinary): array
     {
         $finder = new ExecutableFinder();
         $projectComposer = base_path('composer.phar');
         if (is_file($projectComposer)) {
-            return [$phpBinary, $projectComposer, 'require', $package, '--no-interaction', '--no-progress'];
+            return [$phpBinary, $projectComposer];
         }
 
         $configuredBinary = trim((string) env('TP_COMPOSER_BINARY', ''));
         if ($configuredBinary !== '' && is_file($configuredBinary) && is_executable($configuredBinary)) {
-            return [$configuredBinary, 'require', $package, '--no-interaction', '--no-progress'];
+            return [$configuredBinary];
         }
 
         $commonComposerPaths = [
@@ -123,13 +140,13 @@ final class InstallPlugin implements ShouldQueue
 
         foreach ($commonComposerPaths as $composerPath) {
             if (is_file($composerPath) && is_executable($composerPath)) {
-                return [$composerPath, 'require', $package, '--no-interaction', '--no-progress'];
+                return [$composerPath];
             }
         }
 
         $composer = $finder->find('composer');
         if (is_string($composer) && $composer !== '') {
-            return [$composer, 'require', $package, '--no-interaction', '--no-progress'];
+            return [$composer];
         }
 
         throw new RuntimeException('Composer binary not found. Install Composer or set TP_COMPOSER_BINARY to an absolute composer path.');

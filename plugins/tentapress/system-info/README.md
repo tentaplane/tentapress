@@ -7,7 +7,7 @@ Diagnostics and plugin management for TentaPress.
 | Field    | Value                                             |
 |----------|---------------------------------------------------|
 | ID       | `tentapress/system-info`                          |
-| Version  | 0.4.7                                             |
+| Version  | 0.5.0                                             |
 | Provider | `TentaPress\SystemInfo\SystemInfoServiceProvider` |
 
 ## Features
@@ -18,6 +18,7 @@ Diagnostics and plugin management for TentaPress.
 - Cache status
 - Plugin list with enable/disable controls
 - Queue-based plugin installs from admin (`vendor/package`, GitHub URL, or Packagist URL)
+- Queue-based plugin updates from admin (defaults to installed plugins; full `composer update` gated by `TP_ALLOW_FULL_COMPOSER_UPDATE=true`)
 - Serialized install jobs to avoid overlapping Composer runs
 - Runtime cache refresh for OPCache-backed hosts after plugin lifecycle changes
 

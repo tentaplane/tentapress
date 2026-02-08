@@ -12,6 +12,7 @@ use TentaPress\SystemInfo\Http\Admin\Plugins\IndexController;
 use TentaPress\SystemInfo\Http\Admin\Plugins\InstallController;
 use TentaPress\SystemInfo\Http\Admin\Plugins\InstallStatusController;
 use TentaPress\SystemInfo\Http\Admin\Plugins\SyncController;
+use TentaPress\SystemInfo\Http\Admin\Plugins\UpdateController;
 
 AdminRoutes::group(function (): void {
     Route::get('/plugins', IndexController::class)
@@ -32,6 +33,10 @@ AdminRoutes::group(function (): void {
 
     Route::post('/plugins/install', InstallController::class)
         ->name('plugins.install')
+        ->middleware('tp.can:manage_plugins');
+
+    Route::post('/plugins/update', UpdateController::class)
+        ->name('plugins.update')
         ->middleware('tp.can:manage_plugins');
 
     Route::get('/plugins/install-attempts/{installId}', InstallStatusController::class)

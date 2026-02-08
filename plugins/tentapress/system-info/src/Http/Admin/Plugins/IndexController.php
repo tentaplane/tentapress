@@ -38,11 +38,12 @@ final class IndexController
                     ->get()
                     ->map(fn (TpPluginInstall $attempt): array => [
                         'id' => (int) $attempt->id,
-                        'package' => (string) $attempt->package,
+                        'package' => $attempt->displayPackage(),
                         'status' => (string) $attempt->status,
                         'requested_by' => $attempt->requested_by !== null ? (int) $attempt->requested_by : null,
                         'output' => (string) ($attempt->output ?? ''),
                         'error' => (string) ($attempt->error ?? ''),
+                        'manual_command' => $attempt->manualCommand(),
                         'created_at' => $attempt->created_at?->toIso8601String(),
                         'started_at' => $attempt->started_at?->toIso8601String(),
                         'finished_at' => $attempt->finished_at?->toIso8601String(),
@@ -59,6 +60,7 @@ final class IndexController
             'installTableExists' => $installTableExists,
             'installAttempts' => $installAttempts,
             'canInstallPlugins' => $this->canInstallPlugins(),
+            'allowFullComposerUpdate' => filter_var(env('TP_ALLOW_FULL_COMPOSER_UPDATE', false), FILTER_VALIDATE_BOOL),
         ]);
     }
 

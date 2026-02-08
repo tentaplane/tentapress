@@ -9,7 +9,7 @@
             <p class="tp-description">Manage which plugins are available and active on this site.</p>
         </div>
 
-        <div class="flex gap-2">
+        <div class="flex flex-wrap gap-2">
             <form method="POST" action="{{ route('tp.plugins.sync') }}">
                 @csrf
                 <button type="submit" class="tp-button-secondary">Refresh plugin list</button>
@@ -28,8 +28,10 @@
             canInstallPlugins: @js($canInstallPlugins),
             installTableExists: @js($installTableExists),
             installUrl: @js(route('tp.plugins.install')),
+            updateUrl: @js(route('tp.plugins.update')),
             statusUrlTemplate: @js(route('tp.plugins.install-attempts.show', ['installId' => '__ID__'])),
             initialAttempts: @js($installAttempts),
+            allowFullComposerUpdate: @js($allowFullComposerUpdate),
         })">
         <div class="flex flex-col gap-3">
             <div>
@@ -47,6 +49,30 @@
             <template x-if="installTableExists && !canInstallPlugins">
                 <div class="tp-notice-warning mb-0">Only super administrators can queue plugin installs.</div>
             </template>
+            <template x-if="installTableExists && canInstallPlugins && !allowFullComposerUpdate">
+                <div class="tp-muted text-sm">
+                    Plugin update button runs <span class="tp-code">composer update tentapress/* --with-all-dependencies</span>.
+                    Set <span class="tp-code">TP_ALLOW_FULL_COMPOSER_UPDATE=true</span> to allow full project updates.
+                </div>
+            </template>
+            <template x-if="installTableExists && canInstallPlugins && allowFullComposerUpdate">
+                <div class="tp-notice-warning mb-0">
+                    Full Composer updates are enabled (<span class="tp-code">TP_ALLOW_FULL_COMPOSER_UPDATE=true</span>).
+                    The update button will run <span class="tp-code">composer update --with-all-dependencies</span>.
+                </div>
+            </template>
+
+            <div class="flex justify-start">
+                <button
+                    type="button"
+                    class="tp-button-secondary"
+                    :class="(!canInstallPlugins || !installTableExists || submittingUpdate || hasActiveAttempts()) ? 'tp-button-disabled' : 'tp-button-secondary'"
+                    :disabled="!canInstallPlugins || !installTableExists || submittingUpdate || hasActiveAttempts()"
+                    @click="submitUpdate">
+                    <span x-show="!submittingUpdate">Update plugins</span>
+                    <span x-show="submittingUpdate">Queueing update...</span>
+                </button>
+            </div>
 
             <form class="flex flex-col gap-2 sm:flex-row sm:items-center" @submit.prevent="submit">
                 <input
@@ -88,10 +114,10 @@
                                             <template x-if="attempt.error">
                                                 <div class="tp-muted mt-1 text-xs" x-text="attempt.error"></div>
                                             </template>
-                                            <template x-if="attempt.status === 'failed' && attempt.package">
+                                            <template x-if="attempt.status === 'failed' && attempt.manual_command">
                                                 <div class="mt-1 text-xs">
                                                     <span class="tp-muted">Manual step:</span>
-                                                    <span class="tp-code">composer require </span><span class="tp-code" x-text="attempt.package"></span>
+                                                    <span class="tp-code" x-text="attempt.manual_command"></span>
                                                 </div>
                                             </template>
                                         </td>
@@ -267,11 +293,14 @@
             return {
                 token: String(config.token || ''),
                 installUrl: String(config.installUrl || ''),
+                updateUrl: String(config.updateUrl || ''),
                 statusUrlTemplate: String(config.statusUrlTemplate || ''),
                 canInstallPlugins: Boolean(config.canInstallPlugins),
                 installTableExists: Boolean(config.installTableExists),
+                allowFullComposerUpdate: Boolean(config.allowFullComposerUpdate),
                 packageName: '',
                 submitting: false,
+                submittingUpdate: false,
                 pollTimer: null,
                 attempts: Array.isArray(config.initialAttempts) ? config.initialAttempts : [],
                 init() {
@@ -416,6 +445,54 @@
                         }
                     } finally {
                         this.submitting = false;
+                    }
+                },
+                async submitUpdate() {
+                    if (
+                        this.submittingUpdate ||
+                        !this.canInstallPlugins ||
+                        !this.installTableExists ||
+                        this.hasActiveAttempts()
+                    ) {
+                        return;
+                    }
+
+                    this.submittingUpdate = true;
+
+                    try {
+                        const body = new URLSearchParams({
+                            _token: this.token,
+                        });
+
+                        const response = await fetch(this.updateUrl, {
+                            method: 'POST',
+                            headers: {
+                                Accept: 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body,
+                        });
+
+                        const data = await response.json().catch(() => ({}));
+                        if (!response.ok) {
+                            throw new Error(data.message || 'Unable to queue plugin update.');
+                        }
+
+                        if (data.attempt && typeof data.attempt === 'object') {
+                            this.attempts = [data.attempt, ...this.attempts.filter((item) => item.id !== data.attempt.id)].slice(0, 12);
+                            this.startPollingIfNeeded();
+                        }
+
+                        if (window.tpToast) {
+                            window.tpToast(data.message || 'Plugin update queued.', 'success');
+                        }
+                    } catch (error) {
+                        if (window.tpToast) {
+                            window.tpToast(error.message || 'Unable to queue plugin update.', 'error');
+                        }
+                    } finally {
+                        this.submittingUpdate = false;
                     }
                 },
             };
