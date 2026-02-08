@@ -319,18 +319,14 @@ final class PluginRegistry
             ->all();
 
         $enabled = [];
-        $missingIds = [];
 
         foreach ($rows as $row) {
             $data = (array) $row;
             $id = (string) ($data['id'] ?? '');
             $provider = trim((string) ($data['provider'] ?? ''));
+            $path = (string) ($data['path'] ?? '');
 
-            if ($id === '' || $provider === '' || ! class_exists($provider)) {
-                if ($id !== '') {
-                    $missingIds[] = $id;
-                }
-
+            if ($id === '' || $provider === '') {
                 continue;
             }
 
@@ -342,19 +338,17 @@ final class PluginRegistry
                 $manifest = [];
             }
 
+            if (! $this->providerClassAvailable($provider, $path, $manifest)) {
+                continue;
+            }
+
             $enabled[] = [
                 'id' => $id,
                 'provider' => $provider,
-                'path' => (string) ($data['path'] ?? ''),
+                'path' => $path,
                 'version' => (string) ($data['version'] ?? ''),
                 'manifest' => $manifest,
             ];
-        }
-
-        if ($missingIds !== []) {
-            DB::table('tp_plugins')
-                ->whereIn('id', $missingIds)
-                ->update(['enabled' => 0, 'updated_at' => now()]);
         }
 
         $payload = [
@@ -513,5 +507,68 @@ final class PluginRegistry
         $id = trim($id);
 
         throw_if($id === '' || ! Str::contains($id, '/'), RuntimeException::class, "Invalid plugin id '{$id}'. Expected vendor/name.");
+    }
+
+    /**
+     * @param  array<string,mixed>  $manifest
+     */
+    private function providerClassAvailable(string $provider, string $path, array $manifest): bool
+    {
+        if (class_exists($provider)) {
+            return true;
+        }
+
+        foreach ($this->providerClassCandidates($provider, $path, $manifest) as $candidate) {
+            if (! is_file($candidate)) {
+                continue;
+            }
+
+            try {
+                require_once $candidate;
+            } catch (\Throwable) {
+                continue;
+            }
+
+            if (class_exists($provider, false)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param  array<string,mixed>  $manifest
+     * @return array<int,string>
+     */
+    private function providerClassCandidates(string $provider, string $path, array $manifest): array
+    {
+        $base = base_path($path);
+        $providerPath = trim((string) ($manifest['provider_path'] ?? ''));
+        $shortClass = $this->shortClassName($provider);
+        $candidates = [];
+
+        if ($providerPath !== '') {
+            $candidates[] = $base.'/'.ltrim($providerPath, '/');
+        }
+
+        if ($shortClass !== '') {
+            $candidates[] = $base.'/src/'.$shortClass.'.php';
+            $candidates[] = $base.'/'.$shortClass.'.php';
+        }
+
+        return array_values(array_unique($candidates));
+    }
+
+    private function shortClassName(string $class): string
+    {
+        $class = trim($class);
+        if ($class === '') {
+            return '';
+        }
+
+        $offset = strrpos($class, '\\');
+
+        return $offset === false ? $class : substr($class, $offset + 1);
     }
 }

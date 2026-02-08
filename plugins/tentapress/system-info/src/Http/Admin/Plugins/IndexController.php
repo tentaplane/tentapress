@@ -80,7 +80,8 @@ final class IndexController
             $description = (string) ($manifest['description'] ?? '');
             $version = (string) ($data['version'] ?? ($manifest['version'] ?? ''));
             $enabled = ((int) ($data['enabled'] ?? 0)) === 1;
-            $installed = $provider !== '' && class_exists($provider);
+            $path = trim((string) ($data['path'] ?? ''));
+            $installed = $path !== '' ? is_dir(base_path($path)) : ($provider !== '' && class_exists($provider));
             $protected = in_array($id, PluginRegistry::PROTECTED_PLUGIN_IDS, true);
 
             $plugins[] = [
@@ -89,7 +90,7 @@ final class IndexController
                 'description' => $description,
                 'version' => $version,
                 'provider' => $provider,
-                'path' => (string) ($data['path'] ?? ''),
+                'path' => $path,
                 'enabled' => $enabled,
                 'installed' => $installed,
                 'protected' => $protected,
