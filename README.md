@@ -18,6 +18,15 @@ or
 This runs the full setup flow (composer install, migrations, plugins sync) and then prompts you to create your first
 super admin user.
 
+### Clean install from latest release archive
+
+If you want the latest tagged release without cloning the full git history, this command downloads it and extracts the
+contents directly into your current folder:
+
+```bash
+curl -s https://api.github.com/repos/tentaplane/tentapress/releases/latest | jq -r .tag_name | xargs -I{} sh -c 'curl -L "https://github.com/tentaplane/tentapress/archive/refs/tags/{}.zip" -o tentapress.zip && tmp=$(mktemp -d) && unzip -q tentapress.zip -d "$tmp" && rsync -a "$tmp"/*/ ./ && rm -rf "$tmp" tentapress.zip'
+```
+
 ## Console Commands
 
 TentaPress provides several Artisan commands for managing your installation.
@@ -99,7 +108,8 @@ sites - quickly, safely, and with minimal operational overhead.
 - **Easy to extend** - modular by design, plugins as packages
 - **Easy to leave** - exports and offboarding are first-class
 
-Read the guiding principles in [`docs/vision/MANIFESTO.md`](docs/vision/MANIFESTO.md) and the longer-term direction in [`docs/vision/VISION.md`](docs/vision/VISION.md).
+Read the guiding principles in [`docs/vision/MANIFESTO.md`](docs/vision/MANIFESTO.md) and the longer-term direction in [
+`docs/vision/VISION.md`](docs/vision/VISION.md).
 
 ## What this is not
 

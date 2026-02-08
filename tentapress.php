@@ -1042,7 +1042,7 @@ fwrite(STDOUT, "\nSetup complete.\n");
 fwrite(
     STDOUT,
     "\nNext steps:\n" .
-    "- If using Laravel Herd, visit https://tentapress.test/admin\n" .
+    "- If using Laravel Herd, visit https://yourdomain.test/admin\n" .
     "- Otherwise run: php artisan serve, then visit the printed URL + /admin\n" .
     "- Log in with the admin email and the password you set (or generated).\n"
 );
