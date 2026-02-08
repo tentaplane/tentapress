@@ -7,7 +7,7 @@ Diagnostics and plugin management for TentaPress.
 | Field    | Value                                             |
 |----------|---------------------------------------------------|
 | ID       | `tentapress/system-info`                          |
-| Version  | 0.4.0                                             |
+| Version  | 0.4.1                                             |
 | Provider | `TentaPress\SystemInfo\SystemInfoServiceProvider` |
 
 ## Features

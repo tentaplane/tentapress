@@ -11,6 +11,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Process;
 use RuntimeException;
+use Symfony\Component\Process\ExecutableFinder;
 use Throwable;
 use TentaPress\SystemInfo\Models\TpPluginInstall;
 
@@ -68,7 +69,10 @@ final class InstallPlugin implements ShouldQueue
     {
         $log .= '$ ' . implode(' ', $command) . "\n";
 
+        $environment = $this->buildComposerEnvironment();
+
         $result = Process::path(base_path())
+            ->env($environment)
             ->timeout($this->timeout)
             ->run($command);
 
@@ -78,7 +82,7 @@ final class InstallPlugin implements ShouldQueue
         }
 
         if (! $result->successful()) {
-            throw new RuntimeException('Command failed: ' . implode(' ', $command));
+            throw new RuntimeException($this->buildCommandError($command, $output));
         }
     }
 
@@ -87,12 +91,53 @@ final class InstallPlugin implements ShouldQueue
      */
     private function composerRequireCommand(string $package): array
     {
+        $finder = new ExecutableFinder();
         $projectComposer = base_path('composer.phar');
         if (is_file($projectComposer)) {
             return [PHP_BINARY, $projectComposer, 'require', $package, '--no-interaction', '--no-progress'];
         }
 
-        return ['composer', 'require', $package, '--no-interaction', '--no-progress'];
+        $herd = $finder->find('herd');
+        if (is_string($herd) && $herd !== '') {
+            return [$herd, 'composer', 'require', $package, '--no-interaction', '--no-progress'];
+        }
+
+        $composer = $finder->find('composer');
+        if (is_string($composer) && $composer !== '') {
+            return [$composer, 'require', $package, '--no-interaction', '--no-progress'];
+        }
+
+        throw new RuntimeException('Composer binary not found for queue worker.');
+    }
+
+    /**
+     * @return array<string,string>
+     */
+    private function buildComposerEnvironment(): array
+    {
+        $composerLocal = base_path('composer.local.json');
+        if (! is_file($composerLocal)) {
+            return [];
+        }
+
+        return [
+            'COMPOSER' => $composerLocal,
+        ];
+    }
+
+    /**
+     * @param  array<int,string>  $command
+     */
+    private function buildCommandError(array $command, string $output): string
+    {
+        $prefix = 'Command failed: ' . implode(' ', $command);
+        if ($output === '') {
+            return $prefix;
+        }
+
+        $tail = mb_substr($output, -500);
+
+        return $prefix . ' | ' . $tail;
     }
 
     private function markFailed(TpPluginInstall $install, string $message, string $log): void
