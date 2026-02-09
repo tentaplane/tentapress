@@ -1,7 +1,15 @@
 @php
-    $formKey = trim((string) ($props['form_key'] ?? 'signup'));
-    if ($formKey === '') {
-        $formKey = 'signup';
+    $normalizer = app(\TentaPress\Forms\Services\FormConfigNormalizer::class);
+    $signer = app(\TentaPress\Forms\Services\FormPayloadSigner::class);
+
+    $rawFormKey = trim((string) ($props['form_key'] ?? 'signup'));
+    if ($rawFormKey === '') {
+        $rawFormKey = 'signup';
+    }
+
+    $routeFormKey = strtolower(trim((string) preg_replace('/[^A-Za-z0-9._-]/', '-', $rawFormKey), '-'));
+    if ($routeFormKey === '') {
+        $routeFormKey = 'signup';
     }
 
     $title = (string) ($props['title'] ?? '');
@@ -9,46 +17,37 @@
     $submitLabel = (string) ($props['submit_label'] ?? 'Submit');
     $privacyNotice = (string) ($props['privacy_notice'] ?? '');
 
-    $rawFields = $props['fields'] ?? [];
-    if (is_string($rawFields)) {
-        $decodedFields = json_decode($rawFields, true);
-        $rawFields = is_array($decodedFields) ? $decodedFields : [];
-    }
+    $provider = $normalizer->normalizeProvider($props['provider'] ?? 'mailchimp');
+    $fields = $normalizer->normalizeFields($props['fields'] ?? []);
+    $providerConfig = $normalizer->normalizeProviderConfig(is_array($props) ? $props : []);
 
-    $allowedTypes = ['email', 'text', 'textarea', 'checkbox', 'select', 'hidden'];
-    $fields = [];
+    $payloadToken = $signer->sign([
+        'provider' => $provider,
+        'fields' => $fields,
+        'provider_config' => $providerConfig,
+        'success_message' => (string) ($props['success_message'] ?? ''),
+        'error_message' => (string) ($props['error_message'] ?? ''),
+        'redirect_url' => (string) ($props['redirect_url'] ?? ''),
+    ]);
 
-    foreach ((array) $rawFields as $field) {
-        if (! is_array($field)) {
-            continue;
-        }
-
-        $key = trim((string) ($field['key'] ?? ''));
-        $label = trim((string) ($field['label'] ?? ''));
-        $type = strtolower(trim((string) ($field['type'] ?? 'text')));
-
-        if ($key === '' || $label === '') {
-            continue;
-        }
-
-        if (! in_array($type, $allowedTypes, true)) {
-            $type = 'text';
-        }
-
-        $fields[] = [
-            'key' => $key,
-            'label' => $label,
-            'type' => $type,
-            'required' => in_array((string) ($field['required'] ?? '0'), ['1', 'true', 'yes', 'on'], true),
-            'placeholder' => (string) ($field['placeholder'] ?? ''),
-            'default' => (string) ($field['default'] ?? ''),
-            'options' => (string) ($field['options'] ?? ''),
-        ];
-    }
+    $statusKey = 'tp_forms.status.'.(string) preg_replace('/[^a-z0-9_-]/', '', $routeFormKey);
+    $status = session($statusKey);
 @endphp
 
-<section id="tp-form-{{ $formKey }}" class="py-12">
+<section id="tp-form-{{ $routeFormKey }}" class="py-12">
     <div class="mx-auto max-w-3xl space-y-5 rounded-xl border border-black/10 bg-white p-8">
+        @if (is_array($status) && ($status['type'] ?? '') === 'success' && trim((string) ($status['message'] ?? '')) !== '')
+            <div class="rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
+                {{ (string) ($status['message'] ?? '') }}
+            </div>
+        @endif
+
+        @if (is_array($status) && ($status['type'] ?? '') === 'error' && trim((string) ($status['message'] ?? '')) !== '')
+            <div class="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900">
+                {{ (string) ($status['message'] ?? '') }}
+            </div>
+        @endif
+
         @if ($title !== '')
             <h2 class="text-2xl font-semibold">{{ $title }}</h2>
         @endif
@@ -57,87 +56,90 @@
             <p class="text-black/70">{{ $description }}</p>
         @endif
 
-        <form action="#" method="post" class="space-y-4">
+        <form action="{{ route('tp.forms.submit', ['formKey' => $routeFormKey]) }}" method="post" class="space-y-4">
+            @csrf
+            <input type="hidden" name="_tp_payload" value="{{ $payloadToken }}" />
+            <input type="hidden" name="_tp_started_at" value="{{ now()->timestamp }}" />
+            <input type="hidden" name="_tp_return_url" value="{{ url()->full() }}#tp-form-{{ $routeFormKey }}" />
+
+            <div class="absolute -left-[10000px] top-auto h-px w-px overflow-hidden" aria-hidden="true">
+                <label for="tp-hp-{{ $routeFormKey }}">Company</label>
+                <input type="text" id="tp-hp-{{ $routeFormKey }}" name="_tp_hp" tabindex="-1" autocomplete="off" />
+            </div>
+
             <div class="grid gap-4">
                 @foreach ($fields as $field)
                     @php
-                        $isRequired = $field['required'];
-                        $requiredAttr = $isRequired ? 'required' : null;
+                        $key = $field['key'];
+                        $id = $routeFormKey.'-'.$key;
+                        $required = $field['required'];
+                        $value = old($key, $field['default']);
                     @endphp
 
                     @if ($field['type'] === 'hidden')
-                        <input type="hidden" name="{{ $field['key'] }}" value="{{ $field['default'] }}" />
+                        <input type="hidden" name="{{ $key }}" value="{{ is_scalar($value) ? (string) $value : '' }}" />
                         @continue
                     @endif
 
-                    <label class="block text-sm font-medium text-black/80" for="{{ $formKey }}-{{ $field['key'] }}">
+                    @if ($field['type'] === 'checkbox')
+                        <label class="inline-flex items-center gap-2 text-sm text-black/80" for="{{ $id }}">
+                            <input
+                                id="{{ $id }}"
+                                type="checkbox"
+                                name="{{ $key }}"
+                                value="1"
+                                @checked(in_array(strtolower(trim((string) $value)), ['1', 'true', 'yes', 'on'], true))
+                                class="rounded border border-black/20"
+                                @required($required) />
+                            <span>{{ $field['placeholder'] !== '' ? $field['placeholder'] : $field['label'] }}</span>
+                        </label>
+                        @error($key)
+                            <p class="text-xs text-red-700">{{ $message }}</p>
+                        @enderror
+                        @continue
+                    @endif
+
+                    <label class="block text-sm font-medium text-black/80" for="{{ $id }}">
                         {{ $field['label'] }}
                     </label>
 
                     @if ($field['type'] === 'textarea')
                         <textarea
-                            id="{{ $formKey }}-{{ $field['key'] }}"
-                            name="{{ $field['key'] }}"
+                            id="{{ $id }}"
+                            name="{{ $key }}"
                             rows="4"
-                            {{ $requiredAttr }}
                             class="w-full rounded border border-black/10 px-4 py-2 text-sm"
-                            placeholder="{{ $field['placeholder'] }}">{{ $field['default'] }}</textarea>
+                            placeholder="{{ $field['placeholder'] }}"
+                            @required($required)>{{ is_scalar($value) ? (string) $value : '' }}</textarea>
                     @elseif ($field['type'] === 'select')
-                        @php
-                            $rawOptions = preg_split('/\r?\n/', trim($field['options'])) ?: [];
-                            $options = [];
-
-                            foreach ($rawOptions as $line) {
-                                $line = trim($line);
-                                if ($line === '') {
-                                    continue;
-                                }
-
-                                $parts = array_map('trim', explode('|', $line, 2));
-                                $value = (string) ($parts[0] ?? '');
-                                $label = (string) ($parts[1] ?? $value);
-
-                                if ($value === '') {
-                                    continue;
-                                }
-
-                                $options[] = ['value' => $value, 'label' => $label];
-                            }
-                        @endphp
-
                         <select
-                            id="{{ $formKey }}-{{ $field['key'] }}"
-                            name="{{ $field['key'] }}"
-                            {{ $requiredAttr }}
-                            class="w-full rounded border border-black/10 px-4 py-2 text-sm">
-                            @foreach ($options as $option)
-                                <option value="{{ $option['value'] }}" @selected($field['default'] === $option['value'])>
-                                    {{ $option['label'] }}
+                            id="{{ $id }}"
+                            name="{{ $key }}"
+                            class="w-full rounded border border-black/10 px-4 py-2 text-sm"
+                            @required($required)>
+                            @if (! $required)
+                                <option value="">Select…</option>
+                            @endif
+                            @foreach ($field['options'] as $optionValue => $optionLabel)
+                                <option value="{{ $optionValue }}" @selected((string) $value === (string) $optionValue)>
+                                    {{ $optionLabel }}
                                 </option>
                             @endforeach
                         </select>
-                    @elseif ($field['type'] === 'checkbox')
-                        <label class="inline-flex items-center gap-2 text-sm text-black/80">
-                            <input
-                                id="{{ $formKey }}-{{ $field['key'] }}"
-                                type="checkbox"
-                                name="{{ $field['key'] }}"
-                                value="1"
-                                @checked(in_array(strtolower($field['default']), ['1', 'true', 'yes', 'on'], true))
-                                class="rounded border border-black/20"
-                                {{ $requiredAttr }} />
-                            <span>{{ $field['placeholder'] !== '' ? $field['placeholder'] : $field['label'] }}</span>
-                        </label>
                     @else
                         <input
-                            id="{{ $formKey }}-{{ $field['key'] }}"
+                            id="{{ $id }}"
                             type="{{ $field['type'] === 'email' ? 'email' : 'text' }}"
-                            name="{{ $field['key'] }}"
-                            value="{{ $field['default'] }}"
-                            {{ $requiredAttr }}
+                            name="{{ $key }}"
+                            value="{{ is_scalar($value) ? (string) $value : '' }}"
                             class="w-full rounded border border-black/10 px-4 py-2 text-sm"
-                            placeholder="{{ $field['placeholder'] }}" />
+                            placeholder="{{ $field['placeholder'] }}"
+                            @required($required) />
                     @endif
+
+                    @error($key)
+                        <p class="text-xs text-red-700">{{ $message }}</p>
+                    @enderror
                 @endforeach
             </div>
 

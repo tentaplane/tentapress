@@ -107,6 +107,9 @@ final class EditController
             }
 
             $pluginId = $segments[0].'/'.$segments[1];
+            if (! in_array($pluginId, $enabledPluginIds, true) && count($segments) === 2) {
+                $pluginId = 'tentapress/'.$segments[0];
+            }
 
             return in_array($pluginId, $enabledPluginIds, true);
         }));

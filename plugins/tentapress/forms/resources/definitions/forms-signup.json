@@ -52,6 +52,7 @@
         },
         { "key": "mailchimp_action_url", "label": "Mailchimp Action URL", "type": "text", "placeholder": "https://...list-manage.com/subscribe/post?..." },
         { "key": "mailchimp_list_id", "label": "Mailchimp List ID (optional)", "type": "text", "placeholder": "abc123" },
+        { "key": "mailchimp_gdpr_tag", "label": "Mailchimp GDPR Merge Tag (optional)", "type": "text", "placeholder": "GDPR" },
         { "key": "tentaforms_form_id", "label": "TentaForms Form ID", "type": "text", "placeholder": "contact-us" },
         {
             "key": "tentaforms_environment",
@@ -88,6 +89,7 @@
         "provider": "mailchimp",
         "mailchimp_action_url": "",
         "mailchimp_list_id": "",
+        "mailchimp_gdpr_tag": "",
         "tentaforms_form_id": "",
         "tentaforms_environment": "production",
         "provider_config": ""
@@ -117,6 +119,7 @@
             "provider": "mailchimp",
             "mailchimp_action_url": "",
             "mailchimp_list_id": "",
+            "mailchimp_gdpr_tag": "",
             "tentaforms_form_id": "",
             "tentaforms_environment": "production",
             "provider_config": ""
