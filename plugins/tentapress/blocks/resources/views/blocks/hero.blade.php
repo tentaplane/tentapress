@@ -55,15 +55,37 @@
         'ghost' => 'text-black/70 hover:text-black',
         default => 'bg-black text-white',
     };
+
+    $backgroundRef = null;
+    if ($bg !== '') {
+        $resolver = app()->bound('tp.media.reference_resolver') ? app('tp.media.reference_resolver') : null;
+        if (is_object($resolver) && method_exists($resolver, 'resolveImage')) {
+            $backgroundRef = $resolver->resolveImage(
+                ['url' => $bg, 'alt' => ''],
+                ['variant' => 'large', 'sizes' => '(min-width: 1024px) 560px, 100vw']
+            );
+        }
+    }
+
+    $backgroundSrc = is_array($backgroundRef) ? (string) ($backgroundRef['src'] ?? '') : $bg;
+    $backgroundSrcset = is_array($backgroundRef) ? ($backgroundRef['srcset'] ?? null) : null;
+    $backgroundSizes = is_array($backgroundRef) ? ($backgroundRef['sizes'] ?? null) : null;
 @endphp
 
 <section class="py-16">
     <div class="mx-auto max-w-5xl px-6">
         <div class="rounded-xl border border-black/10 bg-white p-8">
             <div class="{{ $layoutClass }} {{ $alignClass }}">
-                @if ($bg !== '' && ! $splitLayout)
+                @if ($backgroundSrc !== '' && ! $splitLayout)
                     <div class="overflow-hidden rounded-lg border border-black/10">
-                        <img src="{{ $bg }}" alt="" class="h-auto w-full" />
+                        <img
+                            src="{{ $backgroundSrc }}"
+                            alt=""
+                            @if (is_string($backgroundSrcset) && $backgroundSrcset !== '') srcset="{{ $backgroundSrcset }}" @endif
+                            @if (is_string($backgroundSizes) && $backgroundSizes !== '') sizes="{{ $backgroundSizes }}" @endif
+                            class="h-auto w-full"
+                            loading="lazy"
+                            decoding="async" />
                     </div>
                 @endif
 
@@ -103,9 +125,16 @@
                     @endif
                 </div>
 
-                @if ($bg !== '' && $splitLayout)
+                @if ($backgroundSrc !== '' && $splitLayout)
                     <div class="overflow-hidden rounded-lg border border-black/10">
-                        <img src="{{ $bg }}" alt="" class="h-auto w-full" />
+                        <img
+                            src="{{ $backgroundSrc }}"
+                            alt=""
+                            @if (is_string($backgroundSrcset) && $backgroundSrcset !== '') srcset="{{ $backgroundSrcset }}" @endif
+                            @if (is_string($backgroundSizes) && $backgroundSizes !== '') sizes="{{ $backgroundSizes }}" @endif
+                            class="h-auto w-full"
+                            loading="lazy"
+                            decoding="async" />
                     </div>
                 @endif
             </div>
