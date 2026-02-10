@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.32.0](https://github.com/tentaplane/tentapress/compare/v0.31.0...v0.32.0) (2026-02-10)
+
+
+### Features
+
+* **admin-shell:** improve mobile/tablet shell, improve core accessibility for dialog, nav, toasts, and responsive tables, add explicit search labels for index filters ([4dce970](https://github.com/tentaplane/tentapress/commit/4dce97095e6cb1174b2b78157dd0ace91d2561c3))
+
 ## [0.31.0](https://github.com/tentaplane/tentapress/compare/v0.30.3...v0.31.0) (2026-02-08)
 
 
