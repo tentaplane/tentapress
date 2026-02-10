@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.33.0](https://github.com/tentaplane/tentapress/compare/v0.32.0...v0.33.0) (2026-02-10)
+
+
+### Features
+
+* **blocks:** render media images via variant-aware references ([11e7b48](https://github.com/tentaplane/tentapress/commit/11e7b4808636651e45d19e947edb0a09c03a1fbe))
+* **media:** resolve frontend image variants from media references ([cc4df90](https://github.com/tentaplane/tentapress/commit/cc4df9076dc930513c1775abe6acc12322dbafa3))
+* **theme-tailwind:** use media variants in block image templates ([3f76bf5](https://github.com/tentaplane/tentapress/commit/3f76bf59b4210f40fe3b4f9afda6d88153674e7d))
+
+
+### Bug Fixes
+
+* **page-editor:** use resolver helper for media reference lookup ([69d1958](https://github.com/tentaplane/tentapress/commit/69d1958e58e9fd0421e5493a3b0efbb073c68470))
+
 ## [0.32.0](https://github.com/tentaplane/tentapress/compare/v0.31.0...v0.32.0) (2026-02-10)
 
 
