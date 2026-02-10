@@ -341,7 +341,7 @@ final class PageDocumentRenderer
     private function resolveImageReference(array $reference, string $variant): ?array
     {
         if (app()->bound('tp.media.reference_resolver')) {
-            $resolver = app('tp.media.reference_resolver');
+            $resolver = resolve('tp.media.reference_resolver');
             if (is_object($resolver) && method_exists($resolver, 'resolveImage')) {
                 /** @var array{id:int|null,src:string,alt:string,srcset:string|null,sizes:string|null,width:int|null,height:int|null}|null $resolved */
                 $resolved = $resolver->resolveImage($reference, ['variant' => $variant]);
