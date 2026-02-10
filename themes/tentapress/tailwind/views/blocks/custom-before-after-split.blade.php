@@ -57,9 +57,13 @@
     $beforeSrc = is_array($beforeRef) ? (string) ($beforeRef['src'] ?? '') : $beforeImage;
     $beforeSrcset = is_array($beforeRef) ? ($beforeRef['srcset'] ?? null) : null;
     $beforeSizes = is_array($beforeRef) ? ($beforeRef['sizes'] ?? null) : null;
+    $beforeWidth = is_array($beforeRef) && isset($beforeRef['width']) && is_int($beforeRef['width']) ? $beforeRef['width'] : null;
+    $beforeHeight = is_array($beforeRef) && isset($beforeRef['height']) && is_int($beforeRef['height']) ? $beforeRef['height'] : null;
     $afterSrc = is_array($afterRef) ? (string) ($afterRef['src'] ?? '') : $afterImage;
     $afterSrcset = is_array($afterRef) ? ($afterRef['srcset'] ?? null) : null;
     $afterSizes = is_array($afterRef) ? ($afterRef['sizes'] ?? null) : null;
+    $afterWidth = is_array($afterRef) && isset($afterRef['width']) && is_int($afterRef['width']) ? $afterRef['width'] : null;
+    $afterHeight = is_array($afterRef) && isset($afterRef['height']) && is_int($afterRef['height']) ? $afterRef['height'] : null;
 
     $instance = 'tp-before-after-'.substr(md5((string) json_encode([$beforeImage, $afterImage, $startPercent])), 0, 8);
 @endphp
@@ -82,6 +86,8 @@
                         alt="{{ $beforeLabel }}"
                         @if (is_string($beforeSrcset) && $beforeSrcset !== '') srcset="{{ $beforeSrcset }}" @endif
                         @if (is_string($beforeSizes) && $beforeSizes !== '') sizes="{{ $beforeSizes }}" @endif
+                        @if (is_int($beforeWidth) && $beforeWidth > 0) width="{{ $beforeWidth }}" @endif
+                        @if (is_int($beforeHeight) && $beforeHeight > 0) height="{{ $beforeHeight }}" @endif
                         class="absolute inset-0 h-full w-full object-cover"
                         loading="lazy"
                         decoding="async" />
@@ -92,6 +98,8 @@
                         alt="{{ $afterLabel }}"
                         @if (is_string($afterSrcset) && $afterSrcset !== '') srcset="{{ $afterSrcset }}" @endif
                         @if (is_string($afterSizes) && $afterSizes !== '') sizes="{{ $afterSizes }}" @endif
+                        @if (is_int($afterWidth) && $afterWidth > 0) width="{{ $afterWidth }}" @endif
+                        @if (is_int($afterHeight) && $afterHeight > 0) height="{{ $afterHeight }}" @endif
                         class="absolute inset-0 h-full w-full object-cover"
                         style="clip-path: inset(0 calc(100% - {{ $startPercent }}%) 0 0);"
                         loading="lazy"

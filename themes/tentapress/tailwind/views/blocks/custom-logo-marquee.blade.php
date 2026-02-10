@@ -54,6 +54,8 @@
             'src' => is_array($resolved) ? (string) ($resolved['src'] ?? '') : $logoUrl,
             'srcset' => is_array($resolved) ? ($resolved['srcset'] ?? null) : null,
             'sizes' => is_array($resolved) ? ($resolved['sizes'] ?? null) : null,
+            'width' => is_array($resolved) && isset($resolved['width']) && is_int($resolved['width']) ? $resolved['width'] : null,
+            'height' => is_array($resolved) && isset($resolved['height']) && is_int($resolved['height']) ? $resolved['height'] : null,
         ];
     }
 
@@ -80,6 +82,8 @@
                                 alt=""
                                 @if (is_string($logo['srcset'] ?? null) && ($logo['srcset'] ?? '') !== '') srcset="{{ $logo['srcset'] }}" @endif
                                 @if (is_string($logo['sizes'] ?? null) && ($logo['sizes'] ?? '') !== '') sizes="{{ $logo['sizes'] }}" @endif
+                                @if (is_int($logo['width'] ?? null) && ($logo['width'] ?? 0) > 0) width="{{ $logo['width'] }}" @endif
+                                @if (is_int($logo['height'] ?? null) && ($logo['height'] ?? 0) > 0) height="{{ $logo['height'] }}" @endif
                                 class="max-h-10 w-auto object-contain {{ $grayscale ? 'grayscale opacity-70' : 'opacity-95' }}"
                                 loading="lazy"
                                 decoding="async" />

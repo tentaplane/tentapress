@@ -91,6 +91,8 @@
                         $photoSrc = is_array($photoRef) ? (string) ($photoRef['src'] ?? '') : $photo;
                         $photoAlt = is_array($photoRef) ? (string) ($photoRef['alt'] ?? $name) : $name;
                         $photoSrcset = is_array($photoRef) ? ($photoRef['srcset'] ?? null) : null;
+                        $photoWidth = is_array($photoRef) && isset($photoRef['width']) && is_int($photoRef['width']) ? $photoRef['width'] : null;
+                        $photoHeight = is_array($photoRef) && isset($photoRef['height']) && is_int($photoRef['height']) ? $photoRef['height'] : null;
                     @endphp
 
                     <article class="rounded-2xl border border-black/8 bg-white p-5 shadow-sm {{ $compact ? 'space-y-3' : 'space-y-4' }}">
@@ -101,6 +103,8 @@
                                     alt="{{ $photoAlt }}"
                                     @if (is_string($photoSrcset) && $photoSrcset !== '') srcset="{{ $photoSrcset }}" @endif
                                     sizes="56px"
+                                    @if (is_int($photoWidth) && $photoWidth > 0) width="{{ $photoWidth }}" @endif
+                                    @if (is_int($photoHeight) && $photoHeight > 0) height="{{ $photoHeight }}" @endif
                                     class="h-14 w-14 rounded-full object-cover"
                                     loading="lazy"
                                     decoding="async" />

@@ -82,6 +82,8 @@
                             $avatarSrc = is_array($avatarRef) ? (string) ($avatarRef['src'] ?? '') : $avatar;
                             $avatarAlt = is_array($avatarRef) ? (string) ($avatarRef['alt'] ?? $name) : $name;
                             $avatarSrcset = is_array($avatarRef) ? ($avatarRef['srcset'] ?? null) : null;
+                            $avatarWidth = is_array($avatarRef) && isset($avatarRef['width']) && is_int($avatarRef['width']) ? $avatarRef['width'] : null;
+                            $avatarHeight = is_array($avatarRef) && isset($avatarRef['height']) && is_int($avatarRef['height']) ? $avatarRef['height'] : null;
                         @endphp
 
                         <article data-slide class="{{ $idx === 0 ? 'block' : 'hidden' }} text-center">
@@ -96,6 +98,8 @@
                                         alt="{{ $avatarAlt }}"
                                         @if (is_string($avatarSrcset) && $avatarSrcset !== '') srcset="{{ $avatarSrcset }}" @endif
                                         sizes="40px"
+                                        @if (is_int($avatarWidth) && $avatarWidth > 0) width="{{ $avatarWidth }}" @endif
+                                        @if (is_int($avatarHeight) && $avatarHeight > 0) height="{{ $avatarHeight }}" @endif
                                         class="h-10 w-10 rounded-full object-cover"
                                         loading="lazy"
                                         decoding="async" />

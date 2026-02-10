@@ -67,6 +67,8 @@
                         $logoSrc = is_array($logoRef) ? (string) ($logoRef['src'] ?? '') : $logo;
                         $logoSrcset = is_array($logoRef) ? ($logoRef['srcset'] ?? null) : null;
                         $logoSizes = is_array($logoRef) ? ($logoRef['sizes'] ?? null) : null;
+                        $logoWidth = is_array($logoRef) && isset($logoRef['width']) && is_int($logoRef['width']) ? $logoRef['width'] : null;
+                        $logoHeight = is_array($logoRef) && isset($logoRef['height']) && is_int($logoRef['height']) ? $logoRef['height'] : null;
                     @endphp
                     <div class="flex items-center justify-center rounded-[2.5rem] border border-black/[0.08] bg-white px-6 py-5">
                         <img
@@ -74,6 +76,8 @@
                             alt=""
                             @if (is_string($logoSrcset) && $logoSrcset !== '') srcset="{{ $logoSrcset }}" @endif
                             @if (is_string($logoSizes) && $logoSizes !== '') sizes="{{ $logoSizes }}" @endif
+                            @if (is_int($logoWidth) && $logoWidth > 0) width="{{ $logoWidth }}" @endif
+                            @if (is_int($logoHeight) && $logoHeight > 0) height="{{ $logoHeight }}" @endif
                             class="{{ $logoClass }} w-auto {{ $grayscale ? 'grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all' : '' }}"
                             loading="lazy"
                             decoding="async" />

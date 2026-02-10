@@ -69,6 +69,8 @@
     $backgroundSrc = is_array($backgroundRef) ? (string) ($backgroundRef['src'] ?? '') : $bg;
     $backgroundSrcset = is_array($backgroundRef) ? ($backgroundRef['srcset'] ?? null) : null;
     $backgroundSizes = is_array($backgroundRef) ? ($backgroundRef['sizes'] ?? null) : null;
+    $backgroundWidth = is_array($backgroundRef) && isset($backgroundRef['width']) && is_int($backgroundRef['width']) ? $backgroundRef['width'] : null;
+    $backgroundHeight = is_array($backgroundRef) && isset($backgroundRef['height']) && is_int($backgroundRef['height']) ? $backgroundRef['height'] : null;
 @endphp
 
 @if ($splitLayout)
@@ -128,6 +130,8 @@
                             alt=""
                             @if (is_string($backgroundSrcset) && $backgroundSrcset !== '') srcset="{{ $backgroundSrcset }}" @endif
                             @if (is_string($backgroundSizes) && $backgroundSizes !== '') sizes="{{ $backgroundSizes }}" @endif
+                            @if (is_int($backgroundWidth) && $backgroundWidth > 0) width="{{ $backgroundWidth }}" @endif
+                            @if (is_int($backgroundHeight) && $backgroundHeight > 0) height="{{ $backgroundHeight }}" @endif
                             class="h-full w-full object-cover"
                             loading="lazy"
                             decoding="async" />
@@ -146,6 +150,8 @@
                     alt=""
                     @if (is_string($backgroundSrcset) && $backgroundSrcset !== '') srcset="{{ $backgroundSrcset }}" @endif
                     @if (is_string($backgroundSizes) && $backgroundSizes !== '') sizes="{{ $backgroundSizes }}" @endif
+                    @if (is_int($backgroundWidth) && $backgroundWidth > 0) width="{{ $backgroundWidth }}" @endif
+                    @if (is_int($backgroundHeight) && $backgroundHeight > 0) height="{{ $backgroundHeight }}" @endif
                     class="h-full w-full object-cover"
                     loading="lazy"
                     decoding="async" />

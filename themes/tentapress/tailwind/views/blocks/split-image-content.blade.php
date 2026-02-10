@@ -23,6 +23,8 @@
     $imageSrc = is_array($imageRef) ? (string) ($imageRef['src'] ?? '') : $image;
     $imageSrcset = is_array($imageRef) ? ($imageRef['srcset'] ?? null) : null;
     $imageSizes = is_array($imageRef) ? ($imageRef['sizes'] ?? null) : null;
+    $imageWidth = is_array($imageRef) && isset($imageRef['width']) && is_int($imageRef['width']) ? $imageRef['width'] : null;
+    $imageHeight = is_array($imageRef) && isset($imageRef['height']) && is_int($imageRef['height']) ? $imageRef['height'] : null;
 @endphp
 
 <section>
@@ -37,6 +39,8 @@
                                 alt=""
                                 @if (is_string($imageSrcset) && $imageSrcset !== '') srcset="{{ $imageSrcset }}" @endif
                                 @if (is_string($imageSizes) && $imageSizes !== '') sizes="{{ $imageSizes }}" @endif
+                                @if (is_int($imageWidth) && $imageWidth > 0) width="{{ $imageWidth }}" @endif
+                                @if (is_int($imageHeight) && $imageHeight > 0) height="{{ $imageHeight }}" @endif
                                 class="h-full w-full object-cover"
                                 loading="lazy"
                                 decoding="async" />

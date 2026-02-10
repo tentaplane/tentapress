@@ -33,6 +33,8 @@
     $avatarSrc = is_array($avatarRef) ? (string) ($avatarRef['src'] ?? '') : $avatar;
     $avatarAlt = is_array($avatarRef) ? (string) ($avatarRef['alt'] ?? $name) : $name;
     $avatarSrcset = is_array($avatarRef) ? ($avatarRef['srcset'] ?? null) : null;
+    $avatarWidth = is_array($avatarRef) && isset($avatarRef['width']) && is_int($avatarRef['width']) ? $avatarRef['width'] : null;
+    $avatarHeight = is_array($avatarRef) && isset($avatarRef['height']) && is_int($avatarRef['height']) ? $avatarRef['height'] : null;
 @endphp
 
 <section class="py-16 sm:py-20">
@@ -60,6 +62,8 @@
                             alt="{{ $avatarAlt }}"
                             @if (is_string($avatarSrcset) && $avatarSrcset !== '') srcset="{{ $avatarSrcset }}" @endif
                             sizes="48px"
+                            @if (is_int($avatarWidth) && $avatarWidth > 0) width="{{ $avatarWidth }}" @endif
+                            @if (is_int($avatarHeight) && $avatarHeight > 0) height="{{ $avatarHeight }}" @endif
                             class="h-12 w-12 rounded-full border-2 border-surface-100 object-cover"
                             loading="lazy"
                             decoding="async" />

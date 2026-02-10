@@ -63,6 +63,8 @@
                         $imageAlt = is_array($imageRef) ? (string) ($imageRef['alt'] ?? $alt) : $alt;
                         $imageSrcset = is_array($imageRef) ? ($imageRef['srcset'] ?? null) : null;
                         $imageSizes = is_array($imageRef) ? ($imageRef['sizes'] ?? null) : null;
+                        $imageWidth = is_array($imageRef) && isset($imageRef['width']) && is_int($imageRef['width']) ? $imageRef['width'] : null;
+                        $imageHeight = is_array($imageRef) && isset($imageRef['height']) && is_int($imageRef['height']) ? $imageRef['height'] : null;
                         $frameClass = 'overflow-hidden border border-black/[0.08] bg-white';
                         if ($rounded) {
                             $frameClass .= ' rounded-[2.5rem]';
@@ -75,6 +77,8 @@
                                 alt="{{ $imageAlt }}"
                                 @if (is_string($imageSrcset) && $imageSrcset !== '') srcset="{{ $imageSrcset }}" @endif
                                 @if (is_string($imageSizes) && $imageSizes !== '') sizes="{{ $imageSizes }}" @endif
+                                @if (is_int($imageWidth) && $imageWidth > 0) width="{{ $imageWidth }}" @endif
+                                @if (is_int($imageHeight) && $imageHeight > 0) height="{{ $imageHeight }}" @endif
                                 class="{{ $aspectClass !== '' ? 'h-full w-full object-cover' : 'h-auto w-full' }}"
                                 loading="lazy"
                                 decoding="async" />
