@@ -39,7 +39,25 @@
     $grayscale = (bool) ($props['grayscale'] ?? true);
     $instance = 'tp-logo-marquee-'.substr(md5((string) json_encode([$logos, $speed, $pauseOnHover, $grayscale])), 0, 8);
 
-    $marqueeItems = $logos === [] ? [] : array_merge($logos, $logos);
+    $resolver = app()->bound('tp.media.reference_resolver') ? app('tp.media.reference_resolver') : null;
+    $logoItems = [];
+    foreach ($logos as $logoUrl) {
+        $resolved = null;
+        if (is_object($resolver) && method_exists($resolver, 'resolveImage')) {
+            $resolved = $resolver->resolveImage(
+                ['url' => $logoUrl, 'alt' => ''],
+                ['variant' => 'medium', 'sizes' => '160px']
+            );
+        }
+
+        $logoItems[] = [
+            'src' => is_array($resolved) ? (string) ($resolved['src'] ?? '') : $logoUrl,
+            'srcset' => is_array($resolved) ? ($resolved['srcset'] ?? null) : null,
+            'sizes' => is_array($resolved) ? ($resolved['sizes'] ?? null) : null,
+        ];
+    }
+
+    $marqueeItems = $logoItems === [] ? [] : array_merge($logoItems, $logoItems);
 @endphp
 
 <section class="py-12 sm:py-16">
@@ -58,9 +76,13 @@
                     @foreach ($marqueeItems as $logo)
                         <div class="flex h-12 w-32 shrink-0 items-center justify-center">
                             <img
-                                src="{{ $logo }}"
+                                src="{{ $logo['src'] }}"
                                 alt=""
-                                class="max-h-10 w-auto object-contain {{ $grayscale ? 'grayscale opacity-70' : 'opacity-95' }}" />
+                                @if (is_string($logo['srcset'] ?? null) && ($logo['srcset'] ?? '') !== '') srcset="{{ $logo['srcset'] }}" @endif
+                                @if (is_string($logo['sizes'] ?? null) && ($logo['sizes'] ?? '') !== '') sizes="{{ $logo['sizes'] }}" @endif
+                                class="max-h-10 w-auto object-contain {{ $grayscale ? 'grayscale opacity-70' : 'opacity-95' }}"
+                                loading="lazy"
+                                decoding="async" />
                         </div>
                     @endforeach
                 </div>

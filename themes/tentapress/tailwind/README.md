@@ -7,7 +7,7 @@ A Tailwind CSS v4 theme for TentaPress.
 | Field         | Value                 |
 |---------------|-----------------------|
 | ID            | `tentapress/tailwind` |
-| Version       | 0.2.5                 |
+| Version       | 0.3.0                 |
 | CSS Framework | Tailwind CSS v4       |
 
 ## Layouts
@@ -88,6 +88,8 @@ Tailwind v4 uses CSS-first configuration with `@theme`:
 ## Customization
 
 Override block views by creating `views/blocks/{block-key}.blade.php`.
+
+Theme block image templates resolve media through the media reference resolver when available, enabling variant-aware `srcset`/`sizes` output with URL fallback.
 
 ## Cloning This Theme (Agent Checklist)
 

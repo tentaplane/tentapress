@@ -51,6 +51,18 @@
                         $path = parse_url($url, PHP_URL_PATH);
                         $filename = is_string($path) ? pathinfo($path, PATHINFO_FILENAME) : '';
                         $alt = $filename !== '' ? str_replace(['-', '_'], ' ', $filename) : '';
+                        $resolver = app()->bound('tp.media.reference_resolver') ? app('tp.media.reference_resolver') : null;
+                        $imageRef = null;
+                        if (is_object($resolver) && method_exists($resolver, 'resolveImage')) {
+                            $imageRef = $resolver->resolveImage(
+                                ['url' => $url, 'alt' => $alt],
+                                ['variant' => 'medium', 'sizes' => '(min-width: 1536px) 360px, (min-width: 1024px) 33vw, 50vw']
+                            );
+                        }
+                        $imageSrc = is_array($imageRef) ? (string) ($imageRef['src'] ?? '') : $url;
+                        $imageAlt = is_array($imageRef) ? (string) ($imageRef['alt'] ?? $alt) : $alt;
+                        $imageSrcset = is_array($imageRef) ? ($imageRef['srcset'] ?? null) : null;
+                        $imageSizes = is_array($imageRef) ? ($imageRef['sizes'] ?? null) : null;
                         $frameClass = 'overflow-hidden border border-black/[0.08] bg-white';
                         if ($rounded) {
                             $frameClass .= ' rounded-[2.5rem]';
@@ -59,10 +71,13 @@
                     <figure class="{{ $frameClass }}">
                         <div class="overflow-hidden bg-surface-100 {{ $aspectClass }}">
                             <img
-                                src="{{ $url }}"
-                                alt="{{ $alt }}"
+                                src="{{ $imageSrc }}"
+                                alt="{{ $imageAlt }}"
+                                @if (is_string($imageSrcset) && $imageSrcset !== '') srcset="{{ $imageSrcset }}" @endif
+                                @if (is_string($imageSizes) && $imageSizes !== '') sizes="{{ $imageSizes }}" @endif
                                 class="{{ $aspectClass !== '' ? 'h-full w-full object-cover' : 'h-auto w-full' }}"
-                                loading="lazy" />
+                                loading="lazy"
+                                decoding="async" />
                         </div>
                     </figure>
                 @endforeach

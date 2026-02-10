@@ -71,6 +71,17 @@
                             $name = trim((string) ($item['name'] ?? ''));
                             $role = trim((string) ($item['role'] ?? ''));
                             $avatar = trim((string) ($item['avatar'] ?? ''));
+                            $resolver = app()->bound('tp.media.reference_resolver') ? app('tp.media.reference_resolver') : null;
+                            $avatarRef = null;
+                            if ($avatar !== '' && is_object($resolver) && method_exists($resolver, 'resolveImage')) {
+                                $avatarRef = $resolver->resolveImage(
+                                    ['url' => $avatar, 'alt' => $name],
+                                    ['variant' => 'thumb', 'sizes' => '40px']
+                                );
+                            }
+                            $avatarSrc = is_array($avatarRef) ? (string) ($avatarRef['src'] ?? '') : $avatar;
+                            $avatarAlt = is_array($avatarRef) ? (string) ($avatarRef['alt'] ?? $name) : $name;
+                            $avatarSrcset = is_array($avatarRef) ? ($avatarRef['srcset'] ?? null) : null;
                         @endphp
 
                         <article data-slide class="{{ $idx === 0 ? 'block' : 'hidden' }} text-center">
@@ -79,8 +90,15 @@
                             </blockquote>
 
                             <div class="mt-6 flex items-center justify-center gap-3">
-                                @if ($showAvatars && $avatar !== '')
-                                    <img src="{{ $avatar }}" alt="" class="h-10 w-10 rounded-full object-cover" />
+                                @if ($showAvatars && $avatarSrc !== '')
+                                    <img
+                                        src="{{ $avatarSrc }}"
+                                        alt="{{ $avatarAlt }}"
+                                        @if (is_string($avatarSrcset) && $avatarSrcset !== '') srcset="{{ $avatarSrcset }}" @endif
+                                        sizes="40px"
+                                        class="h-10 w-10 rounded-full object-cover"
+                                        loading="lazy"
+                                        decoding="async" />
                                 @endif
                                 <div>
                                     <div class="font-semibold text-surface-900">{{ $name !== '' ? $name : 'Anonymous' }}</div>

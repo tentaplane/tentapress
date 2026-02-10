@@ -29,18 +29,48 @@
     if ($shadow) {
         $figureClass .= ' shadow-lg';
     }
+
+    $imageRef = null;
+    if ($image !== '') {
+        $resolver = app()->bound('tp.media.reference_resolver') ? app('tp.media.reference_resolver') : null;
+        if (is_object($resolver) && method_exists($resolver, 'resolveImage')) {
+            $imageRef = $resolver->resolveImage(
+                ['url' => $image, 'alt' => $alt],
+                ['variant' => 'large', 'sizes' => '(min-width: 1280px) 1120px, 100vw']
+            );
+        }
+    }
+
+    $imageSrc = is_array($imageRef) ? (string) ($imageRef['src'] ?? '') : $image;
+    $imageAlt = is_array($imageRef) ? (string) ($imageRef['alt'] ?? $alt) : $alt;
+    $imageSrcset = is_array($imageRef) ? ($imageRef['srcset'] ?? null) : null;
+    $imageSizes = is_array($imageRef) ? ($imageRef['sizes'] ?? null) : null;
 @endphp
 
-@if ($image !== '')
+@if ($imageSrc !== '')
 <section class="py-16 sm:py-20">
         <div class="mx-auto px-6 {{ $widthClass }} {{ $alignClass }}">
             <figure class="{{ $figureClass }}">
                 @if ($linkUrl !== '')
                     <a href="{{ $linkUrl }}" class="block">
-                        <img src="{{ $image }}" alt="{{ $alt }}" class="h-auto w-full" loading="lazy" />
+                        <img
+                            src="{{ $imageSrc }}"
+                            alt="{{ $imageAlt }}"
+                            @if (is_string($imageSrcset) && $imageSrcset !== '') srcset="{{ $imageSrcset }}" @endif
+                            @if (is_string($imageSizes) && $imageSizes !== '') sizes="{{ $imageSizes }}" @endif
+                            class="h-auto w-full"
+                            loading="lazy"
+                            decoding="async" />
                     </a>
                 @else
-                    <img src="{{ $image }}" alt="{{ $alt }}" class="h-auto w-full" loading="lazy" />
+                    <img
+                        src="{{ $imageSrc }}"
+                        alt="{{ $imageAlt }}"
+                        @if (is_string($imageSrcset) && $imageSrcset !== '') srcset="{{ $imageSrcset }}" @endif
+                        @if (is_string($imageSizes) && $imageSizes !== '') sizes="{{ $imageSizes }}" @endif
+                        class="h-auto w-full"
+                        loading="lazy"
+                        decoding="async" />
                 @endif
 
                 @if ($caption !== '')

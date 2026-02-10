@@ -18,6 +18,21 @@
     $panelClass = $style === 'simple'
         ? 'bg-transparent'
         : 'rounded-[2.5rem] border border-black/[0.08] bg-white p-10 sm:p-14';
+
+    $avatarRef = null;
+    if ($avatar !== '') {
+        $resolver = app()->bound('tp.media.reference_resolver') ? app('tp.media.reference_resolver') : null;
+        if (is_object($resolver) && method_exists($resolver, 'resolveImage')) {
+            $avatarRef = $resolver->resolveImage(
+                ['url' => $avatar, 'alt' => $name],
+                ['variant' => 'thumb', 'sizes' => '48px']
+            );
+        }
+    }
+
+    $avatarSrc = is_array($avatarRef) ? (string) ($avatarRef['src'] ?? '') : $avatar;
+    $avatarAlt = is_array($avatarRef) ? (string) ($avatarRef['alt'] ?? $name) : $name;
+    $avatarSrcset = is_array($avatarRef) ? ($avatarRef['srcset'] ?? null) : null;
 @endphp
 
 <section class="py-16 sm:py-20">
@@ -39,8 +54,15 @@
                 @endif
 
                 <div class="flex gap-4 {{ $metaClass }}">
-                    @if ($avatar !== '')
-                        <img src="{{ $avatar }}" alt="" class="h-12 w-12 rounded-full border-2 border-surface-100 object-cover" />
+                    @if ($avatarSrc !== '')
+                        <img
+                            src="{{ $avatarSrc }}"
+                            alt="{{ $avatarAlt }}"
+                            @if (is_string($avatarSrcset) && $avatarSrcset !== '') srcset="{{ $avatarSrcset }}" @endif
+                            sizes="48px"
+                            class="h-12 w-12 rounded-full border-2 border-surface-100 object-cover"
+                            loading="lazy"
+                            decoding="async" />
                     @endif
 
                     <div>

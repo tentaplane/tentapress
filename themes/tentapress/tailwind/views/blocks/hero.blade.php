@@ -54,6 +54,21 @@
 
     $alignClass = $alignment === 'center' ? 'text-center items-center' : 'text-left items-start';
     $actionsClass = $alignment === 'center' ? 'justify-center' : 'justify-start';
+
+    $backgroundRef = null;
+    if ($bg !== '') {
+        $resolver = app()->bound('tp.media.reference_resolver') ? app('tp.media.reference_resolver') : null;
+        if (is_object($resolver) && method_exists($resolver, 'resolveImage')) {
+            $backgroundRef = $resolver->resolveImage(
+                ['url' => $bg, 'alt' => ''],
+                ['variant' => 'large', 'sizes' => '(min-width: 1280px) 1120px, 100vw']
+            );
+        }
+    }
+
+    $backgroundSrc = is_array($backgroundRef) ? (string) ($backgroundRef['src'] ?? '') : $bg;
+    $backgroundSrcset = is_array($backgroundRef) ? ($backgroundRef['srcset'] ?? null) : null;
+    $backgroundSizes = is_array($backgroundRef) ? ($backgroundRef['sizes'] ?? null) : null;
 @endphp
 
 @if ($splitLayout)
@@ -106,9 +121,16 @@
                     @endif
                 </div>
 
-                @if ($bg !== '')
+                @if ($backgroundSrc !== '')
                     <div class="overflow-hidden rounded-[2.5rem] border border-black/8 bg-surface-100">
-                        <img src="{{ $bg }}" alt="" class="h-full w-full object-cover" />
+                        <img
+                            src="{{ $backgroundSrc }}"
+                            alt=""
+                            @if (is_string($backgroundSrcset) && $backgroundSrcset !== '') srcset="{{ $backgroundSrcset }}" @endif
+                            @if (is_string($backgroundSizes) && $backgroundSizes !== '') sizes="{{ $backgroundSizes }}" @endif
+                            class="h-full w-full object-cover"
+                            loading="lazy"
+                            decoding="async" />
                     </div>
                 @endif
             </div>
@@ -119,7 +141,14 @@
     <section class="relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] w-screen overflow-hidden {{ $hasBackground ? 'min-h-[70vh] flex items-center py-24 sm:py-32' : 'py-20 sm:py-28' }}">
         @if ($hasBackground)
             <div class="absolute inset-0">
-                <img src="{{ $bg }}" alt="" class="h-full w-full object-cover" />
+                <img
+                    src="{{ $backgroundSrc }}"
+                    alt=""
+                    @if (is_string($backgroundSrcset) && $backgroundSrcset !== '') srcset="{{ $backgroundSrcset }}" @endif
+                    @if (is_string($backgroundSizes) && $backgroundSizes !== '') sizes="{{ $backgroundSizes }}" @endif
+                    class="h-full w-full object-cover"
+                    loading="lazy"
+                    decoding="async" />
                 <div class="absolute inset-0 bg-linear-to-br from-surface-950/85 via-surface-950/60 to-surface-900/40"></div>
             </div>
         @endif

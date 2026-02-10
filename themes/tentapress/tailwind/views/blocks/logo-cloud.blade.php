@@ -55,11 +55,28 @@
 
             <div class="grid items-center gap-4 {{ $gridClass }}">
                 @foreach ($logos as $logo)
+                    @php
+                        $resolver = app()->bound('tp.media.reference_resolver') ? app('tp.media.reference_resolver') : null;
+                        $logoRef = null;
+                        if (is_object($resolver) && method_exists($resolver, 'resolveImage')) {
+                            $logoRef = $resolver->resolveImage(
+                                ['url' => $logo, 'alt' => ''],
+                                ['variant' => 'medium', 'sizes' => '(min-width: 1280px) 220px, (min-width: 768px) 18vw, 40vw']
+                            );
+                        }
+                        $logoSrc = is_array($logoRef) ? (string) ($logoRef['src'] ?? '') : $logo;
+                        $logoSrcset = is_array($logoRef) ? ($logoRef['srcset'] ?? null) : null;
+                        $logoSizes = is_array($logoRef) ? ($logoRef['sizes'] ?? null) : null;
+                    @endphp
                     <div class="flex items-center justify-center rounded-[2.5rem] border border-black/[0.08] bg-white px-6 py-5">
                         <img
-                            src="{{ $logo }}"
+                            src="{{ $logoSrc }}"
                             alt=""
-                            class="{{ $logoClass }} w-auto {{ $grayscale ? 'grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all' : '' }}" />
+                            @if (is_string($logoSrcset) && $logoSrcset !== '') srcset="{{ $logoSrcset }}" @endif
+                            @if (is_string($logoSizes) && $logoSizes !== '') sizes="{{ $logoSizes }}" @endif
+                            class="{{ $logoClass }} w-auto {{ $grayscale ? 'grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all' : '' }}"
+                            loading="lazy"
+                            decoding="async" />
                     </div>
                 @endforeach
             </div>

@@ -36,6 +36,31 @@
         $startPercent = 95;
     }
 
+    $resolver = app()->bound('tp.media.reference_resolver') ? app('tp.media.reference_resolver') : null;
+    $beforeRef = null;
+    $afterRef = null;
+    if (is_object($resolver) && method_exists($resolver, 'resolveImage')) {
+        if ($beforeImage !== '') {
+            $beforeRef = $resolver->resolveImage(
+                ['url' => $beforeImage, 'alt' => $beforeLabel],
+                ['variant' => 'large', 'sizes' => '(min-width: 1024px) 960px, 100vw']
+            );
+        }
+        if ($afterImage !== '') {
+            $afterRef = $resolver->resolveImage(
+                ['url' => $afterImage, 'alt' => $afterLabel],
+                ['variant' => 'large', 'sizes' => '(min-width: 1024px) 960px, 100vw']
+            );
+        }
+    }
+
+    $beforeSrc = is_array($beforeRef) ? (string) ($beforeRef['src'] ?? '') : $beforeImage;
+    $beforeSrcset = is_array($beforeRef) ? ($beforeRef['srcset'] ?? null) : null;
+    $beforeSizes = is_array($beforeRef) ? ($beforeRef['sizes'] ?? null) : null;
+    $afterSrc = is_array($afterRef) ? (string) ($afterRef['src'] ?? '') : $afterImage;
+    $afterSrcset = is_array($afterRef) ? ($afterRef['srcset'] ?? null) : null;
+    $afterSizes = is_array($afterRef) ? ($afterRef['sizes'] ?? null) : null;
+
     $instance = 'tp-before-after-'.substr(md5((string) json_encode([$beforeImage, $afterImage, $startPercent])), 0, 8);
 @endphp
 
@@ -45,21 +70,32 @@
             <h2 class="mb-6 text-center font-display text-3xl font-semibold text-surface-900 sm:text-4xl">{{ $title }}</h2>
         @endif
 
-        @if ($beforeImage === '' || $afterImage === '')
+        @if ($beforeSrc === '' || $afterSrc === '')
             <div class="rounded-2xl border border-dashed border-black/15 bg-white/70 p-6 text-center text-sm text-surface-500">
                 Select both before and after images to use the comparison slider.
             </div>
         @else
             <div id="{{ $instance }}" class="rounded-2xl border border-black/8 bg-white p-4 sm:p-6">
                 <div data-compare class="relative aspect-video overflow-hidden rounded-xl border border-black/10 bg-slate-100">
-                    <img src="{{ $beforeImage }}" alt="" class="absolute inset-0 h-full w-full object-cover" />
+                    <img
+                        src="{{ $beforeSrc }}"
+                        alt="{{ $beforeLabel }}"
+                        @if (is_string($beforeSrcset) && $beforeSrcset !== '') srcset="{{ $beforeSrcset }}" @endif
+                        @if (is_string($beforeSizes) && $beforeSizes !== '') sizes="{{ $beforeSizes }}" @endif
+                        class="absolute inset-0 h-full w-full object-cover"
+                        loading="lazy"
+                        decoding="async" />
 
                     <img
                         data-after-image
-                        src="{{ $afterImage }}"
-                        alt=""
+                        src="{{ $afterSrc }}"
+                        alt="{{ $afterLabel }}"
+                        @if (is_string($afterSrcset) && $afterSrcset !== '') srcset="{{ $afterSrcset }}" @endif
+                        @if (is_string($afterSizes) && $afterSizes !== '') sizes="{{ $afterSizes }}" @endif
                         class="absolute inset-0 h-full w-full object-cover"
-                        style="clip-path: inset(0 calc(100% - {{ $startPercent }}%) 0 0);" />
+                        style="clip-path: inset(0 calc(100% - {{ $startPercent }}%) 0 0);"
+                        loading="lazy"
+                        decoding="async" />
 
                     <div data-divider class="pointer-events-none absolute inset-y-0" style="left: {{ $startPercent }}%; transform: translateX(-1px);">
                         <div class="h-full w-0.5 bg-white shadow"></div>

@@ -80,12 +80,30 @@
                         $bio = trim((string) ($member['bio'] ?? ''));
                         $photo = trim((string) ($member['photo'] ?? ''));
                         $profileUrl = trim((string) ($member['profile_url'] ?? ''));
+                        $resolver = app()->bound('tp.media.reference_resolver') ? app('tp.media.reference_resolver') : null;
+                        $photoRef = null;
+                        if ($photo !== '' && is_object($resolver) && method_exists($resolver, 'resolveImage')) {
+                            $photoRef = $resolver->resolveImage(
+                                ['url' => $photo, 'alt' => $name],
+                                ['variant' => 'thumb', 'sizes' => '56px']
+                            );
+                        }
+                        $photoSrc = is_array($photoRef) ? (string) ($photoRef['src'] ?? '') : $photo;
+                        $photoAlt = is_array($photoRef) ? (string) ($photoRef['alt'] ?? $name) : $name;
+                        $photoSrcset = is_array($photoRef) ? ($photoRef['srcset'] ?? null) : null;
                     @endphp
 
                     <article class="rounded-2xl border border-black/8 bg-white p-5 shadow-sm {{ $compact ? 'space-y-3' : 'space-y-4' }}">
                         <div class="flex items-center gap-3">
-                            @if ($photo !== '')
-                                <img src="{{ $photo }}" alt="" class="h-14 w-14 rounded-full object-cover" />
+                            @if ($photoSrc !== '')
+                                <img
+                                    src="{{ $photoSrc }}"
+                                    alt="{{ $photoAlt }}"
+                                    @if (is_string($photoSrcset) && $photoSrcset !== '') srcset="{{ $photoSrcset }}" @endif
+                                    sizes="56px"
+                                    class="h-14 w-14 rounded-full object-cover"
+                                    loading="lazy"
+                                    decoding="async" />
                             @else
                                 <div class="flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 text-lg font-semibold text-slate-500">
                                     {{ strtoupper(substr($name, 0, 1)) }}
