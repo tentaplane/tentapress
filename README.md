@@ -1,126 +1,139 @@
-# README
+# TentaPress
 
-## Getting Started
+An agency-first publishing platform for landing pages, campaigns, and small sites. TentaPress gives teams a faster way
+to launch, a safer way for clients to edit, and a cleaner path to maintain sites over time.
 
-- Clone the `tentaplane/tentapress` and change directory into the clone files.
-- Run our setup command:
+| Key       | Value  |
+|-----------|--------|
+| Version   | 0.31.1 |
+| PHP       | 8.2+   |
+| Framework | Laravel 12 |
+| License   | MIT    |
+
+## Quick Start (ZIP + setup script)
+
+This is the easiest way to get started if you are not planning to develop core code.
+
+1. Download the latest ZIP from [GitHub Releases](https://github.com/tentaplane/tentapress/releases/latest).
+2. Unzip it somewhere on your machine.
+3. Open a terminal in that folder.
+4. Run:
 
 ```bash
 php tentapress.php setup
 ```
 
-or
+5. Follow the prompts:
+   - site name
+   - site URL
+   - starter theme install
+   - optional demo homepage
+   - first admin login
+6. Open your admin at `/admin` and sign in.
+
+If your machine allows executable scripts, this also works:
 
 ```bash
 ./tentapress.php setup
 ```
 
-This runs the full setup flow (composer install, migrations, plugins sync) and then prompts you to create your first
-super admin user. During setup, you will also be asked for `APP_NAME` and `APP_URL`, and `.env` defaults are set for
-production (`APP_ENV=production`, `APP_DEBUG=false`).
+## Why TentaPress works so well
 
-### Clean install from latest release archive
+TentaPress is built for teams that need to move quickly without creating long-term content chaos.
 
-If you want the latest tagged release without cloning the full git history, this command downloads it and extracts the
-contents directly into your current folder:
+- Fast launch flow: starter setup script, starter theme, optional demo homepage.
+- Structured editing: block-based content that keeps pages consistent and harder to break.
+- Agency-friendly operations: plugin-driven architecture for clear ownership and controlled extension.
+- Laravel-native confidence: modern framework foundations, security defaults, and familiar tooling.
+- Practical publishing model: pages, posts, media, menus, users, SEO, and settings in one admin.
 
-```bash
-curl -s https://api.github.com/repos/tentaplane/tentapress/releases/latest | jq -r .tag_name | xargs -I{} sh -c 'curl -L "https://github.com/tentaplane/tentapress/archive/refs/tags/{}.zip" -o tentapress.zip && tmp=$(mktemp -d) && unzip -q tentapress.zip -d "$tmp" && rsync -a "$tmp"/*/ ./ && rm -rf "$tmp" tentapress.zip'
-```
+In short: TentaPress helps teams ship faster today without inheriting a mess tomorrow.
 
-## Console Commands
+## What the setup script does for you
 
-TentaPress provides several Artisan commands for managing your installation.
+`tentapress.php setup` automates first-time installation by:
 
-### Plugin Management
+- preparing `.env` and setting `APP_NAME`, `APP_URL`, `APP_ENV=production`, `APP_DEBUG=false`
+- installing PHP dependencies
+- creating app key, running migrations, and linking storage
+- syncing/enabling default plugins and seeding permissions
+- installing/activating a starter theme (optional)
+- optionally creating demo homepage content
+- creating your first super admin user
 
-```bash
-php artisan tp:plugins sync              # Discover plugins and rebuild cache
-php artisan tp:plugins list              # List all plugins with status
-php artisan tp:plugins enable <id>       # Enable a plugin (e.g., tentapress/export)
-php artisan tp:plugins disable <id>      # Disable a plugin
-php artisan tp:plugins enable --all      # Enable all discovered plugins
-php artisan tp:plugins defaults          # Enable default plugins from config
-php artisan tp:plugins cache             # Rebuild plugin cache
-php artisan tp:plugins clear-cache       # Clear plugin cache
-```
+## Technical Setup and Operations
 
-Optional plugin packages are intentionally excluded from Laravel package auto-discovery. Install with Composer, then
-enable explicitly via `tp:plugins enable <id>` (or from the admin Plugins screen).
+### Requirements
 
-On hosts with aggressive OPCache settings, the admin plugin actions refresh runtime cache metadata so newly installed
-plugins are available in the UI immediately.
+- PHP 8.2+
+- Composer
+- SQLite/MySQL/PostgreSQL (SQLite is the easiest first run path)
+- Optional for frontend/theme asset builds: Bun, pnpm, or npm
 
-### Theme Management
+### Common commands
 
 ```bash
-php artisan tp:themes sync               # Discover themes and rebuild cache
-php artisan tp:themes list               # List all themes with status
-php artisan tp:themes activate <id>      # Activate a theme (e.g., tentapress/tailwind)
-php artisan tp:themes cache              # Rebuild theme cache
-php artisan tp:themes clear-cache        # Clear theme cache
+php artisan tp:plugins sync
+php artisan tp:plugins list
+php artisan tp:plugins enable --all
+
+php artisan tp:themes sync
+php artisan tp:themes list
+php artisan tp:themes activate tentapress/tailwind
+
+php artisan tp:users:make-admin
+php artisan tp:permissions seed
+php artisan tp:posts
 ```
 
-### User Management
+### Development commands
 
 ```bash
-php artisan tp:users:make-admin          # Create an admin user interactively
-php artisan tp:permissions seed          # Seed default roles and capabilities
+composer dev
+bun --cwd plugins/tentapress/admin-shell run dev
+bun --cwd plugins/tentapress/admin-shell run build
+./vendor/bin/pint --dirty
 ```
 
-### Content Management
+### Third-party plugin discovery
 
-```bash
-php artisan tp:posts                     # Publish scheduled posts whose date has passed
-```
+TentaPress discovers plugin manifests (`tentapress.json`) inside allowed Composer vendor namespaces.
 
-### Development
-
-```bash
-composer dev                             # Run PHP server + queue + logs + Vite
-bun --cwd plugins/tentapress/admin-shell run dev   # Vite dev server only
-bun --cwd plugins/tentapress/admin-shell run build # Build frontend assets
-./vendor/bin/pint                        # Format PHP code
-./vendor/bin/pint --dirty                # Format only changed files
-```
-
----
-
-## Distribution notes
-
-Release source archives intentionally exclude development-only paths (plugins, themes, docs, vendor, node_modules, etc.)
-via `.gitattributes export-ignore`. Use the repo clone for full development; use release archives for trimmed
-distribution.
-
-## Third-party plugin discovery
-
-When plugins/themes are installed via Composer, TentaPress scans `vendor/<namespace>` for `tentapress.json` manifests.
-To allow third-party namespaces, add them to `config/tentapress.php` under `plugin_vendor_namespaces`, then run:
+Add namespaces to `config/tentapress.php` (`plugin_vendor_namespaces`), then run:
 
 ```bash
 php artisan tp:plugins sync
 ```
 
----
+## Security
 
-## What this is
+Please report vulnerabilities privately and do not open public exploit issues.
 
-An agency-first, WordPress-adjacent platform for building, publishing, and centrally managing landing pages and small
-sites - quickly, safely, and with minimal operational overhead.
+- Full policy: [`SECURITY.md`](SECURITY.md)
+- Supported versions and disclosure process are documented there.
 
-- **Fast to ship** - templates and constrained sections
-- **Client-safe editing** - content changes without layout breakage
-- **Central management** - one console for many sites
-- **Easy to run** - PHP-based, no Docker required, SQLite-first
-- **Easy to extend** - modular by design, plugins as packages
-- **Easy to leave** - exports and offboarding are first-class
+Operational basics:
 
-Read the guiding principles in [`docs/vision/MANIFESTO.md`](docs/vision/MANIFESTO.md) and the longer-term direction in [
-`docs/vision/VISION.md`](docs/vision/VISION.md).
+- always run HTTPS in production
+- rotate secrets and keep them out of git
+- keep dependencies updated
+- apply least-privilege access for admin and database credentials
 
-## What this is not
+## Contributing
 
-- A full replacement for every WordPress site and plugin on day one
-- A blank-canvas page builder
-- A platform that requires Docker or Kubernetes to evaluate
-- A “zip upload” plugin system for arbitrary, untrusted PHP code
+Contributions are welcome. Keep pull requests small, readable, and documented.
+
+- Contributor guide: [`CONTRIBUTING.md`](CONTRIBUTING.md)
+- Architecture decisions: `docs/adrs/`
+- Product requirement docs: `docs/prds/`
+
+Before opening a PR:
+
+- format changed PHP files with `./vendor/bin/pint`
+- run relevant migrations and plugin sync
+- update docs when behavior changes
+
+## Vision
+
+- Manifesto: [`docs/vision/MANIFESTO.md`](docs/vision/MANIFESTO.md)
+- Product direction: [`docs/vision/VISION.md`](docs/vision/VISION.md)
