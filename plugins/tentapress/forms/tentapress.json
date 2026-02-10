@@ -2,7 +2,7 @@
     "id": "tentapress/forms",
     "name": "Forms",
     "description": "Forms block and submission targets for Mailchimp and TentaForms.",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "provider": "TentaPress\\Forms\\FormsServiceProvider",
     "requires": [
         "tentapress/blocks"

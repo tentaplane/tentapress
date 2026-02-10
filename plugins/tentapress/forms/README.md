@@ -7,7 +7,7 @@ Forms block and submission targets for TentaPress.
 | Field | Value |
 |-------|-------|
 | ID | `tentapress/forms` |
-| Version | 0.2.0 |
+| Version | 0.3.0 |
 | Provider | `TentaPress\Forms\FormsServiceProvider` |
 
 ## Features
@@ -38,4 +38,6 @@ Forms block and submission targets for TentaPress.
 ```bash
 php artisan tp:plugins sync
 php artisan tp:plugins enable tentapress/forms
+php artisan tp:forms:migrate-newsletter --dry-run
+php artisan tp:forms:migrate-newsletter
 ```

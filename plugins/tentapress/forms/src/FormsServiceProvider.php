@@ -10,6 +10,7 @@ use TentaPress\Forms\Destinations\DestinationRegistry;
 use TentaPress\Forms\Destinations\MailchimpDestination;
 use TentaPress\Forms\Destinations\TentaFormsDestination;
 use TentaPress\Forms\Discovery\FormsBlockKit;
+use TentaPress\Forms\Console\MigrateNewsletterBlocksCommand;
 use TentaPress\Forms\Services\FormConfigNormalizer;
 use TentaPress\Forms\Services\FormPayloadSigner;
 use TentaPress\Forms\Services\FormSubmissionService;
@@ -39,6 +40,12 @@ final class FormsServiceProvider extends ServiceProvider
     {
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'tentapress-blocks');
         $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
+
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                MigrateNewsletterBlocksCommand::class,
+            ]);
+        }
 
         if ($this->app->bound(BlockRegistry::class)) {
             $registry = $this->app->make(BlockRegistry::class);
