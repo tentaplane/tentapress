@@ -7,7 +7,7 @@ Upload and manage media files for TentaPress.
 | Field    | Value                                   |
 |----------|-----------------------------------------|
 | ID       | `tentapress/media`                      |
-| Version  | 0.8.0                                   |
+| Version  | 0.9.0                                   |
 | Provider | `TentaPress\Media\MediaServiceProvider` |
 
 ## Goal
@@ -37,6 +37,7 @@ Provide a first-party media library for uploads, management, and reuse across Pa
 - Media maintenance commands for optimize/backfill/verification workflows
 - Optimization status badges in media index and details
 - Media selector for pages, posts, blocks, SEO
+- Frontend media reference resolver (ID/URL) for variant-aware image delivery
 
 ## Dependencies
 

@@ -7,7 +7,7 @@ Page management for TentaPress.
 | Field    | Value                                   |
 | -------- | --------------------------------------- |
 | ID       | `tentapress/pages`                      |
-| Version  | 0.2.11                                  |
+| Version  | 0.3.0                                   |
 | Provider | `TentaPress\Pages\PagesServiceProvider` |
 
 ## Features
@@ -17,6 +17,7 @@ Page management for TentaPress.
 - Theme layout selection
 - Block-based content editor
 - Full-screen editing mode
+- Media picker payloads now include media IDs for variant-aware image rendering
 - SEO fields integration
 - Public rendering by slug
 

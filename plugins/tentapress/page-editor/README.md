@@ -7,7 +7,7 @@ Notion-style continuous page editor for TentaPress.
 | Field    | Value                                               |
 |----------|-----------------------------------------------------|
 | ID       | `tentapress/page-editor`                            |
-| Version  | 0.2.3                                               |
+| Version  | 0.3.0                                               |
 | Provider | `TentaPress\\PageEditor\\PageEditorServiceProvider` |
 
 ## Features
@@ -19,6 +19,7 @@ Notion-style continuous page editor for TentaPress.
 - Full-screen editor mode for pages and posts
 - Per-entry editor choice (`blocks` or `page`)
 - JSON document storage + renderer integration
+- Image blocks now persist media IDs (with URL fallback) for variant-aware frontend rendering
 
 ## Dependencies
 

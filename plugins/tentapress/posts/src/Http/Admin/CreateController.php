@@ -158,7 +158,7 @@ final class CreateController
     }
 
     /**
-     * @return array<int,array{value:string,label:string,original_name:string,mime_type:string,is_image:bool}>
+     * @return array<int,array{id:int,value:string,label:string,original_name:string,mime_type:string,is_image:bool}>
      */
     private function mediaOptions(): array
     {
@@ -193,6 +193,7 @@ final class CreateController
             $isImage = $mime !== '' && str_starts_with($mime, 'image/');
 
             $options[] = [
+                'id' => (int) $item->id,
                 'value' => $url,
                 'label' => $label,
                 'original_name' => $original,

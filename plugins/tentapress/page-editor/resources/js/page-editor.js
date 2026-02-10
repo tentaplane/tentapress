@@ -454,7 +454,13 @@ class CalloutTool {
 class MediaImageTool {
     constructor({ data, config }) {
         this.config = config || {};
+        const mediaId = Number.isInteger(data?.media_id)
+            ? data.media_id
+            : Number.isFinite(Number(data?.media_id))
+              ? Number(data?.media_id)
+              : null;
         this.data = {
+            media_id: mediaId && mediaId > 0 ? mediaId : null,
             url: typeof data?.url === 'string' ? data.url : '',
             alt: typeof data?.alt === 'string' ? data.alt : '',
             caption: typeof data?.caption === 'string' ? data.caption : '',
@@ -472,6 +478,7 @@ class MediaImageTool {
 
     static get sanitize() {
         return {
+            media_id: true,
             url: true,
             alt: true,
             caption: {
@@ -546,6 +553,7 @@ class MediaImageTool {
         removeBtn.textContent = 'Remove';
         removeBtn.className = 'tp-page-editor__image-link';
         removeBtn.addEventListener('click', () => {
+            this.data.media_id = null;
             this.data.url = '';
             this.data.alt = '';
             this.data.caption = '';
@@ -568,12 +576,14 @@ class MediaImageTool {
             return;
         }
         this.data.url = media.url;
+        this.data.media_id = Number.isInteger(media.id) && media.id > 0 ? media.id : null;
         this.data.alt = typeof media.alt === 'string' ? media.alt : typeof media.label === 'string' ? media.label : '';
         this.renderContent();
     }
 
     save() {
         return {
+            media_id: this.data.media_id,
             url: this.data.url,
             alt: this.data.alt,
             caption: this.data.caption,
@@ -750,6 +760,7 @@ window.tpPageEditor = function tpPageEditor(config) {
         chooseMedia(option) {
             if (this.mediaModalResolve) {
                 this.mediaModalResolve({
+                    id: Number.isInteger(option?.id) ? option.id : null,
                     url: String(option?.value || ''),
                     alt: String(option?.label || ''),
                 });
@@ -847,9 +858,22 @@ window.tpPageEditor = function tpPageEditor(config) {
                 };
             }
             if (type === 'image') {
+                const mediaId = Number.isInteger(data.media_id)
+                    ? data.media_id
+                    : Number.isFinite(Number(data.media_id))
+                      ? Number(data.media_id)
+                      : null;
                 const url = String(data.url || '');
                 if (url.trim() === '') return null;
-                return { type, data: { url, alt: String(data.alt || ''), caption: String(data.caption || '') } };
+                return {
+                    type,
+                    data: {
+                        ...(mediaId && mediaId > 0 ? { media_id: mediaId } : {}),
+                        url,
+                        alt: String(data.alt || ''),
+                        caption: String(data.caption || ''),
+                    },
+                };
             }
 
             return { type, data };

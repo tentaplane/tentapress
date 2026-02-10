@@ -123,15 +123,46 @@ final class PageDocumentRenderer
 
     private function renderImage(array $data): string
     {
-        $url = trim((string) ($data['url'] ?? ''));
-        if ($url === '' || $this->isUnsafeUrl($url)) {
+        $reference = [
+            'media_id' => $data['media_id'] ?? null,
+            'url' => $data['url'] ?? null,
+            'alt' => $data['alt'] ?? null,
+        ];
+
+        $resolved = $this->resolveImageReference($reference, 'large');
+        if ($resolved === null) {
             return '';
         }
 
-        $alt = trim((string) ($data['alt'] ?? ''));
         $caption = trim((string) ($data['caption'] ?? ''));
+        $attributes = [
+            'src' => e($resolved['src']),
+            'alt' => e($resolved['alt']),
+            'loading' => 'lazy',
+            'decoding' => 'async',
+        ];
 
-        $img = '<img src="'.e($url).'" alt="'.e($alt).'" />';
+        if (is_string($resolved['srcset']) && $resolved['srcset'] !== '') {
+            $attributes['srcset'] = e($resolved['srcset']);
+        }
+
+        if (is_string($resolved['sizes']) && $resolved['sizes'] !== '') {
+            $attributes['sizes'] = e($resolved['sizes']);
+        }
+
+        if (is_int($resolved['width']) && $resolved['width'] > 0) {
+            $attributes['width'] = (string) $resolved['width'];
+        }
+
+        if (is_int($resolved['height']) && $resolved['height'] > 0) {
+            $attributes['height'] = (string) $resolved['height'];
+        }
+
+        $img = '<img';
+        foreach ($attributes as $key => $value) {
+            $img .= ' '.$key.'="'.$value.'"';
+        }
+        $img .= ' />';
         if ($caption === '') {
             return $this->wrap('figure', $img);
         }
@@ -293,6 +324,49 @@ final class PageDocumentRenderer
         $lower = Str::lower($url);
 
         return str_starts_with($lower, 'javascript:') || str_starts_with($lower, 'data:');
+    }
+
+    /**
+     * @param  array{media_id:mixed,url:mixed,alt:mixed}  $reference
+     * @return array{
+     *   id:int|null,
+     *   src:string,
+     *   alt:string,
+     *   srcset:string|null,
+     *   sizes:string|null,
+     *   width:int|null,
+     *   height:int|null
+     * }|null
+     */
+    private function resolveImageReference(array $reference, string $variant): ?array
+    {
+        if (app()->bound('tp.media.reference_resolver')) {
+            $resolver = app('tp.media.reference_resolver');
+            if (is_object($resolver) && method_exists($resolver, 'resolveImage')) {
+                /** @var array{id:int|null,src:string,alt:string,srcset:string|null,sizes:string|null,width:int|null,height:int|null}|null $resolved */
+                $resolved = $resolver->resolveImage($reference, ['variant' => $variant]);
+                if ($resolved !== null && ! $this->isUnsafeUrl($resolved['src'])) {
+                    return $resolved;
+                }
+            }
+        }
+
+        $url = is_string($reference['url']) ? trim($reference['url']) : '';
+        if ($url === '' || $this->isUnsafeUrl($url)) {
+            return null;
+        }
+
+        $alt = is_string($reference['alt']) ? trim($reference['alt']) : '';
+
+        return [
+            'id' => null,
+            'src' => $url,
+            'alt' => $alt,
+            'srcset' => null,
+            'sizes' => null,
+            'width' => null,
+            'height' => null,
+        ];
     }
 
     private function renderLegacyNode(array $node): string

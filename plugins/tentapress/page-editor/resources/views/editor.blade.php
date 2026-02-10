@@ -135,7 +135,7 @@
                             No media available yet. Upload a file in Media Library first.
                         </div>
                     </template>
-                    <template x-for="option in filteredMediaOptions()" :key="option.value">
+                    <template x-for="option in filteredMediaOptions()" :key="String(option.id || option.value)">
                         <button
                             type="button"
                             class="flex w-full items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 text-left text-sm transition hover:border-slate-300 hover:bg-slate-50"

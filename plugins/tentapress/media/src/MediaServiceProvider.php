@@ -15,6 +15,7 @@ use TentaPress\Media\Optimization\OptimizationSettings;
 use TentaPress\Media\Stock\StockManager;
 use TentaPress\Media\Stock\StockSourceRegistry;
 use TentaPress\Media\Support\LocalMediaUrlGenerator;
+use TentaPress\Media\Support\MediaReferenceResolver;
 use TentaPress\Media\Support\NullMediaUrlGenerator;
 use TentaPress\Media\Support\OptimizedMediaUrlGenerator;
 use TentaPress\Settings\Services\SettingsStore;
@@ -66,6 +67,16 @@ final class MediaServiceProvider extends ServiceProvider
 
             return $generator;
         });
+
+        if (! $this->app->bound(MediaReferenceResolver::class)) {
+            $this->app->singleton(MediaReferenceResolver::class, fn ($app) => new MediaReferenceResolver(
+                $app->make(MediaUrlGenerator::class),
+            ));
+        }
+
+        if (! $this->app->bound('tp.media.reference_resolver')) {
+            $this->app->alias(MediaReferenceResolver::class, 'tp.media.reference_resolver');
+        }
     }
 
     public function boot(): void
