@@ -71,6 +71,8 @@
     $backgroundSizes = is_array($backgroundRef) ? ($backgroundRef['sizes'] ?? null) : null;
     $backgroundWidth = is_array($backgroundRef) && isset($backgroundRef['width']) && is_int($backgroundRef['width']) ? $backgroundRef['width'] : null;
     $backgroundHeight = is_array($backgroundRef) && isset($backgroundRef['height']) && is_int($backgroundRef['height']) ? $backgroundRef['height'] : null;
+    $backgroundLoading = 'eager';
+    $backgroundFetchPriority = 'high';
 @endphp
 
 @if ($splitLayout)
@@ -133,7 +135,8 @@
                             @if (is_int($backgroundWidth) && $backgroundWidth > 0) width="{{ $backgroundWidth }}" @endif
                             @if (is_int($backgroundHeight) && $backgroundHeight > 0) height="{{ $backgroundHeight }}" @endif
                             class="h-full w-full object-cover"
-                            loading="lazy"
+                            loading="{{ $backgroundLoading }}"
+                            fetchpriority="{{ $backgroundFetchPriority }}"
                             decoding="async" />
                     </div>
                 @endif
@@ -153,7 +156,8 @@
                     @if (is_int($backgroundWidth) && $backgroundWidth > 0) width="{{ $backgroundWidth }}" @endif
                     @if (is_int($backgroundHeight) && $backgroundHeight > 0) height="{{ $backgroundHeight }}" @endif
                     class="h-full w-full object-cover"
-                    loading="lazy"
+                    loading="{{ $backgroundLoading }}"
+                    fetchpriority="{{ $backgroundFetchPriority }}"
                     decoding="async" />
                 <div class="absolute inset-0 bg-linear-to-br from-surface-950/85 via-surface-950/60 to-surface-900/40"></div>
             </div>
