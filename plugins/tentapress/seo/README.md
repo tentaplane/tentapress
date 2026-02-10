@@ -5,9 +5,9 @@ SEO fields and metadata management for TentaPress.
 ## Plugin Details
 
 | Field    | Value                               |
-|----------|-------------------------------------|
+| -------- | ----------------------------------- |
 | ID       | `tentapress/seo`                    |
-| Version  | 0.2.5                               |
+| Version  | 0.2.7                               |
 | Provider | `TentaPress\Seo\SeoServiceProvider` |
 
 ## Features
@@ -25,7 +25,7 @@ None.
 ## Admin Menu
 
 | Label | Route          | Capability   | Position | Parent |
-|-------|----------------|--------------|----------|--------|
+| ----- | -------------- | ------------ | -------- | ------ |
 | SEO   | `tp.seo.index` | `manage_seo` | 20       | Pages  |
 
 ## Integration

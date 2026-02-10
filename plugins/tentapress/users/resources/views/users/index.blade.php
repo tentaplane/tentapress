@@ -39,7 +39,7 @@
             <div class="tp-metabox__body tp-muted text-sm">No users yet. Create your first user.</div>
         @else
             <div class="tp-table-wrap">
-                <table class="tp-table tp-table--sticky-head">
+                <table class="tp-table tp-table--responsive tp-table--sticky-head">
                     <thead class="tp-table__thead">
                         <tr>
                             <th class="tp-table__th">ID</th>
@@ -52,8 +52,8 @@
                     <tbody class="tp-table__tbody">
                         @foreach ($users as $user)
                             <tr class="tp-table__row">
-                                <td class="tp-table__td">{{ $user->id }}</td>
-                                <td class="tp-table__td">
+                                <td data-label="ID" class="tp-table__td">{{ $user->id }}</td>
+                                <td data-label="Name" class="tp-table__td">
                                     <div class="font-semibold">
                                         <a
                                             class="tp-button-link"
@@ -62,12 +62,12 @@
                                         </a>
                                     </div>
                                 </td>
-                                <td class="tp-table__td">{{ $user->email }}</td>
-                                <td class="tp-table__td">
+                                <td data-label="Email" class="tp-table__td">{{ $user->email }}</td>
+                                <td data-label="Super Admin" class="tp-table__td">
                                     {{ $user->is_super_admin ? 'Yes' : 'No' }}
                                 </td>
 
-                                <td class="tp-table__td">
+                                <td data-label="Actions" class="tp-table__td">
                                     <div class="tp-muted flex justify-end gap-3 text-xs">
                                         <a
                                             class="tp-button-link"

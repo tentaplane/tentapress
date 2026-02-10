@@ -1,5 +1,5 @@
 <div class="tp-metabox overflow-hidden">
-    <div class="relative bg-linear-to-br from-[#2271b1] to-[#135e96] px-6 py-8 text-white">
+    <div class="relative bg-linear-to-br from-[#2271b1] to-[#135e96] px-4 py-6 text-white sm:px-6 sm:py-8">
         <div class="relative z-10">
             <h2 class="text-xl font-semibold">Welcome to TentaPress</h2>
             <p class="mt-2 text-sm text-white/80">Your site is ready. Jump in with the shortcuts below.</p>
@@ -9,7 +9,7 @@
     </div>
 
     @if (count($shortcuts) > 0)
-        <div class="grid grid-cols-2 gap-px bg-black/5 sm:grid-cols-3 lg:grid-cols-5">
+        <div class="grid grid-cols-1 gap-px bg-black/5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
             @foreach ($shortcuts as $shortcut)
                 <a
                     href="{{ $shortcut['url'] }}"

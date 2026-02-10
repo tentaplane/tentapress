@@ -1,6 +1,6 @@
 {
   "resources/css/admin.css": {
-    "file": "admin-styles-DkMuRENU.css",
+    "file": "admin-styles-BSktNtcG.css",
     "src": "resources/css/admin.css",
     "isEntry": true,
     "name": "admin-styles",
@@ -9,7 +9,7 @@
     ]
   },
   "resources/js/admin.js": {
-    "file": "admin-BsvuGi0g.js",
+    "file": "admin-gRowt44r.js",
     "name": "admin",
     "src": "resources/js/admin.js",
     "isEntry": true

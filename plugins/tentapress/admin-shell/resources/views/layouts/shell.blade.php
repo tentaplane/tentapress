@@ -14,10 +14,14 @@
         $fullscreen = trim($__env->yieldContent('shell_fullscreen')) === '1';
     @endphp
     <body class="bg-[#f0f0f1] text-[#1d2327] @yield('body_class')">
-        <div class="min-h-screen" x-data="{ sidebarOpen: false }">
+        <div
+            class="min-h-screen"
+            x-data="{ sidebarOpen: false }"
+            x-init="$watch('sidebarOpen', value => document.body.classList.toggle('overflow-hidden', value))"
+            @keydown.escape.window="sidebarOpen = false">
             @if (! $fullscreen)
                 <div
-                    class="fixed inset-0 z-30 bg-black/40 md:hidden"
+                    class="fixed inset-0 z-30 bg-black/40 lg:hidden"
                     x-show="sidebarOpen"
                     x-transition.opacity
                     @click="sidebarOpen = false"></div>
@@ -25,12 +29,12 @@
                 @include('tentapress-admin::partials.sidebar')
             @endif
 
-            <div class="ml-0 flex min-h-screen flex-1 flex-col {{ $fullscreen ? '' : 'md:ml-64' }}">
+            <div class="ml-0 flex min-h-screen flex-1 flex-col {{ $fullscreen ? '' : 'lg:ml-64' }}">
                 @if (! $fullscreen)
                     @include('tentapress-admin::partials.topbar')
                 @endif
 
-                <main class="{{ $fullscreen ? 'flex-1 p-0' : 'flex-1 p-4 lg:p-6' }}">
+                <main class="{{ $fullscreen ? 'flex-1 p-0' : 'flex-1 p-3 sm:p-4 lg:p-6' }}">
                     @if ($fullscreen)
                         @yield('content')
                     @else

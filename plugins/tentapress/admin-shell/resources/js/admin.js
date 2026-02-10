@@ -12,6 +12,9 @@ const ensureToastRoot = () => {
     }
 
     root.classList.add('tp-toast-root');
+    root.setAttribute('role', 'status');
+    root.setAttribute('aria-live', 'polite');
+    root.setAttribute('aria-atomic', 'true');
 
     return root;
 };
@@ -80,17 +83,27 @@ const buildDialog = ({ title, message, confirmText, cancelText }) => {
 
     const card = document.createElement('div');
     card.className = 'tp-dialog-card';
+    card.setAttribute('role', 'alertdialog');
+    card.setAttribute('aria-modal', 'true');
+
+    const dialogId = `tp-dialog-${Math.random().toString(36).slice(2)}`;
+    const titleId = `${dialogId}-title`;
+    const messageId = `${dialogId}-message`;
 
     if (title) {
         const header = document.createElement('div');
         header.className = 'tp-dialog-title';
+        header.id = titleId;
         header.textContent = title;
         card.appendChild(header);
+        card.setAttribute('aria-labelledby', titleId);
     }
 
     const body = document.createElement('div');
     body.className = 'tp-dialog-message';
+    body.id = messageId;
     body.textContent = message;
+    card.setAttribute('aria-describedby', messageId);
     card.appendChild(body);
 
     const actions = document.createElement('div');
@@ -127,10 +140,19 @@ const openConfirmDialog = ({ message, title, confirmText, cancelText }) =>
             confirmText,
             cancelText,
         });
+        const previouslyFocused = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+
+        const getFocusable = () =>
+            dialog.backdrop.querySelectorAll(
+                'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+            );
 
         const close = (result) => {
             dialog.backdrop.remove();
             dialogState.active = null;
+            if (previouslyFocused) {
+                previouslyFocused.focus();
+            }
             resolve(result);
         };
 
@@ -144,17 +166,39 @@ const openConfirmDialog = ({ message, title, confirmText, cancelText }) =>
             }
         });
 
-        document.addEventListener(
-            'keydown',
-            (event) => {
-                if (event.key === 'Escape') {
-                    close(false);
-                }
-            },
-            { once: true },
-        );
+        dialog.backdrop.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
+                event.preventDefault();
+                close(false);
+                return;
+            }
+
+            if (event.key !== 'Tab') {
+                return;
+            }
+
+            const focusable = getFocusable();
+            if (!focusable.length) {
+                event.preventDefault();
+                return;
+            }
+
+            const first = focusable[0];
+            const last = focusable[focusable.length - 1];
+            const active = document.activeElement;
+
+            if (event.shiftKey && active === first) {
+                event.preventDefault();
+                last.focus();
+            } else if (!event.shiftKey && active === last) {
+                event.preventDefault();
+                first.focus();
+            }
+        });
 
         document.body.appendChild(dialog.backdrop);
+        dialog.backdrop.tabIndex = -1;
+        dialog.backdrop.focus();
         dialog.confirm.focus();
     });
 
@@ -184,16 +228,18 @@ const confirmSubmitHandler = (event) => {
 
     event.preventDefault();
 
-    window.tpConfirm(message, {
-        confirmText: form.dataset.confirmAction || 'Confirm',
-    }).then((ok) => {
-        if (!ok) {
-            return;
-        }
+    window
+        .tpConfirm(message, {
+            confirmText: form.dataset.confirmAction || 'Confirm',
+        })
+        .then((ok) => {
+            if (!ok) {
+                return;
+            }
 
-        form.dataset.confirming = 'true';
-        form.requestSubmit();
-    });
+            form.dataset.confirming = 'true';
+            form.requestSubmit();
+        });
 };
 
 const confirmClickHandler = (event) => {
@@ -213,17 +259,19 @@ const confirmClickHandler = (event) => {
 
     event.preventDefault();
 
-    window.tpConfirm(message, {
-        confirmText: trigger.dataset.confirmAction || 'Confirm',
-    }).then((ok) => {
-        if (!ok) {
-            return;
-        }
+    window
+        .tpConfirm(message, {
+            confirmText: trigger.dataset.confirmAction || 'Confirm',
+        })
+        .then((ok) => {
+            if (!ok) {
+                return;
+            }
 
-        if (trigger.tagName === 'A') {
-            window.location.href = trigger.href;
-        }
-    });
+            if (trigger.tagName === 'A') {
+                window.location.href = trigger.href;
+            }
+        });
 };
 
 document.addEventListener('submit', confirmSubmitHandler, true);

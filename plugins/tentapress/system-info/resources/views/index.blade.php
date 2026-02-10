@@ -31,7 +31,7 @@
                         <div class="tp-muted mt-2 text-sm">No plugins are currently enabled.</div>
                     @else
                         <div class="tp-table-wrap mt-2">
-                            <table class="tp-table tp-table--sticky-head">
+                            <table class="tp-table tp-table--responsive tp-table--sticky-head">
                                 <thead class="tp-table__thead">
                                     <tr>
                                         <th class="tp-table__th">Plugin</th>
@@ -41,11 +41,11 @@
                                 <tbody class="tp-table__tbody">
                                     @foreach (($report['tentapress']['enabled_plugins'] ?? []) as $p)
                                         <tr class="tp-table__row">
-                                            <td class="tp-table__td">
+                                            <td data-label="Plugin" class="tp-table__td">
                                                 <div class="font-semibold">{{ $p['id'] }}</div>
                                                 <div class="tp-muted text-xs">{{ $p['path'] }}</div>
                                             </td>
-                                            <td class="tp-table__td tp-code">{{ $p['version'] ?: '—' }}</td>
+                                            <td data-label="Version" class="tp-table__td tp-code">{{ $p['version'] ?: '—' }}</td>
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -140,7 +140,7 @@
                 <div>
                     <div class="tp-muted text-xs font-semibold uppercase">Key extensions</div>
                     <div class="tp-table-wrap mt-2">
-                        <table class="tp-table tp-table--sticky-head">
+                        <table class="tp-table tp-table--responsive tp-table--sticky-head">
                             <thead class="tp-table__thead">
                                 <tr>
                                     <th class="tp-table__th">Extension</th>
@@ -150,8 +150,8 @@
                             <tbody class="tp-table__tbody">
                                 @foreach (($report['php']['extensions'] ?? []) as $ext)
                                     <tr class="tp-table__row">
-                                        <td class="tp-table__td tp-code">{{ $ext['key'] }}</td>
-                                        <td class="tp-table__td">
+                                        <td data-label="Extension" class="tp-table__td tp-code">{{ $ext['key'] }}</td>
+                                        <td data-label="Available" class="tp-table__td">
                                             @if (!empty($ext['loaded']))
                                                 <span class="tp-badge tp-badge-success">
                                                     Yes

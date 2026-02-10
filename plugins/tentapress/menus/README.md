@@ -4,10 +4,10 @@ Navigation menu management for TentaPress.
 
 ## Plugin Details
 
-| Field | Value |
-|-------|-------|
-| ID | `tentapress/menus` |
-| Version | 0.3.2 |
+| Field    | Value                                   |
+| -------- | --------------------------------------- |
+| ID       | `tentapress/menus`                      |
+| Version  | 0.3.4                                   |
 | Provider | `TentaPress\Menus\MenusServiceProvider` |
 
 ## Goal
@@ -39,32 +39,32 @@ Allow users to define navigation menus and map them to theme locations.
 ## Data model
 
 - `tp_menus`
-  - `id`
-  - `name`
-  - `slug`
-  - `created_by`, `updated_by`
-  - timestamps
+    - `id`
+    - `name`
+    - `slug`
+    - `created_by`, `updated_by`
+    - timestamps
 - `tp_menu_items`
-  - `id`
-  - `menu_id`
-  - `parent_id` (nullable, for nesting)
-  - `title`
-  - `url`
-  - `target` (nullable, e.g., `_blank`)
-  - `sort_order`
-  - `meta` (json)
-  - timestamps
+    - `id`
+    - `menu_id`
+    - `parent_id` (nullable, for nesting)
+    - `title`
+    - `url`
+    - `target` (nullable, e.g., `_blank`)
+    - `sort_order`
+    - `meta` (json)
+    - timestamps
 - `tp_menu_locations`
-  - `id`
-  - `location_key` (string)
-  - `menu_id` (nullable)
-  - timestamps
+    - `id`
+    - `location_key` (string)
+    - `menu_id` (nullable)
+    - timestamps
 
 ## Admin Menu
 
-| Label | Route | Capability | Icon | Position |
-|-------|-------|------------|------|----------|
-| Menus | `tp.menus.index` | `manage_menus` | menu | 40 |
+| Label | Route            | Capability     | Icon | Position |
+| ----- | ---------------- | -------------- | ---- | -------- |
+| Menus | `tp.menus.index` | `manage_menus` | menu | 40       |
 
 ## Admin UI (current)
 

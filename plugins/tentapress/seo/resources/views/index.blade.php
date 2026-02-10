@@ -101,7 +101,9 @@
                 <div class="flex-1"></div>
 
                 <div class="flex gap-2">
+                    <label class="sr-only" for="seo-search">Search SEO entries</label>
                     <input
+                        id="seo-search"
                         name="s"
                         value="{{ $search }}"
                         class="tp-input w-full sm:w-64"
@@ -119,7 +121,7 @@
             <div class="tp-metabox__body tp-muted text-sm">No matching pages or posts found.</div>
         @else
             <div class="tp-table-wrap">
-                <table class="tp-table tp-table--sticky-head">
+                <table class="tp-table tp-table--responsive tp-table--sticky-head">
                     <thead class="tp-table__thead">
                         <tr>
                             <th class="tp-table__th">
@@ -165,10 +167,10 @@
                                 $updatedAt = $entry['updated_at'];
                             @endphp
                             <tr class="tp-table__row">
-                                <td class="tp-table__td align-middle py-4">
+                                <td data-label="Type" class="tp-table__td align-middle py-4">
                                     <span class="tp-code">{{ $typeLabel }}</span>
                                 </td>
-                                <td class="tp-table__td align-middle py-4">
+                                <td data-label="Title" class="tp-table__td align-middle py-4">
                                     <div class="flex items-center gap-4 whitespace-nowrap">
                                         <a class="tp-button-link" href="{{ $entry['edit_url'] }}">
                                             {{ $entryTitle }}
@@ -176,17 +178,17 @@
                                         <span class="tp-code">/{{ $slug }}</span>
                                     </div>
                                 </td>
-                                <td class="tp-table__td align-middle py-4">
+                                <td data-label="Custom setup" class="tp-table__td align-middle py-4">
                                     @if ($isCustom)
                                         <span class="tp-badge tp-badge-success">Yes</span>
                                     @else
                                         <span class="tp-muted text-xs">No</span>
                                     @endif
                                 </td>
-                                <td class="tp-table__td tp-muted align-middle py-4">
+                                <td data-label="Updated" class="tp-table__td tp-muted align-middle py-4">
                                     {{ $updatedAt?->diffForHumans() ?? '—' }}
                                 </td>
-                                <td class="tp-table__td align-middle py-4">
+                                <td data-label="Actions" class="tp-table__td align-middle py-4">
                                     <div class="tp-muted flex justify-end gap-3 text-xs">
                                         <a class="tp-button-link" href="{{ $entry['edit_url'] }}">
                                             Edit

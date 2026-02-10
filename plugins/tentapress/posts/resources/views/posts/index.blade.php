@@ -77,7 +77,9 @@
                 <div class="flex-1"></div>
 
                 <div class="flex gap-2">
+                    <label class="sr-only" for="posts-search">Search posts</label>
                     <input
+                        id="posts-search"
                         name="s"
                         value="{{ $search }}"
                         class="tp-input w-full sm:w-64"
@@ -93,7 +95,7 @@
             <div class="tp-metabox__body tp-muted text-sm">No posts yet.</div>
         @else
             <div class="tp-table-wrap">
-                <table class="tp-table tp-table--sticky-head">
+                <table class="tp-table tp-table--responsive tp-table--sticky-head">
                     <thead class="tp-table__thead">
                         <tr>
                             <th class="tp-table__th w-1/2">
@@ -132,7 +134,7 @@
                     <tbody class="tp-table__tbody">
                         @foreach ($posts as $post)
                             <tr class="tp-table__row">
-                                <td class="tp-table__td align-middle py-4">
+                                <td data-label="Title" class="tp-table__td align-middle py-4">
                                     <div class="flex items-center gap-4 whitespace-nowrap">
                                         <a
                                             class="tp-button-link"
@@ -142,7 +144,7 @@
                                         <span class="tp-code">/{{ $post->slug }}</span>
                                     </div>
                                 </td>
-                                <td class="tp-table__td align-middle py-4">
+                                <td data-label="Status" class="tp-table__td align-middle py-4">
                                     @if ($post->status === 'published')
                                         <span class="tp-badge tp-badge-success">
                                             Published
@@ -151,13 +153,13 @@
                                         <span class="tp-badge tp-badge-info">Draft</span>
                                     @endif
                                 </td>
-                                <td class="tp-table__td tp-muted align-middle py-4">
+                                <td data-label="Published" class="tp-table__td tp-muted align-middle py-4">
                                     {{ $post->published_at?->format('Y-m-d') ?? '—' }}
                                 </td>
-                                <td class="tp-table__td tp-muted align-middle py-4">
+                                <td data-label="Updated" class="tp-table__td tp-muted align-middle py-4">
                                     {{ $post->updated_at?->diffForHumans() ?? '—' }}
                                 </td>
-                                <td class="tp-table__td align-middle py-4">
+                                <td data-label="Actions" class="tp-table__td align-middle py-4">
                                     <div class="tp-muted flex justify-end gap-3 text-xs">
                                         <a
                                             class="tp-button-link"

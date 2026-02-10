@@ -78,7 +78,9 @@
                 <div class="flex-1"></div>
 
                 <div class="flex gap-2">
+                    <label class="sr-only" for="pages-search">Search pages</label>
                     <input
+                        id="pages-search"
                         name="s"
                         value="{{ $search }}"
                         class="tp-input w-full sm:w-64"
@@ -94,7 +96,7 @@
             <div class="tp-metabox__body tp-muted text-sm">No pages yet.</div>
         @else
             <div class="tp-table-wrap">
-                <table class="tp-table tp-table--sticky-head">
+                <table class="tp-table tp-table--responsive tp-table--sticky-head">
                     <thead class="tp-table__thead">
                         <tr>
                             <th class="tp-table__th w-1/2">
@@ -135,7 +137,7 @@
                                 $remainingMenuCount = max($linkedCount - count($primaryMenus), 0);
                             @endphp
                             <tr class="tp-table__row">
-                                <td class="tp-table__td align-middle py-4">
+                                <td data-label="Title" class="tp-table__td align-middle py-4">
                                     <div class="flex items-center gap-4 whitespace-nowrap">
                                         <a
                                             class="tp-button-link"
@@ -145,7 +147,7 @@
                                         <span class="tp-code">/{{ $page->slug }}</span>
                                     </div>
                                 </td>
-                                <td class="tp-table__td align-middle py-4">
+                                <td data-label="Status" class="tp-table__td align-middle py-4">
                                     @if ($page->status === 'published')
                                         <span class="tp-badge tp-badge-success">
                                             Published
@@ -154,7 +156,7 @@
                                         <span class="tp-badge tp-badge-info">Draft</span>
                                     @endif
                                 </td>
-                                <td class="tp-table__td align-middle py-4">
+                                <td data-label="Menus" class="tp-table__td align-middle py-4">
                                     @if ($linkedCount > 0)
                                         <div class="flex flex-wrap items-center gap-1.5">
                                             @foreach ($primaryMenus as $menuName)
@@ -170,10 +172,10 @@
                                         <span class="tp-muted text-xs">Not in menus</span>
                                     @endif
                                 </td>
-                                <td class="tp-table__td tp-muted align-middle py-4">
+                                <td data-label="Updated" class="tp-table__td tp-muted align-middle py-4">
                                     {{ $page->updated_at?->diffForHumans() ?? '—' }}
                                 </td>
-                                <td class="tp-table__td align-middle py-4">
+                                <td data-label="Actions" class="tp-table__td align-middle py-4">
                                     <div class="tp-muted flex justify-end gap-3 text-xs">
                                         <a
                                             class="tp-button-link"

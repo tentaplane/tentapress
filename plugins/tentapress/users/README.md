@@ -5,9 +5,9 @@ User, role, and capability management for TentaPress.
 ## Plugin Details
 
 | Field    | Value                                   |
-|----------|-----------------------------------------|
+| -------- | --------------------------------------- |
 | ID       | `tentapress/users`                      |
-| Version  | 0.1.11                                   |
+| Version  | 0.1.12                                  |
 | Provider | `TentaPress\Users\UsersServiceProvider` |
 
 ## Features
@@ -25,7 +25,7 @@ None.
 ## Database
 
 | Table                  | Purpose                     |
-|------------------------|-----------------------------|
+| ---------------------- | --------------------------- |
 | `tp_users`             | User accounts               |
 | `tp_roles`             | Role definitions            |
 | `tp_capabilities`      | Capability definitions      |
@@ -34,7 +34,7 @@ None.
 ## Admin Menu
 
 | Label | Route            | Capability     | Icon  | Position | Parent |
-|-------|------------------|----------------|-------|----------|--------|
+| ----- | ---------------- | -------------- | ----- | -------- | ------ |
 | Users | `tp.users.index` | `manage_users` | users | 70       | -      |
 | Roles | `tp.roles.index` | `manage_roles` | -     | 20       | Users  |
 

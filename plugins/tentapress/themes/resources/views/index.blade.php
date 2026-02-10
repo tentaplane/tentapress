@@ -37,7 +37,7 @@
             </div>
         @else
             <div class="tp-table-wrap">
-                <table class="tp-table tp-table--sticky-head">
+                <table class="tp-table tp-table--responsive tp-table--sticky-head">
                     <thead class="tp-table__thead">
                         <tr>
                             <th class="tp-table__th w-56">Preview</th>
@@ -54,8 +54,8 @@
                                 $isActive = ($activeId !== null && $activeId === $id);
                             @endphp
 
-                            <tr class="tp-table__row {{ $isActive ? 'bg-emerald-50/60 ring-1 ring-inset ring-emerald-200' : '' }}">
-                                <td class="tp-table__td">
+                            <tr class="tp-table__row {{ $isActive ? 'bg-emerald-50/60 ring-1 ring-emerald-200 ring-inset' : '' }}">
+                                <td data-label="Preview" class="tp-table__td">
                                     @php
                                         $id = (string) ($theme['id'] ?? '');
                                         $hasScreenshot = ! empty($theme['has_screenshot']);
@@ -74,7 +74,7 @@
                                         </div>
                                     @endif
                                 </td>
-                                <td class="tp-table__td">
+                                <td data-label="Theme" class="tp-table__td">
                                     <div class="flex items-center gap-2 font-semibold">
                                         <a
                                             class="tp-button-link"
@@ -122,8 +122,8 @@
                                         <div class="tp-muted mt-2 text-xs">No layouts listed.</div>
                                     @endif
                                 </td>
-                                <td class="tp-table__td tp-code">{{ $theme['version'] ?? '—' }}</td>
-                                <td class="tp-table__td">
+                                <td data-label="Version" class="tp-table__td tp-code">{{ $theme['version'] ?? '—' }}</td>
+                                <td data-label="Status" class="tp-table__td">
                                     @if ($isActive)
                                         <span class="tp-badge tp-badge-success">
                                             Active
@@ -132,7 +132,7 @@
                                         <span class="tp-badge tp-badge-info">Inactive</span>
                                     @endif
                                 </td>
-                                <td class="tp-table__td">
+                                <td data-label="Actions" class="tp-table__td">
                                     <div class="tp-muted flex justify-end gap-3 text-xs">
                                         <a
                                             class="tp-button-link"

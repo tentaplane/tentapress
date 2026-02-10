@@ -98,7 +98,7 @@
                 </template>
                 <template x-if="attempts.length > 0">
                     <div class="tp-table-wrap">
-                        <table class="tp-table">
+                        <table class="tp-table tp-table--responsive">
                             <thead class="tp-table__thead">
                                 <tr>
                                     <th class="tp-table__th">Package</th>
@@ -109,7 +109,7 @@
                             <tbody class="tp-table__tbody">
                                 <template x-for="attempt in attempts" :key="attempt.id">
                                     <tr class="tp-table__row">
-                                        <td class="tp-table__td">
+                                        <td data-label="Package" class="tp-table__td">
                                             <div class="tp-code text-xs" x-text="attempt.package"></div>
                                             <template x-if="attempt.error">
                                                 <div class="tp-muted mt-1 text-xs" x-text="attempt.error"></div>
@@ -121,13 +121,13 @@
                                                 </div>
                                             </template>
                                         </td>
-                                        <td class="tp-table__td">
+                                        <td data-label="Status" class="tp-table__td">
                                             <span
                                                 class="tp-badge"
                                                 :class="badgeClass(attempt.status)"
                                                 x-text="attempt.status"></span>
                                         </td>
-                                        <td class="tp-table__td">
+                                        <td data-label="When" class="tp-table__td">
                                             <span class="tp-muted text-xs" x-text="formatDate(attempt.created_at)"></span>
                                         </td>
                                     </tr>
@@ -147,7 +147,7 @@
         </div>
     @else
         <div class="tp-table-wrap">
-            <table class="tp-table tp-table--sticky-head">
+            <table class="tp-table tp-table--responsive tp-table--sticky-head">
                 <thead class="tp-table__thead">
                     <tr>
                         <th class="tp-table__th">Plugin</th>
@@ -175,7 +175,7 @@
                                 enableUrl: @js(route('tp.plugins.enable')),
                                 disableUrl: @js(route('tp.plugins.disable')),
                             })">
-                            <td class="tp-table__td">
+                            <td data-label="Plugin" class="tp-table__td">
                                 <div class="font-semibold">{{ $plugin['name'] }}</div>
                                 <div class="tp-muted text-xs">{{ $id }}</div>
                                 @if (! empty($plugin['description']))
@@ -188,7 +188,7 @@
                                     <div class="tp-code mt-1 text-[11px]">Path: {{ $plugin['path'] }}</div>
                                 @endif
                             </td>
-                            <td class="tp-table__td">
+                            <td data-label="Status" class="tp-table__td">
                                 <span x-show="enabled" class="tp-badge tp-badge-success">Enabled</span>
                                 <span x-show="!enabled" class="tp-badge tp-badge-warning">Disabled</span>
 
@@ -200,10 +200,10 @@
                                     <div class="tp-muted mt-2 text-xs">Required plugin</div>
                                 @endif
                             </td>
-                            <td class="tp-table__td tp-code">
+                            <td data-label="Version" class="tp-table__td tp-code">
                                 {{ $plugin['version'] !== '' ? $plugin['version'] : '—' }}
                             </td>
-                            <td class="tp-table__td text-right">
+                            <td data-label="Actions" class="tp-table__td text-right">
                                 <div class="flex justify-end gap-2">
                                     <button
                                         x-show="enabled"

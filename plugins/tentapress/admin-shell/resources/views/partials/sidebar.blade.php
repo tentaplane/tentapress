@@ -1,5 +1,6 @@
 <aside
-    class="fixed inset-y-0 left-0 z-40 h-screen w-64 -translate-x-full overflow-y-auto bg-linear-to-b from-[#172739] to-[#102030] text-white transition-transform md:translate-x-0"
+    id="tp-admin-sidebar"
+    class="fixed inset-y-0 left-0 z-40 h-screen w-64 -translate-x-full overflow-y-auto bg-linear-to-b from-[#172739] to-[#102030] text-white transition-transform lg:translate-x-0"
     :class="sidebarOpen ? 'translate-x-0' : ''">
     <div class="flex h-14 items-center border-b border-white/10 px-4">
         <a href="{{ url('/admin') }}" class="flex items-center gap-2 text-sm hover:text-white/90">
@@ -23,15 +24,20 @@
             @if (!$hasChildren)
                 <a
                     href="{{ $url ?: '#' }}"
-                    class="{{ $isActive ? 'bg-[#2b7bc7]/25 text-white ring-1 ring-inset ring-[#6eaee6]/35' : 'text-white/75 hover:bg-white/8 hover:text-white' }} block rounded px-3 py-2 text-sm font-semibold transition">
+                    @click="sidebarOpen = false"
+                    class="{{ $isActive ? 'bg-[#2b7bc7]/25 text-white ring-1 ring-[#6eaee6]/35 ring-inset' : 'text-white/75 hover:bg-white/8 hover:text-white' }} block rounded px-3 py-2 text-sm font-semibold transition">
                     {{ $label }}
                 </a>
             @else
+                @php
+                    $submenuId = 'tp-admin-submenu-'.$loop->index.'-'.\Illuminate\Support\Str::slug($label);
+                @endphp
                 <div x-data="{ open: {{ $isActive ? 'true' : 'false' }} }">
                     <div class="flex items-center gap-1">
                         <a
                             href="{{ $url ?: '#' }}"
-                            class="{{ $isActive ? 'bg-[#2b7bc7]/25 text-white ring-1 ring-inset ring-[#6eaee6]/35' : 'text-white/75 hover:bg-white/8 hover:text-white' }} block flex-1 rounded px-3 py-2 text-sm font-semibold transition">
+                            @click="sidebarOpen = false"
+                            class="{{ $isActive ? 'bg-[#2b7bc7]/25 text-white ring-1 ring-[#6eaee6]/35 ring-inset' : 'text-white/75 hover:bg-white/8 hover:text-white' }} block flex-1 rounded px-3 py-2 text-sm font-semibold transition">
                             {{ $label }}
                         </a>
 
@@ -39,12 +45,14 @@
                             type="button"
                             @click="open = !open"
                             class="rounded px-2 py-2 text-white/60 transition hover:bg-white/5 hover:text-white"
+                            :aria-expanded="open ? 'true' : 'false'"
+                            aria-controls="{{ $submenuId }}"
                             aria-label="Show or hide {{ $label }}">
                             <span x-text="open ? '–' : '+'"></span>
                         </button>
                     </div>
 
-                    <div x-show="open" x-cloak class="mt-1 space-y-1 pl-3">
+                    <div id="{{ $submenuId }}" x-show="open" x-cloak class="mt-1 space-y-1 pl-3">
                         @foreach ($item['children'] as $child)
                             @php
                                 $childActive = !empty($child['active']);
@@ -54,7 +62,8 @@
 
                             <a
                                 href="{{ $childUrl ?: '#' }}"
-                                class="{{ $childActive ? 'bg-[#2b7bc7]/20 text-white ring-1 ring-inset ring-[#6eaee6]/25' : 'text-white/70 hover:bg-white/8 hover:text-white' }} block rounded px-3 py-2 text-sm transition">
+                                @click="sidebarOpen = false"
+                                class="{{ $childActive ? 'bg-[#2b7bc7]/20 text-white ring-1 ring-[#6eaee6]/25 ring-inset' : 'text-white/70 hover:bg-white/8 hover:text-white' }} block rounded px-3 py-2 text-sm transition">
                                 {{ $childLabel }}
                             </a>
                         @endforeach

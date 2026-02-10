@@ -1,6 +1,6 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
-@plugin "@tailwindcss/forms";
+@plugin '@tailwindcss/forms';
 
 /* Laravel core / cached views (from Tailwind guide) */
 @source '../../../../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
@@ -15,323 +15,343 @@
 @source '../../../../../plugins/**/resources/js/**/*.js';
 
 @layer base {
-	:root {
-		--tp-brand-600: #2271b1;
-		--tp-brand-700: #1f6fb6;
-		--tp-brand-ink: #1a2f43;
-		--tp-surface-soft: #f3f6f9;
-	}
+    :root {
+        --tp-brand-600: #2271b1;
+        --tp-brand-700: #1f6fb6;
+        --tp-brand-ink: #1a2f43;
+        --tp-surface-soft: #f3f6f9;
+    }
 
-	body {
-		font-family:
-			'Public Sans',
-			'Segoe UI Variable',
-			'Segoe UI',
-			-apple-system,
-			BlinkMacSystemFont,
-			'Helvetica Neue',
-			Arial,
-			'Noto Sans',
-			sans-serif;
-	}
+    body {
+        font-family:
+            'Public Sans',
+            'Segoe UI Variable',
+            'Segoe UI',
+            -apple-system,
+            BlinkMacSystemFont,
+            'Helvetica Neue',
+            Arial,
+            'Noto Sans',
+            sans-serif;
+    }
 
-	button:not(:disabled),
-	[role="button"]:not(:disabled) {
-		cursor: pointer;
-	}
+    button:not(:disabled),
+    [role='button']:not(:disabled) {
+        cursor: pointer;
+    }
 
-	[x-cloak] {
-		display: none !important;
-	}
+    [x-cloak] {
+        display: none !important;
+    }
 }
 
 /* -------------------------------------------------
    TentaPress Admin UI Kit
 -------------------------------------------------- */
 @layer components {
-	/* -----------------------------
+    /* -----------------------------
 	   Layout
 	------------------------------ */
-	.tp-wrap {
-		@apply mx-auto;
-	}
+    .tp-wrap {
+        @apply mx-auto;
+    }
 
-	.tp-editor {
-		@apply w-full;
-	}
+    .tp-editor {
+        @apply w-full;
+    }
 
-	.tp-page-header {
-		@apply mb-6 flex items-center justify-between gap-4;
-	}
+    .tp-page-header {
+        @apply mb-4 flex flex-col items-start justify-between gap-3 sm:mb-6 sm:flex-row sm:items-center sm:gap-4;
+    }
 
-	.tp-page-title {
-		@apply text-2xl font-semibold text-[var(--tp-brand-ink)];
-	}
+    .tp-page-title {
+        @apply text-xl font-semibold text-[var(--tp-brand-ink)] sm:text-2xl;
+    }
 
-	.tp-description {
-		@apply mt-1 text-sm text-black/60;
-	}
+    .tp-description {
+        @apply mt-1 text-sm text-black/60;
+    }
 
-	.tp-muted {
-		@apply text-black/60;
-	}
+    .tp-muted {
+        @apply text-black/60;
+    }
 
-	.tp-code {
-		@apply font-mono text-xs text-black/70;
-	}
+    .tp-code {
+        @apply font-mono text-xs text-black/70;
+    }
 
-	.tp-pre {
-		@apply whitespace-pre-wrap rounded bg-[#f6f7f7] p-3 text-xs text-black/80;
-	}
+    .tp-pre {
+        @apply rounded bg-[#f6f7f7] p-3 text-xs whitespace-pre-wrap text-black/80;
+    }
 
-	/* -----------------------------
+    /* -----------------------------
 	   Notices (no composition)
 	------------------------------ */
-	.tp-notice-success {
-		@apply mb-4 rounded border px-4 py-3 text-sm border-emerald-200 bg-emerald-50 text-emerald-900;
-	}
+    .tp-notice-success {
+        @apply mb-4 rounded border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900;
+    }
 
-	.tp-notice-warning {
-		@apply mb-4 rounded border px-4 py-3 text-sm border-amber-200 bg-amber-50 text-amber-900;
-	}
+    .tp-notice-warning {
+        @apply mb-4 rounded border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900;
+    }
 
-	.tp-notice-error {
-		@apply mb-4 rounded border px-4 py-3 text-sm border-red-200 bg-red-50 text-red-900;
-	}
+    .tp-notice-error {
+        @apply mb-4 rounded border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900;
+    }
 
-	.tp-notice-info {
-		@apply mb-4 rounded border px-4 py-3 text-sm border-sky-200 bg-sky-50 text-sky-900;
-	}
+    .tp-notice-info {
+        @apply mb-4 rounded border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-900;
+    }
 
-	/* -----------------------------
+    /* -----------------------------
 	   Toasts (no composition)
 	------------------------------ */
-	.tp-toast-root {
-		@apply fixed top-5 left-1/2 z-9999 flex max-w-88 -translate-x-1/2 flex-col gap-2;
-	}
+    .tp-toast-root {
+        @apply fixed top-4 left-1/2 z-9999 flex w-[calc(100vw-1rem)] max-w-88 -translate-x-1/2 flex-col gap-2 sm:top-5 sm:w-auto;
+    }
 
-	.tp-toast {
-		@apply flex items-start gap-3 rounded-xl border px-4 py-3 text-sm shadow-lg transition;
-		@apply bg-white/95 backdrop-blur-sm ring-1 ring-black/5;
-	}
+    .tp-toast {
+        @apply flex items-start gap-3 rounded-xl border px-4 py-3 text-sm shadow-lg transition;
+        @apply bg-white/95 ring-1 ring-black/5 backdrop-blur-sm;
+    }
 
-	.tp-toast-message {
-		@apply flex-1 leading-snug text-black/80;
-	}
+    .tp-toast-message {
+        @apply flex-1 leading-snug text-black/80;
+    }
 
-	.tp-toast-close {
-		@apply cursor-pointer border-0 bg-transparent text-lg leading-none opacity-60;
-	}
+    .tp-toast-close {
+        @apply cursor-pointer border-0 bg-transparent text-lg leading-none opacity-60;
+    }
 
-	.tp-toast-close:hover {
-		@apply opacity-100;
-	}
+    .tp-toast-close:hover {
+        @apply opacity-100;
+    }
 
-	.tp-toast-hide {
-		@apply opacity-0 -translate-y-1;
-	}
+    .tp-toast-hide {
+        @apply -translate-y-1 opacity-0;
+    }
 
-	.tp-toast-success {
-		@apply border-emerald-200 bg-emerald-50 text-emerald-900;
-	}
+    .tp-toast-success {
+        @apply border-emerald-200 bg-emerald-50 text-emerald-900;
+    }
 
-	.tp-toast-warning {
-		@apply border-amber-200 bg-amber-50 text-amber-900;
-	}
+    .tp-toast-warning {
+        @apply border-amber-200 bg-amber-50 text-amber-900;
+    }
 
-	.tp-toast-error {
-		@apply border-red-200 bg-red-50 text-red-900;
-	}
+    .tp-toast-error {
+        @apply border-red-200 bg-red-50 text-red-900;
+    }
 
-	.tp-toast-info {
-		@apply border-sky-200 bg-sky-50 text-sky-900;
-	}
+    .tp-toast-info {
+        @apply border-sky-200 bg-sky-50 text-sky-900;
+    }
 
-	/* -----------------------------
+    /* -----------------------------
 	   Dialogs (no composition)
 	------------------------------ */
-	.tp-dialog-backdrop {
-		@apply fixed inset-0 z-9999 flex items-start justify-center bg-black/40 px-4 pb-6 pt-20 backdrop-blur-sm;
-	}
+    .tp-dialog-backdrop {
+        @apply fixed inset-0 z-9999 flex items-start justify-center bg-black/40 px-3 pt-12 pb-4 backdrop-blur-sm sm:px-4 sm:pt-20 sm:pb-6;
+    }
 
-	.tp-dialog-card {
-		@apply w-full max-w-md rounded-2xl border border-black/10 bg-white/95 p-6 shadow-xl;
-	}
+    .tp-dialog-card {
+        @apply w-full max-w-md rounded-2xl border border-black/10 bg-white/95 p-4 shadow-xl sm:p-6;
+    }
 
-	.tp-dialog-title {
-		@apply text-lg font-semibold text-[#1d2327];
-	}
+    .tp-dialog-title {
+        @apply text-lg font-semibold text-[#1d2327];
+    }
 
-	.tp-dialog-message {
-		@apply mt-2 text-sm text-black/70;
-	}
+    .tp-dialog-message {
+        @apply mt-2 text-sm text-black/70;
+    }
 
-	.tp-dialog-actions {
-		@apply mt-6 flex items-center justify-end gap-2;
-	}
+    .tp-dialog-actions {
+        @apply mt-6 flex flex-col-reverse items-stretch justify-end gap-2 sm:flex-row sm:items-center;
+    }
 
-	/* -----------------------------
+    /* -----------------------------
 	   Buttons (no composition)
 	------------------------------ */
-	.tp-button-primary {
-		@apply inline-flex items-center rounded-md px-3 py-2 text-sm font-semibold transition
-		bg-linear-to-b from-[#2b7bc7] to-[var(--tp-brand-700)] text-white hover:brightness-95 shadow-sm cursor-pointer;
-	}
+    .tp-button-primary {
+        @apply inline-flex min-h-10 cursor-pointer items-center justify-center rounded-md bg-linear-to-b from-[#2b7bc7] to-[var(--tp-brand-700)] px-3 py-2 text-sm font-semibold text-white shadow-sm transition hover:brightness-95;
+    }
 
-	.tp-button-primary:focus-visible {
-		@apply ring-2 ring-[#2271b1]/40 ring-offset-2 ring-offset-white outline-none;
-	}
+    .tp-button-primary:focus-visible {
+        @apply ring-2 ring-[#2271b1]/40 ring-offset-2 ring-offset-white outline-none;
+    }
 
-	.tp-button-secondary {
-		@apply inline-flex items-center rounded-md px-3 py-2 text-sm font-semibold transition
-		border border-black/20 bg-white text-black/80 hover:bg-black/5 cursor-pointer;
-	}
+    .tp-button-secondary {
+        @apply inline-flex min-h-10 cursor-pointer items-center justify-center rounded-md border border-black/20 bg-white px-3 py-2 text-sm font-semibold text-black/80 transition hover:bg-black/5;
+    }
 
-	.tp-button-secondary:focus-visible {
-		@apply ring-2 ring-[#2271b1]/30 ring-offset-2 ring-offset-white outline-none;
-	}
+    .tp-button-secondary:focus-visible {
+        @apply ring-2 ring-[#2271b1]/30 ring-offset-2 ring-offset-white outline-none;
+    }
 
-	.tp-button-danger {
-		@apply inline-flex items-center rounded-md px-3 py-2 text-sm font-semibold transition
-		bg-red-600 text-white hover:brightness-95 shadow-sm cursor-pointer;
-	}
+    .tp-button-danger {
+        @apply inline-flex min-h-10 cursor-pointer items-center justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm transition hover:brightness-95;
+    }
 
-	.tp-button-danger:focus-visible {
-		@apply ring-2 ring-red-500/35 ring-offset-2 ring-offset-white outline-none;
-	}
+    .tp-button-danger:focus-visible {
+        @apply ring-2 ring-red-500/35 ring-offset-2 ring-offset-white outline-none;
+    }
 
-	.tp-button-link {
-		@apply inline-flex items-center text-sm font-semibold text-[#2271b1] hover:underline cursor-pointer;
-	}
+    .tp-button-link {
+        @apply inline-flex cursor-pointer items-center text-sm font-semibold text-[#2271b1] hover:underline;
+    }
 
-	.tp-button-link:focus-visible {
-		@apply rounded-sm underline ring-2 ring-[#2271b1]/35 ring-offset-1 ring-offset-white outline-none;
-	}
+    .tp-button-link:focus-visible {
+        @apply rounded-sm underline ring-2 ring-[#2271b1]/35 ring-offset-1 ring-offset-white outline-none;
+    }
 
-	.tp-button-disabled {
-		@apply inline-flex items-center rounded-md px-3 py-2 text-sm font-semibold
-		bg-black/10 text-black/40 cursor-not-allowed;
-	}
+    .tp-button-disabled {
+        @apply inline-flex cursor-not-allowed items-center rounded-md bg-black/10 px-3 py-2 text-sm font-semibold text-black/40;
+    }
 
-	/* -----------------------------
+    /* -----------------------------
 	   Badges
 	------------------------------ */
-	.tp-badge {
-		@apply inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-semibold;
-	}
+    .tp-badge {
+        @apply inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-semibold;
+    }
 
-	.tp-badge-success {
-		@apply border-emerald-200 bg-emerald-50 text-emerald-800;
-	}
+    .tp-badge-success {
+        @apply border-emerald-200 bg-emerald-50 text-emerald-800;
+    }
 
-	.tp-badge-info {
-		@apply border-sky-200 bg-sky-50 text-sky-800;
-	}
+    .tp-badge-info {
+        @apply border-sky-200 bg-sky-50 text-sky-800;
+    }
 
-	.tp-badge-warning {
-		@apply border-amber-200 bg-amber-50 text-amber-800;
-	}
+    .tp-badge-warning {
+        @apply border-amber-200 bg-amber-50 text-amber-800;
+    }
 
-	.tp-badge-error {
-		@apply border-red-200 bg-red-50 text-red-800;
-	}
+    .tp-badge-error {
+        @apply border-red-200 bg-red-50 text-red-800;
+    }
 
-	.tp-badge-neutral {
-		@apply border-black/10 bg-black/5 text-black/70;
-	}
+    .tp-badge-neutral {
+        @apply border-black/10 bg-black/5 text-black/70;
+    }
 
-	/* -----------------------------
+    /* -----------------------------
 	   Metabox (no composition)
 	------------------------------ */
-	.tp-metabox {
-		@apply rounded-lg border border-black/5 bg-white shadow-sm;
-	}
+    .tp-metabox {
+        @apply rounded-lg border border-black/5 bg-white shadow-sm;
+    }
 
-	.tp-metabox__title {
-		@apply border-b border-black/10 bg-[var(--tp-surface-soft)]/80 px-4 py-3 text-sm font-semibold;
-	}
+    .tp-metabox__title {
+        @apply border-b border-black/10 bg-[var(--tp-surface-soft)]/80 px-4 py-3 text-sm font-semibold;
+    }
 
-	.tp-metabox__body {
-		@apply px-4 py-3;
-	}
+    .tp-metabox__body {
+        @apply px-4 py-3;
+    }
 
-	/* -----------------------------
+    /* -----------------------------
 	   Tables
 	------------------------------ */
-	.tp-table-wrap {
-		@apply overflow-x-auto;
-	}
+    .tp-table-wrap {
+        @apply overflow-x-auto;
+    }
 
-	.tp-table {
-		@apply min-w-full text-left text-sm;
-	}
+    .tp-table {
+        @apply min-w-full text-left text-sm;
+    }
 
-	.tp-table__thead {
-		@apply bg-[var(--tp-surface-soft)] text-xs uppercase text-black/60;
-	}
+    .tp-table__thead {
+        @apply bg-[var(--tp-surface-soft)] text-xs text-black/60 uppercase;
+    }
 
-	.tp-table--sticky-head .tp-table__thead {
-		@apply sticky top-0 z-10;
-	}
+    .tp-table--sticky-head .tp-table__thead {
+        @apply sticky top-0 z-10;
+    }
 
-	.tp-table__th {
-		@apply px-4 py-3 font-semibold;
-	}
+    .tp-table__th {
+        @apply px-4 py-3 font-semibold;
+    }
 
-	.tp-table__tbody {
-		@apply divide-y divide-black/10;
-	}
+    .tp-table__tbody {
+        @apply divide-y divide-black/10;
+    }
 
-	.tp-table__row {
-		@apply hover:bg-black/2;
-	}
+    .tp-table__row {
+        @apply hover:bg-black/2;
+    }
 
-	.tp-table__td {
-		@apply px-4 py-3 align-top;
-	}
+    .tp-table__td {
+        @apply px-4 py-3 align-top;
+    }
 
-	/* -----------------------------
+    .tp-table--responsive .tp-table__td[data-label]::before {
+        content: attr(data-label);
+        @apply mr-3 text-[11px] font-semibold tracking-wide text-black/60 uppercase md:hidden;
+    }
+
+    .tp-table--responsive .tp-table__td[data-label] {
+        @apply md:before:content-none;
+    }
+
+    @media (max-width: 767px) {
+        .tp-table--responsive .tp-table__thead {
+            @apply sr-only;
+        }
+
+        .tp-table--responsive .tp-table__tbody {
+            @apply divide-y-0;
+        }
+
+        .tp-table--responsive .tp-table__row {
+            @apply mb-3 block rounded-lg border border-black/10 bg-white;
+        }
+
+        .tp-table--responsive .tp-table__td {
+            @apply flex items-start justify-between gap-3 px-4 py-2.5;
+        }
+    }
+
+    /* -----------------------------
 	   Forms
 	------------------------------ */
-	.tp-field {
-		@apply space-y-1;
-	}
+    .tp-field {
+        @apply space-y-1;
+    }
 
-	.tp-label {
-		@apply text-sm font-semibold text-[#1d2327];
-	}
+    .tp-label {
+        @apply text-sm font-semibold text-[#1d2327];
+    }
 
-	.tp-help {
-		@apply text-xs text-black/60;
-	}
+    .tp-help {
+        @apply text-xs text-black/60;
+    }
 
-	.tp-input {
-		@apply w-full rounded border border-black/20 bg-white px-3 py-2 text-sm text-[#1d2327]
-		outline-none focus:border-[#2271b1] focus:ring-2 focus:ring-[#2271b1]/20;
-	}
+    .tp-input {
+        @apply w-full rounded border border-black/20 bg-white px-3 py-2 text-sm text-[#1d2327] outline-none focus:border-[#2271b1] focus:ring-2 focus:ring-[#2271b1]/20;
+    }
 
-	.tp-textarea {
-		@apply w-full rounded border border-black/20 bg-white px-3 py-2 text-sm text-[#1d2327]
-		outline-none focus:border-[#2271b1] focus:ring-2 focus:ring-[#2271b1]/20;
-	}
+    .tp-textarea {
+        @apply w-full rounded border border-black/20 bg-white px-3 py-2 text-sm text-[#1d2327] outline-none focus:border-[#2271b1] focus:ring-2 focus:ring-[#2271b1]/20;
+    }
 
-	.tp-select {
-		@apply w-full rounded border border-black/20 bg-white px-3 py-2 text-sm text-[#1d2327]
-		outline-none focus:border-[#2271b1] focus:ring-2 focus:ring-[#2271b1]/20;
-	}
+    .tp-select {
+        @apply w-full rounded border border-black/20 bg-white px-3 py-2 text-sm text-[#1d2327] outline-none focus:border-[#2271b1] focus:ring-2 focus:ring-[#2271b1]/20;
+    }
 
-	.tp-checkbox {
-		@apply h-5 w-5 rounded border border-black/30 text-[#2271b1] focus:ring-[#2271b1]/20;
-	}
+    .tp-checkbox {
+        @apply h-5 w-5 rounded border border-black/30 text-[#2271b1] focus:ring-[#2271b1]/20;
+    }
 
-	/* -----------------------------
+    /* -----------------------------
 	   Panels / Separators
 	------------------------------ */
-	.tp-panel {
-		@apply rounded-lg border border-black/5 bg-white/70 p-4;
-	}
+    .tp-panel {
+        @apply rounded-lg border border-black/5 bg-white/70 p-4;
+    }
 
-	.tp-divider {
-		@apply my-4 border-t border-black/10;
-	}
+    .tp-divider {
+        @apply my-4 border-t border-black/10;
+    }
 }

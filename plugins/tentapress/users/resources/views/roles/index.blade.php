@@ -39,7 +39,7 @@
             <div class="tp-metabox__body tp-muted text-sm">No roles yet. Create your first role.</div>
         @else
             <div class="tp-table-wrap">
-                <table class="tp-table tp-table--sticky-head">
+                <table class="tp-table tp-table--responsive tp-table--sticky-head">
                     <thead class="tp-table__thead">
                         <tr>
                             <th class="tp-table__th">Name</th>
@@ -51,7 +51,7 @@
                     <tbody class="tp-table__tbody">
                         @foreach ($roles as $role)
                             <tr class="tp-table__row group">
-                                <td class="tp-table__td">
+                                <td data-label="Name" class="tp-table__td">
                                     <div class="font-semibold">
                                         <a
                                             class="tp-button-link"
@@ -60,13 +60,13 @@
                                         </a>
                                     </div>
                                 </td>
-                                <td class="tp-table__td tp-code">{{ $role->slug }}</td>
-                                <td class="tp-table__td">
+                                <td data-label="Key" class="tp-table__td tp-code">{{ $role->slug }}</td>
+                                <td data-label="Capabilities" class="tp-table__td">
                                     <span class="tp-badge tp-badge-neutral">
                                         {{ $role->capabilities_count }}
                                     </span>
                                 </td>
-                                <td class="tp-table__td">
+                                <td data-label="Actions" class="tp-table__td">
                                     <div class="tp-muted flex justify-end gap-3 text-xs">
                                         <a
                                             class="tp-button-link"

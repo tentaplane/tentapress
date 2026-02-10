@@ -5,9 +5,9 @@ Blog post management for TentaPress.
 ## Plugin Details
 
 | Field    | Value                                   |
-|----------|-----------------------------------------|
+| -------- | --------------------------------------- |
 | ID       | `tentapress/posts`                      |
-| Version  | 0.2.9                                   |
+| Version  | 0.2.11                                  |
 | Provider | `TentaPress\Posts\PostsServiceProvider` |
 
 ## Features
@@ -28,19 +28,19 @@ Blog post management for TentaPress.
 ## Database
 
 | Table      | Purpose      |
-|------------|--------------|
+| ---------- | ------------ |
 | `tp_posts` | Post records |
 
 ## Admin Menu
 
 | Label | Route            | Capability     | Icon      | Position |
-|-------|------------------|----------------|-----------|----------|
+| ----- | ---------------- | -------------- | --------- | -------- |
 | Posts | `tp.posts.index` | `manage_posts` | file-text | 30       |
 
 ## Public Routes
 
 | Route          | Description |
-|----------------|-------------|
+| -------------- | ----------- |
 | `/blog`        | Blog index  |
 | `/blog/{slug}` | Single post |
 
