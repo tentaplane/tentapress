@@ -7,7 +7,7 @@ Page management for TentaPress.
 | Field    | Value                                   |
 | -------- | --------------------------------------- |
 | ID       | `tentapress/pages`                      |
-| Version  | 0.3.0                                   |
+| Version  | 0.3.1                                   |
 | Provider | `TentaPress\Pages\PagesServiceProvider` |
 
 ## Features
@@ -48,4 +48,12 @@ None.
 ```bash
 php artisan tp:plugins sync
 php artisan tp:plugins enable tentapress/pages
+```
+
+## Testing
+
+This plugin keeps feature tests locally under `plugins/tentapress/pages/tests/Feature`.
+
+```bash
+composer test:filter -- HomeRedirectTest
 ```
