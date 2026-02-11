@@ -7,7 +7,7 @@ Blog post management for TentaPress.
 | Field    | Value                                   |
 | -------- | --------------------------------------- |
 | ID       | `tentapress/posts`                      |
-| Version  | 0.3.1                                   |
+| Version  | 0.3.2                                   |
 | Provider | `TentaPress\Posts\PostsServiceProvider` |
 
 ## Features
@@ -52,4 +52,5 @@ php artisan tp:plugins sync
 php artisan tp:plugins enable tentapress/posts
 composer test
 composer test:filter -- PostsBaselineFlowTest
+composer test:filter -- PostsEdgeCaseTest
 ```
