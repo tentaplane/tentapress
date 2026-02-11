@@ -5,7 +5,7 @@ to launch, a safer way for clients to edit, and a cleaner path to maintain sites
 
 | Key       | Value      |
 |-----------|------------|
-| Version   | 0.33.4     |
+| Version   | 0.33.5     |
 | PHP       | 8.2+       |
 | Framework | Laravel 12 |
 | License   | MIT        |
@@ -113,6 +113,14 @@ Run all tests from root:
 
 ```bash
 composer test
+```
+
+Validate a fresh setup:
+
+```bash
+composer install
+composer test
+composer test:filter -- HomeRedirectTest
 ```
 
 ### Third-party plugin discovery
