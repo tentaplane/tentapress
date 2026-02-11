@@ -7,7 +7,7 @@ Content import functionality for TentaPress.
 | Field    | Value                                     |
 |----------|-------------------------------------------|
 | ID       | `tentapress/import`                       |
-| Version  | 0.1.8                                     |
+| Version  | 0.1.9                                     |
 | Provider | `TentaPress\Import\ImportServiceProvider` |
 
 ## Features
