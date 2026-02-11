@@ -5,7 +5,7 @@ to launch, a safer way for clients to edit, and a cleaner path to maintain sites
 
 | Key       | Value      |
 |-----------|------------|
-| Version   | 0.33.2     |
+| Version   | 0.33.3     |
 | PHP       | 8.2+       |
 | Framework | Laravel 12 |
 | License   | MIT        |
@@ -106,6 +106,7 @@ TentaPress uses Pest at the root and auto-discovers tests across core, plugins, 
 - Package tests: `packages/<vendor>/<package>/tests/Feature`
 - Plugin/package tests automatically run with Laravel `RefreshDatabase`.
 - Example plugin feature test: `plugins/tentapress/pages/tests/Feature/HomeRedirectTest.php`.
+- Example package feature test: `packages/tentapress/system/tests/Feature/PluginsListCommandTest.php`.
 
 Run all tests from root:
 

@@ -7,7 +7,7 @@ Core platform layer for TentaPress plugin and theme management.
 | Field    | Value                                     |
 |----------|-------------------------------------------|
 | Name     | `tentapress/system`                       |
-| Version  | 0.3.5                                     |
+| Version  | 0.3.6                                     |
 | Provider | `TentaPress\System\SystemServiceProvider` |
 
 ## Overview
@@ -113,3 +113,11 @@ This package auto-registers via Laravel package discovery. The `SystemServicePro
 2. Loads enabled plugins from cache
 3. Boots plugin service providers
 4. Registers admin routes and middleware
+
+## Testing
+
+This package keeps feature tests locally under `packages/tentapress/system/tests/Feature`.
+
+```bash
+composer test:filter -- PluginsListCommandTest
+```
