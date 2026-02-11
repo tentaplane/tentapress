@@ -7,7 +7,7 @@ Admin UI shell providing the base layout, navigation, and shared components for 
 | Field    | Value                                             |
 | -------- | ------------------------------------------------- |
 | ID       | `tentapress/admin-shell`                          |
-| Version  | 0.6.5                                             |
+| Version  | 0.6.6                                             |
 | Provider | `TentaPress\AdminShell\AdminShellServiceProvider` |
 
 ## Features
@@ -58,4 +58,7 @@ php artisan tp:plugins enable tentapress/admin-shell
 
 # Run admin-shell baseline endpoint tests
 composer test:filter -- AdminDashboardAccessTest
+
+# Run admin-shell guard/integration edge-case tests
+composer test:filter -- AdminDashboardGuardEdgeCaseTest
 ```
