@@ -18,7 +18,7 @@ it('gracefully renders system info when settings table is unavailable', function
     $this->actingAs($user)
         ->get('/admin/system-info')
         ->assertOk()
-        ->assertViewHas('report', fn(array $report): bool => ($report['tentapress']['active_theme'] ?? null) === '—');
+        ->assertViewHas('report', fn (array $report): bool => ($report['tentapress']['active_theme'] ?? null) === '—');
 });
 
 it('returns a not found json response for missing plugin install attempts', function (): void {
