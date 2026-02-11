@@ -8,6 +8,7 @@
 
     $mediaOrder = $imagePosition === 'right' ? 'lg:order-2' : 'lg:order-1';
     $contentOrder = $imagePosition === 'right' ? 'lg:order-1' : 'lg:order-2';
+    $imageSizesConfig = '(min-width: 1280px) 576px, (min-width: 1024px) 50vw, 100vw';
 
     $imageRef = null;
     if ($image !== '') {
@@ -15,7 +16,7 @@
         if (is_object($resolver) && method_exists($resolver, 'resolveImage')) {
             $imageRef = $resolver->resolveImage(
                 ['url' => $image, 'alt' => ''],
-                ['variant' => 'large', 'sizes' => '(min-width: 1024px) 560px, 100vw']
+                ['variant' => 'large', 'sizes' => $imageSizesConfig]
             );
         }
     }

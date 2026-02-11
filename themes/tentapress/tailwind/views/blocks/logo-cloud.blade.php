@@ -35,6 +35,13 @@
         'lg' => 'h-12',
         default => 'h-10',
     };
+    $logoSizesConfig = match ($columns) {
+        2 => '(min-width: 1280px) 608px, (min-width: 768px) calc((100vw - 4rem) / 2), calc((100vw - 3rem) / 2)',
+        3 => '(min-width: 1280px) 394px, (min-width: 768px) calc((100vw - 5rem) / 3), calc((100vw - 3rem) / 2)',
+        4 => '(min-width: 1280px) 286px, (min-width: 768px) calc((100vw - 6rem) / 4), calc((100vw - 3rem) / 2)',
+        6 => '(min-width: 1280px) 179px, (min-width: 768px) calc((100vw - 8rem) / 6), calc((100vw - 3rem) / 2)',
+        default => '(min-width: 1280px) 222px, (min-width: 768px) calc((100vw - 7rem) / 5), calc((100vw - 3rem) / 2)',
+    };
 @endphp
 
 @if ($logos !== [])
@@ -61,7 +68,7 @@
                         if (is_object($resolver) && method_exists($resolver, 'resolveImage')) {
                             $logoRef = $resolver->resolveImage(
                                 ['url' => $logo, 'alt' => ''],
-                                ['variant' => 'medium', 'sizes' => '(min-width: 1280px) 220px, (min-width: 768px) 18vw, 40vw']
+                                ['variant' => 'medium', 'sizes' => $logoSizesConfig]
                             );
                         }
                         $logoSrc = is_array($logoRef) ? (string) ($logoRef['src'] ?? '') : $logo;

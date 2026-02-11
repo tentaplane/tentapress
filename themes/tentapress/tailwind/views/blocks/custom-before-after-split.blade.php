@@ -35,6 +35,7 @@
     if ($startPercent > 95) {
         $startPercent = 95;
     }
+    $comparisonSizesConfig = '(min-width: 1280px) 976px, (min-width: 640px) calc(100vw - 6rem), calc(100vw - 2rem)';
 
     $resolver = app()->bound('tp.media.reference_resolver') ? app('tp.media.reference_resolver') : null;
     $beforeRef = null;
@@ -43,13 +44,13 @@
         if ($beforeImage !== '') {
             $beforeRef = $resolver->resolveImage(
                 ['url' => $beforeImage, 'alt' => $beforeLabel],
-                ['variant' => 'large', 'sizes' => '(min-width: 1024px) 960px, 100vw']
+                ['variant' => 'large', 'sizes' => $comparisonSizesConfig]
             );
         }
         if ($afterImage !== '') {
             $afterRef = $resolver->resolveImage(
                 ['url' => $afterImage, 'alt' => $afterLabel],
-                ['variant' => 'large', 'sizes' => '(min-width: 1024px) 960px, 100vw']
+                ['variant' => 'large', 'sizes' => $comparisonSizesConfig]
             );
         }
     }
