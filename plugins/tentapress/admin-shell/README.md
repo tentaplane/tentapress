@@ -7,7 +7,7 @@ Admin UI shell providing the base layout, navigation, and shared components for 
 | Field    | Value                                             |
 | -------- | ------------------------------------------------- |
 | ID       | `tentapress/admin-shell`                          |
-| Version  | 0.6.4                                             |
+| Version  | 0.6.5                                             |
 | Provider | `TentaPress\AdminShell\AdminShellServiceProvider` |
 
 ## Features
@@ -30,7 +30,7 @@ None.
 
 | Route    | Name                 | Description     |
 | -------- | -------------------- | --------------- |
-| `/admin` | `tp.admin.dashboard` | Admin dashboard |
+| `/admin` | `tp.dashboard` | Admin dashboard |
 
 ## Assets
 
@@ -55,4 +55,7 @@ Ship admin assets as part of the plugin so a clean install can load the admin UI
 ```bash
 php artisan tp:plugins sync
 php artisan tp:plugins enable tentapress/admin-shell
+
+# Run admin-shell baseline endpoint tests
+composer test:filter -- AdminDashboardAccessTest
 ```
