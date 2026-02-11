@@ -7,7 +7,7 @@ Site settings management for TentaPress.
 | Field | Value |
 |-------|-------|
 | ID | `tentapress/settings` |
-| Version | 0.1.4 |
+| Version | 0.1.5 |
 | Provider | `TentaPress\Settings\SettingsServiceProvider` |
 
 ## Features
@@ -39,4 +39,5 @@ php artisan tp:plugins sync
 php artisan tp:plugins enable tentapress/settings
 composer test
 composer test:filter -- SettingsAdminFlowTest
+composer test:filter -- SettingsEdgeCaseTest
 ```
