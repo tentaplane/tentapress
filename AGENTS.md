@@ -58,6 +58,7 @@ Testing status
 - Monorepo discovery is enabled from root for `tests/`, `plugins/*/*/tests`, and `packages/*/*/tests`.
 - Plugin/package tests run with `RefreshDatabase` against sqlite `:memory:` during root test runs.
 - CI runs tests with the root command `composer test`.
+- GitHub source archives exclude tests via `.gitattributes` export-ignore rules.
 
 CI expectations (`.github/workflows/ci.yml`)
 
