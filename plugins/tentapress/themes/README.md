@@ -7,7 +7,7 @@ Theme management UI for TentaPress.
 | Field    | Value                                     |
 | -------- | ----------------------------------------- |
 | ID       | `tentapress/themes`                       |
-| Version  | 0.1.14                                    |
+| Version  | 0.1.15                                    |
 | Provider | `TentaPress\Themes\ThemesServiceProvider` |
 
 ## Features
@@ -33,4 +33,6 @@ None.
 ```bash
 php artisan tp:plugins sync
 php artisan tp:plugins enable tentapress/themes
+composer test
+composer test:filter -- ThemesAdminFlowTest
 ```
