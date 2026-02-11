@@ -5,7 +5,7 @@ to launch, a safer way for clients to edit, and a cleaner path to maintain sites
 
 | Key       | Value      |
 |-----------|------------|
-| Version   | 0.33.47    |
+| Version   | 0.33.48    |
 | PHP       | 8.2+       |
 | Framework | Laravel 12 |
 | License   | MIT        |
@@ -94,6 +94,7 @@ bun --cwd plugins/tentapress/admin-shell run dev
 bun --cwd plugins/tentapress/admin-shell run build
 composer test
 composer test:filter -- SomeTestName
+composer test:refactor-guard
 ./vendor/bin/pint --dirty
 ```
 
@@ -121,6 +122,12 @@ Validate a fresh setup:
 composer install
 composer test
 composer test:filter -- HomeRedirectTest
+```
+
+Run the curated refactor guard subset (system/users/pages/import/export/static-deploy):
+
+```bash
+composer test:refactor-guard
 ```
 
 CI now runs `composer test` on pull requests and pushes to `main`.

@@ -1,6 +1,6 @@
 {
     "name": "tentaplane/tentapress",
-    "version": "0.33.47",
+    "version": "0.33.48",
     "license": "MIT",
     "require": {
         "php": "^8.2",
@@ -44,6 +44,7 @@
         ],
         "test": "vendor/bin/pest",
         "test:filter": "vendor/bin/pest --filter",
+        "test:refactor-guard": "vendor/bin/pest --filter='(PluginCacheContractTest|PluginsLifecycleCommandTest|AuthAdminAccessTest|UsersPermissionValidationTest|PublishedPageRenderingTest|PageSlugStatusFallbackEdgeCaseTest|ImportBaselineFlowTest|ImportEdgeCaseTest|ExportBaselineFlowTest|ExportManifestGoldenFileTest|StaticDeployBaselineFlowTest|StaticDeployEdgeCaseTest)'",
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi"
