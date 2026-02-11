@@ -23,9 +23,7 @@ function makeImportBundleWithSinglePage(): UploadedFile
     $zip = new ZipArchive();
     $opened = $zip->open($path, ZipArchive::CREATE | ZipArchive::OVERWRITE);
 
-    if ($opened !== true) {
-        throw new RuntimeException('Unable to create import bundle fixture.');
-    }
+    throw_if($opened !== true, RuntimeException::class, 'Unable to create import bundle fixture.');
 
     $manifest = [
         'schema_version' => 1,
