@@ -7,7 +7,7 @@ A Tailwind CSS v4 theme for TentaPress.
 | Field         | Value                 |
 |---------------|-----------------------|
 | ID            | `tentapress/tailwind` |
-| Version       | 0.3.2                 |
+| Version       | 0.3.3                 |
 | CSS Framework | Tailwind CSS v4       |
 
 ## Layouts
@@ -92,6 +92,7 @@ Override block views by creating `views/blocks/{block-key}.blade.php`.
 Theme block image templates resolve media through the media reference resolver when available, enabling variant-aware `srcset`/`sizes` output with URL fallback.
 Where variant metadata exists, image tags also emit `width`/`height` to reduce layout shift.
 Hero media uses eager loading with high fetch priority to improve above-the-fold rendering.
+Block templates now use layout-aware `sizes` values so `srcset` selection is tuned per block/column width.
 
 ## Cloning This Theme (Agent Checklist)
 

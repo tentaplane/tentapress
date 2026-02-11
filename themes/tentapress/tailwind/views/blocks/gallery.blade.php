@@ -40,6 +40,12 @@
         5 => 'grid-cols-2 md:grid-cols-5',
         default => 'grid-cols-2 md:grid-cols-3',
     };
+    $gallerySizesConfig = match ($columns) {
+        2 => '(min-width: 1280px) 608px, (min-width: 768px) calc((100vw - 4rem) / 2), calc((100vw - 3rem) / 2)',
+        4 => '(min-width: 1280px) 286px, (min-width: 768px) calc((100vw - 6rem) / 4), calc((100vw - 3rem) / 2)',
+        5 => '(min-width: 1280px) 222px, (min-width: 768px) calc((100vw - 7rem) / 5), calc((100vw - 3rem) / 2)',
+        default => '(min-width: 1280px) 394px, (min-width: 768px) calc((100vw - 5rem) / 3), calc((100vw - 3rem) / 2)',
+    };
 @endphp
 
 @if ($images !== [])
@@ -56,7 +62,7 @@
                         if (is_object($resolver) && method_exists($resolver, 'resolveImage')) {
                             $imageRef = $resolver->resolveImage(
                                 ['url' => $url, 'alt' => $alt],
-                                ['variant' => 'medium', 'sizes' => '(min-width: 1536px) 360px, (min-width: 1024px) 33vw, 50vw']
+                                ['variant' => 'medium', 'sizes' => $gallerySizesConfig]
                             );
                         }
                         $imageSrc = is_array($imageRef) ? (string) ($imageRef['src'] ?? '') : $url;

@@ -51,6 +51,9 @@
 
     $splitLayout = $variant === 'split';
     $hasBackground = $bg !== '' && ! $splitLayout;
+    $backgroundSizesConfig = $splitLayout
+        ? '(min-width: 1280px) 608px, (min-width: 1024px) 50vw, 100vw'
+        : '100vw';
 
     $alignClass = $alignment === 'center' ? 'text-center items-center' : 'text-left items-start';
     $actionsClass = $alignment === 'center' ? 'justify-center' : 'justify-start';
@@ -61,7 +64,7 @@
         if (is_object($resolver) && method_exists($resolver, 'resolveImage')) {
             $backgroundRef = $resolver->resolveImage(
                 ['url' => $bg, 'alt' => ''],
-                ['variant' => 'large', 'sizes' => '(min-width: 1280px) 1120px, 100vw']
+                ['variant' => 'large', 'sizes' => $backgroundSizesConfig]
             );
         }
     }

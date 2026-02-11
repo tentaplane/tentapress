@@ -29,6 +29,12 @@
     if ($shadow) {
         $figureClass .= ' shadow-lg';
     }
+    $imageSizesConfig = match ($width) {
+        'narrow' => '(min-width: 1280px) 768px, (min-width: 640px) calc(100vw - 3rem), calc(100vw - 2rem)',
+        'wide' => '(min-width: 1536px) 1280px, (min-width: 640px) calc(100vw - 3rem), calc(100vw - 2rem)',
+        'full' => '100vw',
+        default => '(min-width: 1536px) 1152px, (min-width: 640px) calc(100vw - 3rem), calc(100vw - 2rem)',
+    };
 
     $imageRef = null;
     if ($image !== '') {
@@ -36,7 +42,7 @@
         if (is_object($resolver) && method_exists($resolver, 'resolveImage')) {
             $imageRef = $resolver->resolveImage(
                 ['url' => $image, 'alt' => $alt],
-                ['variant' => 'large', 'sizes' => '(min-width: 1280px) 1120px, 100vw']
+                ['variant' => 'large', 'sizes' => $imageSizesConfig]
             );
         }
     }
