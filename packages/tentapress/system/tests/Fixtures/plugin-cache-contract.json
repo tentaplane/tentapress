@@ -1,0 +1,5 @@
+{
+  "required_plugin_id": "tentapress/pages",
+  "entry_keys": ["provider", "path", "version", "manifest"],
+  "manifest_keys": ["id", "name", "version", "provider"]
+}
