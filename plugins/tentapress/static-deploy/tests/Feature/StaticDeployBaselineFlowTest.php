@@ -8,8 +8,8 @@ use TentaPress\Users\Models\TpUser;
 function registerStaticDeployProvider(): void
 {
     app()->register(StaticDeployServiceProvider::class);
-    app('router')->getRoutes()->refreshNameLookups();
-    app('router')->getRoutes()->refreshActionLookups();
+    resolve('router')->getRoutes()->refreshNameLookups();
+    resolve('router')->getRoutes()->refreshActionLookups();
 }
 
 it('redirects guests from static deploy admin routes to login', function (): void {
