@@ -7,7 +7,7 @@ User, role, and capability management for TentaPress.
 | Field    | Value                                   |
 | -------- | --------------------------------------- |
 | ID       | `tentapress/users`                      |
-| Version  | 0.1.13                                  |
+| Version  | 0.1.14                                  |
 | Provider | `TentaPress\Users\UsersServiceProvider` |
 
 ## Features
@@ -56,4 +56,7 @@ php artisan tp:permissions seed
 
 # Run plugin baseline auth/admin tests
 composer test:filter -- AuthAdminAccessTest
+
+# Run users permission/validation edge-case tests
+composer test:filter -- UsersPermissionValidationTest
 ```
