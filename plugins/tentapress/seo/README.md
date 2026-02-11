@@ -7,7 +7,7 @@ SEO fields and metadata management for TentaPress.
 | Field    | Value                               |
 | -------- | ----------------------------------- |
 | ID       | `tentapress/seo`                    |
-| Version  | 0.2.7                               |
+| Version  | 0.2.8                               |
 | Provider | `TentaPress\Seo\SeoServiceProvider` |
 
 ## Features

@@ -1,7 +1,7 @@
 {
     "id": "tentapress/seo",
     "name": "SEO",
-    "version": "0.2.7",
+    "version": "0.2.8",
     "provider": "TentaPress\\Seo\\SeoServiceProvider",
     "admin": {
         "menus": [
