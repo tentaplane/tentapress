@@ -7,7 +7,7 @@ Core platform layer for TentaPress plugin and theme management.
 | Field    | Value                                     |
 |----------|-------------------------------------------|
 | Name     | `tentapress/system`                       |
-| Version  | 0.3.8                                     |
+| Version  | 0.3.9                                     |
 | Provider | `TentaPress\System\SystemServiceProvider` |
 
 ## Overview
@@ -121,6 +121,7 @@ This package keeps feature tests locally under `packages/tentapress/system/tests
 ```bash
 composer test:filter -- PluginsListCommandTest
 composer test:filter -- PluginsSyncCommandTest
+composer test:filter -- PluginsFailurePathsCommandTest
 ```
 
 Migration behavior for tests is provided by root Pest config via `RefreshDatabase`, so package migrations are applied
