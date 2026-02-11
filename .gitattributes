@@ -42,3 +42,5 @@
 /.prettierignore export-ignore
 /.prettierrc export-ignore
 /release-please-config.json export-ignore
+/plugins/**/tests export-ignore
+/packages/**/tests export-ignore
