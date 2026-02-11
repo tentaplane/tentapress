@@ -3,12 +3,12 @@
 An agency-first publishing platform for landing pages, campaigns, and small sites. TentaPress gives teams a faster way
 to launch, a safer way for clients to edit, and a cleaner path to maintain sites over time.
 
-| Key       | Value  |
-|-----------|--------|
-| Version   | 0.31.1 |
-| PHP       | 8.2+   |
+| Key       | Value      |
+|-----------|------------|
+| Version   | 0.33.0     |
+| PHP       | 8.2+       |
 | Framework | Laravel 12 |
-| License   | MIT    |
+| License   | MIT        |
 
 ## Quick Start (ZIP + setup script)
 
@@ -24,11 +24,11 @@ php tentapress.php setup
 ```
 
 5. Follow the prompts:
-   - site name
-   - site URL
-   - starter theme install
-   - optional demo homepage
-   - first admin login
+    - site name
+    - site URL
+    - starter theme install
+    - optional demo homepage
+    - first admin login
 6. Open your admin at `/admin` and sign in.
 
 If your machine allows executable scripts, this also works:
@@ -92,7 +92,23 @@ php artisan tp:posts
 composer dev
 bun --cwd plugins/tentapress/admin-shell run dev
 bun --cwd plugins/tentapress/admin-shell run build
+composer test
+composer test:filter -- SomeTestName
 ./vendor/bin/pint --dirty
+```
+
+### Testing (Pest, Monorepo)
+
+TentaPress uses Pest at the root and auto-discovers tests across core, plugins, and packages.
+
+- Core tests: `tests/Feature`
+- Plugin tests: `plugins/<vendor>/<plugin>/tests/Feature`
+- Package tests: `packages/<vendor>/<package>/tests/Feature`
+
+Run all tests from root:
+
+```bash
+composer test
 ```
 
 ### Third-party plugin discovery

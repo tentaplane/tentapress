@@ -54,10 +54,9 @@ Quality/lint/format
 
 Testing status
 
-- No test runner config (no phpunit.xml or pest.php, no `tests/`). Composer requires collision/mockery/faker but not
-  wired.
-- CI does not run tests. If adding tests, prefer Laravel `php artisan test` with PHPUnit; document single-test command
-  when added (e.g., `php artisan test --filter ClassName::method`).
+- Root test runner is Pest (PHPUnit under the hood) with `phpunit.xml` + `tests/`.
+- Monorepo discovery is enabled from root for `tests/`, `plugins/*/*/tests`, and `packages/*/*/tests`.
+- CI does not run tests yet; run them locally from root with `composer test` or `vendor/bin/pest`.
 
 CI expectations (`.github/workflows/ci.yml`)
 
@@ -124,8 +123,10 @@ Monorepo/plugin notes
 
 Adding tests (future guidance)
 
-- Preferred: PHPUnit via `php artisan test`. Single test example once configured:
-  `php artisan test --filter MyFeatureTest::test_it_handles_case`.
+- Preferred: feature tests via Pest.
+- Place tests in `plugins/<vendor>/<plugin>/tests/Feature` and `packages/<vendor>/<package>/tests/Feature`.
+- Run all tests from root with `composer test` or a single filter:
+  `composer test:filter -- MyFeatureTest`.
 - Keep sqlite-friendly tests for CI; seed data via factories.
 
 Pre-PR checklist
@@ -135,12 +136,11 @@ Pre-PR checklist
 - Ensure migrations run (`php artisan migrate`); sync plugins (`tp:plugins sync`).
 - Build frontend (`bun --cwd plugins/tentapress/admin-shell run build` or
   `npm --prefix plugins/tentapress/admin-shell run build`).
-- If tests are added later, run `php artisan test` (and filter for single test when iterating).
+- Run tests from root (`composer test`) and filter with `composer test:filter -- SomeTestName` when iterating.
 
 Known gaps to respect
 
-- No test suite/config present; avoid claiming test coverage. If you add tests, also add phpunit.xml/pest.php and update
-  CI.
+- CI does not run tests yet; if enabling tests in CI, use root Pest command (`composer test`).
 - CI skips rector; run locally before pushing major refactors.
 - No ESLint/Stylelint; rely on Prettier + Tailwind conventions.
 
@@ -158,6 +158,8 @@ Quick command reference
 - Sync plugins: `php artisan tp:plugins sync`
 - Enable all plugins: `php artisan tp:plugins enable --all`
 - Migrate: `php artisan migrate --force`
+- Test (root Pest): `composer test`
+- Test single filter: `composer test:filter -- SomeTestName`
 - Format PHP: `./vendor/bin/pint --test` (check) / `./vendor/bin/pint`
 - Rector: `./vendor/bin/rector`
 - Frontend install: `bun install` (preferred) or `npm install`

@@ -17,6 +17,10 @@
 /AGENTS.md export-ignore
 /boost.json export-ignore
 /CHANGELOG.md export-ignore
+/phpunit.xml export-ignore
+/tests export-ignore
+/plugins/**/tests export-ignore
+/packages/**/tests export-ignore
 /.styleci.yml export-ignore
 /pint.json export-ignore
 /rector.php export-ignore
@@ -42,5 +46,3 @@
 /.prettierignore export-ignore
 /.prettierrc export-ignore
 /release-please-config.json export-ignore
-/plugins/**/tests export-ignore
-/packages/**/tests export-ignore
