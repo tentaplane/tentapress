@@ -7,7 +7,7 @@ Upload and manage media files for TentaPress.
 | Field    | Value                                   |
 |----------|-----------------------------------------|
 | ID       | `tentapress/media`                      |
-| Version  | 0.9.0                                   |
+| Version  | 0.9.1                                   |
 | Provider | `TentaPress\Media\MediaServiceProvider` |
 
 ## Goal
@@ -122,6 +122,8 @@ Media URL driver configured in `config/tentapress.php`:
 ```bash
 php artisan tp:plugins sync
 php artisan tp:plugins enable tentapress/media
+composer test
+composer test:filter -- MediaBaselineFlowTest
 ```
 
 ## Commands
