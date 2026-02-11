@@ -7,7 +7,7 @@ Diagnostics and plugin management for TentaPress.
 | Field    | Value                                             |
 | -------- | ------------------------------------------------- |
 | ID       | `tentapress/system-info`                          |
-| Version  | 0.5.1                                             |
+| Version  | 0.5.2                                             |
 | Provider | `TentaPress\SystemInfo\SystemInfoServiceProvider` |
 
 ## Features
@@ -38,4 +38,11 @@ None.
 ```bash
 php artisan tp:plugins sync
 php artisan tp:plugins enable tentapress/system-info
+```
+
+## Testing
+
+```bash
+composer test
+composer test:filter -- SystemInfoDiagnosticsAccessTest
 ```
