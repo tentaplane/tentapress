@@ -5,7 +5,7 @@ to launch, a safer way for clients to edit, and a cleaner path to maintain sites
 
 | Key       | Value      |
 |-----------|------------|
-| Version   | 0.33.48    |
+| Version   | 0.33.49    |
 | PHP       | 8.2+       |
 | Framework | Laravel 12 |
 | License   | MIT        |
@@ -103,6 +103,7 @@ composer test:refactor-guard
 TentaPress uses Pest at the root and auto-discovers tests across core, plugins, and packages.
 
 - Core tests: `tests/Feature`
+- Root platform contracts: `tests/Feature/Platform` (cross-cutting orchestration/config/archive guarantees)
 - Plugin tests: `plugins/<vendor>/<plugin>/tests/Feature`
 - Package tests: `packages/<vendor>/<package>/tests/Feature`
 - Plugin/package tests automatically run with Laravel `RefreshDatabase`.
@@ -124,7 +125,7 @@ composer test
 composer test:filter -- HomeRedirectTest
 ```
 
-Run the curated refactor guard subset (system/users/pages/import/export/static-deploy):
+Run the curated refactor guard subset (root platform contracts + system/users/pages/import/export/static-deploy):
 
 ```bash
 composer test:refactor-guard
