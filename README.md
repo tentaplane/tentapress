@@ -5,7 +5,7 @@ to launch, a safer way for clients to edit, and a cleaner path to maintain sites
 
 | Key       | Value      |
 |-----------|------------|
-| Version   | 0.33.28    |
+| Version   | 0.33.29    |
 | PHP       | 8.2+       |
 | Framework | Laravel 12 |
 | License   | MIT        |
