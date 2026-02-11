@@ -7,7 +7,7 @@ Block registry and rendering system for TentaPress pages and posts.
 | Field    | Value                                     |
 |----------|-------------------------------------------|
 | ID       | `tentapress/blocks`                       |
-| Version  | 0.7.1                                     |
+| Version  | 0.7.2                                     |
 | Provider | `TentaPress\Blocks\BlocksServiceProvider` |
 
 ## Features
@@ -51,4 +51,5 @@ php artisan tp:plugins sync
 php artisan tp:plugins enable tentapress/blocks
 composer test
 composer test:filter -- BlocksRenderingBaselineTest
+composer test:filter -- BlocksEdgeCaseTest
 ```
