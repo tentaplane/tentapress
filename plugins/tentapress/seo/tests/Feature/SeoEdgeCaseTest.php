@@ -108,7 +108,7 @@ it('falls back to site settings when no custom seo row exists', function (): voi
         'editor_driver' => 'blocks',
     ]);
 
-    $meta = app(SeoManager::class)->forPage($page);
+    $meta = resolve(SeoManager::class)->forPage($page);
 
     expect($meta['title'] ?? null)->toBe('Fallback SEO Page · TentaPress Site');
     expect($meta['description'] ?? null)->toBe('Default SEO description.');
