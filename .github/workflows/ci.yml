@@ -1,0 +1,61 @@
+name: CI
+
+on:
+    push:
+        branches: [main]
+    pull_request:
+
+jobs:
+    checks:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: '8.2'
+                  tools: composer:v2
+
+            - name: Install Composer dependencies
+              run: composer install --no-interaction --no-progress --prefer-dist --no-scripts
+
+            - name: Prepare sqlite database
+              run: touch database/database.sqlite
+
+            - name: Prepare environment
+              run: |
+                  cp .env.example .env
+                  {
+                    echo "APP_ENV=testing"
+                    echo "DB_CONNECTION=sqlite"
+                    echo "DB_DATABASE=${{ github.workspace }}/database/database.sqlite"
+                  } >> .env
+
+            - name: Generate app key
+              run: php artisan key:generate --no-interaction
+
+            - name: Run migrations
+              run: php artisan migrate --force --no-interaction
+
+            - name: Check formatting
+              run: ./vendor/bin/pint --test
+
+            - name: Sync and enable plugins
+              run: |
+                  php artisan tp:plugins sync --no-interaction
+                  php artisan tp:plugins enable --all --no-interaction
+                  php artisan migrate --force --no-interaction
+
+            - name: Run tests
+              run: composer test
+
+            - name: Setup Bun
+              uses: oven-sh/setup-bun@v2
+
+            - name: Build admin shell assets
+              run: |
+                  bun --cwd plugins/tentapress/admin-shell install --frozen-lockfile
+                  bun --cwd plugins/tentapress/admin-shell run build

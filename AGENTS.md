@@ -57,16 +57,16 @@ Testing status
 - Root test runner is Pest (PHPUnit under the hood) with `phpunit.xml` + `tests/`.
 - Monorepo discovery is enabled from root for `tests/`, `plugins/*/*/tests`, and `packages/*/*/tests`.
 - Plugin/package tests run with `RefreshDatabase` against sqlite `:memory:` during root test runs.
-- CI does not run tests yet; run them locally from root with `composer test` or `vendor/bin/pest`.
+- CI runs tests with the root command `composer test`.
 
 CI expectations (`.github/workflows/ci.yml`)
 
 - Triggers on push to main and PRs.
 - Steps: checkout → setup PHP 8.2 → composer install (no scripts) → create sqlite db → prepare `.env` (APP_ENV=testing,
   sqlite) → migrate → key:generate → `./vendor/bin/pint --test` → `tp:plugins sync` + `tp:plugins enable --all` +
-  migrate → setup Bun → `bun --cwd plugins/tentapress/admin-shell install --frozen-lockfile` →
+  migrate → `composer test` → setup Bun → `bun --cwd plugins/tentapress/admin-shell install --frozen-lockfile` →
   `bun --cwd plugins/tentapress/admin-shell run build`.
-- CI omits rector and any tests; keep Pint passing.
+- CI omits rector; keep Pint and tests passing.
 
 Conventions: PHP/Laravel
 
@@ -141,7 +141,7 @@ Pre-PR checklist
 
 Known gaps to respect
 
-- CI does not run tests yet; if enabling tests in CI, use root Pest command (`composer test`).
+- CI runs tests; maintain root Pest compatibility (`composer test`).
 - CI skips rector; run locally before pushing major refactors.
 - No ESLint/Stylelint; rely on Prettier + Tailwind conventions.
 

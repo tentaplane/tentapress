@@ -5,7 +5,7 @@ to launch, a safer way for clients to edit, and a cleaner path to maintain sites
 
 | Key       | Value      |
 |-----------|------------|
-| Version   | 0.33.5     |
+| Version   | 0.33.6     |
 | PHP       | 8.2+       |
 | Framework | Laravel 12 |
 | License   | MIT        |
@@ -122,6 +122,8 @@ composer install
 composer test
 composer test:filter -- HomeRedirectTest
 ```
+
+CI now runs `composer test` on pull requests and pushes to `main`.
 
 ### Third-party plugin discovery
 
