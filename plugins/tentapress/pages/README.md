@@ -7,7 +7,7 @@ Page management for TentaPress.
 | Field    | Value                                   |
 | -------- | --------------------------------------- |
 | ID       | `tentapress/pages`                      |
-| Version  | 0.3.2                                   |
+| Version  | 0.3.3                                   |
 | Provider | `TentaPress\Pages\PagesServiceProvider` |
 
 ## Features
@@ -58,4 +58,5 @@ This plugin keeps feature tests locally under `plugins/tentapress/pages/tests/Fe
 composer test
 composer test:filter -- HomeRedirectTest
 composer test:filter -- PublishedPageRenderingTest
+composer test:filter -- PageSlugStatusFallbackEdgeCaseTest
 ```
