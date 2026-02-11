@@ -56,6 +56,7 @@ Testing status
 
 - Root test runner is Pest (PHPUnit under the hood) with `phpunit.xml` + `tests/`.
 - Monorepo discovery is enabled from root for `tests/`, `plugins/*/*/tests`, and `packages/*/*/tests`.
+- Plugin/package tests run with `RefreshDatabase` against sqlite `:memory:` during root test runs.
 - CI does not run tests yet; run them locally from root with `composer test` or `vendor/bin/pest`.
 
 CI expectations (`.github/workflows/ci.yml`)
