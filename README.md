@@ -5,7 +5,7 @@ to launch, a safer way for clients to edit, and a cleaner path to maintain sites
 
 | Key       | Value      |
 |-----------|------------|
-| Version   | 0.33.50    |
+| Version   | 0.33.51    |
 | PHP       | 8.2+       |
 | Framework | Laravel 12 |
 | License   | MIT        |
@@ -95,6 +95,7 @@ bun --cwd plugins/tentapress/admin-shell run build
 composer test
 composer test:filter -- SomeTestName
 composer test:refactor-guard
+composer test:mutation:critical
 ./vendor/bin/pint --dirty
 ```
 
@@ -131,7 +132,13 @@ Run the curated refactor guard subset (root platform contracts + system/users/pa
 composer test:refactor-guard
 ```
 
-CI runs `composer test:refactor-guard` on every push, and runs `composer test` on pull requests and pushes to `main`.
+Run mutation testing for critical refactor targets (`system`, `users`, `pages`):
+
+```bash
+composer test:mutation:critical
+```
+
+CI runs `composer test:refactor-guard` on every push, runs `composer test` on pull requests and pushes to `main`, and runs critical mutation tests on pull requests touching `system`, `users`, or `pages`.
 
 Release archives exclude test sources via `.gitattributes` (`/tests`, `plugins/**/tests`, `packages/**/tests`).
 

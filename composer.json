@@ -1,6 +1,6 @@
 {
     "name": "tentaplane/tentapress",
-    "version": "0.33.50",
+    "version": "0.33.51",
     "license": "MIT",
     "require": {
         "php": "^8.2",
@@ -35,7 +35,11 @@
     "autoload-dev": {
         "psr-4": {
             "Tests\\": "tests/"
-        }
+        },
+        "classmap": [
+            "packages/*/*/src",
+            "plugins/*/*/src"
+        ]
     },
     "scripts": {
         "dev": [
@@ -45,6 +49,8 @@
         "test": "vendor/bin/pest",
         "test:filter": "vendor/bin/pest --filter",
         "test:refactor-guard": "vendor/bin/pest --filter='(PluginCacheContractTest|PluginsLifecycleCommandTest|AuthAdminAccessTest|UsersPermissionValidationTest|PublishedPageRenderingTest|PageSlugStatusFallbackEdgeCaseTest|ImportBaselineFlowTest|ImportEdgeCaseTest|ExportBaselineFlowTest|ExportManifestGoldenFileTest|StaticDeployBaselineFlowTest|StaticDeployEdgeCaseTest|PluginOrchestrationTest|MigrationBootstrapTest|HttpKernelSmokeTest|ConfigContractTest|ReleaseArchiveContractTest)'",
+        "test:mutation": "XDEBUG_MODE=coverage vendor/bin/infection --configuration=infection.json.dist --threads=max --min-msi=0 --min-covered-msi=0",
+        "test:mutation:critical": "XDEBUG_MODE=coverage vendor/bin/infection --configuration=infection.json.dist --threads=max --filter='TentaPress\\\\System\\\\|TentaPress\\\\Users\\\\|TentaPress\\\\Pages\\\\' --min-msi=0 --min-covered-msi=0",
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi"
@@ -84,13 +90,15 @@
         "sort-packages": true,
         "allow-plugins": {
             "php-http/discovery": true,
-            "pestphp/pest-plugin": true
+            "pestphp/pest-plugin": true,
+            "infection/extension-installer": true
         }
     },
     "minimum-stability": "stable",
     "prefer-stable": true,
     "require-dev": {
         "fakerphp/faker": "^1.23",
+        "infection/infection": "^0.30",
         "laravel/pint": "^1.24",
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.6",

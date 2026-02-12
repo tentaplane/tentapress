@@ -1,0 +1,66 @@
+name: Mutation Tests
+
+on:
+    workflow_dispatch:
+    pull_request:
+        paths:
+            - 'packages/tentapress/system/**'
+            - 'plugins/tentapress/users/**'
+            - 'plugins/tentapress/pages/**'
+            - 'infection.json.dist'
+            - 'composer.json'
+            - 'composer.lock'
+            - 'tests/**'
+
+jobs:
+    mutation:
+        runs-on: ubuntu-latest
+        name: Critical Mutation Tests
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: '8.2'
+                  tools: composer:v2
+                  coverage: xdebug
+
+            - name: Install Composer dependencies
+              run: composer install --no-interaction --no-progress --prefer-dist --no-scripts
+
+            - name: Prepare sqlite database
+              run: touch database/database.sqlite
+
+            - name: Prepare environment
+              run: |
+                  cp .env.example .env
+                  {
+                    echo "APP_ENV=testing"
+                    echo "DB_CONNECTION=sqlite"
+                    echo "DB_DATABASE=${{ github.workspace }}/database/database.sqlite"
+                  } >> .env
+
+            - name: Generate app key
+              run: php artisan key:generate --no-interaction
+
+            - name: Run migrations
+              run: php artisan migrate --force --no-interaction
+
+            - name: Sync and enable plugins
+              run: |
+                  php artisan tp:plugins sync --no-interaction
+                  php artisan tp:plugins enable --all --no-interaction
+                  php artisan migrate --force --no-interaction
+
+            - name: Run mutation tests
+              run: composer test:mutation:critical
+
+            - name: Upload mutation log
+              if: always()
+              uses: actions/upload-artifact@v4
+              with:
+                  name: mutation-log
+                  path: build/infection/infection.log
