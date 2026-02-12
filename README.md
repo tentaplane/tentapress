@@ -5,7 +5,7 @@ to launch, a safer way for clients to edit, and a cleaner path to maintain sites
 
 | Key       | Value      |
 |-----------|------------|
-| Version   | 0.33.49    |
+| Version   | 0.33.50    |
 | PHP       | 8.2+       |
 | Framework | Laravel 12 |
 | License   | MIT        |
@@ -131,7 +131,7 @@ Run the curated refactor guard subset (root platform contracts + system/users/pa
 composer test:refactor-guard
 ```
 
-CI now runs `composer test` on pull requests and pushes to `main`.
+CI runs `composer test:refactor-guard` on every push, and runs `composer test` on pull requests and pushes to `main`.
 
 Release archives exclude test sources via `.gitattributes` (`/tests`, `plugins/**/tests`, `packages/**/tests`).
 
