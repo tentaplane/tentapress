@@ -4,6 +4,27 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.33.1](https://github.com/tentaplane/tentapress/compare/v0.33.0...v0.33.1) (2026-02-12)
+
+
+### Bug Fixes
+
+* **testing:** apply refresh database to plugin and package test suites ([8e08551](https://github.com/tentaplane/tentapress/commit/8e085510b31ab17e39410f20b35203d5128c3c19))
+* **theme-tailwind:** apply block-aware sizes for hero image and gallery ([6ccc0ce](https://github.com/tentaplane/tentapress/commit/6ccc0ced2ce9c124f8acda0013f9f0eae14e5be8))
+* **theme-tailwind:** emit intrinsic image dimensions for resolved media ([ce66acb](https://github.com/tentaplane/tentapress/commit/ce66acb5f1edbdbcb2081a02a8a53476331b8c46))
+* **theme-tailwind:** prioritize hero media loading for resolved variants ([3fbdf90](https://github.com/tentaplane/tentapress/commit/3fbdf900b0823188bf71aeed2e2d8d0562ecfc2e))
+* **theme-tailwind:** tune sizes for split, comparison, and logo blocks ([6f84362](https://github.com/tentaplane/tentapress/commit/6f8436269204709fa02a4d6fb66947fc861f71f7))
+
+
+### Miscellaneous Chores
+
+* **export:** normalize golden test resolver usage ([7625b95](https://github.com/tentaplane/tentapress/commit/7625b95520ab3d9e10e7cd065d37d311abb99741))
+* **import:** align baseline test with rector normalization ([efc747f](https://github.com/tentaplane/tentapress/commit/efc747fbac5b8ff32757146dac7c5803665aa188))
+* **seo:** align resolver helper and version docs ([ed1ca3a](https://github.com/tentaplane/tentapress/commit/ed1ca3a4d70492d06fdb4268534562b4791d2ab7))
+* **system-info:** apply rector style to edge-case test ([f126c76](https://github.com/tentaplane/tentapress/commit/f126c7635fc4b7cbf8e7bde4461445b1c096a255))
+* **testing:** exclude tests from releases ([36fbfd0](https://github.com/tentaplane/tentapress/commit/36fbfd03eccc2eb0d897a291b750cf4c337391ae))
+* **testing:** make mutation thresholds configurable ([d5ce6ce](https://github.com/tentaplane/tentapress/commit/d5ce6ceab6169c7f4e69c9fded5cdc9b3a9ed211))
+
 ## [0.33.0](https://github.com/tentaplane/tentapress/compare/v0.32.0...v0.33.0) (2026-02-10)
 
 
