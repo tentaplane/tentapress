@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.33.2](https://github.com/tentaplane/tentapress/compare/v0.33.1...v0.33.2) (2026-02-12)
+
+
+### Bug Fixes
+
+* **monorepo:** documentation fix ([ab95172](https://github.com/tentaplane/tentapress/commit/ab9517204b290e25e2528e2f9b9a24903c3b8677))
+
 ## [0.33.1](https://github.com/tentaplane/tentapress/compare/v0.33.0...v0.33.1) (2026-02-12)
 
 
