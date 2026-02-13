@@ -20,6 +20,7 @@
 - WXR run writes a persistent URL mapping report to `storage/app/tp-import-reports/<token>.json`.
 - WXR attachment URLs are mapped into `media/imports/wordpress/...` and copied to local media storage when reachable.
 - Review screen now supports real-time streamed import feedback with per-item progress lines for pages/posts/media and running import/skip/copy counters.
+- Streaming import payload now includes phase-level events (start/completed per entity type) for clearer live status updates.
 
 ## Summary
 

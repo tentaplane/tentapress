@@ -731,23 +731,57 @@ final readonly class Importer
             // Pages
             $pagesPath = $baseDir . DIRECTORY_SEPARATOR . 'pages.json';
             if (is_file($pagesPath)) {
+                $this->emitProgress($progress, [
+                    'kind' => 'phase',
+                    'entity' => 'page',
+                    'status' => 'started',
+                ]);
                 $pagesPayload = $this->readJsonFile($pagesPath);
                 [$createdPages, , $pageMappings] = $this->importPages($pagesPayload, $pagesMode, $actorUserId, $progress);
+                $this->emitProgress($progress, [
+                    'kind' => 'phase',
+                    'entity' => 'page',
+                    'status' => 'completed',
+                    'created' => $createdPages,
+                ]);
             }
 
             if ($includePosts) {
                 $postsPath = $baseDir . DIRECTORY_SEPARATOR . 'posts.json';
                 if (is_file($postsPath)) {
+                    $this->emitProgress($progress, [
+                        'kind' => 'phase',
+                        'entity' => 'post',
+                        'status' => 'started',
+                    ]);
                     $postsPayload = $this->readJsonFile($postsPath);
                     [$createdPosts, , $postMappings] = $this->importPosts($postsPayload, $actorUserId, $progress);
+                    $this->emitProgress($progress, [
+                        'kind' => 'phase',
+                        'entity' => 'post',
+                        'status' => 'completed',
+                        'created' => $createdPosts,
+                    ]);
                 }
             }
 
             if ($includeMedia) {
                 $mediaPath = $baseDir . DIRECTORY_SEPARATOR . 'media.json';
                 if (is_file($mediaPath)) {
+                    $this->emitProgress($progress, [
+                        'kind' => 'phase',
+                        'entity' => 'media',
+                        'status' => 'started',
+                    ]);
                     $mediaPayload = $this->readJsonFile($mediaPath);
                     [$createdMedia, , $downloadedMedia] = $this->importMedia($mediaPayload, $actorUserId, $progress);
+                    $this->emitProgress($progress, [
+                        'kind' => 'phase',
+                        'entity' => 'media',
+                        'status' => 'completed',
+                        'created' => $createdMedia,
+                        'copied' => $downloadedMedia,
+                    ]);
                 }
             }
 
@@ -859,6 +893,7 @@ final readonly class Importer
             if ($slug === '') {
                 $skipped++;
                 $this->emitProgress($progress, [
+                    'kind' => 'entity',
                     'entity' => 'page',
                     'status' => 'skipped',
                     'title' => $title,
@@ -910,6 +945,7 @@ final readonly class Importer
 
             $created++;
             $this->emitProgress($progress, [
+                'kind' => 'entity',
                 'entity' => 'page',
                 'status' => 'imported',
                 'title' => $title,
@@ -987,6 +1023,7 @@ final readonly class Importer
             if ($slug === '') {
                 $skipped++;
                 $this->emitProgress($progress, [
+                    'kind' => 'entity',
                     'entity' => 'post',
                     'status' => 'skipped',
                     'title' => $title,
@@ -1054,6 +1091,7 @@ final readonly class Importer
 
             $created++;
             $this->emitProgress($progress, [
+                'kind' => 'entity',
                 'entity' => 'post',
                 'status' => 'imported',
                 'title' => $title,
@@ -1122,6 +1160,7 @@ final readonly class Importer
             if ($path === '') {
                 $skipped++;
                 $this->emitProgress($progress, [
+                    'kind' => 'entity',
                     'entity' => 'media',
                     'status' => 'skipped',
                     'title' => '',
@@ -1137,6 +1176,7 @@ final readonly class Importer
             if (DB::table('tp_media')->where('path', $path)->exists()) {
                 $skipped++;
                 $this->emitProgress($progress, [
+                    'kind' => 'entity',
                     'entity' => 'media',
                     'status' => 'skipped',
                     'title' => (string) ($item['title'] ?? ''),
@@ -1183,6 +1223,7 @@ final readonly class Importer
 
             $created++;
             $this->emitProgress($progress, [
+                'kind' => 'entity',
                 'entity' => 'media',
                 'status' => 'imported',
                 'title' => (string) ($item['title'] ?? ''),

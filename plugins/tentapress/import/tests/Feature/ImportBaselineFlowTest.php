@@ -231,6 +231,7 @@ it('streams import progress updates for a super admin', function (): void {
 
     $response->assertOk();
     expect($response->headers->get('Content-Type'))->toContain('text/event-stream');
+    expect($response->streamedContent())->toContain('"kind":"phase"');
     expect($response->streamedContent())->toContain('"event":"progress"');
     expect($response->streamedContent())->toContain('"event":"done"');
 });

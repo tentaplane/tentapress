@@ -452,6 +452,21 @@
                             }
 
                             if (payload.event === 'progress') {
+                                if (payload.kind === 'phase') {
+                                    const phaseEntity = payload.entity || 'step';
+                                    if (payload.status === 'started') {
+                                        statusNode.textContent = `Starting ${phaseEntity} import...`;
+                                        appendLine(`Starting ${phaseEntity} import`);
+                                    } else if (payload.status === 'completed') {
+                                        const created = Number(payload.created || 0);
+                                        const copied = Number(payload.copied || 0);
+                                        const copiedText = phaseEntity === 'media' ? `, copied ${copied} files` : '';
+                                        statusNode.textContent = `${phaseEntity} import completed`;
+                                        appendLine(`Completed ${phaseEntity} import (${created} created${copiedText})`, 'success');
+                                    }
+                                    continue;
+                                }
+
                                 const entity = payload.entity || 'item';
                                 const status = payload.status || 'processed';
                                 const index = payload.index || 0;
