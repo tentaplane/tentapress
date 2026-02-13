@@ -213,7 +213,8 @@ it('allows a super admin to analyze a wordpress wxr bundle', function (): void {
             && ($summary['media'] ?? null) === 1
             && ($summary['categories'] ?? null) === 1
             && ($summary['tags'] ?? null) === 1
-            && ($summary['unsupported_items'] ?? null) === 1)
+            && ($summary['unsupported_items'] ?? null) === 1
+            && ($summary['unsupported_types']['product'] ?? null) === 1)
         ->assertViewHas('meta', fn (array $meta): bool => ($meta['source_format'] ?? null) === 'wxr');
 });
 

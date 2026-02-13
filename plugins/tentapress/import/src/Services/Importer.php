@@ -167,7 +167,9 @@ final readonly class Importer
 
         libxml_use_internal_errors(true);
         $xml = simplexml_load_string((string) $xmlRaw, SimpleXMLElement::class, LIBXML_NOCDATA);
-        throw_if($xml === false, \RuntimeException::class, 'Invalid WXR XML.');
+        if ($xml === false) {
+            throw new \RuntimeException($this->wxrXmlErrorMessage());
+        }
 
         $namespaces = $xml->getDocNamespaces(true);
         foreach ($namespaces as $prefix => $namespaceUri) {
@@ -184,6 +186,9 @@ final readonly class Importer
         $postsItems = [];
         $mediaItems = [];
         $unsupportedByType = [];
+        $unsupportedSamples = [];
+        $categories = [];
+        $tags = [];
 
         $items = $xml->xpath('/rss/channel/item');
         if (is_array($items)) {
@@ -207,12 +212,39 @@ final readonly class Importer
                 $plainContent = $this->plainContentFromHtml($contentEncoded);
                 $slugRaw = trim((string) ($item->xpath('wp:post_name')[0] ?? ''));
                 $slug = $slugRaw !== '' ? Str::slug($slugRaw) : Str::slug($title);
+                $sourcePostId = trim((string) ($item->xpath('wp:post_id')[0] ?? ''));
+                $sourceLink = trim((string) ($item->link ?? ''));
                 if ($slug === '') {
                     $slug = 'imported-' . substr($this->token(), 0, 8);
                 }
 
+                $itemCategories = $item->xpath('category');
+                if (is_array($itemCategories)) {
+                    foreach ($itemCategories as $itemCategory) {
+                        if (!$itemCategory instanceof SimpleXMLElement) {
+                            continue;
+                        }
+
+                        $domain = trim((string) ($itemCategory->attributes()->domain ?? ''));
+                        $label = trim((string) $itemCategory);
+                        if ($label === '') {
+                            continue;
+                        }
+
+                        if ($domain === 'category') {
+                            $categories[$label] = true;
+                        }
+
+                        if ($domain === 'post_tag') {
+                            $tags[$label] = true;
+                        }
+                    }
+                }
+
                 if ($postType === 'page') {
                     $pagesItems[] = [
+                        'source_post_id' => $sourcePostId !== '' ? $sourcePostId : null,
+                        'source_link' => $sourceLink !== '' ? $sourceLink : null,
                         'title' => $title,
                         'slug' => $slug,
                         'status' => $this->normalizeWxrStatus((string) ($item->xpath('wp:status')[0] ?? '')),
@@ -225,6 +257,8 @@ final readonly class Importer
 
                 if ($postType === 'post') {
                     $postsItems[] = [
+                        'source_post_id' => $sourcePostId !== '' ? $sourcePostId : null,
+                        'source_link' => $sourceLink !== '' ? $sourceLink : null,
                         'title' => $title,
                         'slug' => $slug,
                         'status' => $this->normalizeWxrStatus((string) ($item->xpath('wp:status')[0] ?? '')),
@@ -249,6 +283,8 @@ final readonly class Importer
                     }
 
                     $mediaItems[] = [
+                        'source_post_id' => $sourcePostId !== '' ? $sourcePostId : null,
+                        'source_link' => $sourceLink !== '' ? $sourceLink : null,
                         'path' => $path,
                         'disk' => 'public',
                         'title' => $title !== '' ? $title : null,
@@ -260,12 +296,46 @@ final readonly class Importer
 
                 if ($postType !== '') {
                     $unsupportedByType[$postType] = (int) ($unsupportedByType[$postType] ?? 0) + 1;
+
+                    if (count($unsupportedSamples) < 10) {
+                        $unsupportedSamples[] = [
+                            'type' => $postType,
+                            'title' => $title,
+                            'post_id' => $sourcePostId,
+                            'link' => $sourceLink,
+                        ];
+                    }
                 }
             }
         }
 
-        $categories = $xml->xpath('/rss/channel/wp:category');
-        $tags = $xml->xpath('/rss/channel/wp:tag');
+        $channelCategories = $xml->xpath('/rss/channel/wp:category');
+        if (is_array($channelCategories)) {
+            foreach ($channelCategories as $categoryNode) {
+                if (!$categoryNode instanceof SimpleXMLElement) {
+                    continue;
+                }
+
+                $label = trim((string) ($categoryNode->xpath('wp:cat_name')[0] ?? ''));
+                if ($label !== '') {
+                    $categories[$label] = true;
+                }
+            }
+        }
+
+        $channelTags = $xml->xpath('/rss/channel/wp:tag');
+        if (is_array($channelTags)) {
+            foreach ($channelTags as $tagNode) {
+                if (!$tagNode instanceof SimpleXMLElement) {
+                    continue;
+                }
+
+                $label = trim((string) ($tagNode->xpath('wp:tag_name')[0] ?? ''));
+                if ($label !== '') {
+                    $tags[$label] = true;
+                }
+            }
+        }
 
         $generatedAtUtc = now()->toIso8601String();
         $plan = [
@@ -307,10 +377,11 @@ final readonly class Importer
                 'media' => count($mediaItems),
                 'settings' => 0,
                 'seo' => 0,
-                'categories' => is_array($categories) ? count($categories) : 0,
-                'tags' => is_array($tags) ? count($tags) : 0,
+                'categories' => count($categories),
+                'tags' => count($tags),
                 'unsupported_items' => array_sum($unsupportedByType),
                 'unsupported_types' => $unsupportedByType,
+                'unsupported_samples' => $unsupportedSamples,
                 'theme_active_id' => '',
                 'enabled_plugins' => 0,
             ],
@@ -402,6 +473,26 @@ final readonly class Importer
             'avif' => 'image/avif',
             default => null,
         };
+    }
+
+    private function wxrXmlErrorMessage(): string
+    {
+        $errors = libxml_get_errors();
+        libxml_clear_errors();
+
+        if ($errors === []) {
+            return 'Invalid WXR XML.';
+        }
+
+        $first = $errors[0];
+        $line = (int) ($first->line ?? 0);
+        $message = trim((string) ($first->message ?? 'Invalid XML format.'));
+
+        if ($line > 0) {
+            return "Invalid WXR XML at line {$line}: {$message}";
+        }
+
+        return "Invalid WXR XML: {$message}";
     }
 
     /**

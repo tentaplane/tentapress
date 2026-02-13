@@ -103,6 +103,29 @@
                 </div>
             @endif
 
+            @php
+                $unsupportedSamples = $summary['unsupported_samples'] ?? [];
+            @endphp
+
+            @if (is_array($unsupportedSamples) && count($unsupportedSamples) > 0)
+                <div class="tp-panel">
+                    <div class="tp-label mb-2">Unsupported sample items</div>
+                    <ul class="space-y-1 text-sm">
+                        @foreach ($unsupportedSamples as $sample)
+                            <li>
+                                <code class="tp-code">{{ (string) ($sample['type'] ?? 'unknown') }}</code>
+                                <span class="tp-muted">
+                                    {{ (string) ($sample['title'] ?? 'Untitled') }}
+                                    @if (!empty($sample['post_id']))
+                                        · ID {{ (string) $sample['post_id'] }}
+                                    @endif
+                                </span>
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
             <form
                 method="POST"
                 action="{{ route('tp.import.run') }}"

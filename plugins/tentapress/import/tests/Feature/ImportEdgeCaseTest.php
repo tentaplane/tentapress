@@ -101,6 +101,34 @@ it('validates that analyze requires a zip or xml bundle', function (): void {
         ->assertSessionHasErrors(['bundle']);
 });
 
+it('shows actionable error when wxr xml is malformed', function (): void {
+    registerImportProviderForEdgeCases();
+
+    $admin = TpUser::query()->create([
+        'name' => 'Import Admin',
+        'email' => 'import-bad-xml@example.test',
+        'password' => 'secret',
+        'is_super_admin' => true,
+    ]);
+
+    $path = storage_path('framework/testing/tp-import-invalid.xml');
+    File::ensureDirectoryExists(dirname($path));
+    File::put(
+        $path,
+        '<?xml version="1.0" encoding="UTF-8" ?><rss><channel><item><title>Bad</title><wp:post_type>post</wp:post_type></item>'
+    );
+
+    $bundle = new UploadedFile($path, 'invalid.xml', 'text/xml', null, true);
+
+    $this->withoutExceptionHandling();
+
+    expect(fn (): \Illuminate\Testing\TestResponse => $this->actingAs($admin)
+        ->post('/admin/import/analyze', [
+            'bundle' => $bundle,
+        ]))
+        ->toThrow(RuntimeException::class, 'Invalid WXR XML');
+});
+
 it('validates required run payload fields and boolean include flags', function (): void {
     registerImportProviderForEdgeCases();
 
