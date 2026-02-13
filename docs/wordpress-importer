@@ -243,3 +243,55 @@ Exit criteria:
 - Existing TentaPress Analyze/Run import architecture is reused.
 - Media binaries are optional for v1 success; references and metadata are acceptable.
 - No new external dependencies are required at spec stage.
+
+## Staging Runbook (v1)
+
+1. Prepare source export in WordPress:
+   - In WordPress Admin: `Tools -> Export`.
+   - Choose `All content` and download the WXR `.xml`.
+   - Keep the exported file unchanged (no manual edits).
+2. Verify destination environment:
+   - Confirm the import plugin is enabled.
+   - Confirm admin user has `import_site` capability.
+   - Confirm writable storage for:
+     - `storage/app/tp-imports`
+     - `storage/app/tp-import-reports`
+     - `storage/app/public/media/imports/wordpress`
+3. Execute analyze + review:
+   - Upload WXR in `/admin/import`.
+   - Review entity counts, unsupported entity list, and URL mapping preview.
+   - Validate warnings before running import.
+4. Execute import run:
+   - Keep `Pages` in `create_only`.
+   - Enable `Import posts` and `Import media details` as needed.
+   - Start import and monitor live stream feedback:
+     - Per-item lines for pages/posts/media.
+     - Running imported/skipped/failed counters.
+     - Phase completion lines for pages/posts/media.
+5. Validate completion artifacts:
+   - Confirm completion notice includes created/skipped/failed metrics.
+   - Confirm URL mapping report exists at:
+     - `storage/app/tp-import-reports/<token>.json`
+   - Spot-check copied media files under:
+     - `storage/app/public/media/imports/wordpress/YYYY/MM`
+
+## Warning Interpretation
+
+- `Unsupported entity types`: these rows are intentionally skipped; expected for custom post types/comments.
+- `featured_image_refs > featured_image_resolved`: source references attachments not present in WXR payload.
+- `Media files copied: 0` with media rows present: source URLs were unreachable or non-http(s); metadata still imported.
+- Non-zero `failed` counts: row-level failures occurred and require remediation before rerun.
+
+## Release Checklist (v1)
+
+1. Import plugin docs updated and versioned.
+2. WXR analyze/run acceptance tests passing from root:
+   - `composer test:filter -- "Import(BaselineFlowTest|EdgeCaseTest)"`
+3. PHP formatting clean:
+   - `./vendor/bin/pint --dirty`
+4. URL mapping report generation verified in staging run.
+5. One repeat `create_only` rerun verified as non-destructive.
+6. Operator handoff includes:
+   - Scope/non-goals
+   - Warning interpretation
+   - Artifact locations and rollback expectations

@@ -7,7 +7,7 @@ Content import functionality for TentaPress.
 | Field    | Value                                     |
 |----------|-------------------------------------------|
 | ID       | `tentapress/import`                       |
-| Version  | 0.18.0                                    |
+| Version  | 0.18.1                                    |
 | Provider | `TentaPress\Import\ImportServiceProvider` |
 
 ## Features
@@ -31,6 +31,11 @@ Content import functionality for TentaPress.
 - Verify persisted URL mapping report artifacts through feature tests
 - Report created/skipped/failed counts per entity in completion summaries and streamed phase updates
 - Handles pages, posts, media references, settings
+
+## Operations
+
+- Staging/operator runbook and release checklist:
+  - `/docs/wordpress-importer`
 
 ## Dependencies
 
