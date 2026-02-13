@@ -17,6 +17,7 @@
 - Featured-image references are counted in analysis, including how many resolve to imported attachments.
 - Run completion notices now include WXR source context plus unsupported/mapping summary counters.
 - WXR import run now applies actor fallback for post author and creator/updater columns where available.
+- WXR run writes a persistent URL mapping report to `storage/app/tp-import-reports/<token>.json`.
 
 ## Summary
 

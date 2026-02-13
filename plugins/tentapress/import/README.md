@@ -7,7 +7,7 @@ Content import functionality for TentaPress.
 | Field    | Value                                     |
 |----------|-------------------------------------------|
 | ID       | `tentapress/import`                       |
-| Version  | 0.10.0                                    |
+| Version  | 0.11.0                                    |
 | Provider | `TentaPress\Import\ImportServiceProvider` |
 
 ## Features
@@ -22,6 +22,7 @@ Content import functionality for TentaPress.
 - Report featured image reference counts and attachment-resolution coverage
 - Include WXR context and migration summary lines in completion notices
 - Apply actor-based author/creator fallback for imported records where supported
+- Write a persistent URL mapping report file for WXR runs
 - Handles pages, posts, media references, settings
 
 ## Dependencies

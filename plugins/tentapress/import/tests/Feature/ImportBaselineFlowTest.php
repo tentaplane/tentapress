@@ -262,7 +262,8 @@ it('allows a super admin to analyze and run a wordpress wxr bundle', function ()
             'include_seo' => '0',
         ])
         ->assertRedirect('/admin/import')
-        ->assertSessionHas('tp_notice_success', fn (string $message): bool => str_contains($message, 'Source: WordPress WXR'));
+        ->assertSessionHas('tp_notice_success', fn (string $message): bool => str_contains($message, 'Source: WordPress WXR')
+            && str_contains($message, 'URL mapping report: storage/app/tp-import-reports/'));
 
     expect(TpPage::query()->where('slug', 'wxr-page-title')->exists())->toBeTrue();
     expect(TpPost::query()->where('slug', 'wxr-post-title')->exists())->toBeTrue();

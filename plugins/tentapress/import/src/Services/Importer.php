@@ -566,6 +566,33 @@ final readonly class Importer
         return preg_match('/^[a-z0-9]+(?:-[a-z0-9]+)*$/', $rawBase) === 1 ? $rawBase : $defaultBase;
     }
 
+    /**
+     * @param  array<int,array<string,string|null>>  $pageMappings
+     * @param  array<int,array<string,string|null>>  $postMappings
+     */
+    private function writeUrlMappingReport(string $token, array $pageMappings, array $postMappings): ?string
+    {
+        $mappings = array_values(array_filter(array_merge($pageMappings, $postMappings), function (array $row): bool {
+            return trim((string) ($row['destination_url'] ?? '')) !== '';
+        }));
+
+        if ($mappings === []) {
+            return null;
+        }
+
+        $dir = storage_path('app/tp-import-reports');
+        File::ensureDirectoryExists($dir);
+
+        $path = $dir . DIRECTORY_SEPARATOR . $token . '.json';
+        File::put($path, $this->jsonPayload->encode([
+            'generated_at_utc' => now()->toIso8601String(),
+            'source_format' => 'wxr',
+            'mappings' => $mappings,
+        ]));
+
+        return 'storage/app/tp-import-reports/' . $token . '.json';
+    }
+
     private function featuredImageSourceId(SimpleXMLElement $item): ?string
     {
         $postMeta = $item->xpath('wp:postmeta');
@@ -630,6 +657,8 @@ final readonly class Importer
         $createdSettings = 0;
         $updatedSettings = 0;
         $importedSeo = 0;
+        $pageMappings = [];
+        $postMappings = [];
 
         DB::beginTransaction();
 
@@ -638,14 +667,14 @@ final readonly class Importer
             $pagesPath = $baseDir . DIRECTORY_SEPARATOR . 'pages.json';
             if (is_file($pagesPath)) {
                 $pagesPayload = $this->readJsonFile($pagesPath);
-                [$createdPages] = $this->importPages($pagesPayload, $pagesMode, $actorUserId);
+                [$createdPages, , $pageMappings] = $this->importPages($pagesPayload, $pagesMode, $actorUserId);
             }
 
             if ($includePosts) {
                 $postsPath = $baseDir . DIRECTORY_SEPARATOR . 'posts.json';
                 if (is_file($postsPath)) {
                     $postsPayload = $this->readJsonFile($postsPath);
-                    [$createdPosts] = $this->importPosts($postsPayload, $actorUserId);
+                    [$createdPosts, , $postMappings] = $this->importPosts($postsPayload, $actorUserId);
                 }
             }
 
@@ -708,6 +737,11 @@ final readonly class Importer
             $parts[] = 'Source: WordPress WXR';
             $parts[] = 'Unsupported items skipped: '.(int) ($plan['unsupported_items'] ?? 0);
             $parts[] = 'URL mappings previewed: '.(int) ($plan['url_mappings_preview_count'] ?? 0);
+
+            $mappingReportPath = $this->writeUrlMappingReport($token, $pageMappings, $postMappings);
+            if ($mappingReportPath !== null) {
+                $parts[] = "URL mapping report: {$mappingReportPath}";
+            }
         }
 
         return [
@@ -716,7 +750,7 @@ final readonly class Importer
     }
 
     /**
-     * @return array{0:int,1:int} createdPages, skippedPages
+     * @return array{0:int,1:int,2:array<int,array<string,string|null>>} createdPages, skippedPages, mappings
      */
     private function importPages(array $payload, string $mode, int $actorUserId = 0): array
     {
@@ -745,6 +779,7 @@ final readonly class Importer
 
         $created = 0;
         $skipped = 0;
+        $mappings = [];
 
         foreach ($items as $item) {
             if (!is_array($item)) {
@@ -790,12 +825,18 @@ final readonly class Importer
             }
 
             $model = TpPage::query()->create($data);
+            $mappings[] = [
+                'type' => 'page',
+                'source_url' => (string) ($item['source_link'] ?? ''),
+                'source_post_id' => (string) ($item['source_post_id'] ?? ''),
+                'destination_url' => '/'.$slug,
+            ];
             unset($model);
 
             $created++;
         }
 
-        return [$created, $skipped];
+        return [$created, $skipped, $mappings];
     }
 
     private function uniqueSlug(string $slug): string
@@ -821,7 +862,7 @@ final readonly class Importer
     }
 
     /**
-     * @return array{0:int,1:int} createdPosts, skippedPosts
+     * @return array{0:int,1:int,2:array<int,array<string,string|null>>} createdPosts, skippedPosts, mappings
      */
     private function importPosts(array $payload, int $actorUserId = 0): array
     {
@@ -849,6 +890,7 @@ final readonly class Importer
 
         $created = 0;
         $skipped = 0;
+        $mappings = [];
 
         foreach ($items as $item) {
             if (!is_array($item)) {
@@ -910,12 +952,18 @@ final readonly class Importer
             }
 
             $model = TpPost::query()->create($data);
+            $mappings[] = [
+                'type' => 'post',
+                'source_url' => (string) ($item['source_link'] ?? ''),
+                'source_post_id' => (string) ($item['source_post_id'] ?? ''),
+                'destination_url' => '/'.$this->blogBase().'/'.$slug,
+            ];
             unset($model);
 
             $created++;
         }
 
-        return [$created, $skipped];
+        return [$created, $skipped, $mappings];
     }
 
     private function uniquePostSlug(string $slug): string
