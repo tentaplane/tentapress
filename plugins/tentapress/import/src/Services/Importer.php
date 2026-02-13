@@ -600,7 +600,8 @@ final readonly class Importer
      *   settings_mode:string,
      *   include_posts?:bool,
      *   include_media?:bool,
-     *   include_seo?:bool
+     *   include_seo?:bool,
+     *   actor_user_id?:int
      * } $options
      *
      * @return array{message:string}
@@ -621,6 +622,7 @@ final readonly class Importer
         $includePosts = (bool) ($options['include_posts'] ?? true);
         $includeMedia = (bool) ($options['include_media'] ?? true);
         $includeSeo = (bool) ($options['include_seo'] ?? false);
+        $actorUserId = (int) ($options['actor_user_id'] ?? 0);
 
         $createdPages = 0;
         $createdPosts = 0;
@@ -636,14 +638,14 @@ final readonly class Importer
             $pagesPath = $baseDir . DIRECTORY_SEPARATOR . 'pages.json';
             if (is_file($pagesPath)) {
                 $pagesPayload = $this->readJsonFile($pagesPath);
-                [$createdPages] = $this->importPages($pagesPayload, $pagesMode);
+                [$createdPages] = $this->importPages($pagesPayload, $pagesMode, $actorUserId);
             }
 
             if ($includePosts) {
                 $postsPath = $baseDir . DIRECTORY_SEPARATOR . 'posts.json';
                 if (is_file($postsPath)) {
                     $postsPayload = $this->readJsonFile($postsPath);
-                    [$createdPosts] = $this->importPosts($postsPayload);
+                    [$createdPosts] = $this->importPosts($postsPayload, $actorUserId);
                 }
             }
 
@@ -651,7 +653,7 @@ final readonly class Importer
                 $mediaPath = $baseDir . DIRECTORY_SEPARATOR . 'media.json';
                 if (is_file($mediaPath)) {
                     $mediaPayload = $this->readJsonFile($mediaPath);
-                    [$createdMedia] = $this->importMedia($mediaPayload);
+                    [$createdMedia] = $this->importMedia($mediaPayload, $actorUserId);
                 }
             }
 
@@ -716,7 +718,7 @@ final readonly class Importer
     /**
      * @return array{0:int,1:int} createdPages, skippedPages
      */
-    private function importPages(array $payload, string $mode): array
+    private function importPages(array $payload, string $mode, int $actorUserId = 0): array
     {
         if ($mode !== 'create_only') {
             $mode = 'create_only';
@@ -738,6 +740,8 @@ final readonly class Importer
         $hasStatus = Schema::hasColumn('tp_pages', 'status');
         $hasLayout = Schema::hasColumn('tp_pages', 'layout');
         $hasBlocks = Schema::hasColumn('tp_pages', 'blocks');
+        $hasCreatedBy = Schema::hasColumn('tp_pages', 'created_by');
+        $hasUpdatedBy = Schema::hasColumn('tp_pages', 'updated_by');
 
         $created = 0;
         $skipped = 0;
@@ -777,6 +781,14 @@ final readonly class Importer
                 $data['blocks'] = is_array($blocks) ? $blocks : [];
             }
 
+            if ($actorUserId > 0 && $hasCreatedBy) {
+                $data['created_by'] = $actorUserId;
+            }
+
+            if ($actorUserId > 0 && $hasUpdatedBy) {
+                $data['updated_by'] = $actorUserId;
+            }
+
             $model = TpPage::query()->create($data);
             unset($model);
 
@@ -811,7 +823,7 @@ final readonly class Importer
     /**
      * @return array{0:int,1:int} createdPosts, skippedPosts
      */
-    private function importPosts(array $payload): array
+    private function importPosts(array $payload, int $actorUserId = 0): array
     {
         if (!class_exists(TpPost::class)) {
             return [0, 0];
@@ -832,6 +844,8 @@ final readonly class Importer
         $hasPublishedAt = Schema::hasColumn('tp_posts', 'published_at');
         $hasAuthor = Schema::hasColumn('tp_posts', 'author_id');
         $hasUsers = Schema::hasTable('tp_users');
+        $hasCreatedBy = Schema::hasColumn('tp_posts', 'created_by');
+        $hasUpdatedBy = Schema::hasColumn('tp_posts', 'updated_by');
 
         $created = 0;
         $skipped = 0;
@@ -880,9 +894,19 @@ final readonly class Importer
                 $authorId = (int) ($item['author_id'] ?? 0);
                 if ($authorId > 0 && $hasUsers && DB::table('tp_users')->where('id', $authorId)->exists()) {
                     $data['author_id'] = $authorId;
+                } elseif ($actorUserId > 0 && $hasUsers && DB::table('tp_users')->where('id', $actorUserId)->exists()) {
+                    $data['author_id'] = $actorUserId;
                 } else {
                     $data['author_id'] = null;
                 }
+            }
+
+            if ($actorUserId > 0 && $hasCreatedBy) {
+                $data['created_by'] = $actorUserId;
+            }
+
+            if ($actorUserId > 0 && $hasUpdatedBy) {
+                $data['updated_by'] = $actorUserId;
             }
 
             $model = TpPost::query()->create($data);
@@ -918,7 +942,7 @@ final readonly class Importer
     /**
      * @return array{0:int,1:int} createdMedia, skippedMedia
      */
-    private function importMedia(array $payload): array
+    private function importMedia(array $payload, int $actorUserId = 0): array
     {
         if (!class_exists(TpMedia::class)) {
             return [0, 0];
@@ -932,6 +956,9 @@ final readonly class Importer
         if ($items === []) {
             return [0, 0];
         }
+
+        $hasCreatedBy = Schema::hasColumn('tp_media', 'created_by');
+        $hasUpdatedBy = Schema::hasColumn('tp_media', 'updated_by');
 
         $created = 0;
         $skipped = 0;
@@ -966,6 +993,14 @@ final readonly class Importer
                 'width' => array_key_exists('width', $item) ? ($item['width'] === null ? null : (int) $item['width']) : null,
                 'height' => array_key_exists('height', $item) ? ($item['height'] === null ? null : (int) $item['height']) : null,
             ];
+
+            if ($actorUserId > 0 && $hasCreatedBy) {
+                $data['created_by'] = $actorUserId;
+            }
+
+            if ($actorUserId > 0 && $hasUpdatedBy) {
+                $data['updated_by'] = $actorUserId;
+            }
 
             $model = TpMedia::query()->create($data);
             unset($model);

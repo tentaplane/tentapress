@@ -267,4 +267,5 @@ it('allows a super admin to analyze and run a wordpress wxr bundle', function ()
     expect(TpPage::query()->where('slug', 'wxr-page-title')->exists())->toBeTrue();
     expect(TpPost::query()->where('slug', 'wxr-post-title')->exists())->toBeTrue();
     expect(TpMedia::query()->where('path', 'wp-content/uploads/2025/10/image.jpg')->exists())->toBeTrue();
+    expect((int) (TpPost::query()->where('slug', 'wxr-post-title')->value('author_id') ?? 0))->toBe((int) $admin->id);
 });

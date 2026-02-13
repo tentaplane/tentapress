@@ -26,6 +26,7 @@ final class RunController
             'include_posts' => (bool) ($data['include_posts'] ?? false),
             'include_media' => (bool) ($data['include_media'] ?? false),
             'include_seo' => (bool) ($data['include_seo'] ?? false),
+            'actor_user_id' => (int) ($request->user()?->id ?? 0),
         ]);
 
         return to_route('tp.import.index')
