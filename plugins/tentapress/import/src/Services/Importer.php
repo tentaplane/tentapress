@@ -572,9 +572,7 @@ final readonly class Importer
      */
     private function writeUrlMappingReport(string $token, array $pageMappings, array $postMappings): ?string
     {
-        $mappings = array_values(array_filter(array_merge($pageMappings, $postMappings), function (array $row): bool {
-            return trim((string) ($row['destination_url'] ?? '')) !== '';
-        }));
+        $mappings = array_values(array_filter(array_merge($pageMappings, $postMappings), fn (array $row): bool => trim((string) ($row['destination_url'] ?? '')) !== ''));
 
         if ($mappings === []) {
             return null;
