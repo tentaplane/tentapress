@@ -207,3 +207,26 @@ it('creates a unique page slug when imported page slug already exists', function
     expect(TpPage::query()->where('slug', 'imported-home')->exists())->toBeTrue();
     expect(TpPage::query()->where('slug', 'imported-home-2')->exists())->toBeTrue();
 });
+
+it('shows a user-facing error when run token is missing', function (): void {
+    registerImportProviderForEdgeCases();
+
+    $admin = TpUser::query()->create([
+        'name' => 'Import Admin',
+        'email' => 'import-missing-token@example.test',
+        'password' => 'secret',
+        'is_super_admin' => true,
+    ]);
+
+    $this->actingAs($admin)
+        ->post('/admin/import/run', [
+            'token' => 'missing-token',
+            'pages_mode' => 'create_only',
+            'settings_mode' => 'merge',
+            'include_posts' => '1',
+            'include_media' => '1',
+            'include_seo' => '0',
+        ])
+        ->assertRedirect('/admin/import')
+        ->assertSessionHas('tp_notice_error', 'Import token not found. Please run analysis again.');
+});

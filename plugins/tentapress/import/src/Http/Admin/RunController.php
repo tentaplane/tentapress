@@ -20,16 +20,22 @@ final class RunController
             'include_seo' => ['nullable', 'boolean'],
         ]);
 
-        $result = $importer->runImport($data['token'], [
-            'pages_mode' => (string) $data['pages_mode'],
-            'settings_mode' => (string) $data['settings_mode'],
-            'include_posts' => (bool) ($data['include_posts'] ?? false),
-            'include_media' => (bool) ($data['include_media'] ?? false),
-            'include_seo' => (bool) ($data['include_seo'] ?? false),
-            'actor_user_id' => (int) ($request->user()?->id ?? 0),
-        ]);
+        try {
+            $result = $importer->runImport($data['token'], [
+                'pages_mode' => (string) $data['pages_mode'],
+                'settings_mode' => (string) $data['settings_mode'],
+                'include_posts' => (bool) ($data['include_posts'] ?? false),
+                'include_media' => (bool) ($data['include_media'] ?? false),
+                'include_seo' => (bool) ($data['include_seo'] ?? false),
+                'actor_user_id' => (int) ($request->user()?->id ?? 0),
+            ]);
 
-        return to_route('tp.import.index')
-            ->with('tp_notice_success', $result['message']);
+            return to_route('tp.import.index')
+                ->with('tp_notice_success', $result['message']);
+        } catch (\Throwable $e) {
+            return to_route('tp.import.index')
+                ->with('tp_notice_error', $e->getMessage());
+        }
+
     }
 }

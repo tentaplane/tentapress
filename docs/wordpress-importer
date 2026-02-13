@@ -27,6 +27,7 @@
 - Completion summaries and stream phase payloads now include created/skipped/failed metrics by entity for clearer operator diagnostics.
 - Import analysis tokens are now reusable for reruns/retries so immediate follow-up runs do not fail with token-expired errors.
 - Imported media now triggers local variant refresh processing, and run summaries include refreshed variant totals.
+- Non-stream run failures (for example missing tokens) now return user-facing admin notices instead of uncaught runtime errors.
 
 ## Summary
 
