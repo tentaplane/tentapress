@@ -369,6 +369,8 @@ final readonly class Importer
             'schema_version' => 1,
             'generated_at_utc' => $generatedAtUtc,
             'wxr_version' => $wxrVersion,
+            'unsupported_items' => array_sum($unsupportedByType),
+            'url_mappings_preview_count' => count($urlMappingsPreview),
             'files' => [
                 'pages' => $pagesItems !== [],
                 'posts' => $postsItems !== [],
@@ -612,6 +614,7 @@ final readonly class Importer
         $planPath = $baseDir . DIRECTORY_SEPARATOR . 'plan.json';
 
         throw_if(!is_dir($baseDir) || !is_file($planPath), \RuntimeException::class, 'Import token not found or expired.');
+        $plan = $this->readJsonFile($planPath);
 
         $pagesMode = (string) ($options['pages_mode'] ?? 'create_only');
         $settingsMode = (string) ($options['settings_mode'] ?? 'merge');
@@ -697,6 +700,12 @@ final readonly class Importer
 
         if ($includeSeo) {
             $parts[] = "SEO rows imported: {$importedSeo}";
+        }
+
+        if (($plan['source_format'] ?? null) === 'wxr') {
+            $parts[] = 'Source: WordPress WXR';
+            $parts[] = 'Unsupported items skipped: '.(int) ($plan['unsupported_items'] ?? 0);
+            $parts[] = 'URL mappings previewed: '.(int) ($plan['url_mappings_preview_count'] ?? 0);
         }
 
         return [

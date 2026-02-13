@@ -15,6 +15,7 @@
 - Upload validation accepts common XML/WXR MIME types to reduce false rejects.
 - WXR review flow now hides settings import controls and uses safe defaults automatically.
 - Featured-image references are counted in analysis, including how many resolve to imported attachments.
+- Run completion notices now include WXR source context plus unsupported/mapping summary counters.
 
 ## Summary
 
