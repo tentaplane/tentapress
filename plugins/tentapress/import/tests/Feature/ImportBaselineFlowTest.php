@@ -3,7 +3,10 @@
 declare(strict_types=1);
 
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 use TentaPress\Media\Models\TpMedia;
 use TentaPress\Posts\Models\TpPost;
 use TentaPress\Import\ImportServiceProvider;
@@ -240,6 +243,11 @@ it('allows a super admin to analyze and run a wordpress wxr bundle', function ()
     ]);
 
     $bundle = makeWxrBundleWithPagePostAndAttachment();
+    Http::fake([
+        'https://example.com/*' => Http::response('fake-image-content', 200, [
+            'Content-Type' => 'image/jpeg',
+        ]),
+    ]);
 
     $analyzeResponse = $this->actingAs($admin)
         ->post('/admin/import/analyze', [
@@ -263,10 +271,14 @@ it('allows a super admin to analyze and run a wordpress wxr bundle', function ()
         ])
         ->assertRedirect('/admin/import')
         ->assertSessionHas('tp_notice_success', fn (string $message): bool => str_contains($message, 'Source: WordPress WXR')
+            && str_contains($message, 'Media files copied: 1')
             && str_contains($message, 'URL mapping report: storage/app/tp-import-reports/'));
 
     expect(TpPage::query()->where('slug', 'wxr-page-title')->exists())->toBeTrue();
     expect(TpPost::query()->where('slug', 'wxr-post-title')->exists())->toBeTrue();
-    expect(TpMedia::query()->where('path', 'wp-content/uploads/2025/10/image.jpg')->exists())->toBeTrue();
+    $mediaPath = (string) (TpMedia::query()->latest('id')->value('path') ?? '');
+    expect(Str::startsWith($mediaPath, 'media/imports/wordpress/'))->toBeTrue();
+    expect(Str::endsWith($mediaPath, '/image-103.jpg'))->toBeTrue();
+    Storage::disk('public')->assertExists($mediaPath);
     expect((int) (TpPost::query()->where('slug', 'wxr-post-title')->value('author_id') ?? 0))->toBe((int) $admin->id);
 });

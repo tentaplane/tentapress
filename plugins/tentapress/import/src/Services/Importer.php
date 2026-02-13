@@ -7,13 +7,15 @@ namespace TentaPress\Import\Services;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use TentaPress\Settings\Services\SettingsStore;
 use SimpleXMLElement;
 use TentaPress\Media\Models\TpMedia;
 use TentaPress\Pages\Models\TpPage;
 use TentaPress\Posts\Models\TpPost;
+use TentaPress\Settings\Services\SettingsStore;
 use TentaPress\System\Support\JsonPayload;
 use ZipArchive;
 
@@ -298,7 +300,7 @@ final readonly class Importer
 
                 if ($postType === 'attachment') {
                     $attachmentUrl = trim((string) ($item->xpath('wp:attachment_url')[0] ?? ''));
-                    $path = ltrim((string) parse_url($attachmentUrl, PHP_URL_PATH), '/');
+                    $path = $this->mappedMediaPathFromAttachmentUrl($attachmentUrl, $sourcePostId);
 
                     if ($path === '') {
                         continue;
@@ -307,6 +309,7 @@ final readonly class Importer
                     $mediaItems[] = [
                         'source_post_id' => $sourcePostId !== '' ? $sourcePostId : null,
                         'source_link' => $sourceLink !== '' ? $sourceLink : null,
+                        'source_url' => $attachmentUrl !== '' ? $attachmentUrl : null,
                         'path' => $path,
                         'disk' => 'public',
                         'title' => $title !== '' ? $title : null,
@@ -513,6 +516,55 @@ final readonly class Importer
         };
     }
 
+    private function mappedMediaPathFromAttachmentUrl(string $attachmentUrl, string $sourcePostId): string
+    {
+        $parsedPath = (string) parse_url($attachmentUrl, PHP_URL_PATH);
+        $basename = trim((string) pathinfo($parsedPath, PATHINFO_FILENAME));
+        $extension = trim((string) pathinfo($parsedPath, PATHINFO_EXTENSION));
+
+        $safeBase = Str::slug($basename);
+        if ($safeBase === '') {
+            $safeBase = 'attachment';
+        }
+
+        $safeSourceId = trim(preg_replace('/[^a-zA-Z0-9_-]/', '', $sourcePostId) ?? '');
+        $suffix = $safeSourceId !== '' ? '-' . $safeSourceId : '';
+        $filename = $safeBase . $suffix . ($extension !== '' ? '.' . strtolower($extension) : '');
+
+        return 'media/imports/wordpress/' . now()->format('Y/m') . '/' . $filename;
+    }
+
+    private function copyRemoteMediaToDisk(string $sourceUrl, string $disk, string $path): bool
+    {
+        $scheme = strtolower((string) parse_url($sourceUrl, PHP_URL_SCHEME));
+        if ($scheme !== 'http' && $scheme !== 'https') {
+            return false;
+        }
+
+        try {
+            $storage = Storage::disk($disk);
+            if ($storage->exists($path)) {
+                return true;
+            }
+
+            $response = Http::timeout(20)->retry(2, 250)->get($sourceUrl);
+            if (!$response->successful()) {
+                return false;
+            }
+
+            $body = $response->body();
+            if ($body === '') {
+                return false;
+            }
+
+            $storage->put($path, $body);
+
+            return true;
+        } catch (\Throwable) {
+            return false;
+        }
+    }
+
     private function wxrXmlErrorMessage(): string
     {
         $errors = libxml_get_errors();
@@ -652,6 +704,7 @@ final readonly class Importer
         $createdPages = 0;
         $createdPosts = 0;
         $createdMedia = 0;
+        $downloadedMedia = 0;
         $createdSettings = 0;
         $updatedSettings = 0;
         $importedSeo = 0;
@@ -680,7 +733,7 @@ final readonly class Importer
                 $mediaPath = $baseDir . DIRECTORY_SEPARATOR . 'media.json';
                 if (is_file($mediaPath)) {
                     $mediaPayload = $this->readJsonFile($mediaPath);
-                    [$createdMedia] = $this->importMedia($mediaPayload, $actorUserId);
+                    [$createdMedia, , $downloadedMedia] = $this->importMedia($mediaPayload, $actorUserId);
                 }
             }
 
@@ -722,6 +775,7 @@ final readonly class Importer
 
         if ($includeMedia) {
             $parts[] = "Media created: {$createdMedia}";
+            $parts[] = "Media files copied: {$downloadedMedia}";
         }
 
         $parts[] = "Settings created: {$createdSettings}";
@@ -986,21 +1040,21 @@ final readonly class Importer
     }
 
     /**
-     * @return array{0:int,1:int} createdMedia, skippedMedia
+     * @return array{0:int,1:int,2:int} createdMedia, skippedMedia, downloadedMedia
      */
     private function importMedia(array $payload, int $actorUserId = 0): array
     {
         if (!class_exists(TpMedia::class)) {
-            return [0, 0];
+            return [0, 0, 0];
         }
 
         if (!Schema::hasTable('tp_media')) {
-            return [0, 0];
+            return [0, 0, 0];
         }
 
         $items = $this->itemsFromPayload($payload);
         if ($items === []) {
-            return [0, 0];
+            return [0, 0, 0];
         }
 
         $hasCreatedBy = Schema::hasColumn('tp_media', 'created_by');
@@ -1008,6 +1062,7 @@ final readonly class Importer
 
         $created = 0;
         $skipped = 0;
+        $downloaded = 0;
 
         foreach ($items as $item) {
             if (!is_array($item)) {
@@ -1051,10 +1106,15 @@ final readonly class Importer
             $model = TpMedia::query()->create($data);
             unset($model);
 
+            $sourceUrl = trim((string) ($item['source_url'] ?? ''));
+            if ($sourceUrl !== '' && $this->copyRemoteMediaToDisk($sourceUrl, (string) $data['disk'], (string) $data['path'])) {
+                $downloaded++;
+            }
+
             $created++;
         }
 
-        return [$created, $skipped];
+        return [$created, $skipped, $downloaded];
     }
 
     /**

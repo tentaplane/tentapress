@@ -18,6 +18,7 @@
 - Run completion notices now include WXR source context plus unsupported/mapping summary counters.
 - WXR import run now applies actor fallback for post author and creator/updater columns where available.
 - WXR run writes a persistent URL mapping report to `storage/app/tp-import-reports/<token>.json`.
+- WXR attachment URLs are mapped into `media/imports/wordpress/...` and copied to local media storage when reachable.
 
 ## Summary
 
