@@ -3,10 +3,10 @@
 declare(strict_types=1);
 
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use TentaPress\Media\Models\TpMedia;
 use TentaPress\Posts\Models\TpPost;
 use TentaPress\Import\ImportServiceProvider;
@@ -322,6 +322,19 @@ it('allows a super admin to analyze and run a wordpress wxr bundle', function ()
     expect(Str::endsWith($mediaPath, '/image-103.jpg'))->toBeTrue();
     Storage::disk('public')->assertExists($mediaPath);
     expect((int) (TpPost::query()->where('slug', 'wxr-post-title')->value('author_id') ?? 0))->toBe((int) $admin->id);
+
+    $reports = File::glob(storage_path('app/tp-import-reports/*.json'));
+    expect(is_array($reports))->toBeTrue();
+    expect(count($reports))->toBeGreaterThan(0);
+
+    $latestReportPath = is_array($reports) && $reports !== [] ? (string) end($reports) : '';
+    expect($latestReportPath)->not->toBe('');
+
+    $report = json_decode((string) File::get($latestReportPath), true, flags: JSON_THROW_ON_ERROR);
+    expect(is_array($report))->toBeTrue();
+    expect($report['source_format'] ?? null)->toBe('wxr');
+    expect(is_array($report['mappings'] ?? null))->toBeTrue();
+    expect(count($report['mappings'] ?? []))->toBeGreaterThanOrEqual(2);
 });
 
 it('skips duplicate wxr source rows on create-only rerun', function (): void {
