@@ -8,7 +8,7 @@
   - posts
   - attachment metadata (as media records)
 - Categories and tags are parsed and reported in summary counts.
-- Unsupported entity types are still out of import scope and treated as report-only.
+- Unsupported entity types are out of import scope and are explicitly reported by type/count before run.
 
 ## Summary
 

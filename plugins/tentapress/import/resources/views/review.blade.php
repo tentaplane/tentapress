@@ -64,6 +64,10 @@
                         <div class="mt-1">{{ (int) ($summary['tags'] ?? 0) }}</div>
                     </div>
                     <div>
+                        <div class="tp-muted text-xs font-semibold uppercase">Unsupported items</div>
+                        <div class="mt-1">{{ (int) ($summary['unsupported_items'] ?? 0) }}</div>
+                    </div>
+                    <div>
                         <div class="tp-muted text-xs font-semibold uppercase">Enabled plugins</div>
                         <div class="mt-1">{{ (int) ($summary['enabled_plugins'] ?? 0) }}</div>
                     </div>
@@ -80,6 +84,24 @@
                     </div>
                 </div>
             </div>
+
+            @php
+                $unsupportedTypes = $summary['unsupported_types'] ?? [];
+            @endphp
+
+            @if (is_array($unsupportedTypes) && count($unsupportedTypes) > 0)
+                <div class="tp-panel">
+                    <div class="tp-label mb-2">Unsupported entity types</div>
+                    <ul class="space-y-1 text-sm">
+                        @foreach ($unsupportedTypes as $type => $count)
+                            <li>
+                                <code class="tp-code">{{ (string) $type }}</code>
+                                <span class="tp-muted">({{ (int) $count }})</span>
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
 
             <form
                 method="POST"

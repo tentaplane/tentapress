@@ -108,6 +108,11 @@ function makeWxrBundleWithPagePostAndAttachment(): UploadedFile
             <wp:post_type>attachment</wp:post_type>
             <wp:attachment_url>https://example.com/wp-content/uploads/2025/10/image.jpg</wp:attachment_url>
         </item>
+        <item>
+            <title>Custom Product</title>
+            <wp:post_id>104</wp:post_id>
+            <wp:post_type>product</wp:post_type>
+        </item>
     </channel>
 </rss>
 XML;
@@ -207,7 +212,8 @@ it('allows a super admin to analyze a wordpress wxr bundle', function (): void {
             && ($summary['posts'] ?? null) === 1
             && ($summary['media'] ?? null) === 1
             && ($summary['categories'] ?? null) === 1
-            && ($summary['tags'] ?? null) === 1)
+            && ($summary['tags'] ?? null) === 1
+            && ($summary['unsupported_items'] ?? null) === 1)
         ->assertViewHas('meta', fn (array $meta): bool => ($meta['source_format'] ?? null) === 'wxr');
 });
 

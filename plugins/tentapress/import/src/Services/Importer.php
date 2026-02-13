@@ -183,6 +183,7 @@ final readonly class Importer
         $pagesItems = [];
         $postsItems = [];
         $mediaItems = [];
+        $unsupportedByType = [];
 
         $items = $xml->xpath('/rss/channel/item');
         if (is_array($items)) {
@@ -253,6 +254,12 @@ final readonly class Importer
                         'title' => $title !== '' ? $title : null,
                         'mime_type' => $this->mimeFromAttachmentPath($path),
                     ];
+
+                    continue;
+                }
+
+                if ($postType !== '') {
+                    $unsupportedByType[$postType] = (int) ($unsupportedByType[$postType] ?? 0) + 1;
                 }
             }
         }
@@ -302,6 +309,8 @@ final readonly class Importer
                 'seo' => 0,
                 'categories' => is_array($categories) ? count($categories) : 0,
                 'tags' => is_array($tags) ? count($tags) : 0,
+                'unsupported_items' => array_sum($unsupportedByType),
+                'unsupported_types' => $unsupportedByType,
                 'theme_active_id' => '',
                 'enabled_plugins' => 0,
             ],
