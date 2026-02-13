@@ -82,7 +82,7 @@ it('denies import routes to non-super-admin users', function (): void {
         ->assertForbidden();
 });
 
-it('validates that analyze requires a zip bundle', function (): void {
+it('validates that analyze requires a zip or xml bundle', function (): void {
     registerImportProviderForEdgeCases();
 
     $admin = TpUser::query()->create([

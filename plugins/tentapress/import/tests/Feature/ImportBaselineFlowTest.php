@@ -59,6 +59,54 @@ function makeImportBundleWithSinglePage(): UploadedFile
     return new UploadedFile($path, 'bundle.zip', 'application/zip', null, true);
 }
 
+function makeWxrBundleWithPagePostAndAttachment(): UploadedFile
+{
+    $path = storage_path('framework/testing/tp-import-bundle.xml');
+    File::ensureDirectoryExists(dirname($path));
+
+    $xml = <<<'XML'
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0"
+     xmlns:excerpt="http://wordpress.org/export/1.2/excerpt/"
+     xmlns:content="http://purl.org/rss/1.0/modules/content/"
+     xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+     xmlns:dc="http://purl.org/dc/elements/1.1/"
+     xmlns:wp="http://wordpress.org/export/1.2/">
+    <channel>
+        <title>Fixture Site</title>
+        <wp:wxr_version>1.2</wp:wxr_version>
+        <wp:category>
+            <wp:term_id>1</wp:term_id>
+            <wp:cat_name><![CDATA[News]]></wp:cat_name>
+        </wp:category>
+        <wp:tag>
+            <wp:term_id>2</wp:term_id>
+            <wp:tag_name><![CDATA[Release]]></wp:tag_name>
+        </wp:tag>
+        <item>
+            <title>Page Title</title>
+            <wp:post_id>101</wp:post_id>
+            <wp:post_type>page</wp:post_type>
+        </item>
+        <item>
+            <title>Post Title</title>
+            <wp:post_id>102</wp:post_id>
+            <wp:post_type>post</wp:post_type>
+        </item>
+        <item>
+            <title>Image</title>
+            <wp:post_id>103</wp:post_id>
+            <wp:post_type>attachment</wp:post_type>
+        </item>
+    </channel>
+</rss>
+XML;
+
+    File::put($path, $xml);
+
+    return new UploadedFile($path, 'wordpress-export.xml', 'text/xml', null, true);
+}
+
 it('redirects guests from import admin routes to login', function (): void {
     registerImportProvider();
 
@@ -125,4 +173,30 @@ it('allows a super admin to analyze and run an import bundle', function (): void
     expect(
         TpPage::query()->where('slug', 'imported-home')->exists()
     )->toBeTrue();
+});
+
+it('allows a super admin to analyze a wordpress wxr bundle', function (): void {
+    registerImportProvider();
+
+    $admin = TpUser::query()->create([
+        'name' => 'Import Admin',
+        'email' => 'import-wxr@example.test',
+        'password' => 'secret',
+        'is_super_admin' => true,
+    ]);
+
+    $bundle = makeWxrBundleWithPagePostAndAttachment();
+
+    $this->actingAs($admin)
+        ->post('/admin/import/analyze', [
+            'bundle' => $bundle,
+        ])
+        ->assertOk()
+        ->assertViewIs('tentapress-import::review')
+        ->assertViewHas('summary', fn (array $summary): bool => ($summary['pages'] ?? null) === 1
+            && ($summary['posts'] ?? null) === 1
+            && ($summary['media'] ?? null) === 1
+            && ($summary['categories'] ?? null) === 1
+            && ($summary['tags'] ?? null) === 1)
+        ->assertViewHas('meta', fn (array $meta): bool => ($meta['source_format'] ?? null) === 'wxr');
 });

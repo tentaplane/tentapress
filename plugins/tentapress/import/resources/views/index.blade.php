@@ -6,7 +6,7 @@
     <div class="tp-page-header">
         <div>
             <h1 class="tp-page-title">Import</h1>
-            <p class="tp-description">Upload an export file from another TentaPress site.</p>
+            <p class="tp-description">Upload an export file from TentaPress or a WordPress WXR XML file.</p>
         </div>
     </div>
 
@@ -42,7 +42,7 @@
                             this.setFileName(this.$refs.fileInput);
                         }
                     }">
-                    <label class="tp-label">Export file (.zip)</label>
+                    <label class="tp-label">Export file (.zip or .xml)</label>
                     <label
                         class="group relative mt-2 flex min-h-44 cursor-pointer flex-col items-center justify-center gap-3 overflow-hidden rounded-xl border-2 border-dashed border-slate-300 bg-gradient-to-br from-slate-50 via-white to-sky-50 px-6 py-8 text-center transition hover:border-sky-400 hover:from-sky-50 hover:to-indigo-50"
                         :class="isDragging ? 'border-sky-500 ring-4 ring-sky-100' : ''"
@@ -53,7 +53,7 @@
                             x-ref="fileInput"
                             type="file"
                             name="bundle"
-                            accept=".zip,application/zip,application/x-zip-compressed"
+                            accept=".zip,.xml,application/zip,application/x-zip-compressed,text/xml,application/xml"
                             class="sr-only"
                             required
                             @change="setFileName($event.target)" />
@@ -70,9 +70,11 @@
                                 Drop your export zip here or click to browse
                             </p>
                             <p class="text-xs text-slate-500">
-                                Only
+                                Use
                                 <code class="tp-code">.zip</code>
-                                files are accepted
+                                for TentaPress exports or
+                                <code class="tp-code">.xml</code>
+                                for WordPress WXR exports
                             </p>
                         </div>
 
@@ -82,7 +84,7 @@
                             x-cloak
                             x-text="'Selected: ' + fileName"></div>
                     </label>
-                    <div class="tp-help">Choose the `.zip` file created from the Export screen.</div>
+                    <div class="tp-help">Choose a TentaPress export `.zip` or a WordPress WXR `.xml` file.</div>
                 </div>
 
                 <div class="flex gap-2">

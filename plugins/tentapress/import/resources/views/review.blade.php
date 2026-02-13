@@ -21,7 +21,13 @@
                 <div class="grid grid-cols-1 gap-3 text-sm md:grid-cols-2">
                     <div>
                         <div class="tp-muted text-xs font-semibold uppercase">File format</div>
-                        <div class="mt-1">v{{ $meta['schema_version'] ?? 1 }}</div>
+                        <div class="mt-1">
+                            @if (($meta['source_format'] ?? '') === 'wxr')
+                                WordPress WXR ({{ $meta['wxr_version'] ?? 'unknown' }})
+                            @else
+                                TentaPress JSON bundle v{{ $meta['schema_version'] ?? 1 }}
+                            @endif
+                        </div>
                     </div>
                     <div>
                         <div class="tp-muted text-xs font-semibold uppercase">Created</div>
@@ -48,6 +54,14 @@
                     <div>
                         <div class="tp-muted text-xs font-semibold uppercase">SEO records</div>
                         <div class="mt-1">{{ (int) ($summary['seo'] ?? 0) }}</div>
+                    </div>
+                    <div>
+                        <div class="tp-muted text-xs font-semibold uppercase">Categories</div>
+                        <div class="mt-1">{{ (int) ($summary['categories'] ?? 0) }}</div>
+                    </div>
+                    <div>
+                        <div class="tp-muted text-xs font-semibold uppercase">Tags</div>
+                        <div class="mt-1">{{ (int) ($summary['tags'] ?? 0) }}</div>
                     </div>
                     <div>
                         <div class="tp-muted text-xs font-semibold uppercase">Enabled plugins</div>

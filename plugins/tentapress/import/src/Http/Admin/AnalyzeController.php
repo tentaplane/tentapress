@@ -12,7 +12,7 @@ final class AnalyzeController
     public function __invoke(Request $request, Importer $importer)
     {
         $data = $request->validate([
-            'bundle' => ['required', 'file', 'mimes:zip'],
+            'bundle' => ['required', 'file', 'mimes:zip,xml'],
         ]);
 
         $result = $importer->analyzeBundle($data['bundle']);

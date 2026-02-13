@@ -1,0 +1,219 @@
+# WordPress WXR Importer Spec
+
+## Summary
+
+This spec defines a WordPress migration path for TentaPress using WXR (WordPress eXtended RSS) as the primary import format for compatibility.
+
+v1 scope is **content core**:
+
+- Pages and posts
+- Attachments metadata and featured image references
+- Categories and tags
+- Core publish metadata (slug, status, dates, author fallback)
+- URL/permalink compatibility mapping
+
+Out of scope for v1:
+
+- Comments
+- Users/password migration
+- Menus/navigation structures
+- Custom post types and custom taxonomies
+- Broad plugin-specific metadata
+
+## Product and Architecture Intent
+
+### Problem Statement
+
+Users need a reasonably seamless transition from existing WordPress sites into TentaPress, without manual copy/paste of content.
+
+### Why WXR First
+
+- Native WordPress export format
+- Broad tooling compatibility
+- Preserves key content and taxonomy structure with predictable parsing
+
+### User Flow
+
+1. Export WXR from WordPress.
+2. Upload WXR file in TentaPress import admin.
+3. Analyze and review entity counts, mappings, and unsupported items.
+4. Run import with safe defaults.
+5. Review completion summary and warnings.
+
+### Import Philosophy
+
+- Deterministic field mapping
+- Non-destructive defaults (`create_only` for content)
+- Explicit visibility for skipped/unsupported data
+- Idempotent-safe behavior for repeated imports
+
+## Planned Interfaces and Contracts
+
+### Import Source Type
+
+- `source_format = wxr`
+
+### Analysis Summary Shape
+
+- `summary.entities.pages`
+- `summary.entities.posts`
+- `summary.entities.attachments`
+- `summary.entities.categories`
+- `summary.entities.tags`
+- `summary.unsupported[]` with:
+  - `type`
+  - `count`
+  - `samples`
+
+### Mapping DTOs (Planned)
+
+- `WxrParsedItem`
+- `WxrMappedPage`
+- `WxrMappedPost`
+- `WxrMappedAttachment`
+- `ImportReferenceMap` (WP IDs -> TentaPress IDs/slugs)
+
+### Admin Flow
+
+Reuse existing import workflow:
+
+- Analyze step
+- Review step
+- Run step
+
+Extend review payload for WXR diagnostics (unsupported entities, skipped items, mapping warnings).
+
+## Functional Requirements
+
+### Ingestion (`INGEST-*`)
+
+- `INGEST-01`: Validate uploaded file as parseable XML WXR.
+- `INGEST-02`: Validate required namespace/structure for supported WXR versions.
+- `INGEST-03`: Fail with actionable parse errors for malformed XML.
+- `INGEST-04`: Preserve raw source IDs (`wp:post_id`, term IDs) for mapping/reference.
+
+### Mapping (`MAP-*`)
+
+- `MAP-01`: Map `post_type=page` to TentaPress pages.
+- `MAP-02`: Map `post_type=post` to TentaPress posts.
+- `MAP-03`: Map post status/date/slug/title/content/excerpt where available.
+- `MAP-04`: Map author by login/email when possible; fallback to import owner.
+- `MAP-05`: Map `category` and `post_tag` terms and attach to mapped posts.
+- `MAP-06`: Preserve parent-child relationships where target model supports it.
+
+### Media (`MEDIA-*`)
+
+- `MEDIA-01`: Parse attachment entries and store metadata references.
+- `MEDIA-02`: Preserve featured image relationships when attachment references resolve.
+- `MEDIA-03`: Report missing attachment binaries as warnings, not hard failures.
+- `MEDIA-04`: Continue import when attachment URLs are unreachable.
+
+### URL/Permalinks (`URL-*`)
+
+- `URL-01`: Preserve source slugs when available.
+- `URL-02`: Resolve collisions deterministically using suffixes (`-2`, `-3`, ...).
+- `URL-03`: Provide import-time mapping report from source permalink/slug to destination URL.
+
+### Safety and Idempotency (`SAFE-*`)
+
+- `SAFE-01`: Default mode is `create_only`.
+- `SAFE-02`: Re-running same file does not overwrite existing content unless explicit future mode is added.
+- `SAFE-03`: Unsupported entities are skipped and reported.
+- `SAFE-04`: Parsing/mapping errors should isolate failed rows and continue where safe.
+
+### UX and Reporting (`UX-*`)
+
+- `UX-01`: Review screen shows entity totals by type.
+- `UX-02`: Review screen shows unsupported entity counts with samples.
+- `UX-03`: Completion summary lists created/skipped/failed counts per type.
+- `UX-04`: Warnings are actionable and reference source identifiers.
+
+### Validation and Sanitization (`SAN-*`)
+
+- `SAN-01`: Sanitize imported HTML to strip unsafe scripts/attributes.
+- `SAN-02`: Preserve readable structure (headings/paragraphs/lists/links/images) where possible.
+- `SAN-03`: Shortcodes that cannot be mapped are converted to visible placeholders or plain text markers.
+
+## Non-Goals (v1)
+
+- Full parity with all WordPress plugins
+- Comments import
+- Users/roles migration
+- Navigation menu import
+- Custom post type ecosystem migration
+- Full media binary ingestion pipeline
+
+## Roadmap
+
+### Phase 1: WXR Parsing + Analyze
+
+Deliverables:
+
+- WXR parser integration
+- File validation and namespace checks
+- Analyze summary model including unsupported entities
+
+Exit criteria:
+
+- Valid WXR uploads produce reliable analysis summary
+- Invalid WXR returns actionable errors
+
+### Phase 2: Mapping Layer + Dry Run
+
+Deliverables:
+
+- Page/post/taxonomy/attachment mapping pipeline
+- Author fallback and slug conflict handling
+- Dry-run diagnostics with warning categories
+
+Exit criteria:
+
+- Dry-run outputs deterministic results across repeated analysis
+
+### Phase 3: Import Execution
+
+Deliverables:
+
+- Persist mapped entities via existing run workflow
+- Create-only semantics for content
+- Completion summary with created/skipped/failed metrics
+
+Exit criteria:
+
+- Stable import for representative WordPress exports
+- No destructive overwrite by default
+
+### Phase 4: URL Migration Aids + Hardening
+
+Deliverables:
+
+- Source-to-destination permalink mapping report
+- Additional resilience for large files and malformed edge cases
+- Performance and memory profile tuning
+
+Exit criteria:
+
+- Migration report suitable for redirect planning
+- Import remains stable under large datasets
+
+## Acceptance Test Scenarios
+
+1. Valid WXR with pages/posts imports expected counts and core fields.
+2. Duplicate slug conflict appends deterministic numeric suffix.
+3. Missing author maps to fallback author without aborting import.
+4. Categories/tags map and attach correctly.
+5. Attachments metadata imports without requiring binary download.
+6. Featured image links are preserved when attachment mapping exists.
+7. Unsupported entities (comments/custom post types) are skipped and reported.
+8. Malformed XML fails with clear validation message.
+9. Large-file analysis completes with stable summary.
+10. Re-import in `create_only` mode remains non-destructive.
+11. Unknown plugin meta is ignored and reported.
+12. Sanitization strips unsafe markup while preserving readable content.
+
+## Assumptions and Defaults
+
+- v1 scope is content core only.
+- Existing TentaPress Analyze/Run import architecture is reused.
+- Media binaries are optional for v1 success; references and metadata are acceptable.
+- No new external dependencies are required at spec stage.

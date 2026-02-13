@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use SimpleXMLElement;
 use TentaPress\Media\Models\TpMedia;
 use TentaPress\Pages\Models\TpPage;
 use TentaPress\Posts\Models\TpPost;
@@ -22,7 +23,7 @@ final readonly class Importer
     }
 
     /**
-     * Analyze the uploaded zip, extract relevant JSON into storage, return summary + token.
+     * Analyze the uploaded bundle, extract relevant payload into storage, return summary + token.
      *
      * @return array{
      *   token:string,
@@ -30,7 +31,23 @@ final readonly class Importer
      *   meta:array<string,mixed>
      * }
      */
-    public function analyzeBundle(UploadedFile $zipFile): array
+    public function analyzeBundle(UploadedFile $bundleFile): array
+    {
+        if ($this->isZipBundle($bundleFile)) {
+            return $this->analyzeZipBundle($bundleFile);
+        }
+
+        return $this->analyzeWxrBundle($bundleFile);
+    }
+
+    /**
+     * @return array{
+     *   token:string,
+     *   summary:array<string,mixed>,
+     *   meta:array<string,mixed>
+     * }
+     */
+    private function analyzeZipBundle(UploadedFile $zipFile): array
     {
         $token = $this->token();
 
@@ -126,6 +143,126 @@ final readonly class Importer
             'summary' => $summary,
             'meta' => $meta,
         ];
+    }
+
+    /**
+     * @return array{
+     *   token:string,
+     *   summary:array<string,mixed>,
+     *   meta:array<string,mixed>
+     * }
+     */
+    private function analyzeWxrBundle(UploadedFile $wxrFile): array
+    {
+        $token = $this->token();
+
+        $baseDir = storage_path('app/tp-imports/' . $token);
+        File::ensureDirectoryExists($baseDir);
+
+        $xmlPath = $baseDir . DIRECTORY_SEPARATOR . 'bundle.xml';
+        $wxrFile->move($baseDir, 'bundle.xml');
+
+        $xmlRaw = File::get($xmlPath);
+        throw_if(trim((string) $xmlRaw) === '', \RuntimeException::class, 'WXR file is empty.');
+
+        libxml_use_internal_errors(true);
+        $xml = simplexml_load_string((string) $xmlRaw, SimpleXMLElement::class, LIBXML_NOCDATA);
+        throw_if($xml === false, \RuntimeException::class, 'Invalid WXR XML.');
+
+        $namespaces = $xml->getDocNamespaces(true);
+        foreach ($namespaces as $prefix => $namespaceUri) {
+            if ($prefix === '' || !is_string($namespaceUri) || $namespaceUri === '') {
+                continue;
+            }
+
+            $xml->registerXPathNamespace($prefix, $namespaceUri);
+        }
+
+        $wxrVersion = trim((string) ($xml->xpath('/rss/channel/wp:wxr_version')[0] ?? ''));
+
+        $pagesCount = 0;
+        $postsCount = 0;
+        $mediaCount = 0;
+
+        $items = $xml->xpath('/rss/channel/item');
+        if (is_array($items)) {
+            foreach ($items as $item) {
+                if (!$item instanceof SimpleXMLElement) {
+                    continue;
+                }
+
+                foreach ($namespaces as $prefix => $namespaceUri) {
+                    if ($prefix === '' || !is_string($namespaceUri) || $namespaceUri === '') {
+                        continue;
+                    }
+
+                    $item->registerXPathNamespace($prefix, $namespaceUri);
+                }
+
+                $postType = trim((string) ($item->xpath('wp:post_type')[0] ?? ''));
+
+                if ($postType === 'page') {
+                    $pagesCount++;
+                    continue;
+                }
+
+                if ($postType === 'post') {
+                    $postsCount++;
+                    continue;
+                }
+
+                if ($postType === 'attachment') {
+                    $mediaCount++;
+                }
+            }
+        }
+
+        $categories = $xml->xpath('/rss/channel/wp:category');
+        $tags = $xml->xpath('/rss/channel/wp:tag');
+
+        $generatedAtUtc = now()->toIso8601String();
+        $plan = [
+            'source_format' => 'wxr',
+            'schema_version' => 1,
+            'generated_at_utc' => $generatedAtUtc,
+            'wxr_version' => $wxrVersion,
+        ];
+
+        File::put($baseDir . DIRECTORY_SEPARATOR . 'plan.json', $this->jsonPayload->encode($plan));
+        File::put($baseDir . DIRECTORY_SEPARATOR . 'wxr.xml', (string) $xmlRaw);
+
+        return [
+            'token' => $token,
+            'summary' => [
+                'pages' => $pagesCount,
+                'posts' => $postsCount,
+                'media' => $mediaCount,
+                'settings' => 0,
+                'seo' => 0,
+                'categories' => is_array($categories) ? count($categories) : 0,
+                'tags' => is_array($tags) ? count($tags) : 0,
+                'theme_active_id' => '',
+                'enabled_plugins' => 0,
+            ],
+            'meta' => [
+                'schema_version' => 1,
+                'source_format' => 'wxr',
+                'wxr_version' => $wxrVersion !== '' ? $wxrVersion : 'unknown',
+                'generated_at_utc' => $generatedAtUtc,
+            ],
+        ];
+    }
+
+    private function isZipBundle(UploadedFile $bundleFile): bool
+    {
+        $extension = strtolower((string) $bundleFile->getClientOriginalExtension());
+        if ($extension === 'zip') {
+            return true;
+        }
+
+        $mimeType = strtolower((string) $bundleFile->getClientMimeType());
+
+        return str_contains($mimeType, 'zip');
     }
 
     /**
