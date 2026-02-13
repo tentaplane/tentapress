@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use TentaPress\Settings\Services\SettingsStore;
 use SimpleXMLElement;
 use TentaPress\Media\Models\TpMedia;
 use TentaPress\Pages\Models\TpPage;
@@ -189,6 +190,7 @@ final readonly class Importer
         $unsupportedSamples = [];
         $categories = [];
         $tags = [];
+        $urlMappingsPreview = [];
 
         $items = $xml->xpath('/rss/channel/item');
         if (is_array($items)) {
@@ -252,6 +254,10 @@ final readonly class Importer
                         'blocks' => $this->contentBlocks($plainContent),
                     ];
 
+                    if (count($urlMappingsPreview) < 25) {
+                        $urlMappingsPreview[] = $this->urlMappingPreview('page', $sourceLink, $slug, $sourcePostId);
+                    }
+
                     continue;
                 }
 
@@ -270,6 +276,10 @@ final readonly class Importer
                         ),
                         'author_id' => null,
                     ];
+
+                    if (count($urlMappingsPreview) < 25) {
+                        $urlMappingsPreview[] = $this->urlMappingPreview('post', $sourceLink, $slug, $sourcePostId);
+                    }
 
                     continue;
                 }
@@ -382,6 +392,7 @@ final readonly class Importer
                 'unsupported_items' => array_sum($unsupportedByType),
                 'unsupported_types' => $unsupportedByType,
                 'unsupported_samples' => $unsupportedSamples,
+                'url_mappings_preview' => $urlMappingsPreview,
                 'theme_active_id' => '',
                 'enabled_plugins' => 0,
             ],
@@ -493,6 +504,39 @@ final readonly class Importer
         }
 
         return "Invalid WXR XML: {$message}";
+    }
+
+    /**
+     * @return array{type:string,source_url:string,destination_url:string,source_post_id:string}
+     */
+    private function urlMappingPreview(string $type, string $sourceLink, string $slug, string $sourcePostId): array
+    {
+        $destinationUrl = $type === 'post'
+            ? '/'.$this->blogBase().'/'.$slug
+            : '/'.$slug;
+
+        return [
+            'type' => $type,
+            'source_url' => $sourceLink,
+            'destination_url' => $destinationUrl,
+            'source_post_id' => $sourcePostId,
+        ];
+    }
+
+    private function blogBase(): string
+    {
+        $defaultBase = 'blog';
+
+        if (!class_exists(SettingsStore::class) || !app()->bound(SettingsStore::class)) {
+            return $defaultBase;
+        }
+
+        $rawBase = trim((string) resolve(SettingsStore::class)->get('site.blog_base', ''), '/');
+        if ($rawBase === '') {
+            return $defaultBase;
+        }
+
+        return preg_match('/^[a-z0-9]+(?:-[a-z0-9]+)*$/', $rawBase) === 1 ? $rawBase : $defaultBase;
     }
 
     /**

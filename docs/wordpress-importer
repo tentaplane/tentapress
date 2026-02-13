@@ -11,6 +11,7 @@
 - Unsupported entity types are out of import scope and are explicitly reported by type/count before run.
 - Unsupported sample entries are shown in review.
 - Malformed WXR XML now returns actionable parse errors with line context when available.
+- Review now includes source-to-destination URL mapping preview for redirect planning.
 
 ## Summary
 

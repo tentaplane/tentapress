@@ -126,6 +126,45 @@
                 </div>
             @endif
 
+            @php
+                $urlMappingsPreview = $summary['url_mappings_preview'] ?? [];
+            @endphp
+
+            @if (is_array($urlMappingsPreview) && count($urlMappingsPreview) > 0)
+                <div class="tp-panel">
+                    <div class="tp-label mb-2">URL mapping preview</div>
+                    <div class="tp-muted mb-2 text-xs">First {{ count($urlMappingsPreview) }} mapped page/post URLs for redirect planning.</div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full text-sm">
+                            <thead>
+                                <tr class="border-b border-black/10 text-left text-xs uppercase tracking-wide text-black/60">
+                                    <th class="py-2 pr-4">Type</th>
+                                    <th class="py-2 pr-4">Source</th>
+                                    <th class="py-2 pr-4">Destination</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($urlMappingsPreview as $mapping)
+                                    <tr class="border-b border-black/5 align-top">
+                                        <td class="py-2 pr-4"><code class="tp-code">{{ (string) ($mapping['type'] ?? 'unknown') }}</code></td>
+                                        <td class="py-2 pr-4">
+                                            @if (!empty($mapping['source_url']))
+                                                <code class="tp-code">{{ (string) $mapping['source_url'] }}</code>
+                                            @elseif (!empty($mapping['source_post_id']))
+                                                <span class="tp-muted">Post ID {{ (string) $mapping['source_post_id'] }}</span>
+                                            @else
+                                                <span class="tp-muted">Unknown source</span>
+                                            @endif
+                                        </td>
+                                        <td class="py-2 pr-4"><code class="tp-code">{{ (string) ($mapping['destination_url'] ?? '') }}</code></td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            @endif
+
             <form
                 method="POST"
                 action="{{ route('tp.import.run') }}"

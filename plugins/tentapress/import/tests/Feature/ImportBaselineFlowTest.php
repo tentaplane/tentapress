@@ -91,6 +91,7 @@ function makeWxrBundleWithPagePostAndAttachment(): UploadedFile
             <wp:post_type>page</wp:post_type>
             <wp:post_name>wxr-page-title</wp:post_name>
             <wp:status>publish</wp:status>
+            <link>https://legacy.example.com/page-title</link>
             <content:encoded><![CDATA[<p>Page content line 1.</p><p>Page content line 2.</p>]]></content:encoded>
         </item>
         <item>
@@ -100,6 +101,7 @@ function makeWxrBundleWithPagePostAndAttachment(): UploadedFile
             <wp:post_name>wxr-post-title</wp:post_name>
             <wp:status>publish</wp:status>
             <wp:post_date_gmt>2025-10-12 14:00:00</wp:post_date_gmt>
+            <link>https://legacy.example.com/post-title</link>
             <content:encoded><![CDATA[<p>Post body.</p>]]></content:encoded>
         </item>
         <item>
@@ -214,7 +216,9 @@ it('allows a super admin to analyze a wordpress wxr bundle', function (): void {
             && ($summary['categories'] ?? null) === 1
             && ($summary['tags'] ?? null) === 1
             && ($summary['unsupported_items'] ?? null) === 1
-            && ($summary['unsupported_types']['product'] ?? null) === 1)
+            && ($summary['unsupported_types']['product'] ?? null) === 1
+            && (($summary['url_mappings_preview'][0]['destination_url'] ?? null) === '/wxr-page-title')
+            && (($summary['url_mappings_preview'][1]['destination_url'] ?? null) === '/blog/wxr-post-title'))
         ->assertViewHas('meta', fn (array $meta): bool => ($meta['source_format'] ?? null) === 'wxr');
 });
 
