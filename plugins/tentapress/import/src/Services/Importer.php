@@ -913,6 +913,22 @@ final readonly class Importer
                 continue;
             }
 
+            $isSourceMappedItem = trim((string) ($item['source_post_id'] ?? '')) !== ''
+                || trim((string) ($item['source_link'] ?? '')) !== '';
+            if ($isSourceMappedItem && DB::table('tp_pages')->where('slug', $slug)->exists()) {
+                $skipped++;
+                $this->emitProgress($progress, [
+                    'kind' => 'entity',
+                    'entity' => 'page',
+                    'status' => 'skipped',
+                    'title' => $title,
+                    'slug' => $slug,
+                    'index' => $index + 1,
+                    'total' => $total,
+                ]);
+                continue;
+            }
+
             $slug = $this->uniqueSlug($slug);
 
             $data = [
@@ -1037,6 +1053,22 @@ final readonly class Importer
                     'status' => 'skipped',
                     'title' => $title,
                     'slug' => '',
+                    'index' => $index + 1,
+                    'total' => $total,
+                ]);
+                continue;
+            }
+
+            $isSourceMappedItem = trim((string) ($item['source_post_id'] ?? '')) !== ''
+                || trim((string) ($item['source_link'] ?? '')) !== '';
+            if ($isSourceMappedItem && DB::table('tp_posts')->where('slug', $slug)->exists()) {
+                $skipped++;
+                $this->emitProgress($progress, [
+                    'kind' => 'entity',
+                    'entity' => 'post',
+                    'status' => 'skipped',
+                    'title' => $title,
+                    'slug' => $slug,
                     'index' => $index + 1,
                     'total' => $total,
                 ]);

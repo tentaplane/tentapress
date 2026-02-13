@@ -323,3 +323,66 @@ it('allows a super admin to analyze and run a wordpress wxr bundle', function ()
     Storage::disk('public')->assertExists($mediaPath);
     expect((int) (TpPost::query()->where('slug', 'wxr-post-title')->value('author_id') ?? 0))->toBe((int) $admin->id);
 });
+
+it('skips duplicate wxr source rows on create-only rerun', function (): void {
+    registerImportProvider();
+
+    $admin = TpUser::query()->create([
+        'name' => 'Import Admin',
+        'email' => 'import-wxr-rerun@example.test',
+        'password' => 'secret',
+        'is_super_admin' => true,
+    ]);
+
+    $bundle = makeWxrBundleWithPagePostAndAttachment();
+    Http::fake([
+        'https://example.com/*' => Http::response('fake-image-content', 200, [
+            'Content-Type' => 'image/jpeg',
+        ]),
+    ]);
+
+    $firstAnalyzeResponse = $this->actingAs($admin)
+        ->post('/admin/import/analyze', [
+            'bundle' => $bundle,
+        ]);
+    $firstToken = (string) $firstAnalyzeResponse->viewData('token');
+
+    $this->actingAs($admin)
+        ->post('/admin/import/run', [
+            'token' => $firstToken,
+            'pages_mode' => 'create_only',
+            'settings_mode' => 'merge',
+            'include_posts' => '1',
+            'include_media' => '1',
+            'include_seo' => '0',
+        ])
+        ->assertRedirect('/admin/import');
+
+    $secondBundle = makeWxrBundleWithPagePostAndAttachment();
+
+    $secondAnalyzeResponse = $this->actingAs($admin)
+        ->post('/admin/import/analyze', [
+            'bundle' => $secondBundle,
+        ]);
+    $secondToken = (string) $secondAnalyzeResponse->viewData('token');
+
+    $this->actingAs($admin)
+        ->post('/admin/import/run', [
+            'token' => $secondToken,
+            'pages_mode' => 'create_only',
+            'settings_mode' => 'merge',
+            'include_posts' => '1',
+            'include_media' => '1',
+            'include_seo' => '0',
+        ])
+        ->assertRedirect('/admin/import')
+        ->assertSessionHas('tp_notice_success', fn (string $message): bool => str_contains($message, 'Pages created: 0')
+            && str_contains($message, 'Pages skipped: 1')
+            && str_contains($message, 'Posts created: 0')
+            && str_contains($message, 'Posts skipped: 1'));
+
+    expect(TpPage::query()->where('slug', 'wxr-page-title')->count())->toBe(1);
+    expect(TpPage::query()->where('slug', 'wxr-page-title-2')->exists())->toBeFalse();
+    expect(TpPost::query()->where('slug', 'wxr-post-title')->count())->toBe(1);
+    expect(TpPost::query()->where('slug', 'wxr-post-title-2')->exists())->toBeFalse();
+});

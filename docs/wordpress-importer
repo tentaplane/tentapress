@@ -22,6 +22,7 @@
 - Review screen now supports real-time streamed import feedback with per-item progress lines for pages/posts/media and running import/skip/copy counters.
 - Streaming import payload now includes phase-level events (start/completed per entity type) for clearer live status updates.
 - Run completion summaries now include explicit skipped counters by entity (pages/posts/media when included).
+- Re-running the same WXR in `create_only` mode now skips duplicate source rows for pages/posts instead of generating suffixed slugs.
 
 ## Summary
 
