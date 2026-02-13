@@ -270,7 +270,7 @@
                         <span class="text-sm">
                             <span class="font-semibold">Import media details</span>
                             <span class="tp-muted mt-1 block text-xs">
-                                Add media records when the file path is unique. Files are not copied in this version.
+                                Add media records when the file path is unique. Attachment files are copied when source URLs are reachable.
                             </span>
                         </span>
                     </label>
@@ -301,6 +301,21 @@
             <div id="tp-import-progress-panel" class="tp-panel hidden">
                 <div class="tp-label mb-2">Live import progress</div>
                 <div id="tp-import-progress-status" class="tp-muted text-sm">Waiting to start...</div>
+                <div class="mt-3 grid grid-cols-1 gap-2 text-xs sm:grid-cols-3">
+                    <div class="rounded border border-black/10 bg-black/[0.02] px-3 py-2">
+                        <div class="tp-muted uppercase">Pages</div>
+                        <div id="tp-import-count-pages" class="mt-1 font-semibold">0/0</div>
+                    </div>
+                    <div class="rounded border border-black/10 bg-black/[0.02] px-3 py-2">
+                        <div class="tp-muted uppercase">Posts</div>
+                        <div id="tp-import-count-posts" class="mt-1 font-semibold">0/0</div>
+                    </div>
+                    <div class="rounded border border-black/10 bg-black/[0.02] px-3 py-2">
+                        <div class="tp-muted uppercase">Media</div>
+                        <div id="tp-import-count-media" class="mt-1 font-semibold">0/0</div>
+                        <div id="tp-import-count-media-copied" class="tp-muted mt-1">Copied 0</div>
+                    </div>
+                </div>
                 <ul id="tp-import-progress-list" class="mt-3 max-h-72 space-y-1 overflow-auto text-sm"></ul>
             </div>
         </div>
@@ -313,8 +328,12 @@
             const panel = document.getElementById('tp-import-progress-panel');
             const statusNode = document.getElementById('tp-import-progress-status');
             const listNode = document.getElementById('tp-import-progress-list');
+            const countPagesNode = document.getElementById('tp-import-count-pages');
+            const countPostsNode = document.getElementById('tp-import-count-posts');
+            const countMediaNode = document.getElementById('tp-import-count-media');
+            const countMediaCopiedNode = document.getElementById('tp-import-count-media-copied');
 
-            if (!form || !submitButton || !panel || !statusNode || !listNode) {
+            if (!form || !submitButton || !panel || !statusNode || !listNode || !countPagesNode || !countPostsNode || !countMediaNode || !countMediaCopiedNode) {
                 return;
             }
 
@@ -323,9 +342,47 @@
                 return;
             }
 
-            const appendLine = (line) => {
+            const formatCounter = (imported, skipped, total) => `${imported + skipped}/${total} (${imported} imported, ${skipped} skipped)`;
+
+            const counters = {
+                page: { imported: 0, skipped: 0, total: {{ (int) ($summary['pages'] ?? 0) }} },
+                post: { imported: 0, skipped: 0, total: {{ (int) ($summary['posts'] ?? 0) }} },
+                media: { imported: 0, skipped: 0, total: {{ (int) ($summary['media'] ?? 0) }}, copied: 0 },
+            };
+
+            const resetCounters = () => {
+                counters.page.imported = 0;
+                counters.page.skipped = 0;
+                counters.post.imported = 0;
+                counters.post.skipped = 0;
+                counters.media.imported = 0;
+                counters.media.skipped = 0;
+                counters.media.copied = 0;
+            };
+
+            const syncEnabledTotals = () => {
+                const includePosts = form.querySelector('input[name="include_posts"]')?.checked === true;
+                const includeMedia = form.querySelector('input[name="include_media"]')?.checked === true;
+
+                counters.post.total = includePosts ? {{ (int) ($summary['posts'] ?? 0) }} : 0;
+                counters.media.total = includeMedia ? {{ (int) ($summary['media'] ?? 0) }} : 0;
+            };
+
+            const renderCounters = () => {
+                countPagesNode.textContent = formatCounter(counters.page.imported, counters.page.skipped, counters.page.total);
+                countPostsNode.textContent = formatCounter(counters.post.imported, counters.post.skipped, counters.post.total);
+                countMediaNode.textContent = formatCounter(counters.media.imported, counters.media.skipped, counters.media.total);
+                countMediaCopiedNode.textContent = `Copied ${counters.media.copied}`;
+            };
+
+            const appendLine = (line, tone = 'default') => {
                 const li = document.createElement('li');
                 li.textContent = line;
+                li.className = tone === 'error'
+                    ? 'text-red-700'
+                    : tone === 'success'
+                        ? 'text-emerald-700'
+                        : 'text-black/80';
                 listNode.appendChild(li);
                 listNode.scrollTop = listNode.scrollHeight;
             };
@@ -338,6 +395,9 @@
                 submitButton.textContent = 'Importing...';
                 statusNode.textContent = 'Import started...';
                 listNode.innerHTML = '';
+                resetCounters();
+                syncEnabledTotals();
+                renderCounters();
 
                 try {
                     const response = await fetch(streamUrl, {
@@ -397,21 +457,41 @@
                                 const index = payload.index || 0;
                                 const total = payload.total || 0;
                                 const label = payload.title || payload.slug || payload.path || '(untitled)';
-                                appendLine(`[${entity}] ${status} (${index}/${total}) ${label}`);
+                                const normalizedEntity = entity === 'page' || entity === 'post' || entity === 'media' ? entity : null;
+                                if (normalizedEntity) {
+                                    if (status === 'imported') {
+                                        counters[normalizedEntity].imported += 1;
+                                    } else if (status === 'skipped') {
+                                        counters[normalizedEntity].skipped += 1;
+                                    }
+
+                                    if (normalizedEntity === 'media' && payload.copied === true) {
+                                        counters.media.copied += 1;
+                                    }
+
+                                    if (total > 0) {
+                                        counters[normalizedEntity].total = total;
+                                    }
+
+                                    renderCounters();
+                                }
+
+                                const copiedSuffix = entity === 'media' && payload.copied === true ? ' [file copied]' : '';
+                                appendLine(`[${entity}] ${status} (${index}/${total}) ${label}${copiedSuffix}`, status === 'skipped' ? 'default' : 'success');
                                 statusNode.textContent = `Processing ${entity} ${index}/${total}...`;
                                 continue;
                             }
 
                             if (payload.event === 'done') {
                                 statusNode.textContent = payload.message || 'Import completed.';
-                                appendLine('Import completed');
+                                appendLine('Import completed', 'success');
                                 submitButton.textContent = 'Import complete';
                                 return;
                             }
 
                             if (payload.event === 'error') {
                                 statusNode.textContent = payload.message || 'Import failed.';
-                                appendLine('Error: ' + statusNode.textContent);
+                                appendLine('Error: ' + statusNode.textContent, 'error');
                                 submitButton.removeAttribute('disabled');
                                 submitButton.textContent = 'Retry import';
                                 return;
@@ -424,7 +504,7 @@
                 } catch (error) {
                     const message = error instanceof Error ? error.message : 'Import failed.';
                     statusNode.textContent = message;
-                    appendLine('Error: ' + message);
+                    appendLine('Error: ' + message, 'error');
                     submitButton.removeAttribute('disabled');
                     submitButton.textContent = 'Retry import';
                 }

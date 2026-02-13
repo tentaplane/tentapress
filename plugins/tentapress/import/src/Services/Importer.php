@@ -825,16 +825,16 @@ final readonly class Importer
         }
 
         if (!class_exists(TpPage::class)) {
-            return [0, 0];
+            return [0, 0, []];
         }
 
         if (!Schema::hasTable('tp_pages')) {
-            return [0, 0];
+            return [0, 0, []];
         }
 
         $items = $this->itemsFromPayload($payload);
         if ($items === []) {
-            return [0, 0];
+            return [0, 0, []];
         }
 
         $hasStatus = Schema::hasColumn('tp_pages', 'status');
@@ -950,16 +950,16 @@ final readonly class Importer
     private function importPosts(array $payload, int $actorUserId = 0, ?callable $progress = null): array
     {
         if (!class_exists(TpPost::class)) {
-            return [0, 0];
+            return [0, 0, []];
         }
 
         if (!Schema::hasTable('tp_posts')) {
-            return [0, 0];
+            return [0, 0, []];
         }
 
         $items = $this->itemsFromPayload($payload);
         if ($items === []) {
-            return [0, 0];
+            return [0, 0, []];
         }
 
         $hasStatus = Schema::hasColumn('tp_posts', 'status');

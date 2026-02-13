@@ -7,7 +7,7 @@ Content import functionality for TentaPress.
 | Field    | Value                                     |
 |----------|-------------------------------------------|
 | ID       | `tentapress/import`                       |
-| Version  | 0.13.0                                    |
+| Version  | 0.14.0                                    |
 | Provider | `TentaPress\Import\ImportServiceProvider` |
 
 ## Features
@@ -24,7 +24,7 @@ Content import functionality for TentaPress.
 - Apply actor-based author/creator fallback for imported records where supported
 - Write a persistent URL mapping report file for WXR runs
 - Copy WXR attachment URLs into local media storage (`media/imports/wordpress/...`) when reachable
-- Stream real-time import progress in the review screen (pages/posts/media item-by-item)
+- Stream real-time import progress in the review screen (pages/posts/media item-by-item with running counters)
 - Handles pages, posts, media references, settings
 
 ## Dependencies
