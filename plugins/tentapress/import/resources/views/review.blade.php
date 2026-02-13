@@ -465,9 +465,11 @@
                                         const skipped = Number(payload.skipped || 0);
                                         const failed = Number(payload.failed || 0);
                                         const copied = Number(payload.copied || 0);
+                                        const variantsRefreshed = Number(payload.variants_refreshed || 0);
                                         const copiedText = phaseEntity === 'media' ? `, copied ${copied} files` : '';
+                                        const variantsText = phaseEntity === 'media' ? `, refreshed ${variantsRefreshed} variants` : '';
                                         statusNode.textContent = `${phaseEntity} import completed`;
-                                        appendLine(`Completed ${phaseEntity} import (${created} created, ${skipped} skipped, ${failed} failed${copiedText})`, failed > 0 ? 'error' : 'success');
+                                        appendLine(`Completed ${phaseEntity} import (${created} created, ${skipped} skipped, ${failed} failed${copiedText}${variantsText})`, failed > 0 ? 'error' : 'success');
                                     }
                                     continue;
                                 }
@@ -499,8 +501,9 @@
                                 }
 
                                 const copiedSuffix = entity === 'media' && payload.copied === true ? ' [file copied]' : '';
+                                const variantsSuffix = entity === 'media' && payload.variants_refreshed === true ? ' [variants refreshed]' : '';
                                 const tone = status === 'failed' ? 'error' : status === 'skipped' ? 'default' : 'success';
-                                appendLine(`[${entity}] ${status} (${index}/${total}) ${label}${copiedSuffix}`, tone);
+                                appendLine(`[${entity}] ${status} (${index}/${total}) ${label}${copiedSuffix}${variantsSuffix}`, tone);
                                 statusNode.textContent = `Processing ${entity} ${index}/${total}...`;
                                 continue;
                             }

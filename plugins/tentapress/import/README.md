@@ -7,7 +7,7 @@ Content import functionality for TentaPress.
 | Field    | Value                                     |
 |----------|-------------------------------------------|
 | ID       | `tentapress/import`                       |
-| Version  | 0.18.2                                    |
+| Version  | 0.19.0                                    |
 | Provider | `TentaPress\Import\ImportServiceProvider` |
 
 ## Features
@@ -31,6 +31,7 @@ Content import functionality for TentaPress.
 - Verify persisted URL mapping report artifacts through feature tests
 - Report created/skipped/failed counts per entity in completion summaries and streamed phase updates
 - Keep analyzed import tokens available for reruns/retries (no immediate token cleanup after first run)
+- Refresh local media variants for imported media records and report refreshed counts
 - Handles pages, posts, media references, settings
 
 ## Operations

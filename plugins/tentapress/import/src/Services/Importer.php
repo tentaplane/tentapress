@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use TentaPress\Media\Support\MediaVariantMaintenance;
 use SimpleXMLElement;
 use TentaPress\Media\Models\TpMedia;
 use TentaPress\Pages\Models\TpPage;
@@ -729,6 +730,7 @@ final readonly class Importer
         $skippedMedia = 0;
         $failedMedia = 0;
         $downloadedMedia = 0;
+        $refreshedMediaVariants = 0;
         $createdSettings = 0;
         $updatedSettings = 0;
         $importedSeo = 0;
@@ -797,7 +799,7 @@ final readonly class Importer
                         'status' => 'started',
                     ]);
                     $mediaPayload = $this->readJsonFile($mediaPath);
-                    [$createdMedia, $skippedMedia, $failedMedia, $downloadedMedia] = $this->importMedia(
+                    [$createdMedia, $skippedMedia, $failedMedia, $downloadedMedia, $refreshedMediaVariants] = $this->importMedia(
                         $mediaPayload,
                         $actorUserId,
                         $progress
@@ -810,6 +812,7 @@ final readonly class Importer
                         'skipped' => $skippedMedia,
                         'failed' => $failedMedia,
                         'copied' => $downloadedMedia,
+                        'variants_refreshed' => $refreshedMediaVariants,
                     ]);
                 }
             }
@@ -856,6 +859,7 @@ final readonly class Importer
             $parts[] = "Media skipped: {$skippedMedia}";
             $parts[] = "Media failed: {$failedMedia}";
             $parts[] = "Media files copied: {$downloadedMedia}";
+            $parts[] = "Media variants refreshed: {$refreshedMediaVariants}";
         }
 
         $parts[] = "Settings created: {$createdSettings}";
@@ -1220,21 +1224,21 @@ final readonly class Importer
     }
 
     /**
-     * @return array{0:int,1:int,2:int,3:int} createdMedia, skippedMedia, failedMedia, downloadedMedia
+     * @return array{0:int,1:int,2:int,3:int,4:int} createdMedia, skippedMedia, failedMedia, downloadedMedia, refreshedVariants
      */
     private function importMedia(array $payload, int $actorUserId = 0, ?callable $progress = null): array
     {
         if (!class_exists(TpMedia::class)) {
-            return [0, 0, 0, 0];
+            return [0, 0, 0, 0, 0];
         }
 
         if (!Schema::hasTable('tp_media')) {
-            return [0, 0, 0, 0];
+            return [0, 0, 0, 0, 0];
         }
 
         $items = $this->itemsFromPayload($payload);
         if ($items === []) {
-            return [0, 0, 0, 0];
+            return [0, 0, 0, 0, 0];
         }
 
         $hasCreatedBy = Schema::hasColumn('tp_media', 'created_by');
@@ -1244,6 +1248,7 @@ final readonly class Importer
         $skipped = 0;
         $failed = 0;
         $downloaded = 0;
+        $variantsRefreshed = 0;
 
         $total = count($items);
         foreach ($items as $index => $item) {
@@ -1309,13 +1314,18 @@ final readonly class Importer
 
             try {
                 $model = TpMedia::query()->create($data);
-                unset($model);
 
                 $sourceUrl = trim((string) ($item['source_url'] ?? ''));
                 $copied = $sourceUrl !== '' && $this->copyRemoteMediaToDisk($sourceUrl, (string) $data['disk'], (string) $data['path']);
                 if ($copied) {
                     $downloaded++;
                 }
+
+                $variantsUpdated = $this->refreshMediaVariants($model);
+                if ($variantsUpdated) {
+                    $variantsRefreshed++;
+                }
+                unset($model);
 
                 $created++;
                 $this->emitProgress($progress, [
@@ -1326,6 +1336,7 @@ final readonly class Importer
                     'slug' => '',
                     'path' => $path,
                     'copied' => $copied,
+                    'variants_refreshed' => $variantsUpdated,
                     'index' => $index + 1,
                     'total' => $total,
                 ]);
@@ -1340,13 +1351,33 @@ final readonly class Importer
                     'slug' => '',
                     'path' => $path,
                     'copied' => false,
+                    'variants_refreshed' => false,
                     'index' => $index + 1,
                     'total' => $total,
                 ]);
             }
         }
 
-        return [$created, $skipped, $failed, $downloaded];
+        return [$created, $skipped, $failed, $downloaded, $variantsRefreshed];
+    }
+
+    private function refreshMediaVariants(TpMedia $media): bool
+    {
+        if (!class_exists(MediaVariantMaintenance::class)) {
+            return false;
+        }
+
+        try {
+            /** @var MediaVariantMaintenance $maintenance */
+            $maintenance = resolve(MediaVariantMaintenance::class);
+            $maintenance->refresh($media);
+
+            return true;
+        } catch (\Throwable $e) {
+            report($e);
+
+            return false;
+        }
     }
 
     /**

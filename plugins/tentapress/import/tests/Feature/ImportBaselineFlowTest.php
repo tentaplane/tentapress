@@ -317,6 +317,7 @@ it('allows a super admin to analyze and run a wordpress wxr bundle', function ()
             && str_contains($message, 'Media skipped: 0')
             && str_contains($message, 'Media failed: 0')
             && str_contains($message, 'Media files copied: 1')
+            && str_contains($message, 'Media variants refreshed: 1')
             && str_contains($message, 'URL mapping report: storage/app/tp-import-reports/'));
 
     expect(TpPage::query()->where('slug', 'wxr-page-title')->exists())->toBeTrue();
@@ -455,5 +456,6 @@ it('allows rerunning import with the same token without token-expired errors', f
         ->assertRedirect('/admin/import')
         ->assertSessionHas('tp_notice_success', fn (string $message): bool => str_contains($message, 'Pages skipped: 1')
             && str_contains($message, 'Posts skipped: 1')
-            && str_contains($message, 'Media skipped: 1'));
+            && str_contains($message, 'Media skipped: 1')
+            && str_contains($message, 'Media variants refreshed: 0'));
 });
