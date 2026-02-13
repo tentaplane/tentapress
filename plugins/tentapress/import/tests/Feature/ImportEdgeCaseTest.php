@@ -79,6 +79,14 @@ it('denies import routes to non-super-admin users', function (): void {
         ->assertForbidden();
 
     $this->actingAs($user)
+        ->post('/admin/import/start')
+        ->assertForbidden();
+
+    $this->actingAs($user)
+        ->get('/admin/import/progress/test-run')
+        ->assertForbidden();
+
+    $this->actingAs($user)
         ->post('/admin/import/run')
         ->assertForbidden();
 
@@ -229,4 +237,20 @@ it('shows a user-facing error when run token is missing', function (): void {
         ])
         ->assertRedirect('/admin/import')
         ->assertSessionHas('tp_notice_error', 'Import token not found. Please run analysis again.');
+});
+
+it('shows a user-facing error when progress session is missing', function (): void {
+    registerImportProviderForEdgeCases();
+
+    $admin = TpUser::query()->create([
+        'name' => 'Import Admin',
+        'email' => 'import-progress-missing-session@example.test',
+        'password' => 'secret',
+        'is_super_admin' => true,
+    ]);
+
+    $this->actingAs($admin)
+        ->get('/admin/import/progress/missing-run')
+        ->assertRedirect('/admin/import')
+        ->assertSessionHas('tp_notice_error', 'Import progress session not found. Please start import again.');
 });

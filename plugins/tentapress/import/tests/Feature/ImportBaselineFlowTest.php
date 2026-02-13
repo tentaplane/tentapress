@@ -136,6 +136,8 @@ it('redirects guests from import admin routes to login', function (): void {
 
     $this->get('/admin/import')->assertRedirect('/admin/login');
     $this->post('/admin/import/analyze')->assertRedirect('/admin/login');
+    $this->post('/admin/import/start')->assertRedirect('/admin/login');
+    $this->get('/admin/import/progress/test-run')->assertRedirect('/admin/login');
     $this->post('/admin/import/run')->assertRedirect('/admin/login');
     $this->post('/admin/import/run/stream')->assertRedirect('/admin/login');
 });
@@ -236,6 +238,47 @@ it('streams import progress updates for a super admin', function (): void {
     expect($response->streamedContent())->toContain('"kind":"phase"');
     expect($response->streamedContent())->toContain('"event":"progress"');
     expect($response->streamedContent())->toContain('"event":"done"');
+});
+
+it('redirects analyze selections to a dedicated progress page', function (): void {
+    registerImportProvider();
+
+    $admin = TpUser::query()->create([
+        'name' => 'Import Admin',
+        'email' => 'import-progress-route@example.test',
+        'password' => 'secret',
+        'is_super_admin' => true,
+    ]);
+
+    $bundle = makeImportBundleWithSinglePage();
+
+    $analyzeResponse = $this->actingAs($admin)
+        ->post('/admin/import/analyze', [
+            'bundle' => $bundle,
+        ]);
+
+    $token = (string) $analyzeResponse->viewData('token');
+
+    $startResponse = $this->actingAs($admin)
+        ->post('/admin/import/start', [
+            'token' => $token,
+            'pages_mode' => 'create_only',
+            'settings_mode' => 'merge',
+            'include_posts' => '0',
+            'include_media' => '0',
+            'include_seo' => '0',
+        ]);
+
+    $startResponse->assertRedirect();
+    $location = (string) $startResponse->headers->get('Location');
+
+    expect($location)->toContain('/admin/import/progress/');
+
+    $this->actingAs($admin)
+        ->get($location)
+        ->assertOk()
+        ->assertViewIs('tentapress-import::progress')
+        ->assertSee('Import progress');
 });
 
 it('allows a super admin to analyze a wordpress wxr bundle', function (): void {
