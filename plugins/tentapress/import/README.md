@@ -7,7 +7,7 @@ Content import functionality for TentaPress.
 | Field    | Value                                     |
 |----------|-------------------------------------------|
 | ID       | `tentapress/import`                       |
-| Version  | 0.6.1                                     |
+| Version  | 0.7.0                                     |
 | Provider | `TentaPress\Import\ImportServiceProvider` |
 
 ## Features
@@ -18,6 +18,7 @@ Content import functionality for TentaPress.
 - Show unsupported WXR sample entries and actionable XML parse errors
 - Show source-to-destination URL mapping preview for redirect planning
 - Accept common WXR XML MIME types during upload validation
+- Use WXR-aware review controls (settings import options hidden for WXR files)
 - Handles pages, posts, media references, settings
 
 ## Dependencies

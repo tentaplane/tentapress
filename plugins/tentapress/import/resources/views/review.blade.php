@@ -3,6 +3,10 @@
 @section('title', 'Import Review')
 
 @section('content')
+    @php
+        $isWxr = ($meta['source_format'] ?? '') === 'wxr';
+    @endphp
+
     <div class="tp-page-header">
         <div>
             <h1 class="tp-page-title">Review import</h1>
@@ -195,26 +199,32 @@
 
                     <div>
                         <div class="tp-label mb-2">Settings</div>
-
-                        <label class="flex items-center gap-3">
-                            <input type="radio" name="settings_mode" class="tp-checkbox" value="merge" checked />
-                            <span class="text-sm">
-                                <span class="font-semibold">Merge</span>
-                                <span class="tp-muted mt-1 block text-xs">
-                                    Add only missing settings. Existing settings stay the same.
+                        @if ($isWxr)
+                            <input type="hidden" name="settings_mode" value="merge" />
+                            <div class="tp-muted text-sm">
+                                Settings are not included in WordPress WXR imports.
+                            </div>
+                        @else
+                            <label class="flex items-center gap-3">
+                                <input type="radio" name="settings_mode" class="tp-checkbox" value="merge" checked />
+                                <span class="text-sm">
+                                    <span class="font-semibold">Merge</span>
+                                    <span class="tp-muted mt-1 block text-xs">
+                                        Add only missing settings. Existing settings stay the same.
+                                    </span>
                                 </span>
-                            </span>
-                        </label>
+                            </label>
 
-                        <label class="mt-2 flex items-center gap-3">
-                            <input type="radio" name="settings_mode" class="tp-checkbox" value="overwrite" />
-                            <span class="text-sm">
-                                <span class="font-semibold">Overwrite</span>
-                                <span class="tp-muted mt-1 block text-xs">
-                                    Update existing settings to match this file.
+                            <label class="mt-2 flex items-center gap-3">
+                                <input type="radio" name="settings_mode" class="tp-checkbox" value="overwrite" />
+                                <span class="text-sm">
+                                    <span class="font-semibold">Overwrite</span>
+                                    <span class="tp-muted mt-1 block text-xs">
+                                        Update existing settings to match this file.
+                                    </span>
                                 </span>
-                            </span>
-                        </label>
+                            </label>
+                        @endif
                     </div>
 
                     <div class="tp-divider"></div>

@@ -210,6 +210,7 @@ it('allows a super admin to analyze a wordpress wxr bundle', function (): void {
         ])
         ->assertOk()
         ->assertViewIs('tentapress-import::review')
+        ->assertSee('Settings are not included in WordPress WXR imports.')
         ->assertViewHas('summary', fn (array $summary): bool => ($summary['pages'] ?? null) === 1
             && ($summary['posts'] ?? null) === 1
             && ($summary['media'] ?? null) === 1
