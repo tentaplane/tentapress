@@ -643,6 +643,18 @@ final readonly class Importer
         return 'storage/app/tp-import-reports/' . $token . '.json';
     }
 
+    /**
+     * @param  array<string,mixed>  $payload
+     */
+    private function emitProgress(?callable $progress, array $payload): void
+    {
+        if (!is_callable($progress)) {
+            return;
+        }
+
+        $progress($payload);
+    }
+
     private function featuredImageSourceId(SimpleXMLElement $item): ?string
     {
         $postMeta = $item->xpath('wp:postmeta');
@@ -678,7 +690,8 @@ final readonly class Importer
      *   include_posts?:bool,
      *   include_media?:bool,
      *   include_seo?:bool,
-     *   actor_user_id?:int
+     *   actor_user_id?:int,
+     *   progress?:callable(array<string,mixed>):void
      * } $options
      *
      * @return array{message:string}
@@ -700,6 +713,7 @@ final readonly class Importer
         $includeMedia = (bool) ($options['include_media'] ?? true);
         $includeSeo = (bool) ($options['include_seo'] ?? false);
         $actorUserId = (int) ($options['actor_user_id'] ?? 0);
+        $progress = is_callable($options['progress'] ?? null) ? $options['progress'] : null;
 
         $createdPages = 0;
         $createdPosts = 0;
@@ -718,14 +732,14 @@ final readonly class Importer
             $pagesPath = $baseDir . DIRECTORY_SEPARATOR . 'pages.json';
             if (is_file($pagesPath)) {
                 $pagesPayload = $this->readJsonFile($pagesPath);
-                [$createdPages, , $pageMappings] = $this->importPages($pagesPayload, $pagesMode, $actorUserId);
+                [$createdPages, , $pageMappings] = $this->importPages($pagesPayload, $pagesMode, $actorUserId, $progress);
             }
 
             if ($includePosts) {
                 $postsPath = $baseDir . DIRECTORY_SEPARATOR . 'posts.json';
                 if (is_file($postsPath)) {
                     $postsPayload = $this->readJsonFile($postsPath);
-                    [$createdPosts, , $postMappings] = $this->importPosts($postsPayload, $actorUserId);
+                    [$createdPosts, , $postMappings] = $this->importPosts($postsPayload, $actorUserId, $progress);
                 }
             }
 
@@ -733,7 +747,7 @@ final readonly class Importer
                 $mediaPath = $baseDir . DIRECTORY_SEPARATOR . 'media.json';
                 if (is_file($mediaPath)) {
                     $mediaPayload = $this->readJsonFile($mediaPath);
-                    [$createdMedia, , $downloadedMedia] = $this->importMedia($mediaPayload, $actorUserId);
+                    [$createdMedia, , $downloadedMedia] = $this->importMedia($mediaPayload, $actorUserId, $progress);
                 }
             }
 
@@ -804,7 +818,7 @@ final readonly class Importer
     /**
      * @return array{0:int,1:int,2:array<int,array<string,string|null>>} createdPages, skippedPages, mappings
      */
-    private function importPages(array $payload, string $mode, int $actorUserId = 0): array
+    private function importPages(array $payload, string $mode, int $actorUserId = 0, ?callable $progress = null): array
     {
         if ($mode !== 'create_only') {
             $mode = 'create_only';
@@ -833,7 +847,8 @@ final readonly class Importer
         $skipped = 0;
         $mappings = [];
 
-        foreach ($items as $item) {
+        $total = count($items);
+        foreach ($items as $index => $item) {
             if (!is_array($item)) {
                 continue;
             }
@@ -843,6 +858,14 @@ final readonly class Importer
 
             if ($slug === '') {
                 $skipped++;
+                $this->emitProgress($progress, [
+                    'entity' => 'page',
+                    'status' => 'skipped',
+                    'title' => $title,
+                    'slug' => '',
+                    'index' => $index + 1,
+                    'total' => $total,
+                ]);
                 continue;
             }
 
@@ -886,6 +909,14 @@ final readonly class Importer
             unset($model);
 
             $created++;
+            $this->emitProgress($progress, [
+                'entity' => 'page',
+                'status' => 'imported',
+                'title' => $title,
+                'slug' => $slug,
+                'index' => $index + 1,
+                'total' => $total,
+            ]);
         }
 
         return [$created, $skipped, $mappings];
@@ -916,7 +947,7 @@ final readonly class Importer
     /**
      * @return array{0:int,1:int,2:array<int,array<string,string|null>>} createdPosts, skippedPosts, mappings
      */
-    private function importPosts(array $payload, int $actorUserId = 0): array
+    private function importPosts(array $payload, int $actorUserId = 0, ?callable $progress = null): array
     {
         if (!class_exists(TpPost::class)) {
             return [0, 0];
@@ -944,7 +975,8 @@ final readonly class Importer
         $skipped = 0;
         $mappings = [];
 
-        foreach ($items as $item) {
+        $total = count($items);
+        foreach ($items as $index => $item) {
             if (!is_array($item)) {
                 continue;
             }
@@ -954,6 +986,14 @@ final readonly class Importer
 
             if ($slug === '') {
                 $skipped++;
+                $this->emitProgress($progress, [
+                    'entity' => 'post',
+                    'status' => 'skipped',
+                    'title' => $title,
+                    'slug' => '',
+                    'index' => $index + 1,
+                    'total' => $total,
+                ]);
                 continue;
             }
 
@@ -1013,6 +1053,14 @@ final readonly class Importer
             unset($model);
 
             $created++;
+            $this->emitProgress($progress, [
+                'entity' => 'post',
+                'status' => 'imported',
+                'title' => $title,
+                'slug' => $slug,
+                'index' => $index + 1,
+                'total' => $total,
+            ]);
         }
 
         return [$created, $skipped, $mappings];
@@ -1042,7 +1090,7 @@ final readonly class Importer
     /**
      * @return array{0:int,1:int,2:int} createdMedia, skippedMedia, downloadedMedia
      */
-    private function importMedia(array $payload, int $actorUserId = 0): array
+    private function importMedia(array $payload, int $actorUserId = 0, ?callable $progress = null): array
     {
         if (!class_exists(TpMedia::class)) {
             return [0, 0, 0];
@@ -1064,7 +1112,8 @@ final readonly class Importer
         $skipped = 0;
         $downloaded = 0;
 
-        foreach ($items as $item) {
+        $total = count($items);
+        foreach ($items as $index => $item) {
             if (!is_array($item)) {
                 continue;
             }
@@ -1072,11 +1121,31 @@ final readonly class Importer
             $path = trim((string) ($item['path'] ?? ''));
             if ($path === '') {
                 $skipped++;
+                $this->emitProgress($progress, [
+                    'entity' => 'media',
+                    'status' => 'skipped',
+                    'title' => '',
+                    'slug' => '',
+                    'path' => '',
+                    'copied' => false,
+                    'index' => $index + 1,
+                    'total' => $total,
+                ]);
                 continue;
             }
 
             if (DB::table('tp_media')->where('path', $path)->exists()) {
                 $skipped++;
+                $this->emitProgress($progress, [
+                    'entity' => 'media',
+                    'status' => 'skipped',
+                    'title' => (string) ($item['title'] ?? ''),
+                    'slug' => '',
+                    'path' => $path,
+                    'copied' => false,
+                    'index' => $index + 1,
+                    'total' => $total,
+                ]);
                 continue;
             }
 
@@ -1107,11 +1176,22 @@ final readonly class Importer
             unset($model);
 
             $sourceUrl = trim((string) ($item['source_url'] ?? ''));
-            if ($sourceUrl !== '' && $this->copyRemoteMediaToDisk($sourceUrl, (string) $data['disk'], (string) $data['path'])) {
+            $copied = $sourceUrl !== '' && $this->copyRemoteMediaToDisk($sourceUrl, (string) $data['disk'], (string) $data['path']);
+            if ($copied) {
                 $downloaded++;
             }
 
             $created++;
+            $this->emitProgress($progress, [
+                'entity' => 'media',
+                'status' => 'imported',
+                'title' => (string) ($item['title'] ?? ''),
+                'slug' => '',
+                'path' => $path,
+                'copied' => $copied,
+                'index' => $index + 1,
+                'total' => $total,
+            ]);
         }
 
         return [$created, $skipped, $downloaded];

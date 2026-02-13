@@ -81,6 +81,10 @@ it('denies import routes to non-super-admin users', function (): void {
     $this->actingAs($user)
         ->post('/admin/import/run')
         ->assertForbidden();
+
+    $this->actingAs($user)
+        ->post('/admin/import/run/stream')
+        ->assertForbidden();
 });
 
 it('validates that analyze requires a zip or xml bundle', function (): void {

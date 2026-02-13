@@ -137,6 +137,7 @@ it('redirects guests from import admin routes to login', function (): void {
     $this->get('/admin/import')->assertRedirect('/admin/login');
     $this->post('/admin/import/analyze')->assertRedirect('/admin/login');
     $this->post('/admin/import/run')->assertRedirect('/admin/login');
+    $this->post('/admin/import/run/stream')->assertRedirect('/admin/login');
 });
 
 it('allows a super admin to view import index', function (): void {
@@ -197,6 +198,41 @@ it('allows a super admin to analyze and run an import bundle', function (): void
     expect(
         TpPage::query()->where('slug', 'imported-home')->exists()
     )->toBeTrue();
+});
+
+it('streams import progress updates for a super admin', function (): void {
+    registerImportProvider();
+
+    $admin = TpUser::query()->create([
+        'name' => 'Import Admin',
+        'email' => 'import-stream@example.test',
+        'password' => 'secret',
+        'is_super_admin' => true,
+    ]);
+
+    $bundle = makeImportBundleWithSinglePage();
+
+    $analyzeResponse = $this->actingAs($admin)
+        ->post('/admin/import/analyze', [
+            'bundle' => $bundle,
+        ]);
+
+    $token = (string) $analyzeResponse->viewData('token');
+
+    $response = $this->actingAs($admin)
+        ->post('/admin/import/run/stream', [
+            'token' => $token,
+            'pages_mode' => 'create_only',
+            'settings_mode' => 'merge',
+            'include_posts' => '0',
+            'include_media' => '0',
+            'include_seo' => '0',
+        ]);
+
+    $response->assertOk();
+    expect($response->headers->get('Content-Type'))->toContain('text/event-stream');
+    expect($response->streamedContent())->toContain('"event":"progress"');
+    expect($response->streamedContent())->toContain('"event":"done"');
 });
 
 it('allows a super admin to analyze a wordpress wxr bundle', function (): void {

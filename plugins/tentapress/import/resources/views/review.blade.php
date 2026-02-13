@@ -181,6 +181,8 @@
                 method="POST"
                 action="{{ route('tp.import.run') }}"
                 class="space-y-4"
+                id="tp-import-run-form"
+                data-stream-url="{{ route('tp.import.run.stream') }}"
                 data-confirm="Start import now?">
                 @csrf
                 <input type="hidden" name="token" value="{{ $token }}" />
@@ -287,7 +289,7 @@
                 </div>
 
                 <div class="flex gap-2">
-                    <button type="submit" class="tp-button-primary">
+                    <button type="submit" class="tp-button-primary" id="tp-import-run-submit">
                         Start import
                     </button>
                     <a href="{{ route('tp.import.index') }}" class="tp-button-secondary">Cancel</a>
@@ -295,6 +297,138 @@
 
                 <div class="tp-muted text-xs">The uploaded file is removed from temporary storage after import.</div>
             </form>
+
+            <div id="tp-import-progress-panel" class="tp-panel hidden">
+                <div class="tp-label mb-2">Live import progress</div>
+                <div id="tp-import-progress-status" class="tp-muted text-sm">Waiting to start...</div>
+                <ul id="tp-import-progress-list" class="mt-3 max-h-72 space-y-1 overflow-auto text-sm"></ul>
+            </div>
         </div>
     </div>
+
+    <script>
+        (() => {
+            const form = document.getElementById('tp-import-run-form');
+            const submitButton = document.getElementById('tp-import-run-submit');
+            const panel = document.getElementById('tp-import-progress-panel');
+            const statusNode = document.getElementById('tp-import-progress-status');
+            const listNode = document.getElementById('tp-import-progress-list');
+
+            if (!form || !submitButton || !panel || !statusNode || !listNode) {
+                return;
+            }
+
+            const streamUrl = form.getAttribute('data-stream-url');
+            if (!streamUrl || typeof fetch !== 'function') {
+                return;
+            }
+
+            const appendLine = (line) => {
+                const li = document.createElement('li');
+                li.textContent = line;
+                listNode.appendChild(li);
+                listNode.scrollTop = listNode.scrollHeight;
+            };
+
+            form.addEventListener('submit', async (event) => {
+                event.preventDefault();
+
+                panel.classList.remove('hidden');
+                submitButton.setAttribute('disabled', 'disabled');
+                submitButton.textContent = 'Importing...';
+                statusNode.textContent = 'Import started...';
+                listNode.innerHTML = '';
+
+                try {
+                    const response = await fetch(streamUrl, {
+                        method: 'POST',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'text/event-stream',
+                            'X-CSRF-TOKEN': form.querySelector('input[name=\"_token\"]')?.value || '',
+                        },
+                        body: new FormData(form),
+                    });
+
+                    if (!response.ok || !response.body) {
+                        throw new Error('Unable to start streaming import.');
+                    }
+
+                    const reader = response.body.getReader();
+                    const decoder = new TextDecoder();
+                    let buffer = '';
+
+                    while (true) {
+                        const { value, done } = await reader.read();
+                        if (done) {
+                            break;
+                        }
+
+                        buffer += decoder.decode(value, { stream: true });
+                        const chunks = buffer.split('\n\n');
+                        buffer = chunks.pop() || '';
+
+                        for (const chunk of chunks) {
+                            const dataLine = chunk.split('\n').find((line) => line.startsWith('data: '));
+                            if (!dataLine) {
+                                continue;
+                            }
+
+                            let payload = null;
+                            try {
+                                payload = JSON.parse(dataLine.slice(6));
+                            } catch (_) {
+                                continue;
+                            }
+
+                            if (!payload || typeof payload !== 'object') {
+                                continue;
+                            }
+
+                            if (payload.event === 'started') {
+                                statusNode.textContent = payload.message || 'Import started...';
+                                appendLine('Started import');
+                                continue;
+                            }
+
+                            if (payload.event === 'progress') {
+                                const entity = payload.entity || 'item';
+                                const status = payload.status || 'processed';
+                                const index = payload.index || 0;
+                                const total = payload.total || 0;
+                                const label = payload.title || payload.slug || payload.path || '(untitled)';
+                                appendLine(`[${entity}] ${status} (${index}/${total}) ${label}`);
+                                statusNode.textContent = `Processing ${entity} ${index}/${total}...`;
+                                continue;
+                            }
+
+                            if (payload.event === 'done') {
+                                statusNode.textContent = payload.message || 'Import completed.';
+                                appendLine('Import completed');
+                                submitButton.textContent = 'Import complete';
+                                return;
+                            }
+
+                            if (payload.event === 'error') {
+                                statusNode.textContent = payload.message || 'Import failed.';
+                                appendLine('Error: ' + statusNode.textContent);
+                                submitButton.removeAttribute('disabled');
+                                submitButton.textContent = 'Retry import';
+                                return;
+                            }
+                        }
+                    }
+
+                    submitButton.removeAttribute('disabled');
+                    submitButton.textContent = 'Retry import';
+                } catch (error) {
+                    const message = error instanceof Error ? error.message : 'Import failed.';
+                    statusNode.textContent = message;
+                    appendLine('Error: ' + message);
+                    submitButton.removeAttribute('disabled');
+                    submitButton.textContent = 'Retry import';
+                }
+            });
+        })();
+    </script>
 @endsection

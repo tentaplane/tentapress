@@ -5,6 +5,7 @@ declare(strict_types=1);
 use TentaPress\Import\Http\Admin\IndexController;
 use TentaPress\Import\Http\Admin\AnalyzeController;
 use TentaPress\Import\Http\Admin\RunController;
+use TentaPress\Import\Http\Admin\RunStreamController;
 use Illuminate\Support\Facades\Route;
 use TentaPress\System\Support\AdminRoutes;
 
@@ -13,5 +14,6 @@ AdminRoutes::group(function (): void {
         Route::get('/import', IndexController::class)->name('import.index');
         Route::post('/import/analyze', AnalyzeController::class)->name('import.analyze');
         Route::post('/import/run', RunController::class)->name('import.run');
+        Route::post('/import/run/stream', RunStreamController::class)->name('import.run.stream');
     });
 });
