@@ -72,6 +72,14 @@
                         <div class="mt-1">{{ (int) ($summary['unsupported_items'] ?? 0) }}</div>
                     </div>
                     <div>
+                        <div class="tp-muted text-xs font-semibold uppercase">Featured image refs</div>
+                        <div class="mt-1">{{ (int) ($summary['featured_image_refs'] ?? 0) }}</div>
+                    </div>
+                    <div>
+                        <div class="tp-muted text-xs font-semibold uppercase">Featured refs resolved</div>
+                        <div class="mt-1">{{ (int) ($summary['featured_image_resolved'] ?? 0) }}</div>
+                    </div>
+                    <div>
                         <div class="tp-muted text-xs font-semibold uppercase">Enabled plugins</div>
                         <div class="mt-1">{{ (int) ($summary['enabled_plugins'] ?? 0) }}</div>
                     </div>

@@ -191,6 +191,8 @@ final readonly class Importer
         $categories = [];
         $tags = [];
         $urlMappingsPreview = [];
+        $featuredImageRefs = [];
+        $attachmentSourceIds = [];
 
         $items = $xml->xpath('/rss/channel/item');
         if (is_array($items)) {
@@ -244,6 +246,11 @@ final readonly class Importer
                 }
 
                 if ($postType === 'page') {
+                    $featuredImageSourceId = $this->featuredImageSourceId($item);
+                    if ($featuredImageSourceId !== null) {
+                        $featuredImageRefs[] = $featuredImageSourceId;
+                    }
+
                     $pagesItems[] = [
                         'source_post_id' => $sourcePostId !== '' ? $sourcePostId : null,
                         'source_link' => $sourceLink !== '' ? $sourceLink : null,
@@ -262,6 +269,11 @@ final readonly class Importer
                 }
 
                 if ($postType === 'post') {
+                    $featuredImageSourceId = $this->featuredImageSourceId($item);
+                    if ($featuredImageSourceId !== null) {
+                        $featuredImageRefs[] = $featuredImageSourceId;
+                    }
+
                     $postsItems[] = [
                         'source_post_id' => $sourcePostId !== '' ? $sourcePostId : null,
                         'source_link' => $sourceLink !== '' ? $sourceLink : null,
@@ -300,6 +312,10 @@ final readonly class Importer
                         'title' => $title !== '' ? $title : null,
                         'mime_type' => $this->mimeFromAttachmentPath($path),
                     ];
+
+                    if ($sourcePostId !== '') {
+                        $attachmentSourceIds[$sourcePostId] = true;
+                    }
 
                     continue;
                 }
@@ -379,6 +395,13 @@ final readonly class Importer
             'items' => $mediaItems,
         ]));
 
+        $featuredImageResolved = 0;
+        foreach ($featuredImageRefs as $thumbnailId) {
+            if (isset($attachmentSourceIds[$thumbnailId])) {
+                $featuredImageResolved++;
+            }
+        }
+
         return [
             'token' => $token,
             'summary' => [
@@ -393,6 +416,8 @@ final readonly class Importer
                 'unsupported_types' => $unsupportedByType,
                 'unsupported_samples' => $unsupportedSamples,
                 'url_mappings_preview' => $urlMappingsPreview,
+                'featured_image_refs' => count($featuredImageRefs),
+                'featured_image_resolved' => $featuredImageResolved,
                 'theme_active_id' => '',
                 'enabled_plugins' => 0,
             ],
@@ -537,6 +562,32 @@ final readonly class Importer
         }
 
         return preg_match('/^[a-z0-9]+(?:-[a-z0-9]+)*$/', $rawBase) === 1 ? $rawBase : $defaultBase;
+    }
+
+    private function featuredImageSourceId(SimpleXMLElement $item): ?string
+    {
+        $postMeta = $item->xpath('wp:postmeta');
+        if (!is_array($postMeta)) {
+            return null;
+        }
+
+        foreach ($postMeta as $metaNode) {
+            if (!$metaNode instanceof SimpleXMLElement) {
+                continue;
+            }
+
+            $metaKey = trim((string) ($metaNode->xpath('wp:meta_key')[0] ?? ''));
+            if ($metaKey !== '_thumbnail_id') {
+                continue;
+            }
+
+            $metaValue = trim((string) ($metaNode->xpath('wp:meta_value')[0] ?? ''));
+            if ($metaValue !== '') {
+                return $metaValue;
+            }
+        }
+
+        return null;
     }
 
     /**

@@ -102,6 +102,10 @@ function makeWxrBundleWithPagePostAndAttachment(): UploadedFile
             <wp:status>publish</wp:status>
             <wp:post_date_gmt>2025-10-12 14:00:00</wp:post_date_gmt>
             <link>https://legacy.example.com/post-title</link>
+            <wp:postmeta>
+                <wp:meta_key>_thumbnail_id</wp:meta_key>
+                <wp:meta_value>103</wp:meta_value>
+            </wp:postmeta>
             <content:encoded><![CDATA[<p>Post body.</p>]]></content:encoded>
         </item>
         <item>
@@ -219,7 +223,9 @@ it('allows a super admin to analyze a wordpress wxr bundle', function (): void {
             && ($summary['unsupported_items'] ?? null) === 1
             && ($summary['unsupported_types']['product'] ?? null) === 1
             && (($summary['url_mappings_preview'][0]['destination_url'] ?? null) === '/wxr-page-title')
-            && (($summary['url_mappings_preview'][1]['destination_url'] ?? null) === '/blog/wxr-post-title'))
+            && (($summary['url_mappings_preview'][1]['destination_url'] ?? null) === '/blog/wxr-post-title')
+            && ($summary['featured_image_refs'] ?? null) === 1
+            && ($summary['featured_image_resolved'] ?? null) === 1)
         ->assertViewHas('meta', fn (array $meta): bool => ($meta['source_format'] ?? null) === 'wxr');
 });
 
