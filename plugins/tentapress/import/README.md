@@ -7,13 +7,13 @@ Content import functionality for TentaPress.
 | Field    | Value                                     |
 |----------|-------------------------------------------|
 | ID       | `tentapress/import`                       |
-| Version  | 0.2.0                                     |
+| Version  | 0.3.0                                     |
 | Provider | `TentaPress\Import\ImportServiceProvider` |
 
 ## Features
 
 - Import site content from TentaPress JSON export bundles
-- Analyze WordPress WXR (`.xml`) exports with entity summaries
+- Analyze and import WordPress WXR (`.xml`) exports (pages, posts, media metadata)
 - Handles pages, posts, media references, settings
 
 ## Dependencies

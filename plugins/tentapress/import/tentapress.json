@@ -1,7 +1,7 @@
 {
     "id": "tentapress/import",
     "name": "Import",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "provider": "TentaPress\\Import\\ImportServiceProvider",
     "admin": {
         "menus": [

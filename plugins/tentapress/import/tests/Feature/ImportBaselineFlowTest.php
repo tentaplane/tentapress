@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\File;
+use TentaPress\Media\Models\TpMedia;
+use TentaPress\Posts\Models\TpPost;
 use TentaPress\Import\ImportServiceProvider;
 use TentaPress\Pages\Models\TpPage;
 use TentaPress\Users\Models\TpUser;
@@ -87,16 +89,24 @@ function makeWxrBundleWithPagePostAndAttachment(): UploadedFile
             <title>Page Title</title>
             <wp:post_id>101</wp:post_id>
             <wp:post_type>page</wp:post_type>
+            <wp:post_name>wxr-page-title</wp:post_name>
+            <wp:status>publish</wp:status>
+            <content:encoded><![CDATA[<p>Page content line 1.</p><p>Page content line 2.</p>]]></content:encoded>
         </item>
         <item>
             <title>Post Title</title>
             <wp:post_id>102</wp:post_id>
             <wp:post_type>post</wp:post_type>
+            <wp:post_name>wxr-post-title</wp:post_name>
+            <wp:status>publish</wp:status>
+            <wp:post_date_gmt>2025-10-12 14:00:00</wp:post_date_gmt>
+            <content:encoded><![CDATA[<p>Post body.</p>]]></content:encoded>
         </item>
         <item>
             <title>Image</title>
             <wp:post_id>103</wp:post_id>
             <wp:post_type>attachment</wp:post_type>
+            <wp:attachment_url>https://example.com/wp-content/uploads/2025/10/image.jpg</wp:attachment_url>
         </item>
     </channel>
 </rss>
@@ -199,4 +209,44 @@ it('allows a super admin to analyze a wordpress wxr bundle', function (): void {
             && ($summary['categories'] ?? null) === 1
             && ($summary['tags'] ?? null) === 1)
         ->assertViewHas('meta', fn (array $meta): bool => ($meta['source_format'] ?? null) === 'wxr');
+});
+
+it('allows a super admin to analyze and run a wordpress wxr bundle', function (): void {
+    registerImportProvider();
+
+    $admin = TpUser::query()->create([
+        'name' => 'Import Admin',
+        'email' => 'import-wxr-run@example.test',
+        'password' => 'secret',
+        'is_super_admin' => true,
+    ]);
+
+    $bundle = makeWxrBundleWithPagePostAndAttachment();
+
+    $analyzeResponse = $this->actingAs($admin)
+        ->post('/admin/import/analyze', [
+            'bundle' => $bundle,
+        ]);
+
+    $analyzeResponse
+        ->assertOk()
+        ->assertViewHas('token');
+
+    $token = (string) $analyzeResponse->viewData('token');
+
+    $this->actingAs($admin)
+        ->post('/admin/import/run', [
+            'token' => $token,
+            'pages_mode' => 'create_only',
+            'settings_mode' => 'merge',
+            'include_posts' => '1',
+            'include_media' => '1',
+            'include_seo' => '0',
+        ])
+        ->assertRedirect('/admin/import')
+        ->assertSessionHas('tp_notice_success');
+
+    expect(TpPage::query()->where('slug', 'wxr-page-title')->exists())->toBeTrue();
+    expect(TpPost::query()->where('slug', 'wxr-post-title')->exists())->toBeTrue();
+    expect(TpMedia::query()->where('path', 'wp-content/uploads/2025/10/image.jpg')->exists())->toBeTrue();
 });

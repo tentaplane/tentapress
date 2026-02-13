@@ -1,5 +1,15 @@
 # WordPress WXR Importer Spec
 
+## Implementation Status (Current)
+
+- WXR `.xml` upload is supported in Import analyze flow.
+- WXR run currently imports:
+  - pages
+  - posts
+  - attachment metadata (as media records)
+- Categories and tags are parsed and reported in summary counts.
+- Unsupported entity types are still out of import scope and treated as report-only.
+
 ## Summary
 
 This spec defines a WordPress migration path for TentaPress using WXR (WordPress eXtended RSS) as the primary import format for compatibility.

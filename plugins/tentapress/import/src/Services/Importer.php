@@ -180,9 +180,9 @@ final readonly class Importer
 
         $wxrVersion = trim((string) ($xml->xpath('/rss/channel/wp:wxr_version')[0] ?? ''));
 
-        $pagesCount = 0;
-        $postsCount = 0;
-        $mediaCount = 0;
+        $pagesItems = [];
+        $postsItems = [];
+        $mediaItems = [];
 
         $items = $xml->xpath('/rss/channel/item');
         if (is_array($items)) {
@@ -201,18 +201,58 @@ final readonly class Importer
 
                 $postType = trim((string) ($item->xpath('wp:post_type')[0] ?? ''));
 
+                $title = trim((string) ($item->title ?? ''));
+                $contentEncoded = trim((string) ($item->xpath('content:encoded')[0] ?? ''));
+                $plainContent = $this->plainContentFromHtml($contentEncoded);
+                $slugRaw = trim((string) ($item->xpath('wp:post_name')[0] ?? ''));
+                $slug = $slugRaw !== '' ? Str::slug($slugRaw) : Str::slug($title);
+                if ($slug === '') {
+                    $slug = 'imported-' . substr($this->token(), 0, 8);
+                }
+
                 if ($postType === 'page') {
-                    $pagesCount++;
+                    $pagesItems[] = [
+                        'title' => $title,
+                        'slug' => $slug,
+                        'status' => $this->normalizeWxrStatus((string) ($item->xpath('wp:status')[0] ?? '')),
+                        'layout' => 'default',
+                        'blocks' => $this->contentBlocks($plainContent),
+                    ];
+
                     continue;
                 }
 
                 if ($postType === 'post') {
-                    $postsCount++;
+                    $postsItems[] = [
+                        'title' => $title,
+                        'slug' => $slug,
+                        'status' => $this->normalizeWxrStatus((string) ($item->xpath('wp:status')[0] ?? '')),
+                        'layout' => 'default',
+                        'blocks' => $this->contentBlocks($plainContent),
+                        'published_at' => $this->normalizeWxrDate(
+                            (string) ($item->xpath('wp:post_date_gmt')[0] ?? ''),
+                            (string) ($item->xpath('wp:post_date')[0] ?? ''),
+                        ),
+                        'author_id' => null,
+                    ];
+
                     continue;
                 }
 
                 if ($postType === 'attachment') {
-                    $mediaCount++;
+                    $attachmentUrl = trim((string) ($item->xpath('wp:attachment_url')[0] ?? ''));
+                    $path = ltrim((string) parse_url($attachmentUrl, PHP_URL_PATH), '/');
+
+                    if ($path === '') {
+                        continue;
+                    }
+
+                    $mediaItems[] = [
+                        'path' => $path,
+                        'disk' => 'public',
+                        'title' => $title !== '' ? $title : null,
+                        'mime_type' => $this->mimeFromAttachmentPath($path),
+                    ];
                 }
             }
         }
@@ -226,17 +266,38 @@ final readonly class Importer
             'schema_version' => 1,
             'generated_at_utc' => $generatedAtUtc,
             'wxr_version' => $wxrVersion,
+            'files' => [
+                'pages' => $pagesItems !== [],
+                'posts' => $postsItems !== [],
+                'media' => $mediaItems !== [],
+                'settings' => false,
+                'theme' => false,
+                'plugins' => false,
+                'seo' => false,
+            ],
         ];
 
         File::put($baseDir . DIRECTORY_SEPARATOR . 'plan.json', $this->jsonPayload->encode($plan));
         File::put($baseDir . DIRECTORY_SEPARATOR . 'wxr.xml', (string) $xmlRaw);
+        File::put($baseDir . DIRECTORY_SEPARATOR . 'pages.json', $this->jsonPayload->encode([
+            'count' => count($pagesItems),
+            'items' => $pagesItems,
+        ]));
+        File::put($baseDir . DIRECTORY_SEPARATOR . 'posts.json', $this->jsonPayload->encode([
+            'count' => count($postsItems),
+            'items' => $postsItems,
+        ]));
+        File::put($baseDir . DIRECTORY_SEPARATOR . 'media.json', $this->jsonPayload->encode([
+            'count' => count($mediaItems),
+            'items' => $mediaItems,
+        ]));
 
         return [
             'token' => $token,
             'summary' => [
-                'pages' => $pagesCount,
-                'posts' => $postsCount,
-                'media' => $mediaCount,
+                'pages' => count($pagesItems),
+                'posts' => count($postsItems),
+                'media' => count($mediaItems),
                 'settings' => 0,
                 'seo' => 0,
                 'categories' => is_array($categories) ? count($categories) : 0,
@@ -263,6 +324,75 @@ final readonly class Importer
         $mimeType = strtolower((string) $bundleFile->getClientMimeType());
 
         return str_contains($mimeType, 'zip');
+    }
+
+    private function normalizeWxrStatus(string $status): string
+    {
+        return trim(strtolower($status)) === 'publish' ? 'published' : 'draft';
+    }
+
+    private function normalizeWxrDate(string $gmt, string $local): ?string
+    {
+        $candidate = trim($gmt) !== '' && trim($gmt) !== '0000-00-00 00:00:00' ? trim($gmt) : trim($local);
+        if ($candidate === '' || $candidate === '0000-00-00 00:00:00') {
+            return null;
+        }
+
+        return str_replace(' ', 'T', $candidate);
+    }
+
+    /**
+     * @return array<int,array<string,mixed>>
+     */
+    private function contentBlocks(string $plainContent): array
+    {
+        if ($plainContent === '') {
+            return [];
+        }
+
+        return [
+            [
+                'type' => 'blocks/content',
+                'props' => [
+                    'content' => $plainContent,
+                    'width' => 'normal',
+                    'alignment' => 'left',
+                    'background' => 'none',
+                ],
+            ],
+        ];
+    }
+
+    private function plainContentFromHtml(string $html): string
+    {
+        if (trim($html) === '') {
+            return '';
+        }
+
+        $withNewlines = preg_replace('/<\s*br\s*\/?>/i', "\n", $html);
+        if (!is_string($withNewlines)) {
+            return '';
+        }
+
+        $stripped = strip_tags($withNewlines);
+        $decoded = html_entity_decode($stripped, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
+        return trim(preg_replace("/\n{3,}/", "\n\n", $decoded) ?? $decoded);
+    }
+
+    private function mimeFromAttachmentPath(string $path): ?string
+    {
+        $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+
+        return match ($extension) {
+            'jpg', 'jpeg' => 'image/jpeg',
+            'png' => 'image/png',
+            'gif' => 'image/gif',
+            'webp' => 'image/webp',
+            'svg' => 'image/svg+xml',
+            'avif' => 'image/avif',
+            default => null,
+        };
     }
 
     /**
