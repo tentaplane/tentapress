@@ -704,7 +704,11 @@ final readonly class Importer
         $baseDir = storage_path('app/tp-imports/' . $token);
         $planPath = $baseDir . DIRECTORY_SEPARATOR . 'plan.json';
 
-        throw_if(!is_dir($baseDir) || !is_file($planPath), \RuntimeException::class, 'Import token not found or expired.');
+        throw_if(
+            !is_dir($baseDir) || !is_file($planPath),
+            \RuntimeException::class,
+            'Import token not found. Please run analysis again.'
+        );
         $plan = $this->readJsonFile($planPath);
 
         $pagesMode = (string) ($options['pages_mode'] ?? 'create_only');
@@ -830,9 +834,6 @@ final readonly class Importer
         } catch (\Throwable $e) {
             DB::rollBack();
             throw $e;
-        } finally {
-            // Clean up after run (keeps installs tidy)
-            $this->cleanup($baseDir);
         }
 
         $parts = [];

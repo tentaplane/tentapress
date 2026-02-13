@@ -406,3 +406,54 @@ it('skips duplicate wxr source rows on create-only rerun', function (): void {
     expect(TpPost::query()->where('slug', 'wxr-post-title')->count())->toBe(1);
     expect(TpPost::query()->where('slug', 'wxr-post-title-2')->exists())->toBeFalse();
 });
+
+it('allows rerunning import with the same token without token-expired errors', function (): void {
+    registerImportProvider();
+
+    $admin = TpUser::query()->create([
+        'name' => 'Import Admin',
+        'email' => 'import-same-token-rerun@example.test',
+        'password' => 'secret',
+        'is_super_admin' => true,
+    ]);
+
+    $bundle = makeWxrBundleWithPagePostAndAttachment();
+    Http::fake([
+        'https://example.com/*' => Http::response('fake-image-content', 200, [
+            'Content-Type' => 'image/jpeg',
+        ]),
+    ]);
+
+    $analyzeResponse = $this->actingAs($admin)
+        ->post('/admin/import/analyze', [
+            'bundle' => $bundle,
+        ]);
+
+    $token = (string) $analyzeResponse->viewData('token');
+
+    $this->actingAs($admin)
+        ->post('/admin/import/run', [
+            'token' => $token,
+            'pages_mode' => 'create_only',
+            'settings_mode' => 'merge',
+            'include_posts' => '1',
+            'include_media' => '1',
+            'include_seo' => '0',
+        ])
+        ->assertRedirect('/admin/import')
+        ->assertSessionHas('tp_notice_success');
+
+    $this->actingAs($admin)
+        ->post('/admin/import/run', [
+            'token' => $token,
+            'pages_mode' => 'create_only',
+            'settings_mode' => 'merge',
+            'include_posts' => '1',
+            'include_media' => '1',
+            'include_seo' => '0',
+        ])
+        ->assertRedirect('/admin/import')
+        ->assertSessionHas('tp_notice_success', fn (string $message): bool => str_contains($message, 'Pages skipped: 1')
+            && str_contains($message, 'Posts skipped: 1')
+            && str_contains($message, 'Media skipped: 1'));
+});
