@@ -24,6 +24,7 @@
 - Run completion summaries now include explicit skipped counters by entity (pages/posts/media when included).
 - Re-running the same WXR in `create_only` mode now skips duplicate source rows for pages/posts instead of generating suffixed slugs.
 - Feature coverage now verifies URL mapping report artifacts are persisted and populated after WXR run completion.
+- Completion summaries and stream phase payloads now include created/skipped/failed metrics by entity for clearer operator diagnostics.
 
 ## Summary
 

@@ -7,7 +7,7 @@ Content import functionality for TentaPress.
 | Field    | Value                                     |
 |----------|-------------------------------------------|
 | ID       | `tentapress/import`                       |
-| Version  | 0.17.1                                    |
+| Version  | 0.18.0                                    |
 | Provider | `TentaPress\Import\ImportServiceProvider` |
 
 ## Features
@@ -29,6 +29,7 @@ Content import functionality for TentaPress.
 - Include per-entity skipped counters in run completion summaries and phase completion events
 - Skip duplicate WXR source rows on repeated create-only runs (prevents `-2` slug duplication on reruns)
 - Verify persisted URL mapping report artifacts through feature tests
+- Report created/skipped/failed counts per entity in completion summaries and streamed phase updates
 - Handles pages, posts, media references, settings
 
 ## Dependencies

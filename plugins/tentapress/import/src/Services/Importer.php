@@ -717,10 +717,13 @@ final readonly class Importer
 
         $createdPages = 0;
         $skippedPages = 0;
+        $failedPages = 0;
         $createdPosts = 0;
         $skippedPosts = 0;
+        $failedPosts = 0;
         $createdMedia = 0;
         $skippedMedia = 0;
+        $failedMedia = 0;
         $downloadedMedia = 0;
         $createdSettings = 0;
         $updatedSettings = 0;
@@ -740,13 +743,19 @@ final readonly class Importer
                     'status' => 'started',
                 ]);
                 $pagesPayload = $this->readJsonFile($pagesPath);
-                [$createdPages, $skippedPages, $pageMappings] = $this->importPages($pagesPayload, $pagesMode, $actorUserId, $progress);
+                [$createdPages, $skippedPages, $failedPages, $pageMappings] = $this->importPages(
+                    $pagesPayload,
+                    $pagesMode,
+                    $actorUserId,
+                    $progress
+                );
                 $this->emitProgress($progress, [
                     'kind' => 'phase',
                     'entity' => 'page',
                     'status' => 'completed',
                     'created' => $createdPages,
                     'skipped' => $skippedPages,
+                    'failed' => $failedPages,
                 ]);
             }
 
@@ -759,13 +768,18 @@ final readonly class Importer
                         'status' => 'started',
                     ]);
                     $postsPayload = $this->readJsonFile($postsPath);
-                    [$createdPosts, $skippedPosts, $postMappings] = $this->importPosts($postsPayload, $actorUserId, $progress);
+                    [$createdPosts, $skippedPosts, $failedPosts, $postMappings] = $this->importPosts(
+                        $postsPayload,
+                        $actorUserId,
+                        $progress
+                    );
                     $this->emitProgress($progress, [
                         'kind' => 'phase',
                         'entity' => 'post',
                         'status' => 'completed',
                         'created' => $createdPosts,
                         'skipped' => $skippedPosts,
+                        'failed' => $failedPosts,
                     ]);
                 }
             }
@@ -779,13 +793,18 @@ final readonly class Importer
                         'status' => 'started',
                     ]);
                     $mediaPayload = $this->readJsonFile($mediaPath);
-                    [$createdMedia, $skippedMedia, $downloadedMedia] = $this->importMedia($mediaPayload, $actorUserId, $progress);
+                    [$createdMedia, $skippedMedia, $failedMedia, $downloadedMedia] = $this->importMedia(
+                        $mediaPayload,
+                        $actorUserId,
+                        $progress
+                    );
                     $this->emitProgress($progress, [
                         'kind' => 'phase',
                         'entity' => 'media',
                         'status' => 'completed',
                         'created' => $createdMedia,
                         'skipped' => $skippedMedia,
+                        'failed' => $failedMedia,
                         'copied' => $downloadedMedia,
                     ]);
                 }
@@ -823,15 +842,18 @@ final readonly class Importer
             $parts[] = "Pages created: 0";
         }
         $parts[] = "Pages skipped: {$skippedPages}";
+        $parts[] = "Pages failed: {$failedPages}";
 
         if ($includePosts) {
             $parts[] = "Posts created: {$createdPosts}";
             $parts[] = "Posts skipped: {$skippedPosts}";
+            $parts[] = "Posts failed: {$failedPosts}";
         }
 
         if ($includeMedia) {
             $parts[] = "Media created: {$createdMedia}";
             $parts[] = "Media skipped: {$skippedMedia}";
+            $parts[] = "Media failed: {$failedMedia}";
             $parts[] = "Media files copied: {$downloadedMedia}";
         }
 
@@ -859,7 +881,7 @@ final readonly class Importer
     }
 
     /**
-     * @return array{0:int,1:int,2:array<int,array<string,string|null>>} createdPages, skippedPages, mappings
+     * @return array{0:int,1:int,2:int,3:array<int,array<string,string|null>>} createdPages, skippedPages, failedPages, mappings
      */
     private function importPages(array $payload, string $mode, int $actorUserId = 0, ?callable $progress = null): array
     {
@@ -868,16 +890,16 @@ final readonly class Importer
         }
 
         if (!class_exists(TpPage::class)) {
-            return [0, 0, []];
+            return [0, 0, 0, []];
         }
 
         if (!Schema::hasTable('tp_pages')) {
-            return [0, 0, []];
+            return [0, 0, 0, []];
         }
 
         $items = $this->itemsFromPayload($payload);
         if ($items === []) {
-            return [0, 0, []];
+            return [0, 0, 0, []];
         }
 
         $hasStatus = Schema::hasColumn('tp_pages', 'status');
@@ -888,6 +910,7 @@ final readonly class Importer
 
         $created = 0;
         $skipped = 0;
+        $failed = 0;
         $mappings = [];
 
         $total = count($items);
@@ -959,28 +982,42 @@ final readonly class Importer
                 $data['updated_by'] = $actorUserId;
             }
 
-            $model = TpPage::query()->create($data);
-            $mappings[] = [
-                'type' => 'page',
-                'source_url' => (string) ($item['source_link'] ?? ''),
-                'source_post_id' => (string) ($item['source_post_id'] ?? ''),
-                'destination_url' => '/'.$slug,
-            ];
-            unset($model);
+            try {
+                $model = TpPage::query()->create($data);
+                $mappings[] = [
+                    'type' => 'page',
+                    'source_url' => (string) ($item['source_link'] ?? ''),
+                    'source_post_id' => (string) ($item['source_post_id'] ?? ''),
+                    'destination_url' => '/'.$slug,
+                ];
+                unset($model);
 
-            $created++;
-            $this->emitProgress($progress, [
-                'kind' => 'entity',
-                'entity' => 'page',
-                'status' => 'imported',
-                'title' => $title,
-                'slug' => $slug,
-                'index' => $index + 1,
-                'total' => $total,
-            ]);
+                $created++;
+                $this->emitProgress($progress, [
+                    'kind' => 'entity',
+                    'entity' => 'page',
+                    'status' => 'imported',
+                    'title' => $title,
+                    'slug' => $slug,
+                    'index' => $index + 1,
+                    'total' => $total,
+                ]);
+            } catch (\Throwable $e) {
+                report($e);
+                $failed++;
+                $this->emitProgress($progress, [
+                    'kind' => 'entity',
+                    'entity' => 'page',
+                    'status' => 'failed',
+                    'title' => $title,
+                    'slug' => $slug,
+                    'index' => $index + 1,
+                    'total' => $total,
+                ]);
+            }
         }
 
-        return [$created, $skipped, $mappings];
+        return [$created, $skipped, $failed, $mappings];
     }
 
     private function uniqueSlug(string $slug): string
@@ -1006,21 +1043,21 @@ final readonly class Importer
     }
 
     /**
-     * @return array{0:int,1:int,2:array<int,array<string,string|null>>} createdPosts, skippedPosts, mappings
+     * @return array{0:int,1:int,2:int,3:array<int,array<string,string|null>>} createdPosts, skippedPosts, failedPosts, mappings
      */
     private function importPosts(array $payload, int $actorUserId = 0, ?callable $progress = null): array
     {
         if (!class_exists(TpPost::class)) {
-            return [0, 0, []];
+            return [0, 0, 0, []];
         }
 
         if (!Schema::hasTable('tp_posts')) {
-            return [0, 0, []];
+            return [0, 0, 0, []];
         }
 
         $items = $this->itemsFromPayload($payload);
         if ($items === []) {
-            return [0, 0, []];
+            return [0, 0, 0, []];
         }
 
         $hasStatus = Schema::hasColumn('tp_posts', 'status');
@@ -1034,6 +1071,7 @@ final readonly class Importer
 
         $created = 0;
         $skipped = 0;
+        $failed = 0;
         $mappings = [];
 
         $total = count($items);
@@ -1121,28 +1159,42 @@ final readonly class Importer
                 $data['updated_by'] = $actorUserId;
             }
 
-            $model = TpPost::query()->create($data);
-            $mappings[] = [
-                'type' => 'post',
-                'source_url' => (string) ($item['source_link'] ?? ''),
-                'source_post_id' => (string) ($item['source_post_id'] ?? ''),
-                'destination_url' => '/'.$this->blogBase().'/'.$slug,
-            ];
-            unset($model);
+            try {
+                $model = TpPost::query()->create($data);
+                $mappings[] = [
+                    'type' => 'post',
+                    'source_url' => (string) ($item['source_link'] ?? ''),
+                    'source_post_id' => (string) ($item['source_post_id'] ?? ''),
+                    'destination_url' => '/'.$this->blogBase().'/'.$slug,
+                ];
+                unset($model);
 
-            $created++;
-            $this->emitProgress($progress, [
-                'kind' => 'entity',
-                'entity' => 'post',
-                'status' => 'imported',
-                'title' => $title,
-                'slug' => $slug,
-                'index' => $index + 1,
-                'total' => $total,
-            ]);
+                $created++;
+                $this->emitProgress($progress, [
+                    'kind' => 'entity',
+                    'entity' => 'post',
+                    'status' => 'imported',
+                    'title' => $title,
+                    'slug' => $slug,
+                    'index' => $index + 1,
+                    'total' => $total,
+                ]);
+            } catch (\Throwable $e) {
+                report($e);
+                $failed++;
+                $this->emitProgress($progress, [
+                    'kind' => 'entity',
+                    'entity' => 'post',
+                    'status' => 'failed',
+                    'title' => $title,
+                    'slug' => $slug,
+                    'index' => $index + 1,
+                    'total' => $total,
+                ]);
+            }
         }
 
-        return [$created, $skipped, $mappings];
+        return [$created, $skipped, $failed, $mappings];
     }
 
     private function uniquePostSlug(string $slug): string
@@ -1167,21 +1219,21 @@ final readonly class Importer
     }
 
     /**
-     * @return array{0:int,1:int,2:int} createdMedia, skippedMedia, downloadedMedia
+     * @return array{0:int,1:int,2:int,3:int} createdMedia, skippedMedia, failedMedia, downloadedMedia
      */
     private function importMedia(array $payload, int $actorUserId = 0, ?callable $progress = null): array
     {
         if (!class_exists(TpMedia::class)) {
-            return [0, 0, 0];
+            return [0, 0, 0, 0];
         }
 
         if (!Schema::hasTable('tp_media')) {
-            return [0, 0, 0];
+            return [0, 0, 0, 0];
         }
 
         $items = $this->itemsFromPayload($payload);
         if ($items === []) {
-            return [0, 0, 0];
+            return [0, 0, 0, 0];
         }
 
         $hasCreatedBy = Schema::hasColumn('tp_media', 'created_by');
@@ -1189,6 +1241,7 @@ final readonly class Importer
 
         $created = 0;
         $skipped = 0;
+        $failed = 0;
         $downloaded = 0;
 
         $total = count($items);
@@ -1253,30 +1306,46 @@ final readonly class Importer
                 $data['updated_by'] = $actorUserId;
             }
 
-            $model = TpMedia::query()->create($data);
-            unset($model);
+            try {
+                $model = TpMedia::query()->create($data);
+                unset($model);
 
-            $sourceUrl = trim((string) ($item['source_url'] ?? ''));
-            $copied = $sourceUrl !== '' && $this->copyRemoteMediaToDisk($sourceUrl, (string) $data['disk'], (string) $data['path']);
-            if ($copied) {
-                $downloaded++;
+                $sourceUrl = trim((string) ($item['source_url'] ?? ''));
+                $copied = $sourceUrl !== '' && $this->copyRemoteMediaToDisk($sourceUrl, (string) $data['disk'], (string) $data['path']);
+                if ($copied) {
+                    $downloaded++;
+                }
+
+                $created++;
+                $this->emitProgress($progress, [
+                    'kind' => 'entity',
+                    'entity' => 'media',
+                    'status' => 'imported',
+                    'title' => (string) ($item['title'] ?? ''),
+                    'slug' => '',
+                    'path' => $path,
+                    'copied' => $copied,
+                    'index' => $index + 1,
+                    'total' => $total,
+                ]);
+            } catch (\Throwable $e) {
+                report($e);
+                $failed++;
+                $this->emitProgress($progress, [
+                    'kind' => 'entity',
+                    'entity' => 'media',
+                    'status' => 'failed',
+                    'title' => (string) ($item['title'] ?? ''),
+                    'slug' => '',
+                    'path' => $path,
+                    'copied' => false,
+                    'index' => $index + 1,
+                    'total' => $total,
+                ]);
             }
-
-            $created++;
-            $this->emitProgress($progress, [
-                'kind' => 'entity',
-                'entity' => 'media',
-                'status' => 'imported',
-                'title' => (string) ($item['title'] ?? ''),
-                'slug' => '',
-                'path' => $path,
-                'copied' => $copied,
-                'index' => $index + 1,
-                'total' => $total,
-            ]);
         }
 
-        return [$created, $skipped, $downloaded];
+        return [$created, $skipped, $failed, $downloaded];
     }
 
     /**

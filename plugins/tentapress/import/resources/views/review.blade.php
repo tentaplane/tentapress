@@ -342,21 +342,24 @@
                 return;
             }
 
-            const formatCounter = (imported, skipped, total) => `${imported + skipped}/${total} (${imported} imported, ${skipped} skipped)`;
+            const formatCounter = (imported, skipped, failed, total) => `${imported + skipped + failed}/${total} (${imported} imported, ${skipped} skipped, ${failed} failed)`;
 
             const counters = {
-                page: { imported: 0, skipped: 0, total: {{ (int) ($summary['pages'] ?? 0) }} },
-                post: { imported: 0, skipped: 0, total: {{ (int) ($summary['posts'] ?? 0) }} },
-                media: { imported: 0, skipped: 0, total: {{ (int) ($summary['media'] ?? 0) }}, copied: 0 },
+                page: { imported: 0, skipped: 0, failed: 0, total: {{ (int) ($summary['pages'] ?? 0) }} },
+                post: { imported: 0, skipped: 0, failed: 0, total: {{ (int) ($summary['posts'] ?? 0) }} },
+                media: { imported: 0, skipped: 0, failed: 0, total: {{ (int) ($summary['media'] ?? 0) }}, copied: 0 },
             };
 
             const resetCounters = () => {
                 counters.page.imported = 0;
                 counters.page.skipped = 0;
+                counters.page.failed = 0;
                 counters.post.imported = 0;
                 counters.post.skipped = 0;
+                counters.post.failed = 0;
                 counters.media.imported = 0;
                 counters.media.skipped = 0;
+                counters.media.failed = 0;
                 counters.media.copied = 0;
             };
 
@@ -369,9 +372,9 @@
             };
 
             const renderCounters = () => {
-                countPagesNode.textContent = formatCounter(counters.page.imported, counters.page.skipped, counters.page.total);
-                countPostsNode.textContent = formatCounter(counters.post.imported, counters.post.skipped, counters.post.total);
-                countMediaNode.textContent = formatCounter(counters.media.imported, counters.media.skipped, counters.media.total);
+                countPagesNode.textContent = formatCounter(counters.page.imported, counters.page.skipped, counters.page.failed, counters.page.total);
+                countPostsNode.textContent = formatCounter(counters.post.imported, counters.post.skipped, counters.post.failed, counters.post.total);
+                countMediaNode.textContent = formatCounter(counters.media.imported, counters.media.skipped, counters.media.failed, counters.media.total);
                 countMediaCopiedNode.textContent = `Copied ${counters.media.copied}`;
             };
 
@@ -460,10 +463,11 @@
                                     } else if (payload.status === 'completed') {
                                         const created = Number(payload.created || 0);
                                         const skipped = Number(payload.skipped || 0);
+                                        const failed = Number(payload.failed || 0);
                                         const copied = Number(payload.copied || 0);
                                         const copiedText = phaseEntity === 'media' ? `, copied ${copied} files` : '';
                                         statusNode.textContent = `${phaseEntity} import completed`;
-                                        appendLine(`Completed ${phaseEntity} import (${created} created, ${skipped} skipped${copiedText})`, 'success');
+                                        appendLine(`Completed ${phaseEntity} import (${created} created, ${skipped} skipped, ${failed} failed${copiedText})`, failed > 0 ? 'error' : 'success');
                                     }
                                     continue;
                                 }
@@ -479,6 +483,8 @@
                                         counters[normalizedEntity].imported += 1;
                                     } else if (status === 'skipped') {
                                         counters[normalizedEntity].skipped += 1;
+                                    } else if (status === 'failed') {
+                                        counters[normalizedEntity].failed += 1;
                                     }
 
                                     if (normalizedEntity === 'media' && payload.copied === true) {
@@ -493,7 +499,8 @@
                                 }
 
                                 const copiedSuffix = entity === 'media' && payload.copied === true ? ' [file copied]' : '';
-                                appendLine(`[${entity}] ${status} (${index}/${total}) ${label}${copiedSuffix}`, status === 'skipped' ? 'default' : 'success');
+                                const tone = status === 'failed' ? 'error' : status === 'skipped' ? 'default' : 'success';
+                                appendLine(`[${entity}] ${status} (${index}/${total}) ${label}${copiedSuffix}`, tone);
                                 statusNode.textContent = `Processing ${entity} ${index}/${total}...`;
                                 continue;
                             }

@@ -194,7 +194,8 @@ it('allows a super admin to analyze and run an import bundle', function (): void
         ])
         ->assertRedirect('/admin/import')
         ->assertSessionHas('tp_notice_success', fn (string $message): bool => str_contains($message, 'Pages created: 1')
-            && str_contains($message, 'Pages skipped: 0'));
+            && str_contains($message, 'Pages skipped: 0')
+            && str_contains($message, 'Pages failed: 0'));
 
     expect(
         TpPage::query()->where('slug', 'imported-home')->exists()
@@ -310,8 +311,11 @@ it('allows a super admin to analyze and run a wordpress wxr bundle', function ()
         ->assertRedirect('/admin/import')
         ->assertSessionHas('tp_notice_success', fn (string $message): bool => str_contains($message, 'Source: WordPress WXR')
             && str_contains($message, 'Pages skipped: 0')
+            && str_contains($message, 'Pages failed: 0')
             && str_contains($message, 'Posts skipped: 0')
+            && str_contains($message, 'Posts failed: 0')
             && str_contains($message, 'Media skipped: 0')
+            && str_contains($message, 'Media failed: 0')
             && str_contains($message, 'Media files copied: 1')
             && str_contains($message, 'URL mapping report: storage/app/tp-import-reports/'));
 
@@ -391,8 +395,11 @@ it('skips duplicate wxr source rows on create-only rerun', function (): void {
         ->assertRedirect('/admin/import')
         ->assertSessionHas('tp_notice_success', fn (string $message): bool => str_contains($message, 'Pages created: 0')
             && str_contains($message, 'Pages skipped: 1')
+            && str_contains($message, 'Pages failed: 0')
             && str_contains($message, 'Posts created: 0')
-            && str_contains($message, 'Posts skipped: 1'));
+            && str_contains($message, 'Posts skipped: 1')
+            && str_contains($message, 'Posts failed: 0')
+            && str_contains($message, 'Media failed: 0'));
 
     expect(TpPage::query()->where('slug', 'wxr-page-title')->count())->toBe(1);
     expect(TpPage::query()->where('slug', 'wxr-page-title-2')->exists())->toBeFalse();
