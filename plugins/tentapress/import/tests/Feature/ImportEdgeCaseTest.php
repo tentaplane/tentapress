@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Illuminate\Testing\TestResponse;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\File;
 use TentaPress\Import\ImportServiceProvider;
@@ -122,7 +123,7 @@ it('shows actionable error when wxr xml is malformed', function (): void {
 
     $this->withoutExceptionHandling();
 
-    expect(fn (): \Illuminate\Testing\TestResponse => $this->actingAs($admin)
+    expect(fn (): TestResponse => $this->actingAs($admin)
         ->post('/admin/import/analyze', [
             'bundle' => $bundle,
         ]))

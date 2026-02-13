@@ -12,6 +12,7 @@
 - Unsupported sample entries are shown in review.
 - Malformed WXR XML now returns actionable parse errors with line context when available.
 - Review now includes source-to-destination URL mapping preview for redirect planning.
+- Upload validation accepts common XML/WXR MIME types to reduce false rejects.
 
 ## Summary
 
