@@ -716,8 +716,11 @@ final readonly class Importer
         $progress = is_callable($options['progress'] ?? null) ? $options['progress'] : null;
 
         $createdPages = 0;
+        $skippedPages = 0;
         $createdPosts = 0;
+        $skippedPosts = 0;
         $createdMedia = 0;
+        $skippedMedia = 0;
         $downloadedMedia = 0;
         $createdSettings = 0;
         $updatedSettings = 0;
@@ -737,12 +740,13 @@ final readonly class Importer
                     'status' => 'started',
                 ]);
                 $pagesPayload = $this->readJsonFile($pagesPath);
-                [$createdPages, , $pageMappings] = $this->importPages($pagesPayload, $pagesMode, $actorUserId, $progress);
+                [$createdPages, $skippedPages, $pageMappings] = $this->importPages($pagesPayload, $pagesMode, $actorUserId, $progress);
                 $this->emitProgress($progress, [
                     'kind' => 'phase',
                     'entity' => 'page',
                     'status' => 'completed',
                     'created' => $createdPages,
+                    'skipped' => $skippedPages,
                 ]);
             }
 
@@ -755,12 +759,13 @@ final readonly class Importer
                         'status' => 'started',
                     ]);
                     $postsPayload = $this->readJsonFile($postsPath);
-                    [$createdPosts, , $postMappings] = $this->importPosts($postsPayload, $actorUserId, $progress);
+                    [$createdPosts, $skippedPosts, $postMappings] = $this->importPosts($postsPayload, $actorUserId, $progress);
                     $this->emitProgress($progress, [
                         'kind' => 'phase',
                         'entity' => 'post',
                         'status' => 'completed',
                         'created' => $createdPosts,
+                        'skipped' => $skippedPosts,
                     ]);
                 }
             }
@@ -774,12 +779,13 @@ final readonly class Importer
                         'status' => 'started',
                     ]);
                     $mediaPayload = $this->readJsonFile($mediaPath);
-                    [$createdMedia, , $downloadedMedia] = $this->importMedia($mediaPayload, $actorUserId, $progress);
+                    [$createdMedia, $skippedMedia, $downloadedMedia] = $this->importMedia($mediaPayload, $actorUserId, $progress);
                     $this->emitProgress($progress, [
                         'kind' => 'phase',
                         'entity' => 'media',
                         'status' => 'completed',
                         'created' => $createdMedia,
+                        'skipped' => $skippedMedia,
                         'copied' => $downloadedMedia,
                     ]);
                 }
@@ -816,13 +822,16 @@ final readonly class Importer
         } else {
             $parts[] = "Pages created: 0";
         }
+        $parts[] = "Pages skipped: {$skippedPages}";
 
         if ($includePosts) {
             $parts[] = "Posts created: {$createdPosts}";
+            $parts[] = "Posts skipped: {$skippedPosts}";
         }
 
         if ($includeMedia) {
             $parts[] = "Media created: {$createdMedia}";
+            $parts[] = "Media skipped: {$skippedMedia}";
             $parts[] = "Media files copied: {$downloadedMedia}";
         }
 

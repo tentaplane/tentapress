@@ -459,10 +459,11 @@
                                         appendLine(`Starting ${phaseEntity} import`);
                                     } else if (payload.status === 'completed') {
                                         const created = Number(payload.created || 0);
+                                        const skipped = Number(payload.skipped || 0);
                                         const copied = Number(payload.copied || 0);
                                         const copiedText = phaseEntity === 'media' ? `, copied ${copied} files` : '';
                                         statusNode.textContent = `${phaseEntity} import completed`;
-                                        appendLine(`Completed ${phaseEntity} import (${created} created${copiedText})`, 'success');
+                                        appendLine(`Completed ${phaseEntity} import (${created} created, ${skipped} skipped${copiedText})`, 'success');
                                     }
                                     continue;
                                 }

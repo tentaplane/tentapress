@@ -193,7 +193,8 @@ it('allows a super admin to analyze and run an import bundle', function (): void
             'include_seo' => '0',
         ])
         ->assertRedirect('/admin/import')
-        ->assertSessionHas('tp_notice_success');
+        ->assertSessionHas('tp_notice_success', fn (string $message): bool => str_contains($message, 'Pages created: 1')
+            && str_contains($message, 'Pages skipped: 0'));
 
     expect(
         TpPage::query()->where('slug', 'imported-home')->exists()
@@ -308,6 +309,9 @@ it('allows a super admin to analyze and run a wordpress wxr bundle', function ()
         ])
         ->assertRedirect('/admin/import')
         ->assertSessionHas('tp_notice_success', fn (string $message): bool => str_contains($message, 'Source: WordPress WXR')
+            && str_contains($message, 'Pages skipped: 0')
+            && str_contains($message, 'Posts skipped: 0')
+            && str_contains($message, 'Media skipped: 0')
             && str_contains($message, 'Media files copied: 1')
             && str_contains($message, 'URL mapping report: storage/app/tp-import-reports/'));
 
