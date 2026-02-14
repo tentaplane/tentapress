@@ -10,4 +10,4 @@ Use a numeric prefix and short slug:
 - `0001-multi-tenancy-model.md`
 
 ### Template
-Copy `template.md` to start a new ADR.
+Copy `TEMPLATE.md` to start a new ADR.
