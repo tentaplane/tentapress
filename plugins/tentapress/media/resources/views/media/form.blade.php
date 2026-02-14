@@ -3,7 +3,26 @@
 @section('title', $mode === 'create' ? 'Upload File' : 'Edit Media')
 
 @section('content')
-    <div class="tp-editor space-y-6">
+    <div
+        class="tp-editor space-y-6"
+        x-data="{
+            previewModalOpen: false,
+            previewModalSrc: '',
+            previewModalLabel: '',
+            openPreviewModal(src, label = '') {
+                if (!src) {
+                    return;
+                }
+                this.previewModalSrc = src;
+                this.previewModalLabel = label;
+                this.previewModalOpen = true;
+            },
+            closePreviewModal() {
+                this.previewModalOpen = false;
+            }
+        }"
+        x-on:keydown.escape.window="closePreviewModal()"
+        data-media-preview-modal>
         <div class="tp-page-header">
             <div>
                 <h1 class="tp-page-title">
@@ -154,7 +173,12 @@
                     <div class="tp-metabox__title">Details</div>
                     <div class="tp-metabox__body space-y-3 text-sm">
                         @if ($previewUrl && $isImage)
-                            <img src="{{ $previewUrl }}" alt="" class="w-full rounded border border-slate-200 object-cover" />
+                            <button
+                                type="button"
+                                class="block w-full cursor-zoom-in rounded border border-slate-200"
+                                x-on:click="openPreviewModal('{{ e($previewUrl) }}', '{{ e((string) ($media->original_name ?? 'Original image')) }}')">
+                                <img src="{{ $previewUrl }}" alt="" class="w-full rounded object-cover" />
+                            </button>
                         @endif
 
                         <div>
@@ -221,7 +245,12 @@
                                                         <td class="px-2 py-2">{{ $variantSize ? number_format($variantSize / 1024, 1).' KB' : '—' }}</td>
                                                         <td class="px-2 py-2">
                                                             @if ($variantUrl)
-                                                                <a class="tp-button-link" href="{{ $variantUrl }}" target="_blank" rel="noopener">Open</a>
+                                                                <button
+                                                                    type="button"
+                                                                    class="tp-button-link"
+                                                                    x-on:click="openPreviewModal('{{ e($variantUrl) }}', '{{ e((string) $variantKey) }}')">
+                                                                    Open
+                                                                </button>
                                                             @else
                                                                 —
                                                             @endif
@@ -290,6 +319,22 @@
                 </div>
                 </div>
             @endif
+        </div>
+
+        <div
+            class="fixed inset-0 z-50 hidden items-center justify-center bg-black/85 p-4"
+            x-bind:class="previewModalOpen ? 'flex' : 'hidden'"
+            x-on:click.self="closePreviewModal()">
+            <button
+                type="button"
+                class="absolute right-4 top-4 rounded bg-white/10 px-3 py-2 text-sm font-semibold text-white hover:bg-white/20"
+                x-on:click="closePreviewModal()">
+                Close
+            </button>
+            <div class="max-h-[95vh] max-w-[95vw]">
+                <img x-bind:src="previewModalSrc" x-bind:alt="previewModalLabel" class="max-h-[95vh] max-w-[95vw] rounded shadow-2xl" />
+                <div class="mt-2 text-center text-xs text-white/80" x-text="previewModalLabel"></div>
+            </div>
         </div>
     </div>
 @endsection

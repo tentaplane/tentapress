@@ -106,4 +106,9 @@ it('rebuilds image variants from the media edit screen action', function (): voi
 
     expect($media->optimization_status)->toBe('ready');
     expect(is_array($media->variants))->toBeTrue();
+
+    $this->actingAs($admin)
+        ->get('/admin/media/'.$media->id.'/edit')
+        ->assertOk()
+        ->assertSee('data-media-preview-modal', false);
 });
