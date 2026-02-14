@@ -97,7 +97,7 @@
 
         @if ($media->count() > 0 && method_exists($media, 'hasPages') && $media->hasPages())
             <div class="tp-metabox__body">
-                {{ $media->links() }}
+                @include('tentapress-media::media.partials.pagination', ['paginator' => $media])
             </div>
         @endif
 
@@ -206,7 +206,7 @@
                 </div>
             </div>
             <div class="tp-metabox__body">
-                {{ $media->links() }}
+                @include('tentapress-media::media.partials.pagination', ['paginator' => $media])
             </div>
         @else
             <div class="tp-table-wrap">
@@ -300,7 +300,7 @@
             </div>
 
             <div class="tp-metabox__body">
-                {{ $media->links() }}
+                @include('tentapress-media::media.partials.pagination', ['paginator' => $media])
             </div>
         @endif
     </div>
