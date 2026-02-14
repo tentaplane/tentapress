@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.35.0](https://github.com/tentaplane/tentapress/compare/v0.34.0...v0.35.0) (2026-02-14)
+
+
+### Features
+
+* **media:** open edit previews in fullscreen modal ([c1cc032](https://github.com/tentaplane/tentapress/commit/c1cc0327f51ae18f93d62426bc40da06f22e1ccb))
+
+
+### Bug Fixes
+
+* **admin-shell:** bumping the admin assets ([65e1ab1](https://github.com/tentaplane/tentapress/commit/65e1ab137b4b145014ea6e80fda89e9e19ccfb9a))
+* **media:** center fullscreen preview image in modal ([06e8f12](https://github.com/tentaplane/tentapress/commit/06e8f125609e0cc7ef5d71fcace6cbb22d6ea3e8))
+* **media:** show fullscreen preview modal correctly ([24d50fc](https://github.com/tentaplane/tentapress/commit/24d50fca3a0a7cba0559276bc1f118691c5e6632))
+
 ## [0.34.0](https://github.com/tentaplane/tentapress/compare/v0.33.2...v0.34.0) (2026-02-14)
 
 
