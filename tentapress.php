@@ -559,8 +559,8 @@ if ($envFile !== null) {
         $appName = $existingAppName;
         $appUrl = $existingAppUrl;
     } else {
-        $appNameInput = $prompt("Application name [{$existingAppName}]: ");
-        $appUrlInput = $prompt("Application URL [{$existingAppUrl}]: ");
+        $appNameInput = $prompt("Website Name [{$existingAppName}]: ");
+        $appUrlInput = $prompt("Website URL [{$existingAppUrl}]: ");
 
         $appName = $appNameInput === '' ? $existingAppName : $appNameInput;
         $appUrl = $appUrlInput === '' ? $existingAppUrl : $appUrlInput;
@@ -1067,7 +1067,7 @@ if ($skipUser) {
 } else {
     fwrite(
         STDOUT,
-        "Create your admin login.\n" .
+        "\n\nCreate your admin login.\n" .
         "Leave the password blank to generate a secure one.\n\n"
     );
 }
@@ -1107,7 +1107,7 @@ if (! $skipUser) {
 
     $result = $runWithOutput($artisanShell, 'Creating admin user', $passwordHidden);
 
-    $info('Admin user created:');
+    $info("\n\nAdmin user created:");
     $info("- Email: {$email}");
     $info('- Name: ' . ($name !== '' ? $name : 'Admin'));
 
@@ -1132,7 +1132,7 @@ fwrite(STDOUT, "\nSetup complete.\n");
 fwrite(
     STDOUT,
     "\nNext steps:\n" .
-    "- If using Laravel Herd, visit https://yourdomain.test/admin\n" .
+    "- If using Laravel Herd, visit $appUrl/admin\n" .
     "- Otherwise run: php artisan serve, then visit the printed URL + /admin\n" .
     "- Log in with the admin email and the password you set (or generated).\n"
 );

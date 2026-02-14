@@ -46,3 +46,4 @@
 /.prettierignore export-ignore
 /.prettierrc export-ignore
 /release-please-config.json export-ignore
+/infection.json.dist export-ignore

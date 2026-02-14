@@ -35,11 +35,7 @@
     "autoload-dev": {
         "psr-4": {
             "Tests\\": "tests/"
-        },
-        "classmap": [
-            "packages/*/*/src",
-            "plugins/*/*/src"
-        ]
+        }
     },
     "scripts": {
         "dev": [
