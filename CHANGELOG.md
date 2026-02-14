@@ -4,6 +4,54 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.34.0](https://github.com/tentaplane/tentapress/compare/v0.33.2...v0.34.0) (2026-02-14)
+
+
+### Features
+
+* **import:** add failed-row metrics to run feedback ([fb4313f](https://github.com/tentaplane/tentapress/commit/fb4313f2b6e9ead4909a931a3292486791762df2))
+* **import:** add phase events to streamed progress ([71c71c5](https://github.com/tentaplane/tentapress/commit/71c71c57b232823df5e8eb7c34b6b29158424e97))
+* **import:** add WXR URL mapping preview ([fdf5b69](https://github.com/tentaplane/tentapress/commit/fdf5b69acb28a6ce8e50afd11084332ca6e7f145))
+* **import:** add WXR xml analysis support ([af3a680](https://github.com/tentaplane/tentapress/commit/af3a68059d74cfb21321476f2dfee6b6aecb75ab))
+* **import:** apply actor fallback for imported records ([f1c1808](https://github.com/tentaplane/tentapress/commit/f1c1808a3e37eeaebbfa50d507f6c009b962226e))
+* **import:** copy WXR media URLs into local storage ([0bb3544](https://github.com/tentaplane/tentapress/commit/0bb35447ead21ea5425fc3b810919a7813a8ff50))
+* **import:** improve live progress feedback during runs ([d203d6b](https://github.com/tentaplane/tentapress/commit/d203d6b87a8a411a156eff4127bb185ff8198fe7))
+* **import:** improve WXR diagnostics and term counting ([2aad132](https://github.com/tentaplane/tentapress/commit/2aad132129778f6425e2bfacc00566342c491538))
+* **import:** include WXR context in run summary ([93c8680](https://github.com/tentaplane/tentapress/commit/93c8680f3fe5c3742ca8255e06df892d1c916c4d))
+* **import:** move live progress to dedicated route ([0e0100b](https://github.com/tentaplane/tentapress/commit/0e0100b60186350ef706ba7aaa8fe1d41c5231ad))
+* **import:** persist source-to-destination reference maps ([0527451](https://github.com/tentaplane/tentapress/commit/052745188b2c20909c43f32d7c88d4d2377fd779))
+* **import:** persist WXR URL mapping report ([e6b9297](https://github.com/tentaplane/tentapress/commit/e6b92975aae251d83f3acd4bfa0e0ad3dbd20796))
+* **import:** refresh media variants during import ([4a8aa6e](https://github.com/tentaplane/tentapress/commit/4a8aa6ea341161074d46a5afe50ef24e5adaaa23))
+* **import:** report featured image reference coverage ([4a84764](https://github.com/tentaplane/tentapress/commit/4a84764e748bc34a3405d3626860167aab9c1db8))
+* **import:** report skipped counts in run summaries ([1dbe127](https://github.com/tentaplane/tentapress/commit/1dbe12705a2d84194669936da7f5ebb6a0e83763))
+* **import:** report unsupported WXR entity types ([0c2ee13](https://github.com/tentaplane/tentapress/commit/0c2ee135aede8664dcee563668cc965383215fe1))
+* **import:** report WXR term phase in run output ([eea7552](https://github.com/tentaplane/tentapress/commit/eea755240e0cf635e88c41c46cb5b038dba9a1bd))
+* **import:** run WXR imports for core content ([e8968c4](https://github.com/tentaplane/tentapress/commit/e8968c48d1d4db0b6eebaf3b23dcd3053d125a82))
+* **import:** skip duplicate WXR rows on create-only reruns ([3721247](https://github.com/tentaplane/tentapress/commit/3721247ec9348b247f97f9f2b9f2052de19398fc))
+* **import:** stream live per-item progress in review ([4c550a4](https://github.com/tentaplane/tentapress/commit/4c550a4c28c902cf2179ff6d00da4d04c6d0ecd4))
+* **import:** tailor review options for WXR imports ([0392aac](https://github.com/tentaplane/tentapress/commit/0392aaca696d0f2a7aaffbf49341c93bbd8e777d))
+* **media:** list and rebuild image variants from edit screen ([df99ebb](https://github.com/tentaplane/tentapress/commit/df99ebb836fb353fca6d5cda0ba2ce5f94d17fab))
+
+
+### Bug Fixes
+
+* **admin-shell:** bumping the admin assets ([a0acb64](https://github.com/tentaplane/tentapress/commit/a0acb646bacd878a48b2adb5535366a3e847e26a))
+* **import:** accept common WXR XML MIME types ([548d050](https://github.com/tentaplane/tentapress/commit/548d050978e2d36f3c09671756cbb79e07467665))
+* **import:** keep analysis tokens valid for reruns ([710d76d](https://github.com/tentaplane/tentapress/commit/710d76dd68c4df17d758f82587ab748d391b47d1))
+* **import:** show notice when run token is missing ([11a28f9](https://github.com/tentaplane/tentapress/commit/11a28f9a4f232faad05434e0b51bbaffdb47f4c8))
+* **media:** add pagination controls to grid view ([c1fd209](https://github.com/tentaplane/tentapress/commit/c1fd20907b7ade6c6135598ec4f074db860a8ae4))
+* **media:** add top pagination links for grid and list views ([7e70659](https://github.com/tentaplane/tentapress/commit/7e7065935ac54c82d08467d042742930ba16fd4c))
+* **media:** make list and grid previews link to edit ([78ee80d](https://github.com/tentaplane/tentapress/commit/78ee80d65423af963047434b3536d678d0ff1c10))
+* **media:** move actions panel below media form ([ad643bf](https://github.com/tentaplane/tentapress/commit/ad643bfde12790ae4d8b1cb4b305b73243eac56a))
+* **media:** restore true 50-50 edit layout split ([436488b](https://github.com/tentaplane/tentapress/commit/436488bc3529360314b6c2fd8a5124d7503844a0))
+* **media:** restyle pagination and emphasize disabled controls ([2f30250](https://github.com/tentaplane/tentapress/commit/2f30250a131eb8cea27e9d5f952fc0f897717034))
+* **media:** swap edit layout columns and enforce 50-50 split ([1e70776](https://github.com/tentaplane/tentapress/commit/1e707768f1e574a3e31662778deed2eb9231ee04))
+
+
+### Miscellaneous Chores
+
+* **import:** normalize importer formatting ([b8c36b7](https://github.com/tentaplane/tentapress/commit/b8c36b7d8f0f70c91b83f7c9dfa8a89d1dae1cee))
+
 ## [0.33.2](https://github.com/tentaplane/tentapress/compare/v0.33.1...v0.33.2) (2026-02-12)
 
 
