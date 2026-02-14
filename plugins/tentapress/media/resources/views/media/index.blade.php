@@ -199,6 +199,9 @@
                     @endforeach
                 </div>
             </div>
+            <div class="tp-metabox__body">
+                {{ $media->links() }}
+            </div>
         @else
             <div class="tp-table-wrap">
                 <table class="tp-table tp-table--sticky-head">

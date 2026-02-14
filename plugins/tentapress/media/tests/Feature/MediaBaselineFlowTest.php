@@ -45,3 +45,27 @@ it('allows a super admin to view media index and upload a media file', function 
 
     Storage::disk('public')->assertExists((string) $media?->path);
 });
+
+it('renders pagination controls in grid view', function (): void {
+    $admin = TpUser::query()->create([
+        'name' => 'Media Grid Admin',
+        'email' => 'media-grid-admin@example.test',
+        'password' => 'secret',
+        'is_super_admin' => true,
+    ]);
+
+    foreach (range(1, 25) as $index) {
+        TpMedia::query()->create([
+            'title' => 'Grid Item '.$index,
+            'disk' => 'public',
+            'path' => 'media/2026/02/grid-item-'.$index.'.jpg',
+            'original_name' => 'grid-item-'.$index.'.jpg',
+            'mime_type' => 'image/jpeg',
+        ]);
+    }
+
+    $this->actingAs($admin)
+        ->get('/admin/media?view=grid')
+        ->assertOk()
+        ->assertSee('page=2', false);
+});

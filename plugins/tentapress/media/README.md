@@ -7,7 +7,7 @@ Upload and manage media files for TentaPress.
 | Field    | Value                                   |
 |----------|-----------------------------------------|
 | ID       | `tentapress/media`                      |
-| Version  | 0.9.2                                   |
+| Version  | 0.9.3                                   |
 | Provider | `TentaPress\Media\MediaServiceProvider` |
 
 ## Goal
@@ -32,6 +32,7 @@ Provide a first-party media library for uploads, management, and reuse across Pa
 - Async stock imports with multi-select bulk add
 - Imported stock items are marked in-place without inline notices
 - Saved media view preference now applies before render to avoid list/grid flash
+- Pagination controls in both list and grid media views
 - Local image ingest clamp (`2048x2048`) with resize-to-original
 - Generated local image variants (`thumb`, `medium`, `large`) with preview-first admin rendering
 - Media maintenance commands for optimize/backfill/verification workflows
@@ -80,7 +81,7 @@ Provide a first-party media library for uploads, management, and reuse across Pa
 
 ## Admin UI (current)
 
-- Media index: grid + list with previews, type, size, and actions.
+- Media index: grid + list with previews, type, size, actions, and pagination.
 - Upload screen: file upload + metadata fields.
 - Edit screen: metadata editing + details panel.
 - Stock library: available only when at least one stock provider plugin is enabled in plugin state.
