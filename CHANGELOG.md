@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.35.2](https://github.com/tentaplane/tentapress/compare/v0.35.1...v0.35.2) (2026-02-14)
+
+
+### Bug Fixes
+
+* **setup:** remove wildcard autoload-dev classmaps for release installs ([e3ac59a](https://github.com/tentaplane/tentapress/commit/e3ac59aa98332eae65bf8c221a517eb5296c3be5))
+
 ## [0.35.1](https://github.com/tentaplane/tentapress/compare/v0.35.0...v0.35.1) (2026-02-14)
 
 
