@@ -16,21 +16,21 @@
             <div class="space-y-6 {{ $mode === 'edit' ? 'lg:order-2' : 'lg:col-span-3' }}">
                 <div class="tp-metabox">
                     <div class="tp-metabox__body space-y-4">
-                    <form
-                        method="POST"
-                        action="{{ $mode === 'create' ? route('tp.media.store') : route('tp.media.update', ['media' => $media->id]) }}"
-                        enctype="multipart/form-data"
-                        class="space-y-4"
-                        id="media-form">
-                        @csrf
-                        @if ($mode === 'edit')
-                            @method('PUT')
-                        @endif
+                        <form
+                            method="POST"
+                            action="{{ $mode === 'create' ? route('tp.media.store') : route('tp.media.update', ['media' => $media->id]) }}"
+                            enctype="multipart/form-data"
+                            class="space-y-4"
+                            id="media-form">
+                            @csrf
+                            @if ($mode === 'edit')
+                                @method('PUT')
+                            @endif
 
-                        @if ($mode === 'create')
-                            <div
-                                class="tp-field"
-                                x-data="{
+                            @if ($mode === 'create')
+                                <div
+                                    class="tp-field"
+                                    x-data="{
                                     isDragging: false,
                                     fileName: '',
                                     setFileName(input) {
@@ -87,55 +87,56 @@
                                         x-cloak
                                         x-text="'Selected: ' + fileName"></div>
                                 </label>
-                                <div class="tp-help">Upload an image, document, or asset.</div>
+                                    <div class="tp-help">Upload an image, document, or asset.</div>
+                                </div>
+                            @endif
+
+                            <div class="tp-field">
+                                <label class="tp-label">Title</label>
+                                <input name="title" class="tp-input" value="{{ old('title', $media->title) }}" />
+                                <div class="tp-help">Defaults to the original filename.</div>
                             </div>
+
+                            <div class="tp-field">
+                                <label class="tp-label">Alt text</label>
+                                <input name="alt_text" class="tp-input" value="{{ old('alt_text', $media->alt_text) }}" />
+                                <div class="tp-help">Describe the media for accessibility.</div>
+                            </div>
+
+                            <div class="tp-field">
+                                <label class="tp-label">Caption</label>
+                                <textarea name="caption" rows="4" class="tp-textarea">{{ old('caption', $media->caption) }}</textarea>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="tp-metabox">
+                    <div class="tp-metabox__title">Actions</div>
+                    <div class="tp-metabox__body space-y-3 text-sm">
+                        <button type="submit" form="media-form" class="tp-button-primary w-full justify-center">
+                            {{ $mode === 'create' ? 'Upload file' : 'Save changes' }}
+                        </button>
+
+                        @if ($mode === 'edit')
+                            <form
+                                method="POST"
+                                action="{{ route('tp.media.destroy', ['media' => $media->id]) }}"
+                                data-confirm="Delete this media file? This action cannot be undone.">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="tp-button-danger w-full justify-center" aria-label="Delete media">
+                                    Delete
+                                </button>
+                            </form>
                         @endif
-
-                        <div class="tp-field">
-                            <label class="tp-label">Title</label>
-                            <input name="title" class="tp-input" value="{{ old('title', $media->title) }}" />
-                            <div class="tp-help">Defaults to the original filename.</div>
-                        </div>
-
-                        <div class="tp-field">
-                            <label class="tp-label">Alt text</label>
-                            <input name="alt_text" class="tp-input" value="{{ old('alt_text', $media->alt_text) }}" />
-                            <div class="tp-help">Describe the media for accessibility.</div>
-                        </div>
-
-                        <div class="tp-field">
-                            <label class="tp-label">Caption</label>
-                            <textarea name="caption" rows="4" class="tp-textarea">{{ old('caption', $media->caption) }}</textarea>
-                        </div>
-                    </form>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="space-y-6 {{ $mode === 'edit' ? 'lg:order-1' : 'lg:sticky lg:top-6 lg:self-start' }}">
-            <div class="tp-metabox">
-                <div class="tp-metabox__title">Actions</div>
-                <div class="tp-metabox__body space-y-3 text-sm">
-                    <button type="submit" form="media-form" class="tp-button-primary w-full justify-center">
-                        {{ $mode === 'create' ? 'Upload file' : 'Save changes' }}
-                    </button>
-
-                    @if ($mode === 'edit')
-                        <form
-                            method="POST"
-                            action="{{ route('tp.media.destroy', ['media' => $media->id]) }}"
-                            data-confirm="Delete this media file? This action cannot be undone.">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="tp-button-danger w-full justify-center" aria-label="Delete media">
-                                Delete
-                            </button>
-                        </form>
-                    @endif
-                </div>
-            </div>
-
-            @if ($mode === 'edit')
+        @if ($mode === 'edit')
+            <div class="space-y-6 lg:order-1">
                 @php
                     $urlGenerator = app(\TentaPress\Media\Contracts\MediaUrlGenerator::class);
                     $url = $urlGenerator->url($media);
@@ -229,7 +230,7 @@
                         @endif
                     </div>
                 </div>
-            @endif
-        </div>
+            </div>
+        @endif
     </div>
 @endsection
