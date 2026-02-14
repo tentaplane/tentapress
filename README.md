@@ -5,7 +5,7 @@ to launch, a safer way for clients to edit, and a cleaner path to maintain sites
 
 | Key       | Value      |
 |-----------|------------|
-| Version   | 0.33.1     |
+| Version   | 0.34.0 <!-- x-release-please-version --> |
 | PHP       | 8.2+       |
 | Framework | Laravel 12 |
 | License   | MIT        |
@@ -144,7 +144,8 @@ Raise mutation quality gates locally/CI by setting MSI thresholds:
 TP_MUTATION_MIN_MSI=60 TP_MUTATION_MIN_COVERED_MSI=70 composer test:mutation:critical
 ```
 
-CI runs `composer test:refactor-guard` on every push, runs `composer test` on pull requests and pushes to `main`, and runs critical mutation tests on pull requests touching `system`, `users`, or `pages`.
+CI runs `composer test:refactor-guard` on every push, runs `composer test` on pull requests and pushes to `main`, and
+runs critical mutation tests on pull requests touching `system`, `users`, or `pages`.
 
 Release archives exclude test sources via `.gitattributes` (`/tests`, `plugins/**/tests`, `packages/**/tests`).
 

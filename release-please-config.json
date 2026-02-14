@@ -9,7 +9,11 @@
                 "packages/**"
             ],
             "extra-files": [
-                "composer.json"
+                "composer.json",
+                {
+                    "type": "generic",
+                    "path": "README.md"
+                }
             ]
         }
     }
