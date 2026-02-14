@@ -5,9 +5,9 @@ Admin UI shell providing the base layout, navigation, and shared components for 
 ## Plugin Details
 
 | Field    | Value                                             |
-| -------- | ------------------------------------------------- |
+|----------|---------------------------------------------------|
 | ID       | `tentapress/admin-shell`                          |
-| Version  | 0.6.6                                             |
+| Version  | 0.6.7                                             |
 | Provider | `TentaPress\AdminShell\AdminShellServiceProvider` |
 
 ## Features
@@ -28,8 +28,8 @@ None.
 
 ## Admin Routes
 
-| Route    | Name                 | Description     |
-| -------- | -------------------- | --------------- |
+| Route    | Name           | Description     |
+|----------|----------------|-----------------|
 | `/admin` | `tp.dashboard` | Admin dashboard |
 
 ## Assets
