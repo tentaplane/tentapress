@@ -373,6 +373,8 @@ final readonly class Importer
             'schema_version' => 1,
             'generated_at_utc' => $generatedAtUtc,
             'wxr_version' => $wxrVersion,
+            'categories_count' => count($categories),
+            'tags_count' => count($tags),
             'unsupported_items' => array_sum($unsupportedByType),
             'url_mappings_preview_count' => count($urlMappingsPreview),
             'files' => [
@@ -764,6 +766,7 @@ final readonly class Importer
         $createdSettings = 0;
         $updatedSettings = 0;
         $importedSeo = 0;
+        $skippedTerms = 0;
         $pageMappings = [];
         $postMappings = [];
         $mediaMappings = [];
@@ -771,6 +774,23 @@ final readonly class Importer
         DB::beginTransaction();
 
         try {
+            if (($plan['source_format'] ?? null) === 'wxr') {
+                $skippedTerms = (int) ($plan['categories_count'] ?? 0) + (int) ($plan['tags_count'] ?? 0);
+                $this->emitProgress($progress, [
+                    'kind' => 'phase',
+                    'entity' => 'term',
+                    'status' => 'started',
+                ]);
+                $this->emitProgress($progress, [
+                    'kind' => 'phase',
+                    'entity' => 'term',
+                    'status' => 'completed',
+                    'created' => 0,
+                    'skipped' => $skippedTerms,
+                    'failed' => 0,
+                ]);
+            }
+
             // Pages
             $pagesPath = $baseDir . DIRECTORY_SEPARATOR . 'pages.json';
             if (is_file($pagesPath)) {
@@ -902,6 +922,9 @@ final readonly class Importer
 
         if (($plan['source_format'] ?? null) === 'wxr') {
             $parts[] = 'Source: WordPress WXR';
+            $parts[] = 'Terms detected: ' . $skippedTerms;
+            $parts[] = 'Terms imported: 0';
+            $parts[] = 'Terms skipped: ' . $skippedTerms;
             $parts[] = 'Unsupported items skipped: '.(int) ($plan['unsupported_items'] ?? 0);
             $parts[] = 'URL mappings previewed: '.(int) ($plan['url_mappings_preview_count'] ?? 0);
 

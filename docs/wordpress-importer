@@ -31,6 +31,7 @@
 - Import execution now uses a dedicated progress route/screen after review selections are submitted, keeping run feedback separate from options.
 - WXR runs now emit a deterministic reference map artifact (`*-references.json`) with source IDs/URLs mapped to destination IDs/slugs/paths.
 - Unreachable media URLs are treated as non-fatal; media rows still import while copy/variant-refresh metrics remain accurate.
+- WXR runs now emit explicit term-phase reporting in run output (detected/imported/skipped) so taxonomy scope is visible even when term persistence is deferred.
 
 ## Summary
 
@@ -301,3 +302,29 @@ Exit criteria:
    - Scope/non-goals
    - Warning interpretation
    - Artifact locations and rollback expectations
+
+## v1 Release Notes Draft (2026-02-14)
+
+### Added
+
+- WXR analyze and run support for pages, posts, and attachment metadata.
+- Dedicated progress route for import execution:
+  - `POST /admin/import/start`
+  - `GET /admin/import/progress/{run}`
+  - `POST /admin/import/run/stream`
+- Live item/phase feedback with created/skipped/failed counters and media copy/variant-refresh stats.
+- Persistent artifacts for migration follow-up:
+  - URL mapping report: `storage/app/tp-import-reports/<token>.json`
+  - Reference map report: `storage/app/tp-import-reports/<token>-references.json`
+
+### Reliability
+
+- Token reuse for reruns/retries without immediate token cleanup.
+- Non-stream run errors surface as admin notices.
+- Unreachable media URLs remain non-fatal and do not inflate copied/variant metrics.
+
+### Known Limits (v1)
+
+- No comments/users/menus/custom post type migration.
+- Taxonomy relationship persistence remains limited to analysis/reporting context.
+- Media binary ingestion depends on remote URL reachability.

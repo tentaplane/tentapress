@@ -7,7 +7,7 @@ Content import functionality for TentaPress.
 | Field    | Value                                     |
 |----------|-------------------------------------------|
 | ID       | `tentapress/import`                       |
-| Version  | 0.21.1                                    |
+| Version  | 0.22.0                                    |
 | Provider | `TentaPress\Import\ImportServiceProvider` |
 
 ## Features
@@ -35,12 +35,15 @@ Content import functionality for TentaPress.
 - Return user-facing admin notices for run-time token errors in non-stream import flow
 - Persist a source-to-destination reference map report with destination IDs/slugs/paths for pages/posts/media
 - Count media variant refreshes only when variant processing succeeds (unreachable media URLs do not inflate refreshed totals)
+- Include explicit WXR term-phase reporting (`Terms detected/imported/skipped`) in run summaries and streamed phase updates
 - Handles pages, posts, media references, settings
 
 ## Operations
 
 - Staging/operator runbook and release checklist:
   - `/docs/wordpress-importer`
+- v1 release notes draft:
+  - `/docs/wordpress-importer` (`v1 Release Notes Draft`)
 
 ## Dependencies
 
