@@ -7,6 +7,7 @@ use TentaPress\Media\Http\Admin\CreateController;
 use TentaPress\Media\Http\Admin\DestroyController;
 use TentaPress\Media\Http\Admin\EditController;
 use TentaPress\Media\Http\Admin\IndexController;
+use TentaPress\Media\Http\Admin\RebuildVariantsController;
 use TentaPress\Media\Http\Admin\Optimizations\SettingsController as OptimizationSettingsController;
 use TentaPress\Media\Http\Admin\Stock\ImportController as StockImportController;
 use TentaPress\Media\Http\Admin\Stock\IndexController as StockIndexController;
@@ -29,6 +30,7 @@ AdminRoutes::group(function (): void {
 
         Route::get('/media/{media}/edit', EditController::class)->name('media.edit');
         Route::put('/media/{media}', UpdateController::class)->name('media.update');
+        Route::post('/media/{media}/variants/rebuild', RebuildVariantsController::class)->name('media.variants.rebuild');
 
         Route::delete('/media/{media}', DestroyController::class)->name('media.destroy');
     });

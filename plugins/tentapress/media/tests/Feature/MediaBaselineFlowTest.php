@@ -69,3 +69,35 @@ it('renders pagination controls in grid view', function (): void {
         ->assertOk()
         ->assertSee('page=2', false);
 });
+
+it('rebuilds image variants from the media edit screen action', function (): void {
+    Storage::fake('public');
+
+    $admin = TpUser::query()->create([
+        'name' => 'Media Variant Admin',
+        'email' => 'media-variants@example.test',
+        'password' => 'secret',
+        'is_super_admin' => true,
+    ]);
+
+    $file = UploadedFile::fake()->image('rebuild-source.jpg', 2400, 1800);
+    $path = $file->store('media/2026/02', 'public');
+
+    $media = TpMedia::query()->create([
+        'title' => 'Rebuild Source',
+        'disk' => 'public',
+        'path' => $path,
+        'original_name' => 'rebuild-source.jpg',
+        'mime_type' => 'image/jpeg',
+    ]);
+
+    $this->actingAs($admin)
+        ->post('/admin/media/'.$media->id.'/variants/rebuild')
+        ->assertRedirect('/admin/media/'.$media->id.'/edit')
+        ->assertSessionHas('tp_notice_success', 'Image variants rebuilt.');
+
+    $media->refresh();
+
+    expect($media->optimization_status)->toBe('ready');
+    expect(is_array($media->variants))->toBeTrue();
+});

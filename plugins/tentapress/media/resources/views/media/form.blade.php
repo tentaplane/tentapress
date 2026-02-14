@@ -148,6 +148,7 @@
                     $sourceDimensions = $media->source_width && $media->source_height ? $media->source_width.'×'.$media->source_height : '—';
                     $optimizationStatus = (string) ($media->optimization_status ?? 'skipped');
                     $variantCount = is_array($media->variants) ? count($media->variants) : 0;
+                    $variants = is_array($media->variants) ? $media->variants : [];
                 @endphp
                 <div class="tp-metabox">
                     <div class="tp-metabox__title">Details</div>
@@ -184,6 +185,64 @@
                             <span class="tp-muted">Variants:</span>
                             <span class="tp-code">{{ $variantCount }}</span>
                         </div>
+                        @if ($isImage)
+                            <div class="space-y-2">
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <span class="tp-muted">Variant actions:</span>
+                                    <form method="POST" action="{{ route('tp.media.variants.rebuild', ['media' => $media->id]) }}">
+                                        @csrf
+                                        <button type="submit" class="tp-button-secondary">Rebuild all variants</button>
+                                    </form>
+                                </div>
+
+                                @if ($variants !== [])
+                                    <div class="overflow-x-auto rounded border border-slate-200">
+                                        <table class="min-w-full text-xs">
+                                            <thead class="bg-slate-50">
+                                                <tr>
+                                                    <th class="px-2 py-2 text-left font-semibold text-slate-700">Variant</th>
+                                                    <th class="px-2 py-2 text-left font-semibold text-slate-700">Dimensions</th>
+                                                    <th class="px-2 py-2 text-left font-semibold text-slate-700">Size</th>
+                                                    <th class="px-2 py-2 text-left font-semibold text-slate-700">Preview</th>
+                                                    <th class="px-2 py-2 text-left font-semibold text-slate-700">Rebuild</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach ($variants as $variantKey => $variantData)
+                                                    @php
+                                                        $variantWidth = isset($variantData['width']) && is_numeric($variantData['width']) ? (int) $variantData['width'] : null;
+                                                        $variantHeight = isset($variantData['height']) && is_numeric($variantData['height']) ? (int) $variantData['height'] : null;
+                                                        $variantSize = isset($variantData['size']) && is_numeric($variantData['size']) ? (int) $variantData['size'] : null;
+                                                        $variantUrl = $urlGenerator->imageUrl($media, ['variant' => (string) $variantKey]);
+                                                    @endphp
+                                                    <tr class="border-t border-slate-100">
+                                                        <td class="px-2 py-2"><span class="tp-code">{{ $variantKey }}</span></td>
+                                                        <td class="px-2 py-2">{{ $variantWidth && $variantHeight ? $variantWidth.'×'.$variantHeight : '—' }}</td>
+                                                        <td class="px-2 py-2">{{ $variantSize ? number_format($variantSize / 1024, 1).' KB' : '—' }}</td>
+                                                        <td class="px-2 py-2">
+                                                            @if ($variantUrl)
+                                                                <a class="tp-button-link" href="{{ $variantUrl }}" target="_blank" rel="noopener">Open</a>
+                                                            @else
+                                                                —
+                                                            @endif
+                                                        </td>
+                                                        <td class="px-2 py-2">
+                                                            <form method="POST" action="{{ route('tp.media.variants.rebuild', ['media' => $media->id]) }}">
+                                                                @csrf
+                                                                <input type="hidden" name="variant" value="{{ $variantKey }}" />
+                                                                <button type="submit" class="tp-button-secondary">Rebuild</button>
+                                                            </form>
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                @else
+                                    <div class="text-xs text-slate-500">No variants are currently built for this image.</div>
+                                @endif
+                            </div>
+                        @endif
                         @if ($media->optimization_error)
                             <div>
                                 <span class="tp-muted">Optimization error:</span>
