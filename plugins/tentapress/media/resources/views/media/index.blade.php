@@ -95,6 +95,12 @@
             </form>
         </div>
 
+        @if ($media->count() > 0 && method_exists($media, 'hasPages') && $media->hasPages())
+            <div class="tp-metabox__body">
+                {{ $media->links() }}
+            </div>
+        @endif
+
         @if ($media->count() === 0)
             <div class="tp-metabox__body">
                 <div class="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-black/10 bg-[#f6f7f7] px-6 py-10 text-center">
