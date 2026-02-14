@@ -7,7 +7,7 @@ Upload and manage media files for TentaPress.
 | Field    | Value                                   |
 |----------|-----------------------------------------|
 | ID       | `tentapress/media`                      |
-| Version  | 0.9.9                                   |
+| Version  | 0.9.10                                  |
 | Provider | `TentaPress\Media\MediaServiceProvider` |
 
 ## Goal
@@ -33,6 +33,7 @@ Provide a first-party media library for uploads, management, and reuse across Pa
 - Imported stock items are marked in-place without inline notices
 - Saved media view preference now applies before render to avoid list/grid flash
 - Pagination controls in both list and grid media views (top + bottom) with clearer disabled/active states
+- Media previews in list and grid are clickable and open the edit screen
 - Edit media screen uses a true 50/50 desktop split with details first and actions directly under the form
 - Edit media details now list built variants with preview links and rebuild buttons
 - Local image ingest clamp (`2048x2048`) with resize-to-original

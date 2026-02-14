@@ -67,7 +67,13 @@ it('renders pagination controls in grid view', function (): void {
     $this->actingAs($admin)
         ->get('/admin/media?view=grid')
         ->assertOk()
-        ->assertSee('page=2', false);
+        ->assertSee('page=2', false)
+        ->assertSee('data-media-preview-link="grid"', false);
+
+    $this->actingAs($admin)
+        ->get('/admin/media?view=list')
+        ->assertOk()
+        ->assertSee('data-media-preview-link="list"', false);
 });
 
 it('rebuilds image variants from the media edit screen action', function (): void {

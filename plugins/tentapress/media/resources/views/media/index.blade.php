@@ -147,16 +147,21 @@
                         @endphp
                         <div class="group overflow-hidden rounded-2xl border border-black/10 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
                             <div class="relative">
-                                @if ($previewUrl && $isImage)
-                                    <img
-                                        src="{{ $previewUrl }}"
-                                        alt=""
-                                        class="aspect-[4/3] w-full object-cover" />
-                                @else
-                                    <div class="flex aspect-[4/3] items-center justify-center bg-gradient-to-br from-slate-50 via-white to-slate-100 text-xs font-semibold uppercase tracking-wide text-slate-400">
-                                        {{ $typeLabel }}
-                                    </div>
-                                @endif
+                                <a
+                                    href="{{ route('tp.media.edit', ['media' => $item->id]) }}"
+                                    data-media-preview-link="grid"
+                                    class="block focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2">
+                                    @if ($previewUrl && $isImage)
+                                        <img
+                                            src="{{ $previewUrl }}"
+                                            alt=""
+                                            class="aspect-[4/3] w-full object-cover" />
+                                    @else
+                                        <div class="flex aspect-[4/3] items-center justify-center bg-gradient-to-br from-slate-50 via-white to-slate-100 text-xs font-semibold uppercase tracking-wide text-slate-400">
+                                            {{ $typeLabel }}
+                                        </div>
+                                    @endif
+                                </a>
                                 <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent opacity-0 transition group-hover:opacity-100"></div>
                                 <div class="absolute inset-x-0 bottom-0 flex items-center justify-between gap-2 p-3 text-white opacity-0 transition group-hover:opacity-100">
                                     <a
@@ -241,16 +246,21 @@
                             @endphp
                             <tr class="tp-table__row">
                                 <td class="tp-table__td">
-                                    @if ($previewUrl && $isImage)
-                                        <div class="h-28 w-40 overflow-hidden rounded-2xl border border-black/10 bg-slate-50 shadow-sm">
-                                            <img src="{{ $previewUrl }}" alt="" class="h-full w-full object-cover" />
-                                        </div>
-                                    @else
-                                        <div
-                                            class="flex h-28 w-40 items-center justify-center rounded-2xl border border-dashed border-black/20 bg-slate-50 text-[10px] font-semibold uppercase tracking-wide text-slate-500">
-                                            {{ $typeLabel }}
-                                        </div>
-                                    @endif
+                                    <a
+                                        href="{{ route('tp.media.edit', ['media' => $item->id]) }}"
+                                        data-media-preview-link="list"
+                                        class="block w-fit focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2">
+                                        @if ($previewUrl && $isImage)
+                                            <div class="h-28 w-40 overflow-hidden rounded-2xl border border-black/10 bg-slate-50 shadow-sm">
+                                                <img src="{{ $previewUrl }}" alt="" class="h-full w-full object-cover" />
+                                            </div>
+                                        @else
+                                            <div
+                                                class="flex h-28 w-40 items-center justify-center rounded-2xl border border-dashed border-black/20 bg-slate-50 text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+                                                {{ $typeLabel }}
+                                            </div>
+                                        @endif
+                                    </a>
                                 </td>
                                 <td class="tp-table__td">
                                     <a
