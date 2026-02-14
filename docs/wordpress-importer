@@ -29,6 +29,7 @@
 - Imported media now triggers local variant refresh processing, and run summaries include refreshed variant totals.
 - Non-stream run failures (for example missing tokens) now return user-facing admin notices instead of uncaught runtime errors.
 - Import execution now uses a dedicated progress route/screen after review selections are submitted, keeping run feedback separate from options.
+- WXR runs now emit a deterministic reference map artifact (`*-references.json`) with source IDs/URLs mapped to destination IDs/slugs/paths.
 
 ## Summary
 

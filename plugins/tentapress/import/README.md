@@ -7,7 +7,7 @@ Content import functionality for TentaPress.
 | Field    | Value                                     |
 |----------|-------------------------------------------|
 | ID       | `tentapress/import`                       |
-| Version  | 0.20.0                                    |
+| Version  | 0.21.0                                    |
 | Provider | `TentaPress\Import\ImportServiceProvider` |
 
 ## Features
@@ -33,6 +33,7 @@ Content import functionality for TentaPress.
 - Keep analyzed import tokens available for reruns/retries (no immediate token cleanup after first run)
 - Refresh local media variants for imported media records and report refreshed counts
 - Return user-facing admin notices for run-time token errors in non-stream import flow
+- Persist a source-to-destination reference map report with destination IDs/slugs/paths for pages/posts/media
 - Handles pages, posts, media references, settings
 
 ## Operations

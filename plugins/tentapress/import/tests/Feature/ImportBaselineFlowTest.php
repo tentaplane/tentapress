@@ -361,7 +361,8 @@ it('allows a super admin to analyze and run a wordpress wxr bundle', function ()
             && str_contains($message, 'Media failed: 0')
             && str_contains($message, 'Media files copied: 1')
             && str_contains($message, 'Media variants refreshed: 1')
-            && str_contains($message, 'URL mapping report: storage/app/tp-import-reports/'));
+            && str_contains($message, 'URL mapping report: storage/app/tp-import-reports/')
+            && str_contains($message, 'Reference map report: storage/app/tp-import-reports/'));
 
     expect(TpPage::query()->where('slug', 'wxr-page-title')->exists())->toBeTrue();
     expect(TpPost::query()->where('slug', 'wxr-post-title')->exists())->toBeTrue();
@@ -383,6 +384,31 @@ it('allows a super admin to analyze and run a wordpress wxr bundle', function ()
     expect($report['source_format'] ?? null)->toBe('wxr');
     expect(is_array($report['mappings'] ?? null))->toBeTrue();
     expect(count($report['mappings'] ?? []))->toBeGreaterThanOrEqual(2);
+
+    $referenceReports = File::glob(storage_path('app/tp-import-reports/*-references.json'));
+    expect(is_array($referenceReports))->toBeTrue();
+    expect(count($referenceReports))->toBeGreaterThan(0);
+
+    $latestReferenceReportPath = is_array($referenceReports) && $referenceReports !== [] ? (string) end($referenceReports) : '';
+    expect($latestReferenceReportPath)->not->toBe('');
+
+    $referenceReport = json_decode((string) File::get($latestReferenceReportPath), true, flags: JSON_THROW_ON_ERROR);
+    expect(is_array($referenceReport))->toBeTrue();
+    expect($referenceReport['source_format'] ?? null)->toBe('wxr');
+    expect(is_array($referenceReport['pages'] ?? null))->toBeTrue();
+    expect(is_array($referenceReport['posts'] ?? null))->toBeTrue();
+    expect(is_array($referenceReport['media'] ?? null))->toBeTrue();
+
+    $firstPageReference = is_array($referenceReport['pages'] ?? null) && $referenceReport['pages'] !== [] ? $referenceReport['pages'][0] : [];
+    $firstPostReference = is_array($referenceReport['posts'] ?? null) && $referenceReport['posts'] !== [] ? $referenceReport['posts'][0] : [];
+    $firstMediaReference = is_array($referenceReport['media'] ?? null) && $referenceReport['media'] !== [] ? $referenceReport['media'][0] : [];
+
+    expect((string) ($firstPageReference['source_post_id'] ?? ''))->toBe('101');
+    expect((string) ($firstPageReference['destination_slug'] ?? ''))->toBe('wxr-page-title');
+    expect((string) ($firstPostReference['source_post_id'] ?? ''))->toBe('102');
+    expect((string) ($firstPostReference['destination_slug'] ?? ''))->toBe('wxr-post-title');
+    expect((string) ($firstMediaReference['source_post_id'] ?? ''))->toBe('103');
+    expect((string) ($firstMediaReference['destination_path'] ?? ''))->toContain('/image-103.jpg');
 });
 
 it('skips duplicate wxr source rows on create-only rerun', function (): void {

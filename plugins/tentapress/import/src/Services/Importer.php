@@ -645,6 +645,36 @@ final readonly class Importer
     }
 
     /**
+     * @param  array<int,array<string,string|null>>  $pageMappings
+     * @param  array<int,array<string,string|null>>  $postMappings
+     * @param  array<int,array<string,string|null>>  $mediaMappings
+     */
+    private function writeReferenceMapReport(string $token, array $pageMappings, array $postMappings, array $mediaMappings): ?string
+    {
+        $pages = array_values(array_filter($pageMappings, fn (array $row): bool => trim((string) ($row['source_post_id'] ?? '')) !== '' || trim((string) ($row['source_url'] ?? '')) !== ''));
+        $posts = array_values(array_filter($postMappings, fn (array $row): bool => trim((string) ($row['source_post_id'] ?? '')) !== '' || trim((string) ($row['source_url'] ?? '')) !== ''));
+        $media = array_values(array_filter($mediaMappings, fn (array $row): bool => trim((string) ($row['source_post_id'] ?? '')) !== '' || trim((string) ($row['source_url'] ?? '')) !== ''));
+
+        if ($pages === [] && $posts === [] && $media === []) {
+            return null;
+        }
+
+        $dir = storage_path('app/tp-import-reports');
+        File::ensureDirectoryExists($dir);
+
+        $path = $dir . DIRECTORY_SEPARATOR . $token . '-references.json';
+        File::put($path, $this->jsonPayload->encode([
+            'generated_at_utc' => now()->toIso8601String(),
+            'source_format' => 'wxr',
+            'pages' => $pages,
+            'posts' => $posts,
+            'media' => $media,
+        ]));
+
+        return 'storage/app/tp-import-reports/' . $token . '-references.json';
+    }
+
+    /**
      * @param  array<string,mixed>  $payload
      */
     private function emitProgress(?callable $progress, array $payload): void
@@ -736,6 +766,7 @@ final readonly class Importer
         $importedSeo = 0;
         $pageMappings = [];
         $postMappings = [];
+        $mediaMappings = [];
 
         DB::beginTransaction();
 
@@ -799,7 +830,7 @@ final readonly class Importer
                         'status' => 'started',
                     ]);
                     $mediaPayload = $this->readJsonFile($mediaPath);
-                    [$createdMedia, $skippedMedia, $failedMedia, $downloadedMedia, $refreshedMediaVariants] = $this->importMedia(
+                    [$createdMedia, $skippedMedia, $failedMedia, $downloadedMedia, $refreshedMediaVariants, $mediaMappings] = $this->importMedia(
                         $mediaPayload,
                         $actorUserId,
                         $progress
@@ -877,6 +908,11 @@ final readonly class Importer
             $mappingReportPath = $this->writeUrlMappingReport($token, $pageMappings, $postMappings);
             if ($mappingReportPath !== null) {
                 $parts[] = "URL mapping report: {$mappingReportPath}";
+            }
+
+            $referenceReportPath = $this->writeReferenceMapReport($token, $pageMappings, $postMappings, $mediaMappings);
+            if ($referenceReportPath !== null) {
+                $parts[] = "Reference map report: {$referenceReportPath}";
             }
         }
 
@@ -993,6 +1029,8 @@ final readonly class Importer
                     'type' => 'page',
                     'source_url' => (string) ($item['source_link'] ?? ''),
                     'source_post_id' => (string) ($item['source_post_id'] ?? ''),
+                    'destination_id' => (string) $model->getKey(),
+                    'destination_slug' => $slug,
                     'destination_url' => '/'.$slug,
                 ];
                 unset($model);
@@ -1170,6 +1208,8 @@ final readonly class Importer
                     'type' => 'post',
                     'source_url' => (string) ($item['source_link'] ?? ''),
                     'source_post_id' => (string) ($item['source_post_id'] ?? ''),
+                    'destination_id' => (string) $model->getKey(),
+                    'destination_slug' => $slug,
                     'destination_url' => '/'.$this->blogBase().'/'.$slug,
                 ];
                 unset($model);
@@ -1224,21 +1264,21 @@ final readonly class Importer
     }
 
     /**
-     * @return array{0:int,1:int,2:int,3:int,4:int} createdMedia, skippedMedia, failedMedia, downloadedMedia, refreshedVariants
+     * @return array{0:int,1:int,2:int,3:int,4:int,5:array<int,array<string,string|null>>} createdMedia, skippedMedia, failedMedia, downloadedMedia, refreshedVariants, mappings
      */
     private function importMedia(array $payload, int $actorUserId = 0, ?callable $progress = null): array
     {
         if (!class_exists(TpMedia::class)) {
-            return [0, 0, 0, 0, 0];
+            return [0, 0, 0, 0, 0, []];
         }
 
         if (!Schema::hasTable('tp_media')) {
-            return [0, 0, 0, 0, 0];
+            return [0, 0, 0, 0, 0, []];
         }
 
         $items = $this->itemsFromPayload($payload);
         if ($items === []) {
-            return [0, 0, 0, 0, 0];
+            return [0, 0, 0, 0, 0, []];
         }
 
         $hasCreatedBy = Schema::hasColumn('tp_media', 'created_by');
@@ -1249,6 +1289,7 @@ final readonly class Importer
         $failed = 0;
         $downloaded = 0;
         $variantsRefreshed = 0;
+        $mappings = [];
 
         $total = count($items);
         foreach ($items as $index => $item) {
@@ -1325,6 +1366,14 @@ final readonly class Importer
                 if ($variantsUpdated) {
                     $variantsRefreshed++;
                 }
+
+                $mappings[] = [
+                    'type' => 'media',
+                    'source_post_id' => (string) ($item['source_post_id'] ?? ''),
+                    'source_url' => (string) ($item['source_url'] ?? ''),
+                    'destination_id' => (string) $model->getKey(),
+                    'destination_path' => $path,
+                ];
                 unset($model);
 
                 $created++;
@@ -1358,7 +1407,7 @@ final readonly class Importer
             }
         }
 
-        return [$created, $skipped, $failed, $downloaded, $variantsRefreshed];
+        return [$created, $skipped, $failed, $downloaded, $variantsRefreshed, $mappings];
     }
 
     private function refreshMediaVariants(TpMedia $media): bool
