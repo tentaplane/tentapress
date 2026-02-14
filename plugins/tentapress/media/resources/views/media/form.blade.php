@@ -133,10 +133,9 @@
                     </div>
                 </div>
             </div>
-        </div>
 
-        @if ($mode === 'edit')
-            <div class="space-y-6 lg:order-1">
+            @if ($mode === 'edit')
+                <div class="space-y-6 lg:order-1">
                 @php
                     $urlGenerator = app(\TentaPress\Media\Contracts\MediaUrlGenerator::class);
                     $url = $urlGenerator->url($media);
@@ -230,7 +229,8 @@
                         @endif
                     </div>
                 </div>
-            </div>
-        @endif
+                </div>
+            @endif
+        </div>
     </div>
 @endsection
