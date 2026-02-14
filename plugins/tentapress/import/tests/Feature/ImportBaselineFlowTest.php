@@ -528,3 +528,44 @@ it('allows rerunning import with the same token without token-expired errors', f
             && str_contains($message, 'Media skipped: 1')
             && str_contains($message, 'Media variants refreshed: 0'));
 });
+
+it('continues import when wxr media urls are unreachable', function (): void {
+    registerImportProvider();
+
+    $admin = TpUser::query()->create([
+        'name' => 'Import Admin',
+        'email' => 'import-wxr-media-unreachable@example.test',
+        'password' => 'secret',
+        'is_super_admin' => true,
+    ]);
+
+    $bundle = makeWxrBundleWithPagePostAndAttachment();
+    Http::fake([
+        'https://example.com/*' => Http::response('', 404),
+    ]);
+    $expectedPath = 'media/imports/wordpress/' . now()->format('Y/m') . '/image-103.jpg';
+    $expectedVariantPath = 'media/imports/wordpress/' . now()->format('Y/m') . '/variants/image-103-thumb.jpg';
+    Storage::disk('public')->delete([$expectedPath, $expectedVariantPath]);
+
+    $analyzeResponse = $this->actingAs($admin)
+        ->post('/admin/import/analyze', [
+            'bundle' => $bundle,
+        ]);
+
+    $token = (string) $analyzeResponse->viewData('token');
+
+    $this->actingAs($admin)
+        ->post('/admin/import/run', [
+            'token' => $token,
+            'pages_mode' => 'create_only',
+            'settings_mode' => 'merge',
+            'include_posts' => '1',
+            'include_media' => '1',
+            'include_seo' => '0',
+        ])
+        ->assertRedirect('/admin/import')
+        ->assertSessionHas('tp_notice_success', fn (string $message): bool => str_contains($message, 'Media created: 1')
+            && str_contains($message, 'Media files copied: 0')
+            && str_contains($message, 'Media variants refreshed: 0')
+            && str_contains($message, 'Media failed: 0'));
+});

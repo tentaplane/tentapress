@@ -1421,7 +1421,7 @@ final readonly class Importer
             $maintenance = resolve(MediaVariantMaintenance::class);
             $maintenance->refresh($media);
 
-            return true;
+            return (string) ($media->optimization_status ?? '') !== 'failed';
         } catch (\Throwable $e) {
             report($e);
 
