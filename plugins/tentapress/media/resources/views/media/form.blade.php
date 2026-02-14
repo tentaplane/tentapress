@@ -12,8 +12,8 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-1 gap-6 lg:grid-cols-4">
-            <div class="space-y-6 lg:col-span-3">
+        <div class="grid grid-cols-1 gap-6 {{ $mode === 'edit' ? 'lg:grid-cols-2' : 'lg:grid-cols-4' }}">
+            <div class="space-y-6 {{ $mode === 'edit' ? 'lg:order-2' : 'lg:col-span-3' }}">
                 <div class="tp-metabox">
                     <div class="tp-metabox__body space-y-4">
                     <form
@@ -112,7 +112,7 @@
             </div>
         </div>
 
-        <div class="space-y-6 lg:sticky lg:top-6 lg:self-start">
+        <div class="space-y-6 {{ $mode === 'edit' ? 'lg:order-1' : 'lg:sticky lg:top-6 lg:self-start' }}">
             <div class="tp-metabox">
                 <div class="tp-metabox__title">Actions</div>
                 <div class="tp-metabox__body space-y-3 text-sm">
