@@ -322,7 +322,7 @@
         </div>
 
         <div
-            class="fixed inset-0 z-50 items-center justify-center bg-black/85 p-4"
+            class="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4"
             x-show="previewModalOpen"
             x-transition.opacity
             x-on:click.self="closePreviewModal()"
