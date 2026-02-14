@@ -590,10 +590,11 @@ if (! $hasComposerLock && ! $hasVendorFolder) {
         'Installing dependencies'
     );
 
-    $run($composerCommand . ' run post-autoload-dump', 'Initializing app (Composer scripts)');
+    $run(escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($artisanPath) . ' package:discover --ansi', 'Initializing app (package discovery)');
     $run(escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($artisanPath) . ' key:generate', 'Initializing app (app key)');
     $run(escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($artisanPath) . ' migrate --force', 'Initializing app (database)');
-    $run($composerCommand . ' run post-update-cmd', 'Initializing app (post-update scripts)');
+    $run(escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($artisanPath) . ' vendor:publish --tag=laravel-assets --ansi --force', 'Initializing app (publishing assets)');
+    $run(escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($artisanPath) . ' tp:plugins sync --no-interaction', 'Initializing app (plugin sync)');
     $run(escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($artisanPath) . ' storage:link', 'Linking storage');
     $run(escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($artisanPath) . ' tp:plugins defaults --no-interaction', 'Activating default plugins');
     $run(escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($artisanPath) . ' migrate --force', 'Finalizing database');
@@ -626,8 +627,9 @@ if ($themeChoice !== 'none') {
     $themePath = $root . DIRECTORY_SEPARATOR . 'themes' . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $themeId);
     $buildTool = null;
     $shouldBuildAssets = false;
-    $run($composerCommand . ' run post-autoload-dump', 'Refreshing Composer autoload');
-    $run($composerCommand . ' run post-update-cmd', 'Finalizing theme install');
+    $run(escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($artisanPath) . ' package:discover --ansi', 'Refreshing package discovery');
+    $run(escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($artisanPath) . ' vendor:publish --tag=laravel-assets --ansi --force', 'Finalizing theme assets');
+    $run(escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($artisanPath) . ' tp:plugins sync --no-interaction', 'Finalizing plugin sync');
     $run(escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($artisanPath) . ' tp:themes sync', 'Syncing themes');
     $run(
         escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($artisanPath) . ' tp:themes activate ' . escapeshellarg($themeId),
