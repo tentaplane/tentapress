@@ -322,9 +322,11 @@
         </div>
 
         <div
-            class="fixed inset-0 z-50 hidden items-center justify-center bg-black/85 p-4"
-            x-bind:class="previewModalOpen ? 'flex' : 'hidden'"
-            x-on:click.self="closePreviewModal()">
+            class="fixed inset-0 z-50 items-center justify-center bg-black/85 p-4"
+            x-show="previewModalOpen"
+            x-transition.opacity
+            x-on:click.self="closePreviewModal()"
+            x-cloak>
             <button
                 type="button"
                 class="absolute right-4 top-4 rounded bg-white/10 px-3 py-2 text-sm font-semibold text-white hover:bg-white/20"
