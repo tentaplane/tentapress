@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.35.1](https://github.com/tentaplane/tentapress/compare/v0.35.0...v0.35.1) (2026-02-14)
+
+
+### Bug Fixes
+
+* **setup:** avoid composer script hooks during fresh install bootstrap ([14ba60f](https://github.com/tentaplane/tentapress/commit/14ba60f47a2df49e9bed7f9c244910557cbc6399))
+
 ## [0.35.0](https://github.com/tentaplane/tentapress/compare/v0.34.0...v0.35.0) (2026-02-14)
 
 
