@@ -10,6 +10,8 @@ use TentaPress\System\Theme\ThemeManager;
 
 final readonly class BlockRenderer
 {
+    private const MAX_NESTED_DEPTH = 1;
+
     public function __construct(
         private ViewFactory $views,
         private BlockRegistry $registry,
@@ -21,6 +23,14 @@ final readonly class BlockRenderer
      * @param  array{type?:mixed,version?:mixed,props?:mixed}  $block
      */
     public function render(array $block): string
+    {
+        return $this->renderWithDepth($block, 0);
+    }
+
+    /**
+     * @param  array{type?:mixed,version?:mixed,props?:mixed}  $block
+     */
+    private function renderWithDepth(array $block, int $depth): string
     {
         $type = isset($block['type']) ? (string) $block['type'] : '';
         $props = isset($block['props']) && is_array($block['props']) ? $block['props'] : [];
@@ -44,25 +54,45 @@ final readonly class BlockRenderer
         }
 
         $viewKey = $this->resolveVariantView($viewKey, $variant, $def?->variants ?? []);
+        $renderBlocks = function (array $children) use ($depth): string {
+            if ($depth >= self::MAX_NESTED_DEPTH) {
+                return '';
+            }
+
+            $html = '';
+
+            foreach ($children as $child) {
+                if (! is_array($child)) {
+                    continue;
+                }
+
+                $childType = trim((string) ($child['type'] ?? ''));
+                if ($childType === 'blocks/split-layout') {
+                    continue;
+                }
+
+                $html .= $this->renderWithDepth($child, $depth + 1);
+            }
+
+            return $html;
+        };
+        $viewData = [
+            'block' => $block,
+            'props' => $props,
+            'type' => $type,
+            'variant' => $variant,
+            'renderBlocks' => $renderBlocks,
+            'depth' => $depth,
+        ];
 
         // Theme override first
         if ($this->themes->hasActiveTheme() && $this->views->exists('tp-theme::'.$viewKey)) {
-            return $this->views->make('tp-theme::'.$viewKey, [
-                'block' => $block,
-                'props' => $props,
-                'type' => $type,
-                'variant' => $variant,
-            ])->render();
+            return $this->views->make('tp-theme::'.$viewKey, $viewData)->render();
         }
 
         // Plugin fallback
         if ($this->views->exists('tentapress-blocks::'.$viewKey)) {
-            return $this->views->make('tentapress-blocks::'.$viewKey, [
-                'block' => $block,
-                'props' => $props,
-                'type' => $type,
-                'variant' => $variant,
-            ])->render();
+            return $this->views->make('tentapress-blocks::'.$viewKey, $viewData)->render();
         }
 
         // No view found

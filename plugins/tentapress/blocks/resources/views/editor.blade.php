@@ -798,10 +798,100 @@
                                                     </template>
 
                                                     <template
+                                                        x-if="field.type === 'nested-blocks'">
+                                                        <div class="space-y-3" x-data="{ childType: '' }">
+                                                            <div class="flex flex-wrap items-center gap-2">
+                                                                <select
+                                                                    class="tp-select w-full sm:w-64"
+                                                                    :value="childType"
+                                                                    @change="childType = String($event.target.value || '')">
+                                                                    <option value="">Add child block…</option>
+                                                                    <template
+                                                                        x-for="def in nestedDefinitions()"
+                                                                        :key="'nested-' + field.key + '-' + def.type">
+                                                                        <option
+                                                                            :value="String(def.type)"
+                                                                            x-text="def.name || def.type"></option>
+                                                                    </template>
+                                                                </select>
+                                                                <button
+                                                                    type="button"
+                                                                    class="tp-button-secondary"
+                                                                    @click="nestedAddBlock(index, field.key, childType); childType = ''">
+                                                                    Add
+                                                                </button>
+                                                            </div>
+
+                                                            <div
+                                                                class="rounded-md border border-dashed border-slate-200 bg-slate-50 p-3 text-xs text-slate-500"
+                                                                x-show="nestedItems(index, field.key).length === 0"
+                                                                x-cloak>
+                                                                No child blocks yet.
+                                                            </div>
+
+                                                            <div class="space-y-2">
+                                                                <template
+                                                                    x-for="(child, childIndex) in nestedItems(index, field.key)"
+                                                                    :key="child._key">
+                                                                    <div class="rounded-md border border-slate-200 bg-white p-3">
+                                                                        <div class="mb-2 flex items-center justify-between gap-2">
+                                                                            <div class="flex min-w-0 items-center gap-2">
+                                                                                <span
+                                                                                    class="truncate text-sm font-semibold"
+                                                                                    x-text="titleFor(child.type)"></span>
+                                                                                <span
+                                                                                    class="tp-muted text-[11px]"
+                                                                                    x-text="child.type"></span>
+                                                                            </div>
+                                                                            <div class="flex items-center gap-1 text-xs">
+                                                                                <button
+                                                                                    type="button"
+                                                                                    class="tp-button-link"
+                                                                                    :disabled="childIndex === 0"
+                                                                                    :class="childIndex === 0 ? 'opacity-30 cursor-not-allowed' : ''"
+                                                                                    @click="nestedMove(index, field.key, childIndex, -1)">
+                                                                                    Up
+                                                                                </button>
+                                                                                <button
+                                                                                    type="button"
+                                                                                    class="tp-button-link"
+                                                                                    :disabled="childIndex === nestedItems(index, field.key).length - 1"
+                                                                                    :class="childIndex === nestedItems(index, field.key).length - 1 ? 'opacity-30 cursor-not-allowed' : ''"
+                                                                                    @click="nestedMove(index, field.key, childIndex, 1)">
+                                                                                    Down
+                                                                                </button>
+                                                                                <button
+                                                                                    type="button"
+                                                                                    class="tp-button-link"
+                                                                                    @click="nestedDuplicate(index, field.key, childIndex)">
+                                                                                    Duplicate
+                                                                                </button>
+                                                                                <button
+                                                                                    type="button"
+                                                                                    class="tp-button-link text-red-600 hover:text-red-700"
+                                                                                    @click="nestedRemove(index, field.key, childIndex)">
+                                                                                    Remove
+                                                                                </button>
+                                                                            </div>
+                                                                        </div>
+                                                                        <label class="tp-label">Child Props (JSON)</label>
+                                                                        <textarea
+                                                                            class="tp-textarea font-mono text-xs"
+                                                                            rows="6"
+                                                                            @blur="nestedSetPropsJson(index, field.key, childIndex, $event.target.value)"
+                                                                            x-text="nestedPropsJson(index, field.key, childIndex)"></textarea>
+                                                                    </div>
+                                                                </template>
+                                                            </div>
+                                                        </div>
+                                                    </template>
+
+                                                    <template
                                                         x-if="
                                                 field.type !== 'textarea' &&
                                                 field.type !== 'media' &&
                                                 field.type !== 'media-list' &&
+                                                field.type !== 'nested-blocks' &&
                                                 field.type !== 'select' &&
                                                 field.type !== 'toggle' &&
                                                 field.type !== 'number' &&
@@ -2466,6 +2556,176 @@
                     const copy = this.repeaterNormalizeRow(field, items[rowIndex]);
                     items.splice(rowIndex + 1, 0, copy);
                     this.setProp(index, path, items);
+                },
+
+                nestedDefinitions() {
+                    return this.definitions.filter((definition) => {
+                        const type = String(definition?.type || '').trim();
+                        return type !== '' && type !== 'blocks/split-layout';
+                    });
+                },
+
+                nestedNormalizeBlock(block) {
+                    const out = block && typeof block === 'object' ? this.deepClone(block) : {};
+                    out.type = String(out.type || '').trim();
+                    if (!out.type || out.type === 'blocks/split-layout') {
+                        return null;
+                    }
+
+                    const definition = this.defByType(out.type);
+                    out.version = Number.isFinite(parseInt(out.version))
+                        ? parseInt(out.version)
+                        : definition && definition.version
+                          ? parseInt(definition.version)
+                          : 1;
+
+                    if (!out.props || typeof out.props !== 'object') {
+                        out.props = {};
+                    }
+
+                    if (
+                        definition &&
+                        definition.defaults &&
+                        typeof definition.defaults === 'object'
+                    ) {
+                        out.props = this.mergeDefaults(definition.defaults, out.props);
+                    }
+
+                    const variant = this.defaultVariantFor(out.type);
+                    if (variant) {
+                        out.variant = String(out.variant || variant).trim() || variant;
+                    } else {
+                        delete out.variant;
+                    }
+
+                    out._key = out._key || this.uid();
+
+                    return out;
+                },
+
+                nestedCanonical(items) {
+                    return items
+                        .map((item) => this.nestedNormalizeBlock(item))
+                        .filter((item) => !!item)
+                        .map((item) => ({
+                            type: String(item.type || '').trim(),
+                            version: Number.isFinite(parseInt(item.version))
+                                ? parseInt(item.version)
+                                : 1,
+                            ...(item.variant && typeof item.variant === 'string'
+                                ? { variant: item.variant.trim() }
+                                : {}),
+                            props: item.props && typeof item.props === 'object' ? item.props : {},
+                        }))
+                        .filter((item) => item.type !== '');
+                },
+
+                nestedItems(index, path) {
+                    const raw = this.getPropRaw(index, path);
+                    if (!Array.isArray(raw)) {
+                        return [];
+                    }
+
+                    return raw
+                        .map((item) => this.nestedNormalizeBlock(item))
+                        .filter((item) => !!item);
+                },
+
+                nestedSet(index, path, items) {
+                    this.setProp(index, path, this.nestedCanonical(items));
+                },
+
+                nestedAddBlock(index, path, type) {
+                    const childType = String(type || '').trim();
+                    if (!childType || childType === 'blocks/split-layout') {
+                        return;
+                    }
+
+                    const items = this.nestedItems(index, path);
+                    items.push(this.nestedNormalizeBlock(this.exampleBlock(childType)));
+                    this.nestedSet(index, path, items);
+                },
+
+                nestedRemove(index, path, childIndex) {
+                    const items = this.nestedItems(index, path);
+                    if (childIndex < 0 || childIndex >= items.length) {
+                        return;
+                    }
+
+                    items.splice(childIndex, 1);
+                    this.nestedSet(index, path, items);
+                },
+
+                nestedMove(index, path, childIndex, delta) {
+                    const items = this.nestedItems(index, path);
+                    const target = childIndex + delta;
+                    if (
+                        childIndex < 0 ||
+                        childIndex >= items.length ||
+                        target < 0 ||
+                        target >= items.length
+                    ) {
+                        return;
+                    }
+
+                    const [item] = items.splice(childIndex, 1);
+                    items.splice(target, 0, item);
+                    this.nestedSet(index, path, items);
+                },
+
+                nestedDuplicate(index, path, childIndex) {
+                    const items = this.nestedItems(index, path);
+                    if (childIndex < 0 || childIndex >= items.length) {
+                        return;
+                    }
+
+                    const copy = this.nestedNormalizeBlock(items[childIndex]);
+                    if (!copy) {
+                        return;
+                    }
+
+                    copy._key = this.uid();
+                    items.splice(childIndex + 1, 0, copy);
+                    this.nestedSet(index, path, items);
+                },
+
+                nestedPropsJson(index, path, childIndex) {
+                    const items = this.nestedItems(index, path);
+                    if (childIndex < 0 || childIndex >= items.length) {
+                        return '{}';
+                    }
+
+                    const props =
+                        items[childIndex].props && typeof items[childIndex].props === 'object'
+                            ? items[childIndex].props
+                            : {};
+
+                    try {
+                        return JSON.stringify(props, null, 2);
+                    } catch (e) {
+                        return '{}';
+                    }
+                },
+
+                nestedSetPropsJson(index, path, childIndex, text) {
+                    const items = this.nestedItems(index, path);
+                    if (childIndex < 0 || childIndex >= items.length) {
+                        return;
+                    }
+
+                    let parsed = null;
+                    try {
+                        parsed = JSON.parse(String(text || '{}'));
+                    } catch (e) {
+                        return;
+                    }
+
+                    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+                        return;
+                    }
+
+                    items[childIndex].props = parsed;
+                    this.nestedSet(index, path, items);
                 },
 
                 setProp(index, path, value) {

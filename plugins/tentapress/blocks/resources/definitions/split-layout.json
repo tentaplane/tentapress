@@ -1,0 +1,75 @@
+{
+    "type": "blocks/split-layout",
+    "name": "Split Layout",
+    "description": "Two-column container that renders child blocks in each column.",
+    "version": 1,
+    "view": "blocks.split-layout",
+    "fields": [
+        {
+            "key": "ratio",
+            "label": "Column Ratio",
+            "type": "select",
+            "options": [
+                { "value": "50-50", "label": "50 / 50" },
+                { "value": "60-40", "label": "60 / 40" },
+                { "value": "40-60", "label": "40 / 60" }
+            ]
+        },
+        {
+            "key": "gap",
+            "label": "Column Gap",
+            "type": "select",
+            "options": [
+                { "value": "sm", "label": "Small" },
+                { "value": "md", "label": "Medium" },
+                { "value": "lg", "label": "Large" }
+            ]
+        },
+        { "key": "stack_on_mobile", "label": "Stack on mobile", "type": "toggle" },
+        {
+            "key": "left_blocks",
+            "label": "Left Column Blocks",
+            "type": "nested-blocks",
+            "help": "Add child blocks for the left column."
+        },
+        {
+            "key": "right_blocks",
+            "label": "Right Column Blocks",
+            "type": "nested-blocks",
+            "help": "Add child blocks for the right column."
+        }
+    ],
+    "defaults": {
+        "ratio": "50-50",
+        "gap": "md",
+        "stack_on_mobile": true,
+        "left_blocks": [],
+        "right_blocks": []
+    },
+    "example": {
+        "props": {
+            "ratio": "60-40",
+            "gap": "md",
+            "stack_on_mobile": true,
+            "left_blocks": [
+                {
+                    "type": "blocks/content",
+                    "version": 1,
+                    "props": {
+                        "content": "Left column content block."
+                    }
+                }
+            ],
+            "right_blocks": [
+                {
+                    "type": "blocks/image",
+                    "version": 1,
+                    "props": {
+                        "url": "",
+                        "alt": "Right column image"
+                    }
+                }
+            ]
+        }
+    }
+}

@@ -7,7 +7,7 @@ Block registry and rendering system for TentaPress pages and posts.
 | Field    | Value                                     |
 |----------|-------------------------------------------|
 | ID       | `tentapress/blocks`                       |
-| Version  | 0.7.2                                     |
+| Version  | 0.8.0                                     |
 | Provider | `TentaPress\Blocks\BlocksServiceProvider` |
 
 ## Features
@@ -19,7 +19,7 @@ Block registry and rendering system for TentaPress pages and posts.
 - Right-side details panel
 - Block inserter controls
 - Page outline navigation
-- Field types: text, textarea, richtext, select, image, repeater, link, actions
+- Field types: text, textarea, richtext, select, image, repeater, nested-blocks, link, actions
 - Variant-aware image rendering for image-based blocks when media records are available
 
 ## Dependencies
@@ -35,10 +35,22 @@ None.
 - Gallery
 - CTA / Button group
 - Split Image + Content
-- Columns
+- Split Layout (nested child blocks)
 - FAQ (repeater)
 - Embed
 - Divider / Spacer
+
+## Split Layout Child Payload
+
+`blocks/split-layout` stores child blocks in:
+
+- `props.left_blocks` (array of block objects)
+- `props.right_blocks` (array of block objects)
+
+Rules:
+
+- Nesting depth is capped to one level.
+- Child type `blocks/split-layout` is intentionally rejected to prevent recursive containers.
 
 ## Extending
 

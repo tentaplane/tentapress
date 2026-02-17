@@ -44,3 +44,65 @@ it('denies posts admin index access to non-super-admin users without capability'
         ->get('/admin/posts')
         ->assertForbidden();
 });
+
+it('normalizes nested split-layout child blocks on post save', function (): void {
+    $admin = TpUser::query()->create([
+        'name' => 'Posts Nested Admin',
+        'email' => 'posts-nested-layout@example.test',
+        'password' => 'secret',
+        'is_super_admin' => true,
+    ]);
+
+    $payload = [
+        [
+            'type' => 'blocks/split-layout',
+            'props' => [
+                'left_blocks' => [
+                    [
+                        'type' => 'blocks/content',
+                        'props' => [
+                            'content' => 'Nested left post content',
+                        ],
+                    ],
+                    [
+                        'type' => 'blocks/split-layout',
+                        'props' => [
+                            'left_blocks' => [
+                                [
+                                    'type' => 'blocks/content',
+                                    'props' => ['content' => 'Should be dropped'],
+                                ],
+                            ],
+                            'right_blocks' => [],
+                        ],
+                    ],
+                ],
+                'right_blocks' => [
+                    [
+                        'type' => 'blocks/content',
+                        'props' => [
+                            'content' => 'Nested right post content',
+                        ],
+                    ],
+                ],
+            ],
+        ],
+    ];
+
+    $this->actingAs($admin)->post('/admin/posts', [
+        'title' => 'Nested Layout Post',
+        'slug' => '',
+        'editor_driver' => 'blocks',
+        'blocks_json' => json_encode($payload, JSON_THROW_ON_ERROR),
+        'page_doc_json' => '{"time":0,"blocks":[],"version":"2.28.0"}',
+    ])->assertRedirect();
+
+    $post = TpPost::query()->where('title', 'Nested Layout Post')->firstOrFail();
+    $blocks = is_array($post->blocks) ? $post->blocks : [];
+
+    expect($blocks)->toHaveCount(1);
+    expect($blocks[0]['type'] ?? null)->toBe('blocks/split-layout');
+    expect(($blocks[0]['props']['left_blocks'] ?? []))->toHaveCount(1);
+    expect($blocks[0]['props']['left_blocks'][0]['type'] ?? null)->toBe('blocks/content');
+    expect($blocks[0]['props']['right_blocks'][0]['type'] ?? null)->toBe('blocks/content');
+});
