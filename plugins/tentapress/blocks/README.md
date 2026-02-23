@@ -7,7 +7,7 @@ Block registry and rendering system for TentaPress pages and posts.
 | Field    | Value                                     |
 |----------|-------------------------------------------|
 | ID       | `tentapress/blocks`                       |
-| Version  | 0.8.0                                     |
+| Version  | 0.9.0                                     |
 | Provider | `TentaPress\Blocks\BlocksServiceProvider` |
 
 ## Features
@@ -51,6 +51,7 @@ Rules:
 
 - Nesting depth is capped to one level.
 - Child type `blocks/split-layout` is intentionally rejected to prevent recursive containers.
+- Admin editor supports inline child controls for scalar field types and keeps JSON editing available for complex child props.
 
 ## Extending
 

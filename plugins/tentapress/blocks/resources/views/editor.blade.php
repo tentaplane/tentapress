@@ -874,7 +874,127 @@
                                                                                 </button>
                                                                             </div>
                                                                         </div>
-                                                                        <label class="tp-label">Child Props (JSON)</label>
+
+                                                                        <template
+                                                                            x-if="nestedFieldsFor(child.type).length > 0">
+                                                                            <div class="space-y-3">
+                                                                                <template
+                                                                                    x-for="childField in nestedFieldsFor(child.type)"
+                                                                                    :key="child._key + ':' + childField.key">
+                                                                                    <div class="tp-field">
+                                                                                        <label
+                                                                                            class="tp-label"
+                                                                                            x-text="childField.label"></label>
+
+                                                                                        <template
+                                                                                            x-if="nestedFieldSupports(childField)">
+                                                                                            <div>
+                                                                                                <template
+                                                                                                    x-if="childField.type === 'textarea'">
+                                                                                                    <textarea
+                                                                                                        class="tp-textarea"
+                                                                                                        :rows="childField.rows ? childField.rows : 4"
+                                                                                                        :placeholder="childField.placeholder || ''"
+                                                                                                        :value="nestedGetProp(index, field.key, childIndex, childField.key)"
+                                                                                                        @input="nestedSetProp(index, field.key, childIndex, childField.key, $event.target.value)"></textarea>
+                                                                                                </template>
+
+                                                                                                <template
+                                                                                                    x-if="childField.type === 'select'">
+                                                                                                    <select
+                                                                                                        class="tp-select"
+                                                                                                        :value="String(nestedGetProp(index, field.key, childIndex, childField.key) ?? '')"
+                                                                                                        @change="nestedSetProp(index, field.key, childIndex, childField.key, String($event.target.value || ''))">
+                                                                                                        <template
+                                                                                                            x-for="opt in selectOptions(childField)"
+                                                                                                            :key="opt.value">
+                                                                                                            <option
+                                                                                                                :value="String(opt.value)"
+                                                                                                                :selected="String(nestedGetProp(index, field.key, childIndex, childField.key) ?? '') === String(opt.value)"
+                                                                                                                x-text="opt.label"></option>
+                                                                                                        </template>
+                                                                                                    </select>
+                                                                                                </template>
+
+                                                                                                <template
+                                                                                                    x-if="childField.type === 'toggle'">
+                                                                                                    <label
+                                                                                                        class="flex items-center gap-2 text-sm">
+                                                                                                        <input
+                                                                                                            type="checkbox"
+                                                                                                            class="tp-checkbox"
+                                                                                                            :checked="!!nestedGetPropRaw(index, field.key, childIndex, childField.key)"
+                                                                                                            @change="nestedSetProp(index, field.key, childIndex, childField.key, $event.target.checked)" />
+                                                                                                        <span
+                                                                                                            x-text="childField.toggle_label || 'Enabled'"></span>
+                                                                                                    </label>
+                                                                                                </template>
+
+                                                                                                <template
+                                                                                                    x-if="childField.type === 'number'">
+                                                                                                    <input
+                                                                                                        class="tp-input"
+                                                                                                        type="number"
+                                                                                                        :min="childField.min !== undefined ? childField.min : null"
+                                                                                                        :max="childField.max !== undefined ? childField.max : null"
+                                                                                                        :step="childField.step !== undefined ? childField.step : null"
+                                                                                                        :placeholder="childField.placeholder || ''"
+                                                                                                        :value="nestedGetProp(index, field.key, childIndex, childField.key)"
+                                                                                                        @input="nestedSetProp(index, field.key, childIndex, childField.key, $event.target.value)" />
+                                                                                                </template>
+
+                                                                                                <template
+                                                                                                    x-if="childField.type === 'range'">
+                                                                                                    <input
+                                                                                                        class="tp-input"
+                                                                                                        type="range"
+                                                                                                        :min="childField.min !== undefined ? childField.min : null"
+                                                                                                        :max="childField.max !== undefined ? childField.max : null"
+                                                                                                        :step="childField.step !== undefined ? childField.step : null"
+                                                                                                        :value="nestedGetProp(index, field.key, childIndex, childField.key)"
+                                                                                                        @input="nestedSetProp(index, field.key, childIndex, childField.key, $event.target.value)" />
+                                                                                                </template>
+
+                                                                                                <template
+                                                                                                    x-if="childField.type === 'color'">
+                                                                                                    <input
+                                                                                                        class="tp-input h-10 p-1"
+                                                                                                        type="color"
+                                                                                                        :value="nestedGetProp(index, field.key, childIndex, childField.key)"
+                                                                                                        @input="nestedSetProp(index, field.key, childIndex, childField.key, $event.target.value)" />
+                                                                                                </template>
+
+                                                                                                <template
+                                                                                                    x-if="
+                                                                                                        childField.type !== 'textarea' &&
+                                                                                                        childField.type !== 'select' &&
+                                                                                                        childField.type !== 'toggle' &&
+                                                                                                        childField.type !== 'number' &&
+                                                                                                        childField.type !== 'range' &&
+                                                                                                        childField.type !== 'color'
+                                                                                                    ">
+                                                                                                    <input
+                                                                                                        class="tp-input"
+                                                                                                        :type="childField.type === 'url' ? 'url' : 'text'"
+                                                                                                        :placeholder="childField.placeholder || ''"
+                                                                                                        :value="nestedGetProp(index, field.key, childIndex, childField.key)"
+                                                                                                        @input="nestedSetProp(index, field.key, childIndex, childField.key, $event.target.value)" />
+                                                                                                </template>
+                                                                                            </div>
+                                                                                        </template>
+
+                                                                                        <template
+                                                                                            x-if="!nestedFieldSupports(childField)">
+                                                                                            <div class="tp-help">
+                                                                                                This field type is edited via JSON below.
+                                                                                            </div>
+                                                                                        </template>
+                                                                                    </div>
+                                                                                </template>
+                                                                            </div>
+                                                                        </template>
+
+                                                                        <label class="tp-label mt-3">Child Props (JSON)</label>
                                                                         <textarea
                                                                             class="tp-textarea font-mono text-xs"
                                                                             rows="6"
@@ -2565,6 +2685,27 @@
                     });
                 },
 
+                nestedFieldsFor(type) {
+                    return this.fieldsFor(type).filter(
+                        (field) => String(field?.type || '').trim() !== 'nested-blocks',
+                    );
+                },
+
+                nestedFieldSupports(field) {
+                    const type = String(field?.type || '').trim();
+                    return (
+                        type === '' ||
+                        type === 'text' ||
+                        type === 'url' ||
+                        type === 'textarea' ||
+                        type === 'select' ||
+                        type === 'toggle' ||
+                        type === 'number' ||
+                        type === 'range' ||
+                        type === 'color'
+                    );
+                },
+
                 nestedNormalizeBlock(block) {
                     const out = block && typeof block === 'object' ? this.deepClone(block) : {};
                     out.type = String(out.type || '').trim();
@@ -2633,6 +2774,71 @@
 
                 nestedSet(index, path, items) {
                     this.setProp(index, path, this.nestedCanonical(items));
+                },
+
+                nestedGetPropRaw(index, path, childIndex, childPath) {
+                    const items = this.nestedItems(index, path);
+                    if (childIndex < 0 || childIndex >= items.length) {
+                        return null;
+                    }
+
+                    const child = items[childIndex];
+                    const props = child && typeof child.props === 'object' ? child.props : {};
+                    const parts = String(childPath || '').split('.');
+                    let cur = props;
+
+                    for (const part of parts) {
+                        if (
+                            !cur ||
+                            typeof cur !== 'object' ||
+                            !Object.prototype.hasOwnProperty.call(cur, part)
+                        ) {
+                            return null;
+                        }
+                        cur = cur[part];
+                    }
+
+                    return cur;
+                },
+
+                nestedGetProp(index, path, childIndex, childPath) {
+                    const raw = this.nestedGetPropRaw(index, path, childIndex, childPath);
+                    if (raw === null || raw === undefined) {
+                        return '';
+                    }
+                    if (typeof raw === 'object') {
+                        return '';
+                    }
+                    return String(raw);
+                },
+
+                nestedSetProp(index, path, childIndex, childPath, value) {
+                    const items = this.nestedItems(index, path);
+                    if (childIndex < 0 || childIndex >= items.length) {
+                        return;
+                    }
+
+                    const child = items[childIndex];
+                    if (!child.props || typeof child.props !== 'object') {
+                        child.props = {};
+                    }
+
+                    const parts = String(childPath || '').split('.');
+                    let cur = child.props;
+                    for (let i = 0; i < parts.length; i++) {
+                        const part = parts[i];
+                        if (i === parts.length - 1) {
+                            cur[part] = value;
+                            break;
+                        }
+                        if (!cur[part] || typeof cur[part] !== 'object') {
+                            cur[part] = {};
+                        }
+                        cur = cur[part];
+                    }
+
+                    items[childIndex] = child;
+                    this.nestedSet(index, path, items);
                 },
 
                 nestedAddBlock(index, path, type) {
