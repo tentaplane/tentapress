@@ -2,6 +2,9 @@
 
 declare(strict_types=1);
 
+use TentaPress\Builder\BuilderServiceProvider;
+use TentaPress\System\Plugin\PluginRegistry;
+use TentaPress\Builder\Support\PreviewSnapshotStore;
 use TentaPress\Users\Models\TpUser;
 
 function loadBuilderClasses(): void
@@ -16,27 +19,27 @@ function loadBuilderClasses(): void
 
 function registerBuilderProvider(): void
 {
-    if (! class_exists(\TentaPress\Builder\BuilderServiceProvider::class)) {
+    if (! class_exists(BuilderServiceProvider::class)) {
         loadBuilderClasses();
     }
 
-    if (app()->bound(\TentaPress\System\Plugin\PluginRegistry::class)) {
-        app()->make(\TentaPress\System\Plugin\PluginRegistry::class)->clearCache();
+    if (app()->bound(PluginRegistry::class)) {
+        app()->make(PluginRegistry::class)->clearCache();
     }
 
-    if (app()->getProvider(\TentaPress\Builder\BuilderServiceProvider::class) === null) {
-        app()->register(\TentaPress\Builder\BuilderServiceProvider::class);
+    if (app()->getProvider(BuilderServiceProvider::class) === null) {
+        app()->register(BuilderServiceProvider::class);
         resolve('router')->getRoutes()->refreshNameLookups();
         resolve('router')->getRoutes()->refreshActionLookups();
     }
 }
 
 it('stores preview snapshots per-user and expires them after ttl', function (): void {
-    if (! class_exists(\TentaPress\Builder\Support\PreviewSnapshotStore::class)) {
+    if (! class_exists(PreviewSnapshotStore::class)) {
         loadBuilderClasses();
     }
 
-    $store = app()->make(\TentaPress\Builder\Support\PreviewSnapshotStore::class);
+    $store = app()->make(PreviewSnapshotStore::class);
 
     $token = $store->put(101, [
         'resource' => 'pages',

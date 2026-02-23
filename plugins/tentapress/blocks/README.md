@@ -7,7 +7,7 @@ Block registry and rendering system for TentaPress pages and posts.
 | Field    | Value                                     |
 |----------|-------------------------------------------|
 | ID       | `tentapress/blocks`                       |
-| Version  | 0.10.2                                    |
+| Version  | 0.11.0                                    |
 | Provider | `TentaPress\Blocks\BlocksServiceProvider` |
 
 ## Features
@@ -21,6 +21,7 @@ Block registry and rendering system for TentaPress pages and posts.
 - Page outline navigation
 - Field types: text, textarea, richtext, select, image, repeater, nested-blocks, link, actions
 - Variant-aware image rendering for image-based blocks when media records are available
+- Optional presentation wrapper metadata (`props.presentation`) for spacing, alignment, background, and container width
 
 ## Dependencies
 
