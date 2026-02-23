@@ -846,31 +846,47 @@
                                                                             <div class="flex items-center gap-1 text-xs">
                                                                                 <button
                                                                                     type="button"
-                                                                                    class="tp-button-link"
+                                                                                    class="tp-button-link inline-flex items-center justify-center rounded-full p-1 text-slate-500 hover:text-slate-700"
+                                                                                    title="Move up"
+                                                                                    aria-label="Move child block up"
                                                                                     :disabled="childIndex === 0"
                                                                                     :class="childIndex === 0 ? 'opacity-30 cursor-not-allowed' : ''"
                                                                                     @click="nestedMove(index, field.key, childIndex, -1)">
-                                                                                    Up
+                                                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+                                                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 10.5 12 3m0 0 7.5 7.5M12 3v18" />
+                                                                                    </svg>
                                                                                 </button>
                                                                                 <button
                                                                                     type="button"
-                                                                                    class="tp-button-link"
+                                                                                    class="tp-button-link inline-flex items-center justify-center rounded-full p-1 text-slate-500 hover:text-slate-700"
+                                                                                    title="Move down"
+                                                                                    aria-label="Move child block down"
                                                                                     :disabled="childIndex === nestedItems(index, field.key).length - 1"
                                                                                     :class="childIndex === nestedItems(index, field.key).length - 1 ? 'opacity-30 cursor-not-allowed' : ''"
                                                                                     @click="nestedMove(index, field.key, childIndex, 1)">
-                                                                                    Down
+                                                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+                                                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3" />
+                                                                                    </svg>
                                                                                 </button>
                                                                                 <button
                                                                                     type="button"
-                                                                                    class="tp-button-link"
+                                                                                    class="tp-button-link inline-flex items-center justify-center rounded-full p-1 text-slate-500 hover:text-slate-700"
+                                                                                    title="Duplicate"
+                                                                                    aria-label="Duplicate child block"
                                                                                     @click="nestedDuplicate(index, field.key, childIndex)">
-                                                                                    Duplicate
+                                                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+                                                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H9.75" />
+                                                                                    </svg>
                                                                                 </button>
                                                                                 <button
                                                                                     type="button"
-                                                                                    class="tp-button-link text-red-600 hover:text-red-700"
+                                                                                    class="tp-button-link inline-flex items-center justify-center rounded-full p-1 text-red-600 hover:text-red-700"
+                                                                                    title="Delete"
+                                                                                    aria-label="Delete child block"
                                                                                     @click="nestedRemove(index, field.key, childIndex)">
-                                                                                    Remove
+                                                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+                                                                                        <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                                                                    </svg>
                                                                                 </button>
                                                                             </div>
                                                                         </div>
@@ -889,6 +905,149 @@
                                                                                         <template
                                                                                             x-if="nestedFieldSupports(childField)">
                                                                                             <div>
+                                                                                                <template
+                                                                                                    x-if="childField.type === 'repeater'">
+                                                                                                    <div class="space-y-3">
+                                                                                                        <div class="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-black/10 bg-slate-50 px-3 py-2">
+                                                                                                            <div class="text-xs font-semibold tracking-[0.12em] text-slate-500 uppercase">
+                                                                                                                Rows
+                                                                                                                <span
+                                                                                                                    class="ml-1 rounded-full border border-slate-200 bg-white px-2 py-0.5 text-[11px] tracking-normal normal-case"
+                                                                                                                    x-text="nestedRepeaterItems(index, field.key, childIndex, childField.key, childField).length"></span>
+                                                                                                            </div>
+                                                                                                            <div class="flex items-center gap-3 text-xs">
+                                                                                                                <button
+                                                                                                                    type="button"
+                                                                                                                    class="tp-button-link"
+                                                                                                                    @click="nestedRepeaterSetCollapsedAll(index, field.key, childIndex, childField.key, childField, false)">
+                                                                                                                    Expand all
+                                                                                                                </button>
+                                                                                                                <button
+                                                                                                                    type="button"
+                                                                                                                    class="tp-button-link"
+                                                                                                                    @click="nestedRepeaterSetCollapsedAll(index, field.key, childIndex, childField.key, childField, true)">
+                                                                                                                    Collapse all
+                                                                                                                </button>
+                                                                                                            </div>
+                                                                                                        </div>
+
+                                                                                                        <div
+                                                                                                            class="tp-muted rounded-lg border border-dashed border-black/15 bg-white p-4 text-sm"
+                                                                                                            x-show="nestedRepeaterItems(index, field.key, childIndex, childField.key, childField).length === 0">
+                                                                                                            No rows yet. Use Add row to create the first item.
+                                                                                                        </div>
+
+                                                                                                        <template
+                                                                                                            x-for="(item, rowIndex) in nestedRepeaterItems(index, field.key, childIndex, childField.key, childField)"
+                                                                                                            :key="child._key + ':' + childField.key + ':' + rowIndex">
+                                                                                                            <div class="space-y-3 rounded-lg border border-black/10 bg-white p-3">
+                                                                                                                <div class="flex flex-wrap items-center justify-between gap-2">
+                                                                                                                    <div class="min-w-0">
+                                                                                                                        <div class="text-xs font-semibold tracking-[0.12em] text-slate-500 uppercase">
+                                                                                                                            Row <span x-text="rowIndex + 1"></span>
+                                                                                                                        </div>
+                                                                                                                        <div
+                                                                                                                            class="truncate text-sm font-semibold text-slate-700"
+                                                                                                                            x-text="repeaterRowSummary(item, childField, rowIndex)"></div>
+                                                                                                                    </div>
+                                                                                                                    <div class="flex items-center gap-3 text-xs">
+                                                                                                                        <button
+                                                                                                                            type="button"
+                                                                                                                            class="tp-button-link"
+                                                                                                                            @click="nestedRepeaterToggleCollapse(index, field.key, childIndex, childField.key, rowIndex)"
+                                                                                                                            x-text="nestedRepeaterIsCollapsed(index, field.key, childIndex, childField.key, rowIndex) ? 'Expand' : 'Collapse'"></button>
+                                                                                                                        <button
+                                                                                                                            type="button"
+                                                                                                                            class="tp-button-link"
+                                                                                                                            :disabled="rowIndex === 0"
+                                                                                                                            :class="rowIndex === 0 ? 'opacity-30 cursor-not-allowed' : ''"
+                                                                                                                            @click="nestedRepeaterMoveRow(index, field.key, childIndex, childField.key, childField, rowIndex, -1)">
+                                                                                                                            Up
+                                                                                                                        </button>
+                                                                                                                        <button
+                                                                                                                            type="button"
+                                                                                                                            class="tp-button-link"
+                                                                                                                            :disabled="rowIndex === nestedRepeaterItems(index, field.key, childIndex, childField.key, childField).length - 1"
+                                                                                                                            :class="rowIndex === nestedRepeaterItems(index, field.key, childIndex, childField.key, childField).length - 1 ? 'opacity-30 cursor-not-allowed' : ''"
+                                                                                                                            @click="nestedRepeaterMoveRow(index, field.key, childIndex, childField.key, childField, rowIndex, 1)">
+                                                                                                                            Down
+                                                                                                                        </button>
+                                                                                                                        <button
+                                                                                                                            type="button"
+                                                                                                                            class="tp-button-link"
+                                                                                                                            @click="nestedRepeaterDuplicateRow(index, field.key, childIndex, childField.key, childField, rowIndex)">
+                                                                                                                            Duplicate
+                                                                                                                        </button>
+                                                                                                                        <button
+                                                                                                                            type="button"
+                                                                                                                            class="tp-button-link text-red-600 hover:text-red-700"
+                                                                                                                            @click="nestedRepeaterRemoveRow(index, field.key, childIndex, childField.key, childField, rowIndex)">
+                                                                                                                            Remove
+                                                                                                                        </button>
+                                                                                                                    </div>
+                                                                                                                </div>
+
+                                                                                                                <div
+                                                                                                                    class="grid gap-3 sm:grid-cols-2"
+                                                                                                                    x-show="!nestedRepeaterIsCollapsed(index, field.key, childIndex, childField.key, rowIndex)">
+                                                                                                                    <template
+                                                                                                                        x-for="col in repeaterColumns(childField)"
+                                                                                                                        :key="col.key">
+                                                                                                                        <div class="tp-field">
+                                                                                                                            <label
+                                                                                                                                class="tp-label"
+                                                                                                                                x-text="col.label || col.key"></label>
+
+                                                                                                                            <template
+                                                                                                                                x-if="col.type === 'select'">
+                                                                                                                                <select
+                                                                                                                                    class="tp-select"
+                                                                                                                                    :value="String(item[col.key] ?? '')"
+                                                                                                                                    @change="nestedRepeaterSetValue(index, field.key, childIndex, childField.key, childField, rowIndex, col.key, String($event.target.value || ''))">
+                                                                                                                                    <template
+                                                                                                                                        x-for="opt in selectOptions(col)"
+                                                                                                                                        :key="String(opt.value)">
+                                                                                                                                        <option
+                                                                                                                                            :value="String(opt.value)"
+                                                                                                                                            x-text="opt.label"></option>
+                                                                                                                                    </template>
+                                                                                                                                </select>
+                                                                                                                            </template>
+
+                                                                                                                            <template
+                                                                                                                                x-if="col.type === 'textarea'">
+                                                                                                                                <textarea
+                                                                                                                                    class="tp-textarea"
+                                                                                                                                    :rows="col.rows ? col.rows : 3"
+                                                                                                                                    :placeholder="col.placeholder || ''"
+                                                                                                                                    :value="String(item[col.key] ?? '')"
+                                                                                                                                    @input="nestedRepeaterSetValue(index, field.key, childIndex, childField.key, childField, rowIndex, col.key, $event.target.value)"></textarea>
+                                                                                                                            </template>
+
+                                                                                                                            <template
+                                                                                                                                x-if="col.type !== 'select' && col.type !== 'textarea'">
+                                                                                                                                <input
+                                                                                                                                    class="tp-input"
+                                                                                                                                    type="text"
+                                                                                                                                    :placeholder="col.placeholder || ''"
+                                                                                                                                    :value="String(item[col.key] ?? '')"
+                                                                                                                                    @input="nestedRepeaterSetValue(index, field.key, childIndex, childField.key, childField, rowIndex, col.key, $event.target.value)" />
+                                                                                                                            </template>
+                                                                                                                        </div>
+                                                                                                                    </template>
+                                                                                                                </div>
+                                                                                                            </div>
+                                                                                                        </template>
+
+                                                                                                        <button
+                                                                                                            type="button"
+                                                                                                            class="tp-button-secondary"
+                                                                                                            @click="nestedRepeaterAddRow(index, field.key, childIndex, childField.key, childField)">
+                                                                                                            Add row
+                                                                                                        </button>
+                                                                                                    </div>
+                                                                                                </template>
+
                                                                                                 <template
                                                                                                     x-if="childField.type === 'textarea'">
                                                                                                     <textarea
@@ -966,6 +1125,7 @@
 
                                                                                                 <template
                                                                                                     x-if="
+                                                                                                        childField.type !== 'repeater' &&
                                                                                                         childField.type !== 'textarea' &&
                                                                                                         childField.type !== 'select' &&
                                                                                                         childField.type !== 'toggle' &&
@@ -986,20 +1146,13 @@
                                                                                         <template
                                                                                             x-if="!nestedFieldSupports(childField)">
                                                                                             <div class="tp-help">
-                                                                                                This field type is edited via JSON below.
+                                                                                                This field type is not editable inline yet.
                                                                                             </div>
                                                                                         </template>
                                                                                     </div>
                                                                                 </template>
                                                                             </div>
                                                                         </template>
-
-                                                                        <label class="tp-label mt-3">Child Props (JSON)</label>
-                                                                        <textarea
-                                                                            class="tp-textarea font-mono text-xs"
-                                                                            rows="6"
-                                                                            @blur="nestedSetPropsJson(index, field.key, childIndex, $event.target.value)"
-                                                                            x-text="nestedPropsJson(index, field.key, childIndex)"></textarea>
                                                                     </div>
                                                                 </template>
                                                             </div>
@@ -2697,6 +2850,7 @@
                         type === '' ||
                         type === 'text' ||
                         type === 'url' ||
+                        type === 'repeater' ||
                         type === 'textarea' ||
                         type === 'select' ||
                         type === 'toggle' ||
@@ -2841,6 +2995,134 @@
                     this.nestedSet(index, path, items);
                 },
 
+                nestedRepeaterItems(index, path, childIndex, childPath, field) {
+                    const raw = this.nestedGetPropRaw(index, path, childIndex, childPath);
+
+                    if (Array.isArray(raw)) {
+                        return raw.map((row) => this.repeaterNormalizeRow(field, row));
+                    }
+
+                    if (typeof raw !== 'string') {
+                        return [];
+                    }
+
+                    const trimmed = raw.trim();
+                    if (trimmed === '') {
+                        return [];
+                    }
+
+                    let next = null;
+                    try {
+                        const parsed = JSON.parse(trimmed);
+                        if (Array.isArray(parsed)) {
+                            next = parsed.map((row) => this.repeaterNormalizeRow(field, row));
+                        }
+                    } catch (e) {
+                        next = null;
+                    }
+
+                    if (!Array.isArray(next)) {
+                        next = this.repeaterParseLines(field, trimmed);
+                    }
+
+                    this.nestedSetProp(index, path, childIndex, childPath, next);
+
+                    return next;
+                },
+
+                nestedRepeaterAddRow(index, path, childIndex, childPath, field) {
+                    const items = this.nestedRepeaterItems(index, path, childIndex, childPath, field);
+                    items.push(this.repeaterNormalizeRow(field, {}));
+                    this.nestedSetProp(index, path, childIndex, childPath, items);
+                },
+
+                nestedRepeaterRemoveRow(index, path, childIndex, childPath, field, rowIndex) {
+                    const items = this.nestedRepeaterItems(index, path, childIndex, childPath, field);
+                    if (rowIndex < 0 || rowIndex >= items.length) {
+                        return;
+                    }
+                    items.splice(rowIndex, 1);
+                    this.nestedSetProp(index, path, childIndex, childPath, items);
+                },
+
+                nestedRepeaterSetValue(index, path, childIndex, childPath, field, rowIndex, columnKey, value) {
+                    const items = this.nestedRepeaterItems(index, path, childIndex, childPath, field);
+                    if (rowIndex < 0 || rowIndex >= items.length) {
+                        return;
+                    }
+
+                    const key = String(columnKey || '').trim();
+                    if (key === '') {
+                        return;
+                    }
+
+                    const nextRow = this.repeaterNormalizeRow(field, items[rowIndex]);
+                    nextRow[key] = value === null || value === undefined ? '' : String(value);
+                    items[rowIndex] = nextRow;
+                    this.nestedSetProp(index, path, childIndex, childPath, items);
+                },
+
+                nestedRepeaterMoveRow(index, path, childIndex, childPath, field, rowIndex, delta) {
+                    const items = this.nestedRepeaterItems(index, path, childIndex, childPath, field);
+                    const targetIndex = rowIndex + delta;
+                    if (
+                        rowIndex < 0 ||
+                        rowIndex >= items.length ||
+                        targetIndex < 0 ||
+                        targetIndex >= items.length
+                    ) {
+                        return;
+                    }
+
+                    const [row] = items.splice(rowIndex, 1);
+                    items.splice(targetIndex, 0, row);
+                    this.nestedSetProp(index, path, childIndex, childPath, items);
+                },
+
+                nestedRepeaterDuplicateRow(index, path, childIndex, childPath, field, rowIndex) {
+                    const items = this.nestedRepeaterItems(index, path, childIndex, childPath, field);
+                    if (rowIndex < 0 || rowIndex >= items.length) {
+                        return;
+                    }
+
+                    const copy = this.repeaterNormalizeRow(field, items[rowIndex]);
+                    items.splice(rowIndex + 1, 0, copy);
+                    this.nestedSetProp(index, path, childIndex, childPath, items);
+                },
+
+                nestedRepeaterRowStateKey(index, path, childIndex, childPath, rowIndex) {
+                    const items = this.nestedItems(index, path);
+                    const child = items[childIndex];
+                    const childKey = child && child._key ? String(child._key) : `${index}:${childIndex}`;
+                    return `${childKey}:${String(childPath)}:${rowIndex}`;
+                },
+
+                nestedRepeaterIsCollapsed(index, path, childIndex, childPath, rowIndex) {
+                    if (!this.repeaterCollapsed || typeof this.repeaterCollapsed !== 'object') {
+                        return false;
+                    }
+                    return !!this.repeaterCollapsed[
+                        this.nestedRepeaterRowStateKey(index, path, childIndex, childPath, rowIndex)
+                    ];
+                },
+
+                nestedRepeaterToggleCollapse(index, path, childIndex, childPath, rowIndex) {
+                    const stateKey = this.nestedRepeaterRowStateKey(index, path, childIndex, childPath, rowIndex);
+                    const next = { ...(this.repeaterCollapsed || {}) };
+                    next[stateKey] = !next[stateKey];
+                    this.repeaterCollapsed = next;
+                },
+
+                nestedRepeaterSetCollapsedAll(index, path, childIndex, childPath, field, collapsed) {
+                    const items = this.nestedRepeaterItems(index, path, childIndex, childPath, field);
+                    const next = { ...(this.repeaterCollapsed || {}) };
+                    items.forEach((_, rowIndex) => {
+                        next[this.nestedRepeaterRowStateKey(index, path, childIndex, childPath, rowIndex)] =
+                            !!collapsed;
+                    });
+                    this.repeaterCollapsed = next;
+                },
+
                 nestedAddBlock(index, path, type) {
                     const childType = String(type || '').trim();
                     if (!childType || childType === 'blocks/split-layout') {
@@ -2892,45 +3174,6 @@
 
                     copy._key = this.uid();
                     items.splice(childIndex + 1, 0, copy);
-                    this.nestedSet(index, path, items);
-                },
-
-                nestedPropsJson(index, path, childIndex) {
-                    const items = this.nestedItems(index, path);
-                    if (childIndex < 0 || childIndex >= items.length) {
-                        return '{}';
-                    }
-
-                    const props =
-                        items[childIndex].props && typeof items[childIndex].props === 'object'
-                            ? items[childIndex].props
-                            : {};
-
-                    try {
-                        return JSON.stringify(props, null, 2);
-                    } catch (e) {
-                        return '{}';
-                    }
-                },
-
-                nestedSetPropsJson(index, path, childIndex, text) {
-                    const items = this.nestedItems(index, path);
-                    if (childIndex < 0 || childIndex >= items.length) {
-                        return;
-                    }
-
-                    let parsed = null;
-                    try {
-                        parsed = JSON.parse(String(text || '{}'));
-                    } catch (e) {
-                        return;
-                    }
-
-                    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
-                        return;
-                    }
-
-                    items[childIndex].props = parsed;
                     this.nestedSet(index, path, items);
                 },
 
