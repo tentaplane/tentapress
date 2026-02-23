@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace TentaPress\PageEditor;
 
 use Illuminate\Support\ServiceProvider;
+use TentaPress\System\Editor\EditorDriverDefinition;
+use TentaPress\System\Editor\EditorDriverRegistry;
 use TentaPress\PageEditor\Render\PageDocumentRenderer;
 use TentaPress\System\Plugin\PluginRegistry;
 
@@ -23,6 +25,19 @@ final class PageEditorServiceProvider extends ServiceProvider
 
             return $renderer->render($document);
         });
+
+        if ($this->app->bound(EditorDriverRegistry::class)) {
+            $this->app->make(EditorDriverRegistry::class)->register(new EditorDriverDefinition(
+                id: 'page',
+                label: 'Page Editor',
+                description: 'Continuous writing surface.',
+                storage: 'content',
+                pagesView: 'tentapress-page-editor::editor',
+                postsView: 'tentapress-page-editor::editor',
+                usesBlocksEditor: false,
+                sortOrder: 20,
+            ));
+        }
 
         $this->app->bind('tp.pages.editor.view', fn () => 'tentapress-page-editor::editor');
         $this->app->bind('tp.posts.editor.view', fn () => 'tentapress-page-editor::editor');

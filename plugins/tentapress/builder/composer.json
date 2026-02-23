@@ -1,21 +1,24 @@
 {
-    "name": "tentapress/page-editor",
+    "name": "tentapress/builder",
     "type": "library",
     "license": "MIT",
     "require": {
         "php": "^8.2",
         "tentapress/system": "<1.0",
-        "tentapress/pages": "<1.0"
+        "tentapress/admin-shell": "<1.0",
+        "tentapress/blocks": "<1.0",
+        "tentapress/pages": "<1.0",
+        "tentapress/posts": "<1.0"
     },
     "autoload": {
         "psr-4": {
-            "TentaPress\\PageEditor\\": "src/"
+            "TentaPress\\Builder\\": "src/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "TentaPress\\PageEditor\\PageEditorServiceProvider"
+                "TentaPress\\Builder\\BuilderServiceProvider"
             ]
         }
     },

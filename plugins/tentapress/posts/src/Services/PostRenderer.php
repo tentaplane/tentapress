@@ -56,11 +56,11 @@ final class PostRenderer
      */
     private function renderPageContent(?array $content, array $blocks, string $editorDriver): string
     {
-        if ($editorDriver === 'blocks') {
+        if ($editorDriver === 'blocks' || $editorDriver === 'builder') {
             return $this->renderBlocks($blocks);
         }
 
-        if (is_array($content) && app()->bound('tp.page_editor.render')) {
+        if ($editorDriver === 'page' && is_array($content) && app()->bound('tp.page_editor.render')) {
             $renderer = resolve('tp.page_editor.render');
 
             if (is_callable($renderer)) {

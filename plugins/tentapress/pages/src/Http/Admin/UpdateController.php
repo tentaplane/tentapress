@@ -11,6 +11,7 @@ use Illuminate\Validation\Rule;
 use TentaPress\Pages\Models\TpPage;
 use TentaPress\Pages\Services\PageSlugger;
 use TentaPress\Pages\Support\BlocksNormalizer;
+use TentaPress\System\Editor\EditorDriverRegistry;
 
 final readonly class UpdateController
 {
@@ -25,7 +26,7 @@ final readonly class UpdateController
             'title' => ['required', 'string', 'max:255'],
             'slug' => ['required', 'string', 'max:255', 'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/', Rule::unique('tp_pages', 'slug')->ignore($page->id)],
             'layout' => ['nullable', 'string', 'max:255'],
-            'editor_driver' => ['nullable', Rule::in(['blocks', 'page'])],
+            'editor_driver' => ['nullable', Rule::in($this->allowedDrivers())],
             'blocks_json' => ['nullable', 'string'],
             'page_doc_json' => ['nullable', 'string'],
         ]);
@@ -79,16 +80,28 @@ final readonly class UpdateController
     private function resolveEditorDriver(array $data): string
     {
         $requested = (string) ($data['editor_driver'] ?? 'blocks');
-        if ($requested !== 'page') {
+
+        if (! app()->bound(EditorDriverRegistry::class)) {
             return 'blocks';
         }
 
-        if (! app()->bound('tp.pages.editor.view')) {
-            return 'blocks';
+        $registry = app()->make(EditorDriverRegistry::class);
+
+        return $registry->resolve($requested, 'pages', 'blocks');
+    }
+
+    /**
+     * @return array<int,string>
+     */
+    private function allowedDrivers(): array
+    {
+        if (! app()->bound(EditorDriverRegistry::class)) {
+            return ['blocks'];
         }
 
-        $view = resolve('tp.pages.editor.view');
+        $registry = app()->make(EditorDriverRegistry::class);
+        $ids = $registry->idsFor('pages');
 
-        return is_string($view) && view()->exists($view) ? 'page' : 'blocks';
+        return $ids !== [] ? $ids : ['blocks'];
     }
 }

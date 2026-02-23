@@ -15,6 +15,14 @@ final readonly class BlocksNormalizer
         'right_blocks',
     ];
 
+    private const PRESENTATION_CONTAINERS = ['default', 'wide', 'full'];
+
+    private const PRESENTATION_ALIGNMENTS = ['left', 'center', 'right'];
+
+    private const PRESENTATION_BACKGROUNDS = ['none', 'muted', 'brand'];
+
+    private const PRESENTATION_SPACING = ['none', 'xs', 'sm', 'md', 'lg', 'xl'];
+
     public function __construct(
         private BlockRegistry $registry,
     ) {
@@ -135,6 +143,10 @@ final readonly class BlocksNormalizer
             $props['actions'] = $this->parseActions($props['actions']);
         }
 
+        if (array_key_exists('presentation', $props)) {
+            $props['presentation'] = $this->normalizePresentation($props['presentation']);
+        }
+
         $def = $this->registry->get($type);
 
         $version = 1;
@@ -168,5 +180,54 @@ final readonly class BlocksNormalizer
             'props' => $props,
             ...($variant !== '' ? ['variant' => $variant] : []),
         ];
+    }
+
+    /**
+     * @param  mixed  $raw
+     * @return array<string,mixed>
+     */
+    private function normalizePresentation(mixed $raw): array
+    {
+        if (! is_array($raw)) {
+            return [];
+        }
+
+        $normalized = [];
+
+        $container = trim((string) ($raw['container'] ?? ''));
+        if (in_array($container, self::PRESENTATION_CONTAINERS, true)) {
+            $normalized['container'] = $container;
+        }
+
+        $align = trim((string) ($raw['align'] ?? ''));
+        if (in_array($align, self::PRESENTATION_ALIGNMENTS, true)) {
+            $normalized['align'] = $align;
+        }
+
+        $background = trim((string) ($raw['background'] ?? ''));
+        if (in_array($background, self::PRESENTATION_BACKGROUNDS, true)) {
+            $normalized['background'] = $background;
+        }
+
+        $spacingRaw = $raw['spacing'] ?? null;
+        if (is_array($spacingRaw)) {
+            $spacing = [];
+
+            $top = trim((string) ($spacingRaw['top'] ?? ''));
+            if (in_array($top, self::PRESENTATION_SPACING, true)) {
+                $spacing['top'] = $top;
+            }
+
+            $bottom = trim((string) ($spacingRaw['bottom'] ?? ''));
+            if (in_array($bottom, self::PRESENTATION_SPACING, true)) {
+                $spacing['bottom'] = $bottom;
+            }
+
+            if ($spacing !== []) {
+                $normalized['spacing'] = $spacing;
+            }
+        }
+
+        return $normalized;
     }
 }

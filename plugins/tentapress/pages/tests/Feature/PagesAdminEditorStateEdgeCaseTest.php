@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 use TentaPress\Pages\Models\TpPage;
+use TentaPress\System\Editor\EditorDriverDefinition;
+use TentaPress\System\Editor\EditorDriverRegistry;
 use TentaPress\Users\Models\TpUser;
 
 it('creates unique slugs from duplicate page titles when slug is omitted', function (): void {
@@ -150,4 +152,85 @@ it('normalizes nested split-layout child blocks on page save', function (): void
     expect(($blocks[0]['props']['left_blocks'] ?? []))->toHaveCount(1);
     expect($blocks[0]['props']['left_blocks'][0]['type'] ?? null)->toBe('blocks/content');
     expect($blocks[0]['props']['right_blocks'][0]['type'] ?? null)->toBe('blocks/content');
+});
+
+it('accepts builder as an editor driver when registered', function (): void {
+    $admin = TpUser::query()->create([
+        'name' => 'Pages Builder Admin',
+        'email' => 'pages-builder-driver@example.test',
+        'password' => 'secret',
+        'is_super_admin' => true,
+    ]);
+
+    /** @var EditorDriverRegistry $registry */
+    $registry = app()->make(EditorDriverRegistry::class);
+    $registry->register(new EditorDriverDefinition(
+        id: 'builder',
+        label: 'Visual Builder',
+        description: 'Test builder driver.',
+        storage: 'blocks',
+        usesBlocksEditor: true,
+        sortOrder: 30,
+    ));
+
+    $this->actingAs($admin)->post('/admin/pages', [
+        'title' => 'Builder Driver Page',
+        'slug' => '',
+        'layout' => 'default',
+        'editor_driver' => 'builder',
+        'blocks_json' => '[]',
+    ])->assertRedirect();
+
+    $page = TpPage::query()->where('title', 'Builder Driver Page')->firstOrFail();
+
+    expect((string) $page->editor_driver)->toBe('builder');
+});
+
+it('normalizes presentation metadata to the supported whitelist on page save', function (): void {
+    $admin = TpUser::query()->create([
+        'name' => 'Pages Presentation Admin',
+        'email' => 'pages-presentation@example.test',
+        'password' => 'secret',
+        'is_super_admin' => true,
+    ]);
+
+    $payload = [
+        [
+            'type' => 'blocks/content',
+            'props' => [
+                'content' => 'Presentation test',
+                'presentation' => [
+                    'container' => 'wide',
+                    'align' => 'center',
+                    'background' => 'brand',
+                    'spacing' => [
+                        'top' => 'lg',
+                        'bottom' => 'invalid',
+                    ],
+                    'script' => 'alert(1)',
+                ],
+            ],
+        ],
+    ];
+
+    $this->actingAs($admin)->post('/admin/pages', [
+        'title' => 'Presentation Page',
+        'slug' => '',
+        'layout' => 'default',
+        'editor_driver' => 'blocks',
+        'blocks_json' => json_encode($payload, JSON_THROW_ON_ERROR),
+    ])->assertRedirect();
+
+    $page = TpPage::query()->where('title', 'Presentation Page')->firstOrFail();
+    $blocks = is_array($page->blocks) ? $page->blocks : [];
+    $presentation = $blocks[0]['props']['presentation'] ?? null;
+
+    expect($presentation)->toBe([
+        'container' => 'wide',
+        'align' => 'center',
+        'background' => 'brand',
+        'spacing' => [
+            'top' => 'lg',
+        ],
+    ]);
 });

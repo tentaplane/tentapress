@@ -1,0 +1,23 @@
+{
+    "id": "tentapress/builder",
+    "name": "Builder",
+    "description": "Visual drag-and-drop builder with live theme preview for pages and posts.",
+    "version": "0.1.0",
+    "provider": "TentaPress\\Builder\\BuilderServiceProvider",
+    "requires": [
+        "tentapress/blocks",
+        "tentapress/pages",
+        "tentapress/posts",
+        "tentapress/admin-shell"
+    ],
+    "assets": {
+        "admin": {
+            "scripts": [
+                "resources/js/main.ts"
+            ],
+            "styles": [
+                "resources/css/builder-editor.css"
+            ]
+        }
+    }
+}

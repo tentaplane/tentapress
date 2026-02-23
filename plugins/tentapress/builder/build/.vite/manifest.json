@@ -1,0 +1,13 @@
+{
+  "resources/css/builder-editor.css": {
+    "file": "builder-editor-styles-CRehMlPO.css",
+    "src": "resources/css/builder-editor.css",
+    "isEntry": true
+  },
+  "resources/js/main.ts": {
+    "file": "builder-editor-DqmbjKej.js",
+    "name": "builder-editor",
+    "src": "resources/js/main.ts",
+    "isEntry": true
+  }
+}
