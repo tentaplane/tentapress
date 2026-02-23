@@ -51,25 +51,8 @@
             "ratio": "60-40",
             "gap": "md",
             "stack_on_mobile": true,
-            "left_blocks": [
-                {
-                    "type": "blocks/content",
-                    "version": 1,
-                    "props": {
-                        "content": "Left column content block."
-                    }
-                }
-            ],
-            "right_blocks": [
-                {
-                    "type": "blocks/image",
-                    "version": 1,
-                    "props": {
-                        "url": "",
-                        "alt": "Right column image"
-                    }
-                }
-            ]
+            "left_blocks": [],
+            "right_blocks": []
         }
     }
 }
