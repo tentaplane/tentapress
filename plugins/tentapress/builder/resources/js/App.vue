@@ -239,87 +239,22 @@ watch(
 
 <template>
     <div class="tp-builder">
-        <aside class="tp-builder__panel tp-builder__panel--library">
-            <div class="tp-builder__panel-title">Block library</div>
-            <input v-model="store.search" type="search" class="tp-builder__search" placeholder="Search blocks..." />
-            <div class="tp-builder__list">
-                <button
-                    v-for="definition in store.filteredDefinitions"
-                    :key="definition.type"
-                    type="button"
-                    class="tp-builder__library-item"
-                    @click="store.addBlock(definition.type)">
-                    <span class="tp-builder__library-title">{{ definition.name || definition.type }}</span>
-                    <span class="tp-builder__library-meta">{{ definition.type }}</span>
-                </button>
-            </div>
-
-            <div class="tp-builder__panel-title tp-builder__panel-title--spaced">Patterns</div>
-            <div class="tp-builder__list">
-                <button
-                    v-for="pattern in store.patterns"
-                    :key="pattern.id"
-                    type="button"
-                    class="tp-builder__library-item"
-                    @click="store.insertPattern(pattern)">
-                    <span class="tp-builder__library-title">{{ pattern.name }}</span>
-                    <span class="tp-builder__library-meta">{{ pattern.description }}</span>
-                </button>
-            </div>
-        </aside>
-
-        <section class="tp-builder__canvas">
-            <div class="tp-builder__canvas-toolbar">
-                <div class="tp-builder__canvas-title">Visual {{ resourceLabel }} canvas</div>
-                <div class="tp-builder__toolbar-actions">
-                    <button type="button" class="tp-button-secondary" :disabled="store.historyIndex <= 0" @click="store.undo()">
-                        Undo
-                    </button>
-                    <button
-                        type="button"
-                        class="tp-button-secondary"
-                        :disabled="store.historyIndex >= store.history.length - 1"
-                        @click="store.redo()">
-                        Redo
-                    </button>
-                    <button type="button" class="tp-button-primary" @click="submitForm()">Save</button>
-                </div>
-            </div>
-
-            <div v-if="store.blocks.length === 0" class="tp-builder__empty">
-                Add a block from the left panel or insert a built-in pattern.
-            </div>
-
-            <div class="tp-builder__canvas-list">
-                <article
-                    v-for="(block, index) in store.blocks"
-                    :key="block._key"
-                    class="tp-builder__card"
-                    :class="{ 'is-selected': store.selectedIndex === index }"
-                    draggable="true"
-                    @click="store.select(index)"
-                    @dragstart="onDragStart(index, $event)"
-                    @dragover.prevent
-                    @drop.prevent="onDrop(index)">
-                    <header class="tp-builder__card-header">
-                        <div>
-                            <div class="tp-builder__card-title">{{ store.definitionFor(block.type)?.name || block.type }}</div>
-                            <div class="tp-builder__card-meta">{{ block.type }}</div>
-                        </div>
-                        <div class="tp-builder__card-actions">
-                            <button type="button" class="tp-button-link" @click.stop="store.duplicate(index)">Duplicate</button>
-                            <button type="button" class="tp-button-link text-red-600" @click.stop="store.remove(index)">Delete</button>
-                        </div>
-                    </header>
-                    <p class="tp-builder__card-summary">{{ blockSummary(index) }}</p>
-                </article>
-            </div>
-        </section>
-
         <aside class="tp-builder__panel tp-builder__panel--inspector">
-            <div class="tp-builder__panel-title">Inspector</div>
+            <div class="tp-builder__panel-title">Block configuration</div>
 
             <template v-if="hasSelection && store.selectedBlock && store.selectedDefinition">
+                <div class="tp-builder__selected-meta">
+                    <div class="tp-builder__selected-title">{{ store.selectedDefinition.name || store.selectedBlock.type }}</div>
+                    <div class="tp-builder__selected-type">{{ store.selectedBlock.type }}</div>
+                </div>
+
+                <div class="tp-builder__selected-actions">
+                    <button type="button" class="tp-button-secondary" @click="store.duplicate(store.selectedIndex)">Duplicate</button>
+                    <button type="button" class="tp-button-secondary text-red-600" @click="store.remove(store.selectedIndex)">
+                        Delete
+                    </button>
+                </div>
+
                 <div class="tp-builder__field-group">
                     <label
                         v-for="field in store.selectedDefinition.fields"
@@ -443,12 +378,91 @@ watch(
                 </div>
             </template>
 
-            <div v-else class="tp-builder__empty tp-builder__empty--small">Select a block to edit its content and presentation.</div>
+            <div v-else class="tp-builder__empty tp-builder__empty--small">Select a block from the structure panel to configure it.</div>
+        </aside>
 
-            <div class="tp-builder__panel-title tp-builder__panel-title--spaced">Live preview</div>
+        <section class="tp-builder__canvas tp-builder__canvas--preview">
+            <div class="tp-builder__canvas-toolbar">
+                <div class="tp-builder__canvas-title">Live {{ resourceLabel }} preview</div>
+                <div class="tp-builder__toolbar-actions">
+                    <button type="button" class="tp-button-secondary" :disabled="store.historyIndex <= 0" @click="store.undo()">
+                        Undo
+                    </button>
+                    <button
+                        type="button"
+                        class="tp-button-secondary"
+                        :disabled="store.historyIndex >= store.history.length - 1"
+                        @click="store.redo()">
+                        Redo
+                    </button>
+                    <button type="button" class="tp-button-primary" @click="submitForm()">Save</button>
+                </div>
+            </div>
+
             <div class="tp-builder__preview-state" v-if="previewLoading">Updating preview...</div>
             <div class="tp-builder__preview-state tp-builder__preview-state--error" v-if="previewError">{{ previewError }}</div>
-            <iframe v-if="store.previewUrl" class="tp-builder__preview" :src="store.previewUrl" title="Builder preview"></iframe>
+            <iframe v-if="store.previewUrl" class="tp-builder__preview tp-builder__preview--center" :src="store.previewUrl" title="Builder preview"></iframe>
+            <div v-else class="tp-builder__empty">
+                Preview is loading. Add blocks from the right panel to render sections into the page template.
+            </div>
+        </section>
+
+        <aside class="tp-builder__panel tp-builder__panel--library">
+            <div class="tp-builder__panel-title">Block library</div>
+            <input v-model="store.search" type="search" class="tp-builder__search" placeholder="Search blocks..." />
+            <div class="tp-builder__list">
+                <button
+                    v-for="definition in store.filteredDefinitions"
+                    :key="definition.type"
+                    type="button"
+                    class="tp-builder__library-item"
+                    @click="store.addBlock(definition.type)">
+                    <span class="tp-builder__library-title">{{ definition.name || definition.type }}</span>
+                    <span class="tp-builder__library-meta">{{ definition.type }}</span>
+                </button>
+            </div>
+
+            <div class="tp-builder__panel-title tp-builder__panel-title--spaced">Patterns</div>
+            <div class="tp-builder__list">
+                <button
+                    v-for="pattern in store.patterns"
+                    :key="pattern.id"
+                    type="button"
+                    class="tp-builder__library-item"
+                    @click="store.insertPattern(pattern)">
+                    <span class="tp-builder__library-title">{{ pattern.name }}</span>
+                    <span class="tp-builder__library-meta">{{ pattern.description }}</span>
+                </button>
+            </div>
+
+            <div class="tp-builder__panel-title tp-builder__panel-title--spaced">Page structure</div>
+            <div v-if="store.blocks.length === 0" class="tp-builder__empty tp-builder__empty--small">
+                Add a block to begin building this {{ resourceLabel }}.
+            </div>
+            <div class="tp-builder__canvas-list">
+                <article
+                    v-for="(block, index) in store.blocks"
+                    :key="block._key"
+                    class="tp-builder__card"
+                    :class="{ 'is-selected': store.selectedIndex === index }"
+                    draggable="true"
+                    @click="store.select(index)"
+                    @dragstart="onDragStart(index, $event)"
+                    @dragover.prevent
+                    @drop.prevent="onDrop(index)">
+                    <header class="tp-builder__card-header">
+                        <div>
+                            <div class="tp-builder__card-title">{{ store.definitionFor(block.type)?.name || block.type }}</div>
+                            <div class="tp-builder__card-meta">{{ block.type }}</div>
+                        </div>
+                        <div class="tp-builder__card-actions">
+                            <button type="button" class="tp-button-link" @click.stop="store.duplicate(index)">Duplicate</button>
+                            <button type="button" class="tp-button-link text-red-600" @click.stop="store.remove(index)">Delete</button>
+                        </div>
+                    </header>
+                    <p class="tp-builder__card-summary">{{ blockSummary(index) }}</p>
+                </article>
+            </div>
         </aside>
     </div>
 </template>
