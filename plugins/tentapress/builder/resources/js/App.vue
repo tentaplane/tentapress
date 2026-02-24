@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { useBuilderEditorStore } from './stores/editor';
-import type { BuilderConfig } from './types';
+import type { BuilderConfig, BuilderPreviewDocument } from './types';
 
 const props = defineProps<{ config: BuilderConfig }>();
 
@@ -10,9 +10,15 @@ const store = useBuilderEditorStore();
 const dragIndex = ref<number | null>(null);
 const previewLoading = ref(false);
 const previewError = ref('');
+const previewHost = ref<HTMLDivElement | null>(null);
+const previewRevision = ref('');
+let previewShadowRoot: ShadowRoot | null = null;
 let previewTimer: number | null = null;
 
 const hasSelection = computed(() => store.selectedIndex >= 0 && store.selectedIndex < store.blocks.length);
+const previewMode = computed<'fragment' | 'iframe'>(() =>
+    props.config.previewMode === 'iframe' ? 'iframe' : 'fragment',
+);
 const selectedPresentation = computed(() => {
     if (!hasSelection.value) {
         return {
@@ -127,6 +133,134 @@ function getMetaValue(name: string, fallback = ''): string {
     return String(input.value ?? fallback);
 }
 
+function resolveStyleHref(href: string): string {
+    try {
+        return new URL(href, window.location.origin).toString();
+    } catch {
+        return href;
+    }
+}
+
+function ensurePreviewShadowRoot(): ShadowRoot | null {
+    if (!previewHost.value) {
+        return null;
+    }
+
+    if (!previewShadowRoot) {
+        previewShadowRoot = previewHost.value.attachShadow({ mode: 'open' });
+    }
+
+    return previewShadowRoot;
+}
+
+function applyPreviewSelection(): void {
+    if (previewMode.value !== 'fragment' || !previewShadowRoot) {
+        return;
+    }
+
+    const allMarkers = Array.from(previewShadowRoot.querySelectorAll('[data-tp-builder-block-index]'));
+    for (const marker of allMarkers) {
+        if (!(marker instanceof HTMLElement)) {
+            continue;
+        }
+
+        marker.removeAttribute('data-tp-builder-selected');
+    }
+
+    if (!hasSelection.value) {
+        return;
+    }
+
+    const selected = previewShadowRoot.querySelector(
+        `[data-tp-builder-block-index="${store.selectedIndex}"]`,
+    );
+    if (selected instanceof HTMLElement) {
+        selected.setAttribute('data-tp-builder-selected', '1');
+    }
+}
+
+function onPreviewClick(event: MouseEvent): void {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) {
+        return;
+    }
+
+    const anchor = target.closest('a');
+    if (anchor instanceof HTMLAnchorElement) {
+        event.preventDefault();
+    }
+
+    const marker = target.closest('[data-tp-builder-block-index]');
+    if (!(marker instanceof HTMLElement)) {
+        return;
+    }
+
+    event.preventDefault();
+
+    const rawIndex = marker.getAttribute('data-tp-builder-block-index') ?? '';
+    const index = Number.parseInt(rawIndex, 10);
+    if (Number.isNaN(index)) {
+        return;
+    }
+
+    store.select(index);
+}
+
+function applyPreviewDocument(payload: BuilderPreviewDocument): void {
+    const shadowRoot = ensurePreviewShadowRoot();
+    if (!shadowRoot) {
+        return;
+    }
+
+    shadowRoot.innerHTML = '';
+
+    const uiStyle = document.createElement('style');
+    uiStyle.textContent = `
+        :host { display: block; min-height: 100%; color: inherit; }
+        .tp-builder-preview-document { min-height: 100%; background: #fff; color: #0f172a; }
+        .tp-builder-preview-document [data-tp-builder-block-index] {
+            cursor: pointer;
+            border-radius: 0.5rem;
+            transition: box-shadow 120ms ease-in-out;
+        }
+        .tp-builder-preview-document [data-tp-builder-block-index][data-tp-builder-selected="1"] {
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.65);
+        }
+    `;
+    shadowRoot.appendChild(uiStyle);
+
+    for (const styleDef of payload.styles ?? []) {
+        const href = typeof styleDef?.href === 'string' ? styleDef.href.trim() : '';
+        if (href === '') {
+            continue;
+        }
+
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = resolveStyleHref(href);
+        link.media = typeof styleDef?.media === 'string' && styleDef.media.trim() !== '' ? styleDef.media : 'all';
+        shadowRoot.appendChild(link);
+    }
+
+    for (const cssText of payload.inline_styles ?? []) {
+        if (typeof cssText !== 'string' || cssText.trim() === '') {
+            continue;
+        }
+
+        const style = document.createElement('style');
+        style.textContent = cssText;
+        shadowRoot.appendChild(style);
+    }
+
+    const documentRoot = document.createElement('div');
+    documentRoot.className = `tp-builder-preview-document ${payload.body_class ?? ''}`.trim();
+    documentRoot.innerHTML = payload.body_html ?? '';
+    documentRoot.addEventListener('click', onPreviewClick);
+    shadowRoot.appendChild(documentRoot);
+
+    applyPreviewSelection();
+}
+
 async function refreshPreview(): Promise<void> {
     if (!props.config.snapshotEndpoint) {
         return;
@@ -158,13 +292,45 @@ async function refreshPreview(): Promise<void> {
             throw new Error('Preview request failed.');
         }
 
-        const payload = (await response.json()) as { preview_url?: string };
+        const snapshot = (await response.json()) as { document_url?: string; preview_url?: string };
 
-        if (!payload.preview_url) {
-            throw new Error('Preview URL missing.');
+        if (previewMode.value === 'iframe') {
+            if (!snapshot.preview_url) {
+                throw new Error('Preview URL missing.');
+            }
+
+            store.setPreviewUrl(snapshot.preview_url);
+            previewRevision.value = '';
+
+            return;
         }
 
-        store.setPreviewUrl(payload.preview_url);
+        if (!snapshot.document_url) {
+            throw new Error('Preview document URL missing.');
+        }
+
+        const documentResponse = await fetch(snapshot.document_url, {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+            },
+        });
+
+        if (!documentResponse.ok) {
+            throw new Error('Preview document request failed.');
+        }
+
+        const payload = (await documentResponse.json()) as BuilderPreviewDocument;
+        if (typeof payload.revision !== 'string' || payload.revision.trim() === '') {
+            throw new Error('Preview document revision missing.');
+        }
+
+        if (payload.revision === previewRevision.value) {
+            return;
+        }
+
+        previewRevision.value = payload.revision;
+        applyPreviewDocument(payload);
     } catch (error) {
         previewError.value = 'Preview unavailable. Save and refresh to retry.';
     } finally {
@@ -226,6 +392,7 @@ onBeforeUnmount(() => {
     if (previewTimer !== null) {
         window.clearTimeout(previewTimer);
     }
+    previewShadowRoot = null;
 });
 
 watch(
@@ -233,6 +400,13 @@ watch(
     () => {
         store.persistDraft();
         schedulePreview();
+    },
+);
+
+watch(
+    () => store.selectedIndex,
+    () => {
+        applyPreviewSelection();
     },
 );
 </script>
@@ -401,10 +575,18 @@ watch(
 
             <div class="tp-builder__preview-state" v-if="previewLoading">Updating preview...</div>
             <div class="tp-builder__preview-state tp-builder__preview-state--error" v-if="previewError">{{ previewError }}</div>
-            <iframe v-if="store.previewUrl" class="tp-builder__preview tp-builder__preview--center" :src="store.previewUrl" title="Builder preview"></iframe>
-            <div v-else class="tp-builder__empty">
-                Preview is loading. Add blocks from the right panel to render sections into the page template.
-            </div>
+            <template v-if="previewMode === 'iframe'">
+                <iframe v-if="store.previewUrl" class="tp-builder__preview tp-builder__preview--center" :src="store.previewUrl" title="Builder preview"></iframe>
+                <div v-else class="tp-builder__empty">
+                    Preview is loading. Add blocks from the right panel to render sections into the page template.
+                </div>
+            </template>
+            <div
+                v-else
+                ref="previewHost"
+                class="tp-builder__preview tp-builder__preview--center"
+                role="region"
+                aria-label="Builder preview"></div>
         </section>
 
         <aside class="tp-builder__panel tp-builder__panel--library">

@@ -47,8 +47,30 @@ export type BuilderConfig = {
     initialJson: string;
     resource: EditorResource;
     snapshotEndpoint: string;
+    previewMode: 'fragment' | 'iframe';
     storageKey: string;
     hiddenFieldId: string;
     definitions: BlockDefinition[];
     mediaOptions: MediaOption[];
+};
+
+export type BuilderPreviewStyle = {
+    href: string;
+    media?: string;
+};
+
+export type BuilderPreviewBlockMap = {
+    index: number;
+    key: string;
+};
+
+export type BuilderPreviewDocument = {
+    token: string;
+    revision: string;
+    lang: string;
+    body_class: string;
+    styles: BuilderPreviewStyle[];
+    inline_styles: string[];
+    body_html: string;
+    block_map: BuilderPreviewBlockMap[];
 };

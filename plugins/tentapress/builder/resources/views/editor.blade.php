@@ -10,10 +10,13 @@
     $mode = $mode ?? 'edit';
     $modelId = is_object($model) ? (int) ($model->id ?? 0) : 0;
     $storageKey = $isPost ? 'tp.builder.post.'.$modelId : 'tp.builder.page.'.$modelId;
+    $previewMode = trim((string) config('tentapress.builder.preview_mode', 'fragment'));
+    $previewMode = in_array($previewMode, ['fragment', 'iframe'], true) ? $previewMode : 'fragment';
     $builderConfig = [
         'initialJson' => $blocksJson,
         'resource' => $resource,
         'snapshotEndpoint' => \Illuminate\Support\Facades\Route::has('tp.builder.snapshots.store') ? route('tp.builder.snapshots.store') : '',
+        'previewMode' => $previewMode,
         'storageKey' => $storageKey,
         'hiddenFieldId' => 'tp-builder-json-field',
         'definitions' => is_array($blockDefinitions ?? null) ? $blockDefinitions : [],
