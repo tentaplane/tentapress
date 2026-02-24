@@ -103,3 +103,26 @@ it('denies cross-user access to preview snapshots', function (): void {
         ->get($previewUrl)
         ->assertNotFound();
 });
+
+it('accepts an empty block payload for preview snapshots', function (): void {
+    registerBuilderProvider();
+
+    $author = TpUser::query()->create([
+        'name' => 'Builder Empty',
+        'email' => 'builder-empty@example.test',
+        'password' => 'secret',
+        'is_super_admin' => true,
+    ]);
+
+    $snapshot = $this->actingAs($author)
+        ->post('/admin/builder/snapshots', [
+            'resource' => 'pages',
+            'title' => '',
+            'slug' => '',
+            'layout' => '',
+            'blocks' => [],
+        ]);
+
+    $snapshot->assertOk();
+    expect((string) $snapshot->json('preview_url'))->not->toBe('');
+});

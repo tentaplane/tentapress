@@ -28,15 +28,17 @@ final readonly class BuilderSnapshotController
             'layout' => ['nullable', 'string', 'max:255'],
             'title' => ['nullable', 'string', 'max:255'],
             'slug' => ['nullable', 'string', 'max:255'],
-            'blocks' => ['required', 'array'],
+            'blocks' => ['present', 'array'],
         ]);
 
         $resource = (string) $data['resource'];
         $this->authorizeForResource($resource);
 
+        $rawBlocks = is_array($data['blocks'] ?? null) ? $data['blocks'] : [];
+
         $blocks = $resource === 'pages'
-            ? $this->pageNormalizer->normalize($data['blocks'])
-            : $this->postNormalizer->normalize($data['blocks']);
+            ? $this->pageNormalizer->normalize($rawBlocks)
+            : $this->postNormalizer->normalize($rawBlocks);
 
         $userId = (int) (Auth::user()?->id ?? 0);
 
