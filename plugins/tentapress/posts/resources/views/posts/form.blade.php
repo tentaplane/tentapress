@@ -40,6 +40,8 @@
     $selectedEditorView = is_string($selectedEditorView) && view()->exists($selectedEditorView) ? $selectedEditorView : null;
     $usesBlocksEditor = $selectedDriver?->usesBlocksEditor ?? true;
     $editorLabel = $selectedDriver?->label ?? 'Blocks Builder';
+    $isBuilderDriver = ($selectedDriver?->id ?? '') === 'builder';
+    $canRenderSelectedEditorInline = $editorMode || ! $isBuilderDriver;
 @endphp
 
 @if ($editorMode)
@@ -112,6 +114,7 @@
                                 <input type="hidden" name="editor_driver" value="{{ $editorDriver }}" />
                                 <input type="hidden" name="return_to" value="editor" />
                             @else
+                                <input type="hidden" name="return_to" value="" data-editor-return-to />
                                 <div
                                     class="space-y-4"
                                     x-data="{
@@ -263,7 +266,7 @@
                                 </div>
                             @endif
 
-                            @if (! $usesBlocksEditor && $selectedEditorView)
+                            @if (! $usesBlocksEditor && $selectedEditorView && $canRenderSelectedEditorInline)
                                 @include($selectedEditorView, [
                                     'post' => $post,
                                     'editorTitle' => $editorMode ? (trim((string) ($post->title ?? '')) !== '' ? $post->title : 'Untitled Post') : null,
@@ -276,6 +279,15 @@
                                     'mode' => $mode,
                                 ])
                             @else
+                                @if (! $editorMode && $isBuilderDriver && $mode === 'edit')
+                                    <div class="rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-900">
+                                        <div class="font-semibold">Visual Builder opens in full-screen mode.</div>
+                                        <div class="mt-1">
+                                            Use full-screen mode to edit layout and block fields.
+                                            <a href="{{ route('tp.posts.editor', ['post' => $post->id]) }}" class="underline decoration-sky-400 underline-offset-2">Open Visual Builder</a>
+                                        </div>
+                                    </div>
+                                @endif
                                 @component('tentapress-blocks::editor', [
                                     'blocksEditorMode' => $editorMode,
                                     'editorTitle' => $editorMode ? (trim((string) ($post->title ?? '')) !== '' ? $post->title : 'Untitled Post') : null,
@@ -493,6 +505,12 @@
 
                                 current = next;
                                 form.dataset.editorDriverCurrent = current;
+                                const returnTo = form.querySelector(
+                                    'input[name="return_to"][data-editor-return-to]',
+                                );
+                                if (returnTo instanceof HTMLInputElement) {
+                                    returnTo.value = next === 'builder' ? 'editor' : '';
+                                }
                                 form.requestSubmit();
                             });
                         });
