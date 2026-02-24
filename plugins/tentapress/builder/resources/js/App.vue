@@ -12,8 +12,20 @@ const previewLoading = ref(false);
 const previewError = ref('');
 const previewHost = ref<HTMLDivElement | null>(null);
 const previewRevision = ref('');
+const previewViewport = ref<'desktop' | 'tablet' | 'mobile'>('desktop');
+const leftPanelWidth = ref(360);
+const rightPanelWidth = ref(250);
+const isResizing = ref<'left' | 'right' | null>(null);
+const resizeStartX = ref(0);
+const resizeStartWidth = ref(0);
 let previewShadowRoot: ShadowRoot | null = null;
 let previewTimer: number | null = null;
+
+const LAYOUT_STORAGE_KEY = 'tp.builder.layout.v1';
+const LEFT_MIN_WIDTH = 320;
+const LEFT_MAX_WIDTH = 520;
+const RIGHT_MIN_WIDTH = 220;
+const RIGHT_MAX_WIDTH = 420;
 
 const hasSelection = computed(() => store.selectedIndex >= 0 && store.selectedIndex < store.blocks.length);
 const previewMode = computed<'fragment' | 'iframe'>(() =>
@@ -34,6 +46,11 @@ const selectedPresentation = computed(() => {
 const spacingTop = computed(() => String((selectedPresentation.value.spacing as { top?: string }).top ?? 'none'));
 const spacingBottom = computed(() => String((selectedPresentation.value.spacing as { bottom?: string }).bottom ?? 'none'));
 const mediaOptions = computed<MediaOption[]>(() => (Array.isArray(props.config.mediaOptions) ? props.config.mediaOptions : []));
+
+const layoutStyle = computed<Record<string, string>>(() => ({
+    '--tp-builder-left': `${leftPanelWidth.value}px`,
+    '--tp-builder-right': `${rightPanelWidth.value}px`,
+}));
 
 const resourceLabel = computed(() => (props.config.resource === 'pages' ? 'page' : 'post'));
 
@@ -66,6 +83,78 @@ function onDrop(index: number): void {
 
     store.move(dragIndex.value, index);
     dragIndex.value = null;
+}
+
+function clampWidth(value: number, min: number, max: number): number {
+    return Math.max(min, Math.min(max, value));
+}
+
+function loadLayoutPreference(): void {
+    const raw = window.localStorage.getItem(LAYOUT_STORAGE_KEY);
+    if (!raw) {
+        return;
+    }
+
+    try {
+        const parsed = JSON.parse(raw) as { left?: number; right?: number };
+        if (typeof parsed.left === 'number') {
+            leftPanelWidth.value = clampWidth(parsed.left, LEFT_MIN_WIDTH, LEFT_MAX_WIDTH);
+        }
+
+        if (typeof parsed.right === 'number') {
+            rightPanelWidth.value = clampWidth(parsed.right, RIGHT_MIN_WIDTH, RIGHT_MAX_WIDTH);
+        }
+    } catch {
+        return;
+    }
+}
+
+function storeLayoutPreference(): void {
+    window.localStorage.setItem(
+        LAYOUT_STORAGE_KEY,
+        JSON.stringify({
+            left: leftPanelWidth.value,
+            right: rightPanelWidth.value,
+        }),
+    );
+}
+
+function onResizeMove(event: PointerEvent): void {
+    if (isResizing.value === null) {
+        return;
+    }
+
+    const delta = event.clientX - resizeStartX.value;
+    if (isResizing.value === 'left') {
+        leftPanelWidth.value = clampWidth(resizeStartWidth.value + delta, LEFT_MIN_WIDTH, LEFT_MAX_WIDTH);
+        return;
+    }
+
+    rightPanelWidth.value = clampWidth(resizeStartWidth.value - delta, RIGHT_MIN_WIDTH, RIGHT_MAX_WIDTH);
+}
+
+function onResizeEnd(): void {
+    if (isResizing.value === null) {
+        return;
+    }
+
+    isResizing.value = null;
+    window.removeEventListener('pointermove', onResizeMove);
+    window.removeEventListener('pointerup', onResizeEnd);
+    storeLayoutPreference();
+}
+
+function startResize(side: 'left' | 'right', event: PointerEvent): void {
+    if (window.matchMedia('(max-width: 1279px)').matches) {
+        return;
+    }
+
+    event.preventDefault();
+    isResizing.value = side;
+    resizeStartX.value = event.clientX;
+    resizeStartWidth.value = side === 'left' ? leftPanelWidth.value : rightPanelWidth.value;
+    window.addEventListener('pointermove', onResizeMove);
+    window.addEventListener('pointerup', onResizeEnd);
 }
 
 function submitForm(): void {
@@ -696,6 +785,7 @@ function onKeydown(event: KeyboardEvent): void {
 
 onMounted(() => {
     store.init(props.config);
+    loadLayoutPreference();
     window.addEventListener('keydown', onKeydown);
     const form = document.getElementById(props.config.resource === 'pages' ? 'page-form' : 'post-form') as HTMLFormElement | null;
     form?.addEventListener('submit', () => {
@@ -705,6 +795,7 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
+    onResizeEnd();
     window.removeEventListener('keydown', onKeydown);
     if (previewTimer !== null) {
         window.clearTimeout(previewTimer);
@@ -729,7 +820,7 @@ watch(
 </script>
 
 <template>
-    <div class="tp-builder">
+    <div class="tp-builder" :style="layoutStyle">
         <aside class="tp-builder__panel tp-builder__panel--inspector">
             <div class="tp-builder__panel-title">Block configuration</div>
 
@@ -1102,10 +1193,49 @@ watch(
             <div v-else class="tp-builder__empty tp-builder__empty--small">Select a block from the structure panel to configure it.</div>
         </aside>
 
+        <div class="tp-builder__resizer" aria-hidden="true" @pointerdown="startResize('left', $event)"></div>
+
         <section class="tp-builder__canvas tp-builder__canvas--preview">
             <div class="tp-builder__canvas-toolbar">
                 <div class="tp-builder__canvas-title">Live {{ resourceLabel }} preview</div>
-                <div class="tp-builder__toolbar-actions">
+                <div class="tp-builder__toolbar-groups">
+                    <div class="tp-builder__viewport-switch" role="group" aria-label="Preview viewport">
+                        <button
+                            type="button"
+                            class="tp-builder__icon-button"
+                            :class="{ 'is-active': previewViewport === 'mobile' }"
+                            title="Mobile viewport"
+                            aria-label="Mobile viewport"
+                            @click="previewViewport = 'mobile'">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 2.25h3A2.25 2.25 0 0 1 15.75 4.5v15A2.25 2.25 0 0 1 13.5 21.75h-3a2.25 2.25 0 0 1-2.25-2.25v-15A2.25 2.25 0 0 1 10.5 2.25Zm0 14.25h3" />
+                            </svg>
+                        </button>
+                        <button
+                            type="button"
+                            class="tp-builder__icon-button"
+                            :class="{ 'is-active': previewViewport === 'tablet' }"
+                            title="Tablet viewport"
+                            aria-label="Tablet viewport"
+                            @click="previewViewport = 'tablet'">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3.75h10.5c.621 0 1.125.504 1.125 1.125v14.25c0 .621-.504 1.125-1.125 1.125H6.75a1.125 1.125 0 0 1-1.125-1.125V4.875c0-.621.504-1.125 1.125-1.125Z" />
+                            </svg>
+                        </button>
+                        <button
+                            type="button"
+                            class="tp-builder__icon-button"
+                            :class="{ 'is-active': previewViewport === 'desktop' }"
+                            title="Desktop viewport"
+                            aria-label="Desktop viewport"
+                            @click="previewViewport = 'desktop'">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 5.25A2.25 2.25 0 0 1 6 3h12a2.25 2.25 0 0 1 2.25 2.25v9A2.25 2.25 0 0 1 18 16.5H6a2.25 2.25 0 0 1-2.25-2.25v-9Zm6.75 15h3m-4.5 0h6" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="tp-builder__toolbar-actions">
                     <button
                         type="button"
                         class="tp-builder__icon-button"
@@ -1139,23 +1269,30 @@ watch(
                         </svg>
                     </button>
                 </div>
+                </div>
             </div>
 
             <div class="tp-builder__preview-state" v-if="previewLoading">Updating preview...</div>
             <div class="tp-builder__preview-state tp-builder__preview-state--error" v-if="previewError">{{ previewError }}</div>
-            <template v-if="previewMode === 'iframe'">
-                <iframe v-if="store.previewUrl" class="tp-builder__preview tp-builder__preview--center" :src="store.previewUrl" title="Builder preview"></iframe>
-                <div v-else class="tp-builder__empty">
-                    Preview is loading. Add blocks from the right panel to render sections into the page template.
+            <div class="tp-builder__preview-stage">
+                <div class="tp-builder__preview-viewport" :class="`is-${previewViewport}`">
+                    <template v-if="previewMode === 'iframe'">
+                        <iframe v-if="store.previewUrl" class="tp-builder__preview tp-builder__preview--center" :src="store.previewUrl" title="Builder preview"></iframe>
+                        <div v-else class="tp-builder__empty">
+                            Preview is loading. Add blocks from the right panel to render sections into the page template.
+                        </div>
+                    </template>
+                    <div
+                        v-else
+                        ref="previewHost"
+                        class="tp-builder__preview tp-builder__preview--center"
+                        role="region"
+                        aria-label="Builder preview"></div>
                 </div>
-            </template>
-            <div
-                v-else
-                ref="previewHost"
-                class="tp-builder__preview tp-builder__preview--center"
-                role="region"
-                aria-label="Builder preview"></div>
+            </div>
         </section>
+
+        <div class="tp-builder__resizer" aria-hidden="true" @pointerdown="startResize('right', $event)"></div>
 
         <aside class="tp-builder__panel tp-builder__panel--library">
             <div class="tp-builder__panel-title">Block library</div>
