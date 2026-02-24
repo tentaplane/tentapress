@@ -7,7 +7,7 @@ Visual drag-and-drop builder for TentaPress pages and posts.
 | Field    | Value                                      |
 |----------|--------------------------------------------|
 | ID       | `tentapress/builder`                       |
-| Version  | 0.1.0                                      |
+| Version  | 0.1.2                                      |
 | Provider | `TentaPress\\Builder\\BuilderServiceProvider` |
 
 ## Features

@@ -10,10 +10,20 @@
     $mode = $mode ?? 'edit';
     $modelId = is_object($model) ? (int) ($model->id ?? 0) : 0;
     $storageKey = $isPost ? 'tp.builder.post.'.$modelId : 'tp.builder.page.'.$modelId;
+    $builderConfig = [
+        'initialJson' => $blocksJson,
+        'resource' => $resource,
+        'snapshotEndpoint' => \Illuminate\Support\Facades\Route::has('tp.builder.snapshots.store') ? route('tp.builder.snapshots.store') : '',
+        'storageKey' => $storageKey,
+        'hiddenFieldId' => 'tp-builder-json-field',
+        'definitions' => is_array($blockDefinitions ?? null) ? $blockDefinitions : [],
+        'mediaOptions' => is_array($mediaOptions ?? null) ? $mediaOptions : [],
+    ];
 @endphp
 
 @once
     @push('head-prepend')
+        <meta name="csrf-token" content="{{ csrf_token() }}">
         @tpPluginScripts('tentapress/builder')
     @endpush
 @endonce
@@ -55,15 +65,7 @@
 
     <div
         id="tp-builder-root"
-        data-config='@json([
-            "initialJson" => $blocksJson,
-            "resource" => $resource,
-            "snapshotEndpoint" => \Illuminate\Support\Facades\Route::has("tp.builder.snapshots.store") ? route("tp.builder.snapshots.store") : "",
-            "storageKey" => $storageKey,
-            "hiddenFieldId" => "tp-builder-json-field",
-            "definitions" => is_array($blockDefinitions ?? null) ? $blockDefinitions : [],
-            "mediaOptions" => is_array($mediaOptions ?? null) ? $mediaOptions : [],
-        ])'>
+        data-config='@json($builderConfig)'>
     </div>
 
     <textarea id="tp-builder-json-field" name="blocks_json" class="hidden">{{ $blocksJson }}</textarea>
