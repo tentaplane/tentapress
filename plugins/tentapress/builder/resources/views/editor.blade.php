@@ -37,7 +37,7 @@
     @endpush
 @endonce
 
-<div class="tp-builder-field space-y-3">
+<div class="tp-builder-field {{ $editorMode ? 'tp-builder-field--fullscreen' : '' }} space-y-3">
     @if ($editorMode && $mode === 'edit' && is_object($model))
         <div
             class="sticky top-0 z-30 -mx-4 flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 bg-white/95 px-4 py-3 shadow-sm backdrop-blur sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">

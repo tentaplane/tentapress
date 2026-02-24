@@ -740,9 +740,30 @@ watch(
                 </div>
 
                 <div class="tp-builder__selected-actions">
-                    <button type="button" class="tp-button-secondary" @click="store.duplicate(store.selectedIndex)">Duplicate</button>
-                    <button type="button" class="tp-button-secondary text-red-600" @click="store.remove(store.selectedIndex)">
-                        Delete
+                    <button
+                        type="button"
+                        class="tp-builder__icon-button"
+                        title="Duplicate block"
+                        aria-label="Duplicate block"
+                        @click="store.duplicate(store.selectedIndex)">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <rect x="9" y="9" width="10" height="10" rx="1.5"></rect>
+                            <rect x="5" y="5" width="10" height="10" rx="1.5"></rect>
+                        </svg>
+                    </button>
+                    <button
+                        type="button"
+                        class="tp-builder__icon-button tp-builder__icon-button--danger"
+                        title="Delete block"
+                        aria-label="Delete block"
+                        @click="store.remove(store.selectedIndex)">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <path d="M4 7h16"></path>
+                            <path d="M10 11v6"></path>
+                            <path d="M14 11v6"></path>
+                            <path d="M6 7l1 12h10l1-12"></path>
+                            <path d="M9 7V5h6v2"></path>
+                        </svg>
                     </button>
                 </div>
 
@@ -797,10 +818,18 @@ watch(
                             <div class="tp-builder__media-actions">
                                 <button
                                     type="button"
-                                    class="tp-button-link"
+                                    class="tp-builder__icon-button tp-builder__icon-button--danger"
                                     :disabled="mediaFieldValue(field.key) === ''"
+                                    title="Clear media"
+                                    aria-label="Clear media"
                                     @click="clearMediaField(field.key)">
-                                    Clear
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                        <path d="M4 7h16"></path>
+                                        <path d="M10 11v6"></path>
+                                        <path d="M14 11v6"></path>
+                                        <path d="M6 7l1 12h10l1-12"></path>
+                                        <path d="M9 7V5h6v2"></path>
+                                    </svg>
                                 </button>
                             </div>
 
@@ -853,9 +882,17 @@ watch(
                                     </div>
                                     <button
                                         type="button"
-                                        class="tp-button-link text-red-600"
+                                        class="tp-builder__icon-button tp-builder__icon-button--danger"
+                                        title="Remove media item"
+                                        aria-label="Remove media item"
                                         @click="removeMediaListItem(field.key, mediaIndex)">
-                                        Remove
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                            <path d="M4 7h16"></path>
+                                            <path d="M10 11v6"></path>
+                                            <path d="M14 11v6"></path>
+                                            <path d="M6 7l1 12h10l1-12"></path>
+                                            <path d="M9 7V5h6v2"></path>
+                                        </svg>
                                     </button>
                                 </article>
                             </div>
@@ -863,8 +900,16 @@ watch(
 
                         <div v-else-if="field.type === 'repeater'" class="tp-builder__repeater-field">
                             <div class="tp-builder__repeater-toolbar">
-                                <button type="button" class="tp-button-secondary" @click="addRepeaterRow(field.key, field)">
-                                    Add row
+                                <button
+                                    type="button"
+                                    class="tp-builder__icon-button"
+                                    title="Add row"
+                                    aria-label="Add row"
+                                    @click="addRepeaterRow(field.key, field)">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                        <path d="M12 5v14"></path>
+                                        <path d="M5 12h14"></path>
+                                    </svg>
                                 </button>
                             </div>
 
@@ -883,29 +928,52 @@ watch(
                                     <div class="tp-builder__repeater-row-actions">
                                         <button
                                             type="button"
-                                            class="tp-button-link"
+                                            class="tp-builder__icon-button"
                                             :disabled="rowIndex === 0"
+                                            title="Move row up"
+                                            aria-label="Move row up"
                                             @click="moveRepeaterRow(field.key, field, rowIndex, -1)">
-                                            Up
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                                <path d="M12 18V6"></path>
+                                                <path d="M7 11l5-5 5 5"></path>
+                                            </svg>
                                         </button>
                                         <button
                                             type="button"
-                                            class="tp-button-link"
+                                            class="tp-builder__icon-button"
                                             :disabled="rowIndex === repeaterRows(field.key, field).length - 1"
+                                            title="Move row down"
+                                            aria-label="Move row down"
                                             @click="moveRepeaterRow(field.key, field, rowIndex, 1)">
-                                            Down
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                                <path d="M12 6v12"></path>
+                                                <path d="M7 13l5 5 5-5"></path>
+                                            </svg>
                                         </button>
                                         <button
                                             type="button"
-                                            class="tp-button-link"
+                                            class="tp-builder__icon-button"
+                                            title="Duplicate row"
+                                            aria-label="Duplicate row"
                                             @click="duplicateRepeaterRow(field.key, field, rowIndex)">
-                                            Duplicate
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                                <rect x="9" y="9" width="10" height="10" rx="1.5"></rect>
+                                                <rect x="5" y="5" width="10" height="10" rx="1.5"></rect>
+                                            </svg>
                                         </button>
                                         <button
                                             type="button"
-                                            class="tp-button-link text-red-600"
+                                            class="tp-builder__icon-button tp-builder__icon-button--danger"
+                                            title="Remove row"
+                                            aria-label="Remove row"
                                             @click="removeRepeaterRow(field.key, field, rowIndex)">
-                                            Remove
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                                <path d="M4 7h16"></path>
+                                                <path d="M10 11v6"></path>
+                                                <path d="M14 11v6"></path>
+                                                <path d="M6 7l1 12h10l1-12"></path>
+                                                <path d="M9 7V5h6v2"></path>
+                                            </svg>
                                         </button>
                                     </div>
                                 </header>
@@ -1059,17 +1127,42 @@ watch(
             <div class="tp-builder__canvas-toolbar">
                 <div class="tp-builder__canvas-title">Live {{ resourceLabel }} preview</div>
                 <div class="tp-builder__toolbar-actions">
-                    <button type="button" class="tp-button-secondary" :disabled="store.historyIndex <= 0" @click="store.undo()">
-                        Undo
+                    <button
+                        type="button"
+                        class="tp-builder__icon-button"
+                        :disabled="store.historyIndex <= 0"
+                        title="Undo"
+                        aria-label="Undo"
+                        @click="store.undo()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <path d="M9 7l-5 5 5 5"></path>
+                            <path d="M20 12H4"></path>
+                        </svg>
                     </button>
                     <button
                         type="button"
-                        class="tp-button-secondary"
+                        class="tp-builder__icon-button"
                         :disabled="store.historyIndex >= store.history.length - 1"
+                        title="Redo"
+                        aria-label="Redo"
                         @click="store.redo()">
-                        Redo
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <path d="M15 7l5 5-5 5"></path>
+                            <path d="M4 12h16"></path>
+                        </svg>
                     </button>
-                    <button type="button" class="tp-button-primary" @click="submitForm()">Save</button>
+                    <button
+                        type="button"
+                        class="tp-builder__icon-button"
+                        title="Save"
+                        aria-label="Save"
+                        @click="submitForm()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <path d="M5 4h12l2 2v14H5z"></path>
+                            <path d="M8 4v6h8V4"></path>
+                            <path d="M9 19h6"></path>
+                        </svg>
+                    </button>
                 </div>
             </div>
 
@@ -1138,8 +1231,31 @@ watch(
                             <div class="tp-builder__card-meta">{{ block.type }}</div>
                         </div>
                         <div class="tp-builder__card-actions">
-                            <button type="button" class="tp-button-link" @click.stop="store.duplicate(index)">Duplicate</button>
-                            <button type="button" class="tp-button-link text-red-600" @click.stop="store.remove(index)">Delete</button>
+                            <button
+                                type="button"
+                                class="tp-builder__icon-button"
+                                title="Duplicate block"
+                                aria-label="Duplicate block"
+                                @click.stop="store.duplicate(index)">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                    <rect x="9" y="9" width="10" height="10" rx="1.5"></rect>
+                                    <rect x="5" y="5" width="10" height="10" rx="1.5"></rect>
+                                </svg>
+                            </button>
+                            <button
+                                type="button"
+                                class="tp-builder__icon-button tp-builder__icon-button--danger"
+                                title="Delete block"
+                                aria-label="Delete block"
+                                @click.stop="store.remove(index)">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                    <path d="M4 7h16"></path>
+                                    <path d="M10 11v6"></path>
+                                    <path d="M14 11v6"></path>
+                                    <path d="M6 7l1 12h10l1-12"></path>
+                                    <path d="M9 7V5h6v2"></path>
+                                </svg>
+                            </button>
                         </div>
                     </header>
                     <p class="tp-builder__card-summary">{{ blockSummary(index) }}</p>
