@@ -1,11 +1,11 @@
 {
   "resources/css/builder-editor.css": {
-    "file": "builder-editor-styles-D76gRWY3.css",
+    "file": "builder-editor-styles-Bx9MSSmc.css",
     "src": "resources/css/builder-editor.css",
     "isEntry": true
   },
   "resources/js/main.ts": {
-    "file": "builder-editor-YlDxTO2B.js",
+    "file": "builder-editor-BwhlikY3.js",
     "name": "builder-editor",
     "src": "resources/js/main.ts",
     "isEntry": true

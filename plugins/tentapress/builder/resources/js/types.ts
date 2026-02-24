@@ -7,6 +7,7 @@ export type BlockField = {
     help?: string;
     placeholder?: string;
     options?: Array<{ value: string; label: string } | string>;
+    columns?: BlockField[];
 };
 
 export type BlockDefinition = {

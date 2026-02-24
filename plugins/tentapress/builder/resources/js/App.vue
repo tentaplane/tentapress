@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { useBuilderEditorStore } from './stores/editor';
-import type { BuilderConfig, BuilderPreviewDocument } from './types';
+import type { BlockField, BuilderConfig, BuilderPreviewDocument, MediaOption } from './types';
 
 const props = defineProps<{ config: BuilderConfig }>();
 
@@ -33,6 +33,7 @@ const selectedPresentation = computed(() => {
 });
 const spacingTop = computed(() => String((selectedPresentation.value.spacing as { top?: string }).top ?? 'none'));
 const spacingBottom = computed(() => String((selectedPresentation.value.spacing as { bottom?: string }).bottom ?? 'none'));
+const mediaOptions = computed<MediaOption[]>(() => (Array.isArray(props.config.mediaOptions) ? props.config.mediaOptions : []));
 
 const resourceLabel = computed(() => (props.config.resource === 'pages' ? 'page' : 'post'));
 
@@ -104,6 +105,320 @@ function updateToggleField(key: string, event: Event): void {
     }
 
     store.setBlockProp(store.selectedIndex, key, checkboxValue(event));
+}
+
+function repeaterColumns(field: BlockField): BlockField[] {
+    if (!Array.isArray(field.columns)) {
+        return [];
+    }
+
+    return field.columns.filter(
+        (column) => typeof column?.key === 'string' && column.key.trim() !== '',
+    );
+}
+
+function normalizeRepeaterRow(field: BlockField, row: unknown): Record<string, unknown> {
+    const columns = repeaterColumns(field);
+    const source = row && typeof row === 'object' ? (row as Record<string, unknown>) : {};
+    const normalized: Record<string, unknown> = {};
+
+    for (const column of columns) {
+        const key = String(column.key ?? '').trim();
+        if (key === '') {
+            continue;
+        }
+
+        const value = source[key];
+        if (column.type === 'toggle') {
+            normalized[key] = value === true || value === '1' || value === 1 || String(value ?? '').toLowerCase() === 'true';
+            continue;
+        }
+
+        normalized[key] = value === null || value === undefined ? '' : String(value);
+    }
+
+    return normalized;
+}
+
+function parseRepeaterLines(field: BlockField, value: string): Array<Record<string, unknown>> {
+    const rows: Array<Record<string, unknown>> = [];
+    const columns = repeaterColumns(field);
+    const lines = value.split(/\r?\n/);
+
+    for (const line of lines) {
+        const trimmed = String(line).trim();
+        if (trimmed === '') {
+            continue;
+        }
+
+        const parts = trimmed.split('|').map((part) => part.trim());
+        const row: Record<string, unknown> = {};
+        columns.forEach((column, index) => {
+            const key = String(column.key ?? '').trim();
+            if (key === '') {
+                return;
+            }
+
+            row[key] = parts[index] ?? '';
+        });
+        rows.push(normalizeRepeaterRow(field, row));
+    }
+
+    return rows;
+}
+
+function repeaterRows(fieldKey: string, field: BlockField): Array<Record<string, unknown>> {
+    if (!hasSelection.value || !store.selectedBlock) {
+        return [];
+    }
+
+    const raw = store.selectedBlock.props[fieldKey];
+    if (Array.isArray(raw)) {
+        return raw.map((row) => normalizeRepeaterRow(field, row));
+    }
+
+    if (typeof raw === 'string') {
+        const trimmed = raw.trim();
+        if (trimmed === '') {
+            return [];
+        }
+
+        try {
+            const parsed = JSON.parse(trimmed);
+            if (Array.isArray(parsed)) {
+                return parsed.map((row) => normalizeRepeaterRow(field, row));
+            }
+        } catch {
+            return parseRepeaterLines(field, trimmed);
+        }
+
+        return parseRepeaterLines(field, trimmed);
+    }
+
+    return [];
+}
+
+function setRepeaterRows(fieldKey: string, rows: Array<Record<string, unknown>>): void {
+    if (!hasSelection.value) {
+        return;
+    }
+
+    store.setBlockProp(store.selectedIndex, fieldKey, rows);
+}
+
+function addRepeaterRow(fieldKey: string, field: BlockField): void {
+    const rows = repeaterRows(fieldKey, field);
+    rows.push(normalizeRepeaterRow(field, {}));
+    setRepeaterRows(fieldKey, rows);
+}
+
+function removeRepeaterRow(fieldKey: string, field: BlockField, rowIndex: number): void {
+    const rows = repeaterRows(fieldKey, field);
+    if (rowIndex < 0 || rowIndex >= rows.length) {
+        return;
+    }
+
+    rows.splice(rowIndex, 1);
+    setRepeaterRows(fieldKey, rows);
+}
+
+function duplicateRepeaterRow(fieldKey: string, field: BlockField, rowIndex: number): void {
+    const rows = repeaterRows(fieldKey, field);
+    if (rowIndex < 0 || rowIndex >= rows.length) {
+        return;
+    }
+
+    rows.splice(rowIndex + 1, 0, normalizeRepeaterRow(field, rows[rowIndex]));
+    setRepeaterRows(fieldKey, rows);
+}
+
+function moveRepeaterRow(fieldKey: string, field: BlockField, rowIndex: number, delta: number): void {
+    const rows = repeaterRows(fieldKey, field);
+    const targetIndex = rowIndex + delta;
+    if (rowIndex < 0 || rowIndex >= rows.length || targetIndex < 0 || targetIndex >= rows.length) {
+        return;
+    }
+
+    const [row] = rows.splice(rowIndex, 1);
+    rows.splice(targetIndex, 0, row);
+    setRepeaterRows(fieldKey, rows);
+}
+
+function updateRepeaterColumn(fieldKey: string, field: BlockField, rowIndex: number, column: BlockField, event: Event): void {
+    const rows = repeaterRows(fieldKey, field);
+    if (rowIndex < 0 || rowIndex >= rows.length) {
+        return;
+    }
+
+    const key = String(column.key ?? '').trim();
+    if (key === '') {
+        return;
+    }
+
+    const next = normalizeRepeaterRow(field, rows[rowIndex]);
+    next[key] = column.type === 'toggle' ? checkboxValue(event) : inputValue(event);
+    rows[rowIndex] = next;
+    setRepeaterRows(fieldKey, rows);
+}
+
+function repeaterColumnTextValue(row: Record<string, unknown>, column: BlockField): string {
+    const key = String(column.key ?? '').trim();
+    if (key === '') {
+        return '';
+    }
+
+    const value = row[key];
+    return value === null || value === undefined ? '' : String(value);
+}
+
+function repeaterColumnToggleValue(row: Record<string, unknown>, column: BlockField): boolean {
+    const key = String(column.key ?? '').trim();
+    if (key === '') {
+        return false;
+    }
+
+    const value = row[key];
+    return value === true || value === '1' || value === 1 || String(value ?? '').toLowerCase() === 'true';
+}
+
+function repeaterRowSummary(row: Record<string, unknown>, field: BlockField, rowIndex: number): string {
+    const pieces: string[] = [];
+    for (const column of repeaterColumns(field)) {
+        const value = repeaterColumnTextValue(row, column).trim();
+        if (value !== '') {
+            pieces.push(value);
+        }
+        if (pieces.length >= 2) {
+            break;
+        }
+    }
+
+    if (pieces.length === 0) {
+        return `Row ${rowIndex + 1}`;
+    }
+
+    return pieces.join(' - ');
+}
+
+function mediaOption(value: unknown): MediaOption | null {
+    const key = String(value ?? '').trim();
+    if (key === '') {
+        return null;
+    }
+
+    const found = mediaOptions.value.find((option) => String(option.value ?? '').trim() === key);
+    if (found) {
+        return found;
+    }
+
+    return {
+        id: 0,
+        value: key,
+        label: key.split('/').pop() || key,
+    };
+}
+
+function mediaLabel(value: unknown): string {
+    const option = mediaOption(value);
+    if (!option) {
+        return '';
+    }
+
+    return option.label || option.original_name || option.value || '';
+}
+
+function isMediaImage(value: unknown): boolean {
+    const option = mediaOption(value);
+    if (!option) {
+        return false;
+    }
+
+    if (option.is_image !== undefined) {
+        return !!option.is_image;
+    }
+
+    return /\.(png|jpe?g|gif|webp|svg)$/i.test(String(option.value ?? ''));
+}
+
+function mediaFieldValue(fieldKey: string): string {
+    if (!hasSelection.value || !store.selectedBlock) {
+        return '';
+    }
+
+    return String(store.selectedBlock.props[fieldKey] ?? '');
+}
+
+function updateMediaField(fieldKey: string, event: Event): void {
+    if (!hasSelection.value) {
+        return;
+    }
+
+    store.setBlockProp(store.selectedIndex, fieldKey, inputValue(event));
+}
+
+function clearMediaField(fieldKey: string): void {
+    if (!hasSelection.value) {
+        return;
+    }
+
+    store.setBlockProp(store.selectedIndex, fieldKey, '');
+}
+
+function mediaListValue(fieldKey: string): string[] {
+    if (!hasSelection.value || !store.selectedBlock) {
+        return [];
+    }
+
+    const raw = store.selectedBlock.props[fieldKey];
+    if (Array.isArray(raw)) {
+        return raw.map((item) => String(item ?? '').trim()).filter((item) => item !== '');
+    }
+
+    if (typeof raw === 'string') {
+        return raw
+            .split(/[\n,]/)
+            .map((item) => item.trim())
+            .filter((item) => item !== '');
+    }
+
+    return [];
+}
+
+function setMediaListValue(fieldKey: string, values: string[]): void {
+    if (!hasSelection.value) {
+        return;
+    }
+
+    const normalized = values.map((item) => String(item ?? '').trim()).filter((item) => item !== '');
+    store.setBlockProp(store.selectedIndex, fieldKey, normalized);
+}
+
+function addMediaListItem(fieldKey: string, event: Event): void {
+    const value = inputValue(event).trim();
+    if (value === '') {
+        return;
+    }
+
+    const next = mediaListValue(fieldKey);
+    if (!next.includes(value)) {
+        next.push(value);
+        setMediaListValue(fieldKey, next);
+    }
+
+    const target = event.target;
+    if (target instanceof HTMLSelectElement) {
+        target.value = '';
+    }
+}
+
+function removeMediaListItem(fieldKey: string, index: number): void {
+    const next = mediaListValue(fieldKey);
+    if (index < 0 || index >= next.length) {
+        return;
+    }
+
+    next.splice(index, 1);
+    setMediaListValue(fieldKey, next);
 }
 
 function updatePresentation(key: 'container' | 'align' | 'background', event: Event): void {
@@ -216,8 +531,10 @@ function applyPreviewDocument(payload: BuilderPreviewDocument): void {
 
     const uiStyle = document.createElement('style');
     uiStyle.textContent = `
-        :host { display: block; min-height: 100%; color: inherit; }
-        .tp-builder-preview-document { min-height: 100%; background: #fff; color: #0f172a; }
+        :host { display: block; min-height: 100%; color: inherit; overflow: auto; }
+        .tp-builder-preview-document { min-height: 100%; background: #fff; color: #0f172a; overflow-x: clip; box-sizing: border-box; }
+        .tp-builder-preview-document * { box-sizing: border-box; }
+        .tp-builder-preview-document img, .tp-builder-preview-document video, .tp-builder-preview-document svg { max-width: 100%; }
         .tp-builder-preview-document [data-tp-builder-block-index] {
             cursor: pointer;
             border-radius: 0.5rem;
@@ -430,7 +747,7 @@ watch(
                 </div>
 
                 <div class="tp-builder__field-group">
-                    <label
+                    <div
                         v-for="field in store.selectedDefinition.fields"
                         :key="field.key"
                         class="tp-builder__field">
@@ -444,7 +761,7 @@ watch(
                             @input="updateField(field.key, $event)" />
 
                         <textarea
-                            v-else-if="['textarea', 'richtext', 'markdown', 'embed', 'repeater', 'nested-blocks', 'media-list'].includes(field.type)"
+                            v-else-if="['textarea', 'richtext', 'markdown', 'embed', 'nested-blocks'].includes(field.type)"
                             class="tp-textarea"
                             rows="4"
                             :value="String(store.selectedBlock.props[field.key] ?? '')"
@@ -463,6 +780,189 @@ watch(
                             </option>
                         </select>
 
+                        <div v-else-if="field.type === 'media'" class="tp-builder__media-field">
+                            <select
+                                class="tp-select"
+                                :value="mediaFieldValue(field.key)"
+                                @change="updateMediaField(field.key, $event)">
+                                <option value="">Select media</option>
+                                <option
+                                    v-for="option in mediaOptions"
+                                    :key="option.value"
+                                    :value="option.value">
+                                    {{ option.label || option.original_name || option.value }}
+                                </option>
+                            </select>
+
+                            <div class="tp-builder__media-actions">
+                                <button
+                                    type="button"
+                                    class="tp-button-link"
+                                    :disabled="mediaFieldValue(field.key) === ''"
+                                    @click="clearMediaField(field.key)">
+                                    Clear
+                                </button>
+                            </div>
+
+                            <div
+                                v-if="mediaFieldValue(field.key) !== ''"
+                                class="tp-builder__media-preview">
+                                <img
+                                    v-if="isMediaImage(mediaFieldValue(field.key))"
+                                    :src="mediaFieldValue(field.key)"
+                                    :alt="mediaLabel(mediaFieldValue(field.key))" />
+                                <a
+                                    :href="mediaFieldValue(field.key)"
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    class="tp-builder__media-link">
+                                    {{ mediaLabel(mediaFieldValue(field.key)) || mediaFieldValue(field.key) }}
+                                </a>
+                            </div>
+                        </div>
+
+                        <div v-else-if="field.type === 'media-list'" class="tp-builder__media-list-field">
+                            <select class="tp-select" value="" @change="addMediaListItem(field.key, $event)">
+                                <option value="">Add media item</option>
+                                <option
+                                    v-for="option in mediaOptions"
+                                    :key="`${field.key}:${option.value}`"
+                                    :value="option.value">
+                                    {{ option.label || option.original_name || option.value }}
+                                </option>
+                            </select>
+
+                            <div
+                                v-if="mediaListValue(field.key).length === 0"
+                                class="tp-builder__empty tp-builder__empty--inline">
+                                No media selected.
+                            </div>
+                            <div v-else class="tp-builder__media-list">
+                                <article
+                                    v-for="(item, mediaIndex) in mediaListValue(field.key)"
+                                    :key="`${field.key}:${item}:${mediaIndex}`"
+                                    class="tp-builder__media-list-item">
+                                    <img
+                                        v-if="isMediaImage(item)"
+                                        :src="item"
+                                        :alt="mediaLabel(item)"
+                                        class="tp-builder__media-thumb" />
+                                    <div class="tp-builder__media-item-meta">
+                                        <div class="tp-builder__media-item-title">{{ mediaLabel(item) || item }}</div>
+                                        <a :href="item" target="_blank" rel="noreferrer" class="tp-builder__media-link">{{ item }}</a>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        class="tp-button-link text-red-600"
+                                        @click="removeMediaListItem(field.key, mediaIndex)">
+                                        Remove
+                                    </button>
+                                </article>
+                            </div>
+                        </div>
+
+                        <div v-else-if="field.type === 'repeater'" class="tp-builder__repeater-field">
+                            <div class="tp-builder__repeater-toolbar">
+                                <button type="button" class="tp-button-secondary" @click="addRepeaterRow(field.key, field)">
+                                    Add row
+                                </button>
+                            </div>
+
+                            <div
+                                v-if="repeaterRows(field.key, field).length === 0"
+                                class="tp-builder__empty tp-builder__empty--inline">
+                                No rows yet.
+                            </div>
+
+                            <article
+                                v-for="(row, rowIndex) in repeaterRows(field.key, field)"
+                                :key="`${field.key}:${rowIndex}`"
+                                class="tp-builder__repeater-row">
+                                <header class="tp-builder__repeater-row-header">
+                                    <div class="tp-builder__repeater-row-title">{{ repeaterRowSummary(row, field, rowIndex) }}</div>
+                                    <div class="tp-builder__repeater-row-actions">
+                                        <button
+                                            type="button"
+                                            class="tp-button-link"
+                                            :disabled="rowIndex === 0"
+                                            @click="moveRepeaterRow(field.key, field, rowIndex, -1)">
+                                            Up
+                                        </button>
+                                        <button
+                                            type="button"
+                                            class="tp-button-link"
+                                            :disabled="rowIndex === repeaterRows(field.key, field).length - 1"
+                                            @click="moveRepeaterRow(field.key, field, rowIndex, 1)">
+                                            Down
+                                        </button>
+                                        <button
+                                            type="button"
+                                            class="tp-button-link"
+                                            @click="duplicateRepeaterRow(field.key, field, rowIndex)">
+                                            Duplicate
+                                        </button>
+                                        <button
+                                            type="button"
+                                            class="tp-button-link text-red-600"
+                                            @click="removeRepeaterRow(field.key, field, rowIndex)">
+                                            Remove
+                                        </button>
+                                    </div>
+                                </header>
+
+                                <div class="tp-builder__repeater-grid">
+                                    <label
+                                        v-for="column in repeaterColumns(field)"
+                                        :key="`${field.key}:${rowIndex}:${column.key}`"
+                                        class="tp-builder__field">
+                                        <span class="tp-builder__label">{{ column.label }}</span>
+
+                                        <input
+                                            v-if="['text', 'url', 'color', 'number', 'range'].includes(column.type)"
+                                            class="tp-input"
+                                            :type="column.type === 'range' ? 'range' : column.type === 'number' ? 'number' : column.type === 'color' ? 'color' : column.type === 'url' ? 'url' : 'text'"
+                                            :value="repeaterColumnTextValue(row, column)"
+                                            @input="updateRepeaterColumn(field.key, field, rowIndex, column, $event)" />
+
+                                        <textarea
+                                            v-else-if="['textarea', 'richtext', 'markdown', 'embed'].includes(column.type)"
+                                            class="tp-textarea"
+                                            rows="3"
+                                            :value="repeaterColumnTextValue(row, column)"
+                                            @input="updateRepeaterColumn(field.key, field, rowIndex, column, $event)" />
+
+                                        <select
+                                            v-else-if="column.type === 'select'"
+                                            class="tp-select"
+                                            :value="repeaterColumnTextValue(row, column)"
+                                            @change="updateRepeaterColumn(field.key, field, rowIndex, column, $event)">
+                                            <option
+                                                v-for="option in column.options || []"
+                                                :key="typeof option === 'string' ? option : option.value"
+                                                :value="typeof option === 'string' ? option : option.value">
+                                                {{ typeof option === 'string' ? option : option.label }}
+                                            </option>
+                                        </select>
+
+                                        <label v-else-if="column.type === 'toggle'" class="tp-builder__inline-toggle">
+                                            <input
+                                                type="checkbox"
+                                                :checked="repeaterColumnToggleValue(row, column)"
+                                                @change="updateRepeaterColumn(field.key, field, rowIndex, column, $event)" />
+                                            <span>Enabled</span>
+                                        </label>
+
+                                        <input
+                                            v-else
+                                            class="tp-input"
+                                            type="text"
+                                            :value="repeaterColumnTextValue(row, column)"
+                                            @input="updateRepeaterColumn(field.key, field, rowIndex, column, $event)" />
+                                    </label>
+                                </div>
+                            </article>
+                        </div>
+
                         <label v-else-if="field.type === 'toggle'" class="tp-builder__inline-toggle">
                             <input
                                 type="checkbox"
@@ -479,7 +979,7 @@ watch(
                             @input="updateField(field.key, $event)" />
 
                         <small v-if="field.help" class="tp-builder__help">{{ field.help }}</small>
-                    </label>
+                    </div>
                 </div>
 
                 <div class="tp-builder__panel-title tp-builder__panel-title--spaced">Presentation</div>
