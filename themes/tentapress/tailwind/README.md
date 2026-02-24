@@ -7,7 +7,7 @@ A Tailwind CSS v4 theme for TentaPress.
 | Field         | Value                 |
 |---------------|-----------------------|
 | ID            | `tentapress/tailwind` |
-| Version       | 0.3.4                 |
+| Version       | 0.4.0                 |
 | CSS Framework | Tailwind CSS v4       |
 
 ## Layouts
@@ -66,6 +66,11 @@ tailwind/
 │   │   ├── default.blade.php
 │   │   ├── landing.blade.php
 │   │   └── post.blade.php
+│   ├── preview/
+│   │   └── layouts/
+│   │       ├── default.blade.php
+│   │       ├── landing.blade.php
+│   │       └── post.blade.php
 │   └── blocks/
 │       └── (block overrides)
 └── resources/
@@ -93,6 +98,16 @@ Theme block image templates resolve media through the media reference resolver w
 Where variant metadata exists, image tags also emit `width`/`height` to reduce layout shift.
 Hero media uses eager loading with high fetch priority to improve above-the-fold rendering.
 Block templates now use layout-aware `sizes` values (including gallery, hero, logo cloud, split content, and before/after) so `srcset` selection is tuned per block/column width.
+
+## Builder Preview Contract
+
+This theme includes optional Visual Builder preview layouts under:
+
+- `views/preview/layouts/default.blade.php`
+- `views/preview/layouts/landing.blade.php`
+- `views/preview/layouts/post.blade.php`
+
+These are used by `tentapress/builder` non-iframe snapshot documents when available.
 
 ## Cloning This Theme (Agent Checklist)
 
