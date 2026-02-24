@@ -2,7 +2,7 @@
     "id": "tentapress/builder",
     "name": "Builder",
     "description": "Visual drag-and-drop builder with live theme preview for pages and posts.",
-    "version": "0.3.1",
+    "version": "0.3.2",
     "provider": "TentaPress\\Builder\\BuilderServiceProvider",
     "requires": [
         "tentapress/blocks",
