@@ -12,8 +12,12 @@ function loadBuilderClasses(): void
     $base = dirname(__DIR__, 2).'/src';
 
     require_once $base.'/Support/PreviewSnapshotStore.php';
+    require_once $base.'/Support/BuilderPreviewBlockRenderer.php';
+    require_once $base.'/Support/BuilderPreviewDocumentExtractor.php';
+    require_once $base.'/Support/BuilderPreviewDocumentRenderer.php';
     require_once $base.'/Http/Admin/BuilderSnapshotController.php';
     require_once $base.'/Http/Admin/BuilderPreviewController.php';
+    require_once $base.'/Http/Admin/BuilderPreviewDocumentController.php';
     require_once $base.'/BuilderServiceProvider.php';
 }
 
@@ -92,7 +96,9 @@ it('denies cross-user access to preview snapshots', function (): void {
     $snapshot->assertOk();
 
     $previewUrl = (string) $snapshot->json('preview_url');
+    $documentUrl = (string) $snapshot->json('document_url');
     expect($previewUrl)->not->toBe('');
+    expect($documentUrl)->not->toBe('');
 
     $this->actingAs($author)
         ->get($previewUrl)
@@ -125,4 +131,5 @@ it('accepts an empty block payload for preview snapshots', function (): void {
 
     $snapshot->assertOk();
     expect((string) $snapshot->json('preview_url'))->not->toBe('');
+    expect((string) $snapshot->json('document_url'))->not->toBe('');
 });

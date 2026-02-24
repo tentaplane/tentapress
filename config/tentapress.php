@@ -41,8 +41,8 @@ return [
         'tentapress/static-deploy' => 'Static deployments',
         'tentapress/custom-blocks' => 'Theme single-file custom block discovery',
         'tentapress/block-markdown-editor' => 'Markdown based rich text editor block',
-        'tentapress/page-editor' => 'Notion-style page editor'
-
+        'tentapress/page-editor' => 'Notion-style page editor',
+        'tentapress/builder' => 'Visual drag-and-drop page and post builder',
     ],
 
     /*
@@ -70,5 +70,19 @@ return [
     */
     'media' => [
         'url_driver' => env('TP_MEDIA_URL_DRIVER', 'local'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Visual Builder
+    |--------------------------------------------------------------------------
+    |
+    | Preview mode can be switched for rollback safety:
+    | - fragment: server document fragments (default)
+    | - iframe: legacy iframe preview transport
+    |
+    */
+    'builder' => [
+        'preview_mode' => env('TP_BUILDER_PREVIEW_MODE', 'fragment'),
     ],
 ];
