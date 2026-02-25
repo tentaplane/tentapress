@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { useBuilderEditorStore } from './stores/editor';
-import type { BlockField, BuilderConfig, BuilderPreviewDocument, MediaOption } from './types';
+import type { BlockField, BuilderConfig, BuilderPreviewDocument, MediaOption, PatternDefinition } from './types';
 
 const props = defineProps<{ config: BuilderConfig }>();
 
@@ -10,16 +10,21 @@ const store = useBuilderEditorStore();
 const dragIndex = ref<number | null>(null);
 const previewLoading = ref(false);
 const previewError = ref('');
-const previewHost = ref<HTMLDivElement | null>(null);
+const previewFrame = ref<HTMLIFrameElement | null>(null);
 const previewRevision = ref('');
 const previewViewport = ref<'desktop' | 'tablet' | 'mobile'>('desktop');
+const blockLibraryOpen = ref(false);
 const leftPanelWidth = ref(360);
 const rightPanelWidth = ref(250);
 const isResizing = ref<'left' | 'right' | null>(null);
 const resizeStartX = ref(0);
 const resizeStartWidth = ref(0);
-let previewShadowRoot: ShadowRoot | null = null;
 let previewTimer: number | null = null;
+const mediaModalOpen = ref(false);
+const mediaModalSearch = ref('');
+const mediaModalMode = ref<'single' | 'multi'>('single');
+const mediaModalFieldKey = ref('');
+const mediaModalSelection = ref<Record<string, boolean>>({});
 
 const LAYOUT_STORAGE_KEY = 'tp.builder.layout.v1';
 const LEFT_MIN_WIDTH = 320;
@@ -115,6 +120,19 @@ function storeLayoutPreference(): void {
         }),
     );
 }
+
+const filteredMediaOptions = computed<MediaOption[]>(() => {
+    const query = mediaModalSearch.value.trim().toLowerCase();
+    if (query === '') {
+        return mediaOptions.value;
+    }
+
+    return mediaOptions.value.filter((option) => {
+        const label = String(option.label ?? option.original_name ?? '').toLowerCase();
+        const value = String(option.value ?? '').toLowerCase();
+        return label.includes(query) || value.includes(query);
+    });
+});
 
 function onResizeMove(event: PointerEvent): void {
     if (isResizing.value === null) {
@@ -434,14 +452,6 @@ function mediaFieldValue(fieldKey: string): string {
     return String(store.selectedBlock.props[fieldKey] ?? '');
 }
 
-function updateMediaField(fieldKey: string, event: Event): void {
-    if (!hasSelection.value) {
-        return;
-    }
-
-    store.setBlockProp(store.selectedIndex, fieldKey, inputValue(event));
-}
-
 function clearMediaField(fieldKey: string): void {
     if (!hasSelection.value) {
         return;
@@ -479,24 +489,6 @@ function setMediaListValue(fieldKey: string, values: string[]): void {
     store.setBlockProp(store.selectedIndex, fieldKey, normalized);
 }
 
-function addMediaListItem(fieldKey: string, event: Event): void {
-    const value = inputValue(event).trim();
-    if (value === '') {
-        return;
-    }
-
-    const next = mediaListValue(fieldKey);
-    if (!next.includes(value)) {
-        next.push(value);
-        setMediaListValue(fieldKey, next);
-    }
-
-    const target = event.target;
-    if (target instanceof HTMLSelectElement) {
-        target.value = '';
-    }
-}
-
 function removeMediaListItem(fieldKey: string, index: number): void {
     const next = mediaListValue(fieldKey);
     if (index < 0 || index >= next.length) {
@@ -505,6 +497,89 @@ function removeMediaListItem(fieldKey: string, index: number): void {
 
     next.splice(index, 1);
     setMediaListValue(fieldKey, next);
+}
+
+function openMediaModal(fieldKey: string, mode: 'single' | 'multi' = 'single'): void {
+    if (!hasSelection.value) {
+        return;
+    }
+
+    mediaModalFieldKey.value = fieldKey;
+    mediaModalMode.value = mode;
+    mediaModalSearch.value = '';
+    if (mode === 'multi') {
+        mediaModalSelection.value = Object.fromEntries(mediaListValue(fieldKey).map((value) => [value, true]));
+    } else {
+        mediaModalSelection.value = {};
+    }
+
+    mediaModalOpen.value = true;
+}
+
+function closeMediaModal(): void {
+    mediaModalOpen.value = false;
+    mediaModalSearch.value = '';
+}
+
+function modalToggleSelection(value: string): void {
+    const key = String(value ?? '').trim();
+    if (key === '') {
+        return;
+    }
+
+    const next = { ...mediaModalSelection.value };
+    if (next[key]) {
+        delete next[key];
+    } else {
+        next[key] = true;
+    }
+    mediaModalSelection.value = next;
+}
+
+function modalIsSelected(value: string): boolean {
+    return !!mediaModalSelection.value[String(value ?? '').trim()];
+}
+
+function modalSelectSingle(value: string): void {
+    if (!hasSelection.value || mediaModalFieldKey.value.trim() === '') {
+        return;
+    }
+
+    store.setBlockProp(store.selectedIndex, mediaModalFieldKey.value.trim(), value);
+    closeMediaModal();
+}
+
+function modalApplyMulti(): void {
+    if (!hasSelection.value || mediaModalFieldKey.value.trim() === '') {
+        return;
+    }
+
+    const selected = mediaOptions.value
+        .map((option) => String(option.value ?? '').trim())
+        .filter((value) => value !== '' && !!mediaModalSelection.value[value]);
+    setMediaListValue(mediaModalFieldKey.value.trim(), selected);
+    closeMediaModal();
+}
+
+function insertBlockFromLibrary(type: string): void {
+    store.addBlock(type);
+    blockLibraryOpen.value = false;
+}
+
+function insertPatternFromLibrary(pattern: PatternDefinition): void {
+    store.insertPattern(pattern);
+    blockLibraryOpen.value = false;
+}
+
+function onDocumentClick(event: MouseEvent): void {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) {
+        return;
+    }
+
+    if (!target.closest('[data-tp-builder-library]')) {
+        blockLibraryOpen.value = false;
+    }
 }
 
 function updatePresentation(key: 'container' | 'align' | 'background', event: Event): void {
@@ -542,24 +617,13 @@ function resolveStyleHref(href: string): string {
     }
 }
 
-function ensurePreviewShadowRoot(): ShadowRoot | null {
-    if (!previewHost.value) {
-        return null;
-    }
-
-    if (!previewShadowRoot) {
-        previewShadowRoot = previewHost.value.attachShadow({ mode: 'open' });
-    }
-
-    return previewShadowRoot;
-}
-
 function applyPreviewSelection(): void {
-    if (!previewShadowRoot) {
+    const frameDocument = previewFrame.value?.contentDocument ?? null;
+    if (!frameDocument) {
         return;
     }
 
-    const allMarkers = Array.from(previewShadowRoot.querySelectorAll('[data-tp-builder-block-index]'));
+    const allMarkers = Array.from(frameDocument.querySelectorAll('[data-tp-builder-block-index]'));
     for (const marker of allMarkers) {
         if (!(marker instanceof HTMLElement)) {
             continue;
@@ -572,7 +636,7 @@ function applyPreviewSelection(): void {
         return;
     }
 
-    const selected = previewShadowRoot.querySelector(
+    const selected = frameDocument.querySelector(
         `[data-tp-builder-block-index="${store.selectedIndex}"]`,
     );
     if (selected instanceof HTMLElement) {
@@ -580,7 +644,7 @@ function applyPreviewSelection(): void {
     }
 }
 
-function onPreviewClick(event: MouseEvent): void {
+function onPreviewClick(event: Event): void {
     const target = event.target;
     if (!(target instanceof HTMLElement)) {
         return;
@@ -608,16 +672,28 @@ function onPreviewClick(event: MouseEvent): void {
 }
 
 function applyPreviewDocument(payload: BuilderPreviewDocument): void {
-    const shadowRoot = ensurePreviewShadowRoot();
-    if (!shadowRoot) {
+    if (!previewFrame.value) {
         return;
     }
 
-    shadowRoot.innerHTML = '';
+    const styleLinks = (payload.styles ?? [])
+        .map((styleDef) => {
+            const href = typeof styleDef?.href === 'string' ? styleDef.href.trim() : '';
+            if (href === '') {
+                return '';
+            }
 
-    const uiStyle = document.createElement('style');
-    uiStyle.textContent = `
-        :host { display: block; min-height: 100%; color: inherit; overflow: auto; }
+            const media = typeof styleDef?.media === 'string' && styleDef.media.trim() !== '' ? styleDef.media : 'all';
+            return `<link rel="stylesheet" href="${resolveStyleHref(href)}" media="${media}">`;
+        })
+        .join('');
+    const inlineStyles = (payload.inline_styles ?? [])
+        .filter((cssText) => typeof cssText === 'string' && cssText.trim() !== '')
+        .map((cssText) => `<style>${cssText}</style>`)
+        .join('');
+    const uiStyle = `<style>
+        html, body { margin: 0; min-height: 100%; }
+        body { overflow-x: hidden; }
         .tp-builder-preview-document { min-height: 100%; background: #fff; color: #0f172a; overflow-x: hidden; box-sizing: border-box; }
         .tp-builder-preview-document * { box-sizing: border-box; }
         .tp-builder-preview-document img, .tp-builder-preview-document video, .tp-builder-preview-document svg { max-width: 100%; }
@@ -631,39 +707,32 @@ function applyPreviewDocument(payload: BuilderPreviewDocument): void {
         .tp-builder-preview-document [data-tp-builder-block-index][data-tp-builder-selected="1"] {
             box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.65);
         }
-    `;
-    shadowRoot.appendChild(uiStyle);
+    </style>`;
+    const bodyClass = String(payload.body_class ?? '').trim();
+    const bodyHtml = String(payload.body_html ?? '');
 
-    for (const styleDef of payload.styles ?? []) {
-        const href = typeof styleDef?.href === 'string' ? styleDef.href.trim() : '';
-        if (href === '') {
-            continue;
+    previewFrame.value.srcdoc = `<!doctype html>
+<html lang="${String(payload.lang ?? 'en')}">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        ${styleLinks}
+        ${inlineStyles}
+        ${uiStyle}
+    </head>
+    <body class="${bodyClass}">
+        <div class="tp-builder-preview-document">${bodyHtml}</div>
+    </body>
+</html>`;
+    previewFrame.value.onload = () => {
+        const frameDocument = previewFrame.value?.contentDocument;
+        if (!frameDocument) {
+            return;
         }
 
-        const link = document.createElement('link');
-        link.rel = 'stylesheet';
-        link.href = resolveStyleHref(href);
-        link.media = typeof styleDef?.media === 'string' && styleDef.media.trim() !== '' ? styleDef.media : 'all';
-        shadowRoot.appendChild(link);
-    }
-
-    for (const cssText of payload.inline_styles ?? []) {
-        if (typeof cssText !== 'string' || cssText.trim() === '') {
-            continue;
-        }
-
-        const style = document.createElement('style');
-        style.textContent = cssText;
-        shadowRoot.appendChild(style);
-    }
-
-    const documentRoot = document.createElement('div');
-    documentRoot.className = `tp-builder-preview-document ${payload.body_class ?? ''}`.trim();
-    documentRoot.innerHTML = payload.body_html ?? '';
-    documentRoot.addEventListener('click', onPreviewClick);
-    shadowRoot.appendChild(documentRoot);
-
-    applyPreviewSelection();
+        frameDocument.addEventListener('click', onPreviewClick);
+        applyPreviewSelection();
+    };
 }
 
 async function refreshPreview(): Promise<void> {
@@ -775,6 +844,7 @@ onMounted(() => {
     store.init(props.config);
     loadLayoutPreference();
     window.addEventListener('keydown', onKeydown);
+    document.addEventListener('click', onDocumentClick);
     const form = document.getElementById(props.config.resource === 'pages' ? 'page-form' : 'post-form') as HTMLFormElement | null;
     form?.addEventListener('submit', () => {
         store.clearDraft();
@@ -785,10 +855,10 @@ onMounted(() => {
 onBeforeUnmount(() => {
     onResizeEnd();
     window.removeEventListener('keydown', onKeydown);
+    document.removeEventListener('click', onDocumentClick);
     if (previewTimer !== null) {
         window.clearTimeout(previewTimer);
     }
-    previewShadowRoot = null;
 });
 
 watch(
@@ -876,18 +946,12 @@ watch(
                         </select>
 
                         <div v-else-if="field.type === 'media'" class="tp-builder__media-field">
-                            <select
-                                class="tp-select"
-                                :value="mediaFieldValue(field.key)"
-                                @change="updateMediaField(field.key, $event)">
-                                <option value="">Select media</option>
-                                <option
-                                    v-for="option in mediaOptions"
-                                    :key="option.value"
-                                    :value="option.value">
-                                    {{ option.label || option.original_name || option.value }}
-                                </option>
-                            </select>
+                            <button
+                                type="button"
+                                class="tp-button-secondary"
+                                @click="openMediaModal(field.key, 'single')">
+                                {{ mediaFieldValue(field.key) === '' ? 'Select media' : 'Replace media' }}
+                            </button>
 
                             <div class="tp-builder__media-actions">
                                 <button
@@ -921,15 +985,12 @@ watch(
                         </div>
 
                         <div v-else-if="field.type === 'media-list'" class="tp-builder__media-list-field">
-                            <select class="tp-select" value="" @change="addMediaListItem(field.key, $event)">
-                                <option value="">Add media item</option>
-                                <option
-                                    v-for="option in mediaOptions"
-                                    :key="`${field.key}:${option.value}`"
-                                    :value="option.value">
-                                    {{ option.label || option.original_name || option.value }}
-                                </option>
-                            </select>
+                            <button
+                                type="button"
+                                class="tp-button-secondary"
+                                @click="openMediaModal(field.key, 'multi')">
+                                Manage media list
+                            </button>
 
                             <div
                                 v-if="mediaListValue(field.key).length === 0"
@@ -1185,7 +1246,43 @@ watch(
 
         <section class="tp-builder__canvas tp-builder__canvas--preview">
             <div class="tp-builder__canvas-toolbar">
-                <div class="tp-builder__canvas-title">Live {{ resourceLabel }} preview</div>
+                <div class="tp-builder__toolbar-left">
+                    <div class="tp-builder__canvas-title">Live {{ resourceLabel }} preview</div>
+                    <div class="tp-builder__library-dropdown" data-tp-builder-library>
+                        <button
+                            type="button"
+                            class="tp-button-secondary tp-builder__library-trigger"
+                            @click.stop="blockLibraryOpen = !blockLibraryOpen">
+                            Add block
+                        </button>
+                        <div v-if="blockLibraryOpen" class="tp-builder__library-menu">
+                            <input v-model="store.search" type="search" class="tp-builder__search" placeholder="Search blocks..." />
+                            <div class="tp-builder__list">
+                                <button
+                                    v-for="definition in store.filteredDefinitions"
+                                    :key="definition.type"
+                                    type="button"
+                                    class="tp-builder__library-item"
+                                    @click="insertBlockFromLibrary(definition.type)">
+                                    <span class="tp-builder__library-title">{{ definition.name || definition.type }}</span>
+                                    <span class="tp-builder__library-meta">{{ definition.type }}</span>
+                                </button>
+                            </div>
+                            <div class="tp-builder__panel-title tp-builder__panel-title--spaced">Patterns</div>
+                            <div class="tp-builder__list">
+                                <button
+                                    v-for="pattern in store.patterns"
+                                    :key="pattern.id"
+                                    type="button"
+                                    class="tp-builder__library-item"
+                                    @click="insertPatternFromLibrary(pattern)">
+                                    <span class="tp-builder__library-title">{{ pattern.name }}</span>
+                                    <span class="tp-builder__library-meta">{{ pattern.description }}</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div class="tp-builder__toolbar-groups">
                     <div class="tp-builder__viewport-switch" role="group" aria-label="Preview viewport">
                         <button
@@ -1264,11 +1361,11 @@ watch(
             <div class="tp-builder__preview-state tp-builder__preview-state--error" v-if="previewError">{{ previewError }}</div>
             <div class="tp-builder__preview-stage">
                 <div class="tp-builder__preview-viewport" :class="`is-${previewViewport}`">
-                    <div
-                        ref="previewHost"
+                    <iframe
+                        ref="previewFrame"
                         class="tp-builder__preview tp-builder__preview--center"
                         role="region"
-                        aria-label="Builder preview"></div>
+                        title="Builder preview"></iframe>
                 </div>
             </div>
         </section>
@@ -1276,34 +1373,7 @@ watch(
         <div class="tp-builder__resizer" aria-hidden="true" @pointerdown="startResize('right', $event)"></div>
 
         <aside class="tp-builder__panel tp-builder__panel--library">
-            <div class="tp-builder__panel-title">Block library</div>
-            <input v-model="store.search" type="search" class="tp-builder__search" placeholder="Search blocks..." />
-            <div class="tp-builder__list">
-                <button
-                    v-for="definition in store.filteredDefinitions"
-                    :key="definition.type"
-                    type="button"
-                    class="tp-builder__library-item"
-                    @click="store.addBlock(definition.type)">
-                    <span class="tp-builder__library-title">{{ definition.name || definition.type }}</span>
-                    <span class="tp-builder__library-meta">{{ definition.type }}</span>
-                </button>
-            </div>
-
-            <div class="tp-builder__panel-title tp-builder__panel-title--spaced">Patterns</div>
-            <div class="tp-builder__list">
-                <button
-                    v-for="pattern in store.patterns"
-                    :key="pattern.id"
-                    type="button"
-                    class="tp-builder__library-item"
-                    @click="store.insertPattern(pattern)">
-                    <span class="tp-builder__library-title">{{ pattern.name }}</span>
-                    <span class="tp-builder__library-meta">{{ pattern.description }}</span>
-                </button>
-            </div>
-
-            <div class="tp-builder__panel-title tp-builder__panel-title--spaced">Page structure</div>
+            <div class="tp-builder__panel-title">Page structure</div>
             <div v-if="store.blocks.length === 0" class="tp-builder__empty tp-builder__empty--small">
                 Add a block to begin building this {{ resourceLabel }}.
             </div>
@@ -1350,5 +1420,37 @@ watch(
                 </article>
             </div>
         </aside>
+
+        <div v-if="mediaModalOpen" class="tp-builder__media-modal-backdrop" @click.self="closeMediaModal">
+            <div class="tp-builder__media-modal" role="dialog" aria-modal="true" aria-label="Media library">
+                <header class="tp-builder__media-modal-header">
+                    <h3 class="tp-builder__media-modal-title">Media library</h3>
+                    <button type="button" class="tp-button-secondary" @click="closeMediaModal">Close</button>
+                </header>
+
+                <input v-model="mediaModalSearch" type="search" class="tp-builder__search" placeholder="Search media..." />
+
+                <div class="tp-builder__media-modal-list">
+                    <button
+                        v-for="option in filteredMediaOptions"
+                        :key="option.value"
+                        type="button"
+                        class="tp-builder__media-modal-item"
+                        :class="{ 'is-selected': modalIsSelected(option.value) }"
+                        @click="mediaModalMode === 'multi' ? modalToggleSelection(option.value) : modalSelectSingle(option.value)">
+                        <span class="tp-builder__media-modal-label">{{ option.label || option.original_name || option.value }}</span>
+                        <span class="tp-builder__media-modal-value">{{ option.value }}</span>
+                    </button>
+                    <div v-if="filteredMediaOptions.length === 0" class="tp-builder__empty tp-builder__empty--inline">
+                        No media matched your search.
+                    </div>
+                </div>
+
+                <footer v-if="mediaModalMode === 'multi'" class="tp-builder__media-modal-footer">
+                    <button type="button" class="tp-button-secondary" @click="mediaModalSelection = {}">Clear selection</button>
+                    <button type="button" class="tp-button-primary" @click="modalApplyMulti()">Apply selection</button>
+                </footer>
+            </div>
+        </div>
     </div>
 </template>
