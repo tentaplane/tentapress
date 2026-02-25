@@ -27,7 +27,6 @@ export const useBuilderEditorStore = defineStore('builder-editor', () => {
     const selectedIndex = ref<number>(-1);
     const search = ref('');
     const dirty = ref(false);
-    const previewUrl = ref('');
 
     const history = ref<string[]>([]);
     const historyIndex = ref(-1);
@@ -390,10 +389,6 @@ export const useBuilderEditorStore = defineStore('builder-editor', () => {
         dirty.value = false;
     }
 
-    function setPreviewUrl(url: string): void {
-        previewUrl.value = url;
-    }
-
     return {
         blocks,
         selectedIndex,
@@ -402,7 +397,6 @@ export const useBuilderEditorStore = defineStore('builder-editor', () => {
         filteredDefinitions,
         patterns,
         search,
-        previewUrl,
         dirty,
         historyIndex,
         history,
@@ -422,7 +416,6 @@ export const useBuilderEditorStore = defineStore('builder-editor', () => {
         undo,
         redo,
         clearDraft,
-        setPreviewUrl,
         persistDraft,
         syncHidden,
         config,

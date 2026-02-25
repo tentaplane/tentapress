@@ -48,7 +48,6 @@ export type BuilderConfig = {
     initialJson: string;
     resource: EditorResource;
     snapshotEndpoint: string;
-    previewMode: 'fragment' | 'iframe';
     storageKey: string;
     hiddenFieldId: string;
     definitions: BlockDefinition[];

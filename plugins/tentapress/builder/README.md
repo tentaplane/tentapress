@@ -7,7 +7,7 @@ Visual drag-and-drop builder for TentaPress pages and posts.
 | Field    | Value                                      |
 |----------|--------------------------------------------|
 | ID       | `tentapress/builder`                       |
-| Version  | 0.3.4                                      |
+| Version  | 0.4.0                                      |
 | Provider | `TentaPress\\Builder\\BuilderServiceProvider` |
 
 ## Features
@@ -31,18 +31,11 @@ Visual drag-and-drop builder for TentaPress pages and posts.
 
 This plugin stores builder output in the `blocks` JSON column and uses `editor_driver = builder`.
 
-## Preview Mode
+## Preview Transport
 
-Builder preview defaults to non-iframe fragments and can be temporarily switched back for rollback:
+Builder preview uses non-iframe server fragments via:
 
-```env
-TP_BUILDER_PREVIEW_MODE=fragment
-```
-
-Valid values:
-
-- `fragment` (default) - `/admin/builder/snapshots/{token}/document` JSON transport
-- `iframe` - legacy `/admin/builder/preview/{token}` transport
+- `/admin/builder/snapshots/{token}/document` JSON transport
 
 ## Asset Build
 

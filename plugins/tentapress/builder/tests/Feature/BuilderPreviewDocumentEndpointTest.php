@@ -15,7 +15,6 @@ function loadBuilderDocumentClasses(): void
     require_once $base.'/Support/BuilderPreviewDocumentExtractor.php';
     require_once $base.'/Support/BuilderPreviewDocumentRenderer.php';
     require_once $base.'/Http/Admin/BuilderSnapshotController.php';
-    require_once $base.'/Http/Admin/BuilderPreviewController.php';
     require_once $base.'/Http/Admin/BuilderPreviewDocumentController.php';
     require_once $base.'/BuilderServiceProvider.php';
 }

@@ -28,9 +28,6 @@ const RIGHT_MIN_WIDTH = 220;
 const RIGHT_MAX_WIDTH = 420;
 
 const hasSelection = computed(() => store.selectedIndex >= 0 && store.selectedIndex < store.blocks.length);
-const previewMode = computed<'fragment' | 'iframe'>(() =>
-    props.config.previewMode === 'iframe' ? 'iframe' : 'fragment',
-);
 const selectedPresentation = computed(() => {
     if (!hasSelection.value) {
         return {
@@ -558,7 +555,7 @@ function ensurePreviewShadowRoot(): ShadowRoot | null {
 }
 
 function applyPreviewSelection(): void {
-    if (previewMode.value !== 'fragment' || !previewShadowRoot) {
+    if (!previewShadowRoot) {
         return;
     }
 
@@ -700,18 +697,7 @@ async function refreshPreview(): Promise<void> {
             throw new Error('Preview request failed.');
         }
 
-        const snapshot = (await response.json()) as { document_url?: string; preview_url?: string };
-
-        if (previewMode.value === 'iframe') {
-            if (!snapshot.preview_url) {
-                throw new Error('Preview URL missing.');
-            }
-
-            store.setPreviewUrl(snapshot.preview_url);
-            previewRevision.value = '';
-
-            return;
-        }
+        const snapshot = (await response.json()) as { document_url?: string };
 
         if (!snapshot.document_url) {
             throw new Error('Preview document URL missing.');
@@ -1278,14 +1264,7 @@ watch(
             <div class="tp-builder__preview-state tp-builder__preview-state--error" v-if="previewError">{{ previewError }}</div>
             <div class="tp-builder__preview-stage">
                 <div class="tp-builder__preview-viewport" :class="`is-${previewViewport}`">
-                    <template v-if="previewMode === 'iframe'">
-                        <iframe v-if="store.previewUrl" class="tp-builder__preview tp-builder__preview--center" :src="store.previewUrl" title="Builder preview"></iframe>
-                        <div v-else class="tp-builder__empty">
-                            Preview is loading. Add blocks from the right panel to render sections into the page template.
-                        </div>
-                    </template>
                     <div
-                        v-else
                         ref="previewHost"
                         class="tp-builder__preview tp-builder__preview--center"
                         role="region"

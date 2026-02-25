@@ -72,17 +72,4 @@ return [
         'url_driver' => env('TP_MEDIA_URL_DRIVER', 'local'),
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | Visual Builder
-    |--------------------------------------------------------------------------
-    |
-    | Preview mode can be switched for rollback safety:
-    | - fragment: server document fragments (default)
-    | - iframe: legacy iframe preview transport
-    |
-    */
-    'builder' => [
-        'preview_mode' => env('TP_BUILDER_PREVIEW_MODE', 'fragment'),
-    ],
 ];

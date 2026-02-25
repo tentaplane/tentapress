@@ -53,7 +53,6 @@ final readonly class BuilderSnapshotController
         return response()->json([
             'token' => $token,
             'document_url' => route('tp.builder.snapshots.document', ['token' => $token]),
-            'preview_url' => route('tp.builder.preview.show', ['token' => $token]),
         ]);
     }
 
