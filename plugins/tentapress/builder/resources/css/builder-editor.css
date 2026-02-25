@@ -237,7 +237,8 @@
     border: 1px solid #e2e8f0;
     border-radius: 12px;
     background: #fff;
-    overflow: auto;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .tp-builder__preview-stage {

@@ -621,9 +621,11 @@ function applyPreviewDocument(payload: BuilderPreviewDocument): void {
     const uiStyle = document.createElement('style');
     uiStyle.textContent = `
         :host { display: block; min-height: 100%; color: inherit; overflow: auto; }
-        .tp-builder-preview-document { min-height: 100%; background: #fff; color: #0f172a; overflow-x: clip; box-sizing: border-box; }
+        .tp-builder-preview-document { min-height: 100%; background: #fff; color: #0f172a; overflow-x: hidden; box-sizing: border-box; }
         .tp-builder-preview-document * { box-sizing: border-box; }
         .tp-builder-preview-document img, .tp-builder-preview-document video, .tp-builder-preview-document svg { max-width: 100%; }
+        .tp-builder-preview-document .w-screen,
+        .tp-builder-preview-document [class*="w-screen"] { width: 100% !important; max-width: 100% !important; }
         .tp-builder-preview-document [data-tp-builder-block-index] {
             cursor: pointer;
             border-radius: 0.5rem;
