@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { useBuilderEditorStore } from './stores/editor';
 import type { BlockField, BuilderConfig, BuilderPreviewDocument, MediaOption, PatternDefinition } from './types';
 
@@ -14,6 +14,8 @@ const previewFrame = ref<HTMLIFrameElement | null>(null);
 const previewRevision = ref('');
 const previewViewport = ref<'desktop' | 'tablet' | 'mobile'>('desktop');
 const previewScrollTop = ref(0);
+const inspectorPanel = ref<HTMLElement | null>(null);
+const structurePanel = ref<HTMLElement | null>(null);
 const blockLibraryOpen = ref(false);
 const leftPanelWidth = ref(360);
 const rightPanelWidth = ref(250);
@@ -682,6 +684,26 @@ function onStructureSelect(index: number): void {
     applyPreviewSelection(true);
 }
 
+function syncPanelSelection(index: number): void {
+    nextTick(() => {
+        const structureItem = structurePanel.value?.querySelector(
+            `[data-tp-builder-structure-index="${index}"]`,
+        );
+        if (structureItem instanceof HTMLElement) {
+            structureItem.scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest',
+                inline: 'nearest',
+            });
+        }
+
+        inspectorPanel.value?.scrollTo({
+            top: 0,
+            behavior: 'smooth',
+        });
+    });
+}
+
 function onPreviewClick(event: Event): void {
     const target = event.target;
     if (!(target instanceof HTMLElement)) {
@@ -707,6 +729,7 @@ function onPreviewClick(event: Event): void {
     }
 
     store.select(index);
+    syncPanelSelection(index);
 }
 
 function applyPreviewDocument(payload: BuilderPreviewDocument): void {
@@ -936,7 +959,7 @@ watch(
 
 <template>
     <div class="tp-builder" :style="layoutStyle">
-        <aside class="tp-builder__panel tp-builder__panel--inspector">
+        <aside ref="inspectorPanel" class="tp-builder__panel tp-builder__panel--inspector">
             <div class="tp-builder__panel-title">Block configuration</div>
 
             <template v-if="hasSelection && store.selectedBlock && store.selectedDefinition">
@@ -1429,7 +1452,7 @@ watch(
 
         <div class="tp-builder__resizer" aria-hidden="true" @pointerdown="startResize('right', $event)"></div>
 
-        <aside class="tp-builder__panel tp-builder__panel--library">
+        <aside ref="structurePanel" class="tp-builder__panel tp-builder__panel--library">
             <div class="tp-builder__panel-title">Page structure</div>
             <div v-if="store.blocks.length === 0" class="tp-builder__empty tp-builder__empty--small">
                 Add a block to begin building this {{ resourceLabel }}.
@@ -1438,6 +1461,7 @@ watch(
                 <article
                     v-for="(block, index) in store.blocks"
                     :key="block._key"
+                    :data-tp-builder-structure-index="index"
                     class="tp-builder__card"
                     :class="{ 'is-selected': store.selectedIndex === index }"
                     draggable="true"
