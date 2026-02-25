@@ -13,6 +13,7 @@ const previewError = ref('');
 const previewFrame = ref<HTMLIFrameElement | null>(null);
 const previewRevision = ref('');
 const previewViewport = ref<'desktop' | 'tablet' | 'mobile'>('desktop');
+const previewScrollTop = ref(0);
 const blockLibraryOpen = ref(false);
 const leftPanelWidth = ref(360);
 const rightPanelWidth = ref(250);
@@ -627,7 +628,7 @@ function resolveStyleHref(href: string): string {
     }
 }
 
-function applyPreviewSelection(): void {
+function applyPreviewSelection(shouldScroll = true): void {
     const frameDocument = previewFrame.value?.contentDocument ?? null;
     const frameWindow = previewFrame.value?.contentWindow ?? null;
     if (!frameDocument) {
@@ -652,20 +653,22 @@ function applyPreviewSelection(): void {
     );
     if (selected instanceof HTMLElement) {
         selected.setAttribute('data-tp-builder-selected', '1');
-        selected.scrollIntoView({
-            behavior: 'smooth',
-            block: 'center',
-            inline: 'nearest',
-        });
-        if (frameWindow) {
-            const nextTop = Math.max(
-                selected.getBoundingClientRect().top + frameWindow.scrollY - frameWindow.innerHeight * 0.25,
-                0,
-            );
-            frameWindow.scrollTo({
-                top: nextTop,
+        if (shouldScroll) {
+            selected.scrollIntoView({
                 behavior: 'smooth',
+                block: 'center',
+                inline: 'nearest',
             });
+            if (frameWindow) {
+                const nextTop = Math.max(
+                    selected.getBoundingClientRect().top + frameWindow.scrollY - frameWindow.innerHeight * 0.25,
+                    0,
+                );
+                frameWindow.scrollTo({
+                    top: nextTop,
+                    behavior: 'smooth',
+                });
+            }
         }
 
         selected.classList.remove('tp-builder-preview-selected-pulse');
@@ -676,7 +679,7 @@ function applyPreviewSelection(): void {
 
 function onStructureSelect(index: number): void {
     store.select(index);
-    applyPreviewSelection();
+    applyPreviewSelection(true);
 }
 
 function onPreviewClick(event: Event): void {
@@ -709,6 +712,11 @@ function onPreviewClick(event: Event): void {
 function applyPreviewDocument(payload: BuilderPreviewDocument): void {
     if (!previewFrame.value) {
         return;
+    }
+
+    const currentTop = previewFrame.value.contentWindow?.scrollY;
+    if (typeof currentTop === 'number' && Number.isFinite(currentTop) && currentTop >= 0) {
+        previewScrollTop.value = currentTop;
     }
 
     const styleLinks = (payload.styles ?? [])
@@ -768,12 +776,19 @@ function applyPreviewDocument(payload: BuilderPreviewDocument): void {
 </html>`;
     previewFrame.value.onload = () => {
         const frameDocument = previewFrame.value?.contentDocument;
+        const frameWindow = previewFrame.value?.contentWindow;
         if (!frameDocument) {
             return;
         }
 
         frameDocument.addEventListener('click', onPreviewClick);
-        applyPreviewSelection();
+        if (frameWindow) {
+            frameWindow.scrollTo({
+                top: Math.max(0, previewScrollTop.value),
+                behavior: 'auto',
+            });
+        }
+        applyPreviewSelection(false);
     };
 }
 
@@ -914,7 +929,7 @@ watch(
 watch(
     () => store.selectedIndex,
     () => {
-        applyPreviewSelection();
+        applyPreviewSelection(true);
     },
 );
 </script>
