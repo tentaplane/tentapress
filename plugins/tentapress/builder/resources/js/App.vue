@@ -641,6 +641,15 @@ function applyPreviewSelection(): void {
     );
     if (selected instanceof HTMLElement) {
         selected.setAttribute('data-tp-builder-selected', '1');
+        selected.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center',
+            inline: 'nearest',
+        });
+
+        selected.classList.remove('tp-builder-preview-selected-pulse');
+        void selected.offsetWidth;
+        selected.classList.add('tp-builder-preview-selected-pulse');
     }
 }
 
@@ -706,6 +715,13 @@ function applyPreviewDocument(payload: BuilderPreviewDocument): void {
         }
         .tp-builder-preview-document [data-tp-builder-block-index][data-tp-builder-selected="1"] {
             box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.65);
+        }
+        .tp-builder-preview-document .tp-builder-preview-selected-pulse {
+            animation: tp-builder-selected-pulse 700ms ease-out;
+        }
+        @keyframes tp-builder-selected-pulse {
+            0% { box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.65), 0 0 0 0 rgba(37, 99, 235, 0.28); }
+            100% { box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.65), 0 0 0 16px rgba(37, 99, 235, 0); }
         }
     </style>`;
     const bodyClass = String(payload.body_class ?? '').trim();
