@@ -128,9 +128,15 @@ const filteredMediaOptions = computed<MediaOption[]>(() => {
     }
 
     return mediaOptions.value.filter((option) => {
-        const label = String(option.label ?? option.original_name ?? '').toLowerCase();
-        const value = String(option.value ?? '').toLowerCase();
-        return label.includes(query) || value.includes(query);
+        const haystack = [
+            String(option.label ?? ''),
+            String(option.original_name ?? ''),
+            String(option.mime_type ?? ''),
+            String(option.value ?? ''),
+        ]
+            .join(' ')
+            .toLowerCase();
+        return haystack.includes(query);
     });
 });
 
@@ -540,6 +546,10 @@ function modalIsSelected(value: string): boolean {
     return !!mediaModalSelection.value[String(value ?? '').trim()];
 }
 
+function modalSelectionCount(): number {
+    return Object.keys(mediaModalSelection.value).length;
+}
+
 function modalSelectSingle(value: string): void {
     if (!hasSelection.value || mediaModalFieldKey.value.trim() === '') {
         return;
@@ -619,6 +629,7 @@ function resolveStyleHref(href: string): string {
 
 function applyPreviewSelection(): void {
     const frameDocument = previewFrame.value?.contentDocument ?? null;
+    const frameWindow = previewFrame.value?.contentWindow ?? null;
     if (!frameDocument) {
         return;
     }
@@ -646,6 +657,16 @@ function applyPreviewSelection(): void {
             block: 'center',
             inline: 'nearest',
         });
+        if (frameWindow) {
+            const nextTop = Math.max(
+                selected.getBoundingClientRect().top + frameWindow.scrollY - frameWindow.innerHeight * 0.25,
+                0,
+            );
+            frameWindow.scrollTo({
+                top: nextTop,
+                behavior: 'smooth',
+            });
+        }
 
         selected.classList.remove('tp-builder-preview-selected-pulse');
         void selected.offsetWidth;
@@ -1445,31 +1466,48 @@ watch(
         <div v-if="mediaModalOpen" class="tp-builder__media-modal-backdrop" @click.self="closeMediaModal">
             <div class="tp-builder__media-modal" role="dialog" aria-modal="true" aria-label="Media library">
                 <header class="tp-builder__media-modal-header">
-                    <h3 class="tp-builder__media-modal-title">Media library</h3>
-                    <button type="button" class="tp-button-secondary" @click="closeMediaModal">Close</button>
+                    <div>
+                        <h3 class="tp-builder__media-modal-title">Select media</h3>
+                        <div v-if="mediaModalMode === 'multi'" class="tp-builder__media-modal-subtitle">
+                            Choose multiple images for galleries.
+                        </div>
+                    </div>
+                    <div class="tp-builder__media-modal-header-actions">
+                        <input v-model="mediaModalSearch" type="search" class="tp-builder__search" placeholder="Search media..." />
+                        <button type="button" class="tp-button-secondary" @click="closeMediaModal">Close</button>
+                    </div>
                 </header>
 
-                <input v-model="mediaModalSearch" type="search" class="tp-builder__search" placeholder="Search media..." />
-
                 <div class="tp-builder__media-modal-list">
-                    <button
-                        v-for="option in filteredMediaOptions"
-                        :key="option.value"
-                        type="button"
-                        class="tp-builder__media-modal-item"
-                        :class="{ 'is-selected': modalIsSelected(option.value) }"
-                        @click="mediaModalMode === 'multi' ? modalToggleSelection(option.value) : modalSelectSingle(option.value)">
-                        <span class="tp-builder__media-modal-label">{{ option.label || option.original_name || option.value }}</span>
-                        <span class="tp-builder__media-modal-value">{{ option.value }}</span>
-                    </button>
+                    <div class="tp-builder__media-modal-grid" v-if="filteredMediaOptions.length > 0">
+                        <button
+                            v-for="option in filteredMediaOptions"
+                            :key="option.value"
+                            type="button"
+                            class="tp-builder__media-modal-item"
+                            :class="{ 'is-selected': modalIsSelected(option.value) }"
+                            @click="mediaModalMode === 'multi' ? modalToggleSelection(option.value) : modalSelectSingle(option.value)">
+                            <div class="tp-builder__media-modal-thumb-wrap">
+                                <img v-if="isMediaImage(option.value)" :src="option.value" alt="" class="tp-builder__media-modal-thumb" />
+                                <div v-else class="tp-builder__media-modal-file">File</div>
+                            </div>
+                            <div class="tp-builder__media-modal-meta">
+                                <span class="tp-builder__media-modal-label">{{ option.label || option.original_name || option.value }}</span>
+                                <span class="tp-builder__media-modal-value">{{ option.original_name || option.value }}</span>
+                            </div>
+                        </button>
+                    </div>
                     <div v-if="filteredMediaOptions.length === 0" class="tp-builder__empty tp-builder__empty--inline">
                         No media matched your search.
                     </div>
                 </div>
 
                 <footer v-if="mediaModalMode === 'multi'" class="tp-builder__media-modal-footer">
-                    <button type="button" class="tp-button-secondary" @click="mediaModalSelection = {}">Clear selection</button>
-                    <button type="button" class="tp-button-primary" @click="modalApplyMulti()">Apply selection</button>
+                    <div class="tp-builder__media-modal-count"><strong>{{ modalSelectionCount() }}</strong> selected</div>
+                    <div class="tp-builder__media-modal-footer-actions">
+                        <button type="button" class="tp-button-secondary" @click="mediaModalSelection = {}">Clear</button>
+                        <button type="button" class="tp-button-primary" @click="modalApplyMulti()">Use selected</button>
+                    </div>
                 </footer>
             </div>
         </div>
