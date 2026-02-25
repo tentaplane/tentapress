@@ -653,6 +653,11 @@ function applyPreviewSelection(): void {
     }
 }
 
+function onStructureSelect(index: number): void {
+    store.select(index);
+    applyPreviewSelection();
+}
+
 function onPreviewClick(event: Event): void {
     const target = event.target;
     if (!(target instanceof HTMLElement)) {
@@ -1400,7 +1405,7 @@ watch(
                     class="tp-builder__card"
                     :class="{ 'is-selected': store.selectedIndex === index }"
                     draggable="true"
-                    @click="store.select(index)"
+                    @click="onStructureSelect(index)"
                     @dragstart="onDragStart(index, $event)"
                     @dragover.prevent
                     @drop.prevent="onDrop(index)">
