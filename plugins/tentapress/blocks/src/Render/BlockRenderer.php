@@ -12,6 +12,26 @@ final readonly class BlockRenderer
 {
     private const MAX_NESTED_DEPTH = 1;
 
+    private const SPACING_MAP = [
+        'none' => '0',
+        'xs' => '0.5rem',
+        'sm' => '1rem',
+        'md' => '1.5rem',
+        'lg' => '2rem',
+        'xl' => '3rem',
+    ];
+
+    private const BACKGROUND_MAP = [
+        'muted' => '#f8fafc',
+        'brand' => '#e0ecf8',
+    ];
+
+    private const CONTAINER_MAP = [
+        'default' => '80rem',
+        'wide' => '96rem',
+        'full' => 'none',
+    ];
+
     public function __construct(
         private ViewFactory $views,
         private BlockRegistry $registry,
@@ -87,12 +107,16 @@ final readonly class BlockRenderer
 
         // Theme override first
         if ($this->themes->hasActiveTheme() && $this->views->exists('tp-theme::'.$viewKey)) {
-            return $this->views->make('tp-theme::'.$viewKey, $viewData)->render();
+            $html = $this->views->make('tp-theme::'.$viewKey, $viewData)->render();
+
+            return $this->wrapPresentation($html, $props);
         }
 
         // Plugin fallback
         if ($this->views->exists('tentapress-blocks::'.$viewKey)) {
-            return $this->views->make('tentapress-blocks::'.$viewKey, $viewData)->render();
+            $html = $this->views->make('tentapress-blocks::'.$viewKey, $viewData)->render();
+
+            return $this->wrapPresentation($html, $props);
         }
 
         // No view found
@@ -131,5 +155,59 @@ final readonly class BlockRenderer
         $variantKey = str_replace(['\\', '/'], '.', $variant);
 
         return $baseView.'.'.$variantKey;
+    }
+
+    /**
+     * @param  array<string,mixed>  $props
+     */
+    private function wrapPresentation(string $html, array $props): string
+    {
+        $presentation = $props['presentation'] ?? null;
+        if (! is_array($presentation)) {
+            return $html;
+        }
+
+        $styleParts = [];
+        $classes = ['tp-block-presentation'];
+
+        $spacing = $presentation['spacing'] ?? null;
+        if (is_array($spacing)) {
+            $top = trim((string) ($spacing['top'] ?? ''));
+            if (isset(self::SPACING_MAP[$top])) {
+                $styleParts[] = 'margin-top:'.self::SPACING_MAP[$top];
+            }
+
+            $bottom = trim((string) ($spacing['bottom'] ?? ''));
+            if (isset(self::SPACING_MAP[$bottom])) {
+                $styleParts[] = 'margin-bottom:'.self::SPACING_MAP[$bottom];
+            }
+        }
+
+        $align = trim((string) ($presentation['align'] ?? ''));
+        if (in_array($align, ['left', 'center', 'right'], true)) {
+            $styleParts[] = 'text-align:'.$align;
+        }
+
+        $background = trim((string) ($presentation['background'] ?? ''));
+        if (isset(self::BACKGROUND_MAP[$background])) {
+            $styleParts[] = 'background-color:'.self::BACKGROUND_MAP[$background];
+            $styleParts[] = 'padding:1.25rem';
+            $styleParts[] = 'border-radius:0.75rem';
+        }
+
+        $container = trim((string) ($presentation['container'] ?? ''));
+        if (isset(self::CONTAINER_MAP[$container]) && self::CONTAINER_MAP[$container] !== 'none') {
+            $styleParts[] = 'max-width:'.self::CONTAINER_MAP[$container];
+            $styleParts[] = 'margin-left:auto';
+            $styleParts[] = 'margin-right:auto';
+        }
+
+        if ($styleParts === []) {
+            return $html;
+        }
+
+        $style = implode(';', $styleParts);
+
+        return '<div class="'.e(implode(' ', $classes)).'" style="'.e($style).'">'.$html.'</div>';
     }
 }

@@ -7,7 +7,7 @@ Blog post management for TentaPress.
 | Field    | Value                                   |
 | -------- | --------------------------------------- |
 | ID       | `tentapress/posts`                      |
-| Version  | 0.3.2                                   |
+| Version  | 0.4.1                                   |
 | Provider | `TentaPress\Posts\PostsServiceProvider` |
 
 ## Features
@@ -17,6 +17,7 @@ Blog post management for TentaPress.
 - Author assignment
 - Featured image
 - Block-based content editor
+- Pluggable editor driver selection (`blocks`, `page`, `builder`)
 - Full-screen editing mode
 - Media picker payloads now include media IDs for variant-aware image rendering
 - SEO fields integration

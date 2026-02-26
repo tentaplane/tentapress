@@ -41,8 +41,8 @@ return [
         'tentapress/static-deploy' => 'Static deployments',
         'tentapress/custom-blocks' => 'Theme single-file custom block discovery',
         'tentapress/block-markdown-editor' => 'Markdown based rich text editor block',
-        'tentapress/page-editor' => 'Notion-style page editor'
-
+        'tentapress/page-editor' => 'Notion-style page editor',
+        'tentapress/builder' => 'Visual drag-and-drop page and post builder',
     ],
 
     /*

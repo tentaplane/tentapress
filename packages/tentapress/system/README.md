@@ -7,7 +7,7 @@ Core platform layer for TentaPress plugin and theme management.
 | Field    | Value                                     |
 |----------|-------------------------------------------|
 | Name     | `tentapress/system`                       |
-| Version  | 0.3.16                                    |
+| Version  | 0.4.0                                     |
 | Provider | `TentaPress\System\SystemServiceProvider` |
 
 ## Overview
@@ -16,6 +16,7 @@ The system package provides the foundational infrastructure for TentaPress:
 
 - Plugin discovery and lifecycle management
 - Theme discovery and activation
+- Editor driver registry for pluggable page/post editing experiences
 - Admin middleware stack
 - Console commands for plugin/theme operations
 
@@ -51,6 +52,7 @@ The system package provides the foundational infrastructure for TentaPress:
 | Class         | Purpose                    |
 |---------------|----------------------------|
 | `AdminRoutes` | Route registration helpers |
+| `EditorDriverRegistry` | Register/resolve page and post editor drivers |
 | `JsonPayload` | JSON encoding helper       |
 | `Paths`       | Path resolution utilities  |
 

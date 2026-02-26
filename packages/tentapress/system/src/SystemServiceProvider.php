@@ -10,6 +10,8 @@ use Livewire\Blaze\Blaze;
 use TentaPress\System\Console\PluginsCommand;
 use TentaPress\System\Console\SeedDemoHomeCommand;
 use TentaPress\System\Console\ThemesCommand;
+use TentaPress\System\Editor\EditorDriverDefinition;
+use TentaPress\System\Editor\EditorDriverRegistry;
 use TentaPress\System\Http\AdminAuthMiddleware;
 use TentaPress\System\Http\AdminErrorPagesMiddleware;
 use TentaPress\System\Http\AdminMiddleware;
@@ -36,9 +38,11 @@ final class SystemServiceProvider extends ServiceProvider
         $this->app->singleton(PluginAssetPublisher::class);
         $this->app->singleton(RuntimeCacheRefresher::class);
         $this->app->singleton(AdminMiddleware::class);
+        $this->app->singleton(EditorDriverRegistry::class);
 
         $this->app->singleton(ThemeRegistry::class);
         $this->app->singleton(ThemeManager::class);
+        $this->registerDefaultEditorDrivers();
         $this->app->make(PluginManager::class)->registerEnabledPluginProviders();
     }
 
@@ -146,5 +150,19 @@ final class SystemServiceProvider extends ServiceProvider
         }
 
         return $resolved;
+    }
+
+    private function registerDefaultEditorDrivers(): void
+    {
+        $registry = $this->app->make(EditorDriverRegistry::class);
+
+        $registry->register(new EditorDriverDefinition(
+            id: 'blocks',
+            label: 'Blocks Builder',
+            description: 'Structured sections and fields.',
+            storage: 'blocks',
+            usesBlocksEditor: true,
+            sortOrder: 10,
+        ));
     }
 }

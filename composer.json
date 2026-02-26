@@ -26,7 +26,8 @@
         "tentapress/static-deploy": "Static deployments",
         "tentapress/custom-blocks": "Theme single-file custom block discovery",
         "tentapress/block-markdown-editor": "Markdown based rich text editor block",
-        "tentapress/page-editor": "Notion-style page editor for TentaPress"
+        "tentapress/page-editor": "Notion-style page editor for TentaPress",
+        "tentapress/builder": "Visual drag-and-drop builder with live preview"
     },
     "autoload": {
         "psr-4": {
@@ -72,6 +73,7 @@
                 "tentapress/custom-blocks",
                 "tentapress/block-markdown-editor",
                 "tentapress/page-editor",
+                "tentapress/builder",
                 "tentapress/media-optimization-bunny",
                 "tentapress/media-optimization-cloudflare",
                 "tentapress/media-optimization-imagekit",

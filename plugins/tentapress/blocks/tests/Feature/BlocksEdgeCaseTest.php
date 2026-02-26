@@ -38,3 +38,32 @@ it('skips malformed payload entries while rendering valid blocks', function (): 
 
     expect($html)->toContain('Valid block remains rendered');
 });
+
+it('applies presentation wrapper styles for whitelisted settings', function (): void {
+    $render = resolve('tp.blocks.render');
+
+    $html = $render([
+        [
+            'type' => 'blocks/content',
+            'props' => [
+                'content' => 'Presentation wrapper',
+                'presentation' => [
+                    'container' => 'wide',
+                    'align' => 'center',
+                    'background' => 'muted',
+                    'spacing' => [
+                        'top' => 'sm',
+                        'bottom' => 'lg',
+                    ],
+                ],
+            ],
+        ],
+    ]);
+
+    expect($html)->toContain('tp-block-presentation');
+    expect($html)->toContain('margin-top:1rem');
+    expect($html)->toContain('margin-bottom:2rem');
+    expect($html)->toContain('text-align:center');
+    expect($html)->toContain('background-color:#f8fafc');
+    expect($html)->toContain('max-width:96rem');
+});

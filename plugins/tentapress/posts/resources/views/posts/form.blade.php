@@ -2,15 +2,46 @@
 
 @php
     $editorMode = (bool) ($editorMode ?? false);
-    $customEditorView = app()->bound('tp.posts.editor.view') ? resolve('tp.posts.editor.view') : null;
-    $customEditorView = is_string($customEditorView) && view()->exists($customEditorView) ? $customEditorView : null;
-    $editorDriver = old('editor_driver', $post->editor_driver ?? ($customEditorView ? 'page' : 'blocks'));
-    $editorDriver = is_string($editorDriver) && in_array($editorDriver, ['blocks', 'page'], true) ? $editorDriver : 'blocks';
-    if (! $customEditorView) {
-        $editorDriver = 'blocks';
+    $driverRegistry = app()->bound(\TentaPress\System\Editor\EditorDriverRegistry::class)
+        ? app(\TentaPress\System\Editor\EditorDriverRegistry::class)
+        : null;
+    $editorDrivers = $driverRegistry instanceof \TentaPress\System\Editor\EditorDriverRegistry
+        ? $driverRegistry->allFor('posts')
+        : [];
+    if ($editorDrivers === []) {
+        $editorDrivers = [
+            new \TentaPress\System\Editor\EditorDriverDefinition(
+                id: 'blocks',
+                label: 'Blocks Builder',
+                description: 'Structured sections and fields.',
+                storage: 'blocks',
+                usesBlocksEditor: true,
+                sortOrder: 10,
+            ),
+        ];
     }
-    $usePageEditor = $customEditorView && $editorDriver === 'page';
-    $editorLabel = $usePageEditor ? 'Page Editor' : 'Blocks Editor';
+    $editorDriverMap = [];
+    foreach ($editorDrivers as $definition) {
+        if (! $definition instanceof \TentaPress\System\Editor\EditorDriverDefinition) {
+            continue;
+        }
+
+        $editorDriverMap[$definition->id] = $definition;
+    }
+
+    $editorDriver = old('editor_driver', $post->editor_driver ?? 'blocks');
+    $editorDriver = is_string($editorDriver) && isset($editorDriverMap[$editorDriver]) ? $editorDriver : 'blocks';
+    if (! isset($editorDriverMap[$editorDriver])) {
+        $editorDriver = array_key_first($editorDriverMap) ?? 'blocks';
+    }
+
+    $selectedDriver = $editorDriverMap[$editorDriver] ?? null;
+    $selectedEditorView = $selectedDriver?->viewFor('posts');
+    $selectedEditorView = is_string($selectedEditorView) && view()->exists($selectedEditorView) ? $selectedEditorView : null;
+    $usesBlocksEditor = $selectedDriver?->usesBlocksEditor ?? true;
+    $editorLabel = $selectedDriver?->label ?? 'Blocks Builder';
+    $isBuilderDriver = ($selectedDriver?->id ?? '') === 'builder';
+    $canRenderSelectedEditorInline = $editorMode || ! $isBuilderDriver;
 @endphp
 
 @if ($editorMode)
@@ -49,7 +80,7 @@
                             action="{{ $mode === 'create' ? route('tp.posts.store') : route('tp.posts.update', ['post' => $post->id]) }}"
                             class="space-y-4"
                             id="post-form"
-                            @if ($mode === 'edit' && $customEditorView)
+                            @if ($mode === 'edit' && count($editorDriverMap) > 1)
                                 data-editor-switch-form="1"
                                 data-editor-driver-current="{{ $editorDriver }}"
                             @endif>
@@ -83,6 +114,7 @@
                                 <input type="hidden" name="editor_driver" value="{{ $editorDriver }}" />
                                 <input type="hidden" name="return_to" value="editor" />
                             @else
+                                <input type="hidden" name="return_to" value="" data-editor-return-to />
                                 <div
                                     class="space-y-4"
                                     x-data="{
@@ -206,43 +238,56 @@
                                     </div>
                                 </div>
 
-                                @if ($customEditorView)
+                                @if (count($editorDriverMap) > 1)
                                     <div class="tp-field">
                                         <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                                            <label class="cursor-pointer">
-                                                <input type="radio" name="editor_driver" value="blocks" class="sr-only peer" data-editor-switch-radio @checked($editorDriver === 'blocks') />
-                                                <div class="rounded-xl border border-slate-200 bg-white p-3 transition peer-checked:border-slate-900 peer-checked:ring-2 peer-checked:ring-slate-200">
-                                                    <div class="text-sm font-semibold text-slate-900">Blocks Builder</div>
-                                                    <div class="mt-1 text-xs text-slate-500">Structured sections and fields.</div>
-                                                </div>
-                                            </label>
-                                            <label class="cursor-pointer">
-                                                <input type="radio" name="editor_driver" value="page" class="sr-only peer" data-editor-switch-radio @checked($editorDriver === 'page') />
-                                                <div class="rounded-xl border border-slate-200 bg-white p-3 transition peer-checked:border-slate-900 peer-checked:ring-2 peer-checked:ring-slate-200">
-                                                    <div class="text-sm font-semibold text-slate-900">Page Editor</div>
-                                                    <div class="mt-1 text-xs text-slate-500">Continuous writing surface.</div>
-                                                </div>
-                                            </label>
+                                            @foreach ($editorDriverMap as $driverId => $driverDefinition)
+                                                <label class="cursor-pointer">
+                                                    <input
+                                                        type="radio"
+                                                        name="editor_driver"
+                                                        value="{{ $driverId }}"
+                                                        class="sr-only peer"
+                                                        data-editor-switch-radio
+                                                        data-editor-label="{{ $driverDefinition->label }}"
+                                                        @checked($editorDriver === $driverId) />
+                                                    <div class="rounded-xl border border-slate-200 bg-white p-3 transition peer-checked:border-slate-900 peer-checked:ring-2 peer-checked:ring-slate-200">
+                                                        <div class="text-sm font-semibold text-slate-900">{{ $driverDefinition->label }}</div>
+                                                        <div class="mt-1 text-xs text-slate-500">{{ $driverDefinition->description }}</div>
+                                                    </div>
+                                                </label>
+                                            @endforeach
                                         </div>
                                         <div class="tp-help">Choose the editing experience for this post.</div>
                                     </div>
                                 @else
-                                    <input type="hidden" name="editor_driver" value="blocks" />
+                                    <input type="hidden" name="editor_driver" value="{{ $editorDriver }}" />
                                 @endif
                                 </div>
                             @endif
 
-                            @if ($usePageEditor)
-                                @include($customEditorView, [
+                            @if (! $usesBlocksEditor && $selectedEditorView && $canRenderSelectedEditorInline)
+                                @include($selectedEditorView, [
                                     'post' => $post,
                                     'editorTitle' => $editorMode ? (trim((string) ($post->title ?? '')) !== '' ? $post->title : 'Untitled Post') : null,
                                     'pageDocJson' => $pageDocJson ?? null,
+                                    'blocksJson' => $blocksJson ?? '[]',
+                                    'blockDefinitions' => $blockDefinitions ?? [],
                                     'mediaOptions' => $mediaOptions ?? [],
                                     'mediaIndexUrl' => \Illuminate\Support\Facades\Route::has('tp.media.index') ? route('tp.media.index') : '',
                                     'editorMode' => $editorMode,
                                     'mode' => $mode,
                                 ])
                             @else
+                                @if (! $editorMode && $isBuilderDriver && $mode === 'edit')
+                                    <div class="rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-900">
+                                        <div class="font-semibold">Visual Builder opens in full-screen mode.</div>
+                                        <div class="mt-1">
+                                            Use full-screen mode to edit layout and block fields.
+                                            <a href="{{ route('tp.posts.editor', ['post' => $post->id]) }}" class="underline decoration-sky-400 underline-offset-2">Open Visual Builder</a>
+                                        </div>
+                                    </div>
+                                @endif
                                 @component('tentapress-blocks::editor', [
                                     'blocksEditorMode' => $editorMode,
                                     'editorTitle' => $editorMode ? (trim((string) ($post->title ?? '')) !== '' ? $post->title : 'Untitled Post') : null,
@@ -443,8 +488,7 @@
                                 return;
                             }
 
-                            const nextLabel =
-                                next === 'page' ? 'Page Editor' : 'Blocks Builder';
+                            const nextLabel = radio.dataset.editorLabel || 'Editor';
                             window.tpConfirm(
                                 `Switch to ${nextLabel}? This will save your changes and reload the editor.`,
                                 {
@@ -461,6 +505,12 @@
 
                                 current = next;
                                 form.dataset.editorDriverCurrent = current;
+                                const returnTo = form.querySelector(
+                                    'input[name="return_to"][data-editor-return-to]',
+                                );
+                                if (returnTo instanceof HTMLInputElement) {
+                                    returnTo.value = next === 'builder' ? 'editor' : '';
+                                }
                                 form.requestSubmit();
                             });
                         });
