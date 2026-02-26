@@ -758,7 +758,7 @@ function applyPreviewDocument(payload: BuilderPreviewDocument): void {
         .map((cssText) => `<style>${cssText}</style>`)
         .join('');
     const uiStyle = `<style>
-        html, body { margin: 0; min-height: 100%; }
+        html, body { margin: 0; min-height: 100%; background: #fff; color: #0f172a; }
         body { overflow-x: hidden; }
         .tp-builder-preview-document { min-height: 100%; background: #fff; color: #0f172a; overflow-x: hidden; box-sizing: border-box; }
         .tp-builder-preview-document * { box-sizing: border-box; }
@@ -1444,6 +1444,7 @@ watch(
                     <iframe
                         ref="previewFrame"
                         class="tp-builder__preview tp-builder__preview--center"
+                        sandbox="allow-same-origin"
                         role="region"
                         title="Builder preview"></iframe>
                 </div>

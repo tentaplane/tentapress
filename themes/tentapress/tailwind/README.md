@@ -7,7 +7,7 @@ A Tailwind CSS v4 theme for TentaPress.
 | Field         | Value                 |
 |---------------|-----------------------|
 | ID            | `tentapress/tailwind` |
-| Version       | 0.4.0                 |
+| Version       | 0.4.1                 |
 | CSS Framework | Tailwind CSS v4       |
 
 ## Layouts
@@ -108,6 +108,7 @@ This theme includes optional Visual Builder preview layouts under:
 - `views/preview/layouts/post.blade.php`
 
 These are used by `tentapress/builder` non-iframe snapshot documents when available.
+In this theme they delegate to the main layout views to avoid template drift.
 
 ## Cloning This Theme (Agent Checklist)
 
