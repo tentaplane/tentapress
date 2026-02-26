@@ -24,17 +24,12 @@ final class BuilderServiceProvider extends ServiceProvider
 
         $this->app->singleton(PreviewSnapshotStore::class);
 
+        $this->app->afterResolving(EditorDriverRegistry::class, function (EditorDriverRegistry $registry): void {
+            $this->registerEditorDriver($registry);
+        });
+
         if ($this->app->bound(EditorDriverRegistry::class)) {
-            $this->app->make(EditorDriverRegistry::class)->register(new EditorDriverDefinition(
-                id: 'builder',
-                label: 'Visual Builder',
-                description: 'Drag and drop visual canvas with live preview.',
-                storage: 'blocks',
-                pagesView: 'tentapress-builder::editor',
-                postsView: 'tentapress-builder::editor',
-                usesBlocksEditor: false,
-                sortOrder: 30,
-            ));
+            $this->registerEditorDriver($this->app->make(EditorDriverRegistry::class));
         }
     }
 
@@ -93,5 +88,19 @@ final class BuilderServiceProvider extends ServiceProvider
         });
 
         self::$autoloadRegistered = true;
+    }
+
+    private function registerEditorDriver(EditorDriverRegistry $registry): void
+    {
+        $registry->register(new EditorDriverDefinition(
+            id: 'builder',
+            label: 'Visual Builder',
+            description: 'Drag and drop visual canvas with live preview.',
+            storage: 'blocks',
+            pagesView: 'tentapress-builder::editor',
+            postsView: 'tentapress-builder::editor',
+            usesBlocksEditor: false,
+            sortOrder: 30,
+        ));
     }
 }
