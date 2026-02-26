@@ -79,12 +79,8 @@ final class SystemServiceProvider extends ServiceProvider
 
         Blaze::enable();
 
-        $configuredPaths = config('tentapress.blaze.paths', []);
-        if (! is_array($configuredPaths)) {
-            return;
-        }
-
         $optimizer = Blaze::optimize();
+        $configuredPaths = $this->resolvedBlazePaths();
 
         foreach ($configuredPaths as $entry) {
             if (! is_array($entry)) {
@@ -103,5 +99,35 @@ final class SystemServiceProvider extends ServiceProvider
                 fold: (bool) ($entry['fold'] ?? false),
             );
         }
+    }
+
+    /**
+     * @return array<int,array{path:string,compile:bool,memo:bool,fold:bool}>
+     */
+    private function resolvedBlazePaths(): array
+    {
+        $resolved = [];
+
+        $activeTheme = $this->app->make(ThemeManager::class)->activeTheme();
+        $activeThemePath = (string) ($activeTheme['path'] ?? '');
+        if ($activeThemePath !== '') {
+            $resolved[] = [
+                'path' => base_path('themes/'.$activeThemePath.'/views/components'),
+                'compile' => (bool) config('tentapress.blaze.active_theme_components.compile', true),
+                'memo' => (bool) config('tentapress.blaze.active_theme_components.memo', false),
+                'fold' => (bool) config('tentapress.blaze.active_theme_components.fold', false),
+            ];
+        }
+
+        $explicitPaths = config('tentapress.blaze.paths', []);
+        if (is_array($explicitPaths)) {
+            foreach ($explicitPaths as $path) {
+                if (is_array($path)) {
+                    $resolved[] = $path;
+                }
+            }
+        }
+
+        return $resolved;
     }
 }

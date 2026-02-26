@@ -83,13 +83,11 @@ return [
     */
     'blaze' => [
         'enabled' => (bool) env('TP_BLAZE_ENABLED', false),
-        'paths' => [
-            [
-                'path' => base_path('themes/tentapress/tailwind/views/components'),
-                'compile' => true,
-                'memo' => false,
-                'fold' => false,
-            ],
+        'active_theme_components' => [
+            'compile' => true,
+            'memo' => false,
+            'fold' => false,
         ],
+        'paths' => [],
     ],
 ];

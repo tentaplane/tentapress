@@ -7,7 +7,7 @@ Core platform layer for TentaPress plugin and theme management.
 | Field    | Value                                     |
 |----------|-------------------------------------------|
 | Name     | `tentapress/system`                       |
-| Version  | 0.3.12                                    |
+| Version  | 0.3.13                                    |
 | Provider | `TentaPress\System\SystemServiceProvider` |
 
 ## Overview
@@ -102,7 +102,9 @@ For OPCache-backed hosts, runtime cache refresh helpers invalidate these files a
 Blaze is integrated as an opt-in optimization layer for anonymous components.
 
 - Toggle with `TP_BLAZE_ENABLED=true|false` (default `false`).
-- Configure optimized directories in `config/tentapress.php` under `blaze.paths`.
+- The active theme's `views/components` path is resolved dynamically at runtime.
+- Configure active theme strategy in `config/tentapress.php` under `blaze.active_theme_components`.
+- Configure additional optimized directories (for plugin/package components) under `blaze.paths`.
 - Keep `fold` disabled unless a component is fully static and safe for compile-time folding.
 - After changing Blaze path configuration, clear compiled views:
 
