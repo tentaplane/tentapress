@@ -26,6 +26,12 @@ This file is provided for attribution/notice convenience and does not modify any
 - Source: https://packagist.org/packages/laravel/tinker
 - License text: `vendor/laravel/tinker/LICENSE.md` (or `LICENSE*`)
 
+### livewire/blaze (^1.0.2)
+
+- License: MIT
+- License text: `vendor/livewire/blaze/LICENSE.md` (or `LICENSE*`)
+- Source: https://github.com/livewire/blaze
+
 ---
 
 ## Development dependencies (Composer `require-dev`)
