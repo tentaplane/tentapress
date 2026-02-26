@@ -27,6 +27,9 @@ final class SystemServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
+        config()->set('blaze.enabled', (bool) config('tentapress.blaze.enabled', false));
+        config()->set('blaze.debug', (bool) config('tentapress.blaze.debug', false));
+
         $this->app->singleton(PluginRegistry::class);
         $this->app->singleton(PluginManager::class);
         $this->app->singleton(PluginAssetRegistry::class);
@@ -99,6 +102,20 @@ final class SystemServiceProvider extends ServiceProvider
                 fold: (bool) ($entry['fold'] ?? false),
             );
         }
+
+        $optimizer->in(
+            path: base_path('vendor/laravel/framework/src/Illuminate/Foundation/resources/exceptions'),
+            compile: false,
+            memo: false,
+            fold: false,
+        );
+
+        $optimizer->in(
+            path: base_path('plugins/tentapress/admin-shell/resources/views'),
+            compile: false,
+            memo: false,
+            fold: false,
+        );
     }
 
     /**

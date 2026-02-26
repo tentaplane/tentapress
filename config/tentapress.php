@@ -83,6 +83,7 @@ return [
     */
     'blaze' => [
         'enabled' => (bool) env('TP_BLAZE_ENABLED', false),
+        'debug' => (bool) env('TP_BLAZE_DEBUG', false),
         'active_theme_components' => [
             'compile' => true,
             'memo' => false,
