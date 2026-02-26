@@ -7,7 +7,7 @@ A Tailwind CSS v4 theme for TentaPress.
 | Field         | Value                 |
 |---------------|-----------------------|
 | ID            | `tentapress/tailwind` |
-| Version       | 0.4.1                 |
+| Version       | 0.4.2                 |
 | CSS Framework | Tailwind CSS v4       |
 
 ## Layouts
@@ -101,14 +101,8 @@ Block templates now use layout-aware `sizes` values (including gallery, hero, lo
 
 ## Builder Preview Contract
 
-This theme includes optional Visual Builder preview layouts under:
-
-- `views/preview/layouts/default.blade.php`
-- `views/preview/layouts/landing.blade.php`
-- `views/preview/layouts/post.blade.php`
-
-These are used by `tentapress/builder` non-iframe snapshot documents when available.
-In this theme they delegate to the main layout views to avoid template drift.
+`tentapress/builder` uses this theme's normal layout views for preview rendering.
+No preview-specific layout directory is required.
 
 ## Cloning This Theme (Agent Checklist)
 

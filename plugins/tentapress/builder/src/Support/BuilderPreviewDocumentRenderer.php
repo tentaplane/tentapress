@@ -127,25 +127,11 @@ final readonly class BuilderPreviewDocumentRenderer
      */
     private function resolveView(string $resource, string $layoutKey): array
     {
-        $previewCandidates = [
-            ThemeManager::VIEW_NAMESPACE.'::preview.layouts.'.$layoutKey,
-            ThemeManager::VIEW_NAMESPACE.'::preview.layouts.page',
-        ];
-
-        foreach ($previewCandidates as $candidate) {
-            if ($this->views->exists($candidate)) {
-                return [
-                    'view' => $candidate,
-                    'uses_fallback' => false,
-                ];
-            }
-        }
-
         $themeView = $this->themes->layoutView($layoutKey);
         if (is_string($themeView) && $themeView !== '') {
             return [
                 'view' => $themeView,
-                'uses_fallback' => true,
+                'uses_fallback' => false,
             ];
         }
 
