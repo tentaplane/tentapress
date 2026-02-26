@@ -630,6 +630,45 @@ function resolveStyleHref(href: string): string {
     }
 }
 
+function escapeHtmlAttribute(value: string): string {
+    return value
+        .replaceAll('&', '&amp;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;');
+}
+
+function sanitizePreviewBodyHtml(html: string): string {
+    if (html.trim() === '') {
+        return '';
+    }
+
+    const parser = new DOMParser();
+    const parsed = parser.parseFromString(html, 'text/html');
+
+    parsed.querySelectorAll('script, noscript').forEach((node) => node.remove());
+
+    parsed.querySelectorAll('*').forEach((element) => {
+        for (const attributeName of element.getAttributeNames()) {
+            const lowered = attributeName.toLowerCase();
+            if (lowered.startsWith('on')) {
+                element.removeAttribute(attributeName);
+                continue;
+            }
+
+            if (['src', 'href', 'xlink:href', 'formaction'].includes(lowered)) {
+                const value = (element.getAttribute(attributeName) ?? '').trim().toLowerCase();
+                if (value.startsWith('javascript:') || value.startsWith('data:text/html')) {
+                    element.removeAttribute(attributeName);
+                }
+            }
+        }
+    });
+
+    return parsed.body.innerHTML;
+}
+
 function applyPreviewSelection(shouldScroll = true): void {
     const frameDocument = previewFrame.value?.contentDocument ?? null;
     const frameWindow = previewFrame.value?.contentWindow ?? null;
@@ -781,11 +820,12 @@ function applyPreviewDocument(payload: BuilderPreviewDocument): void {
             100% { box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.65), 0 0 0 16px rgba(37, 99, 235, 0); }
         }
     </style>`;
-    const bodyClass = String(payload.body_class ?? '').trim();
-    const bodyHtml = String(payload.body_html ?? '');
+    const bodyClass = escapeHtmlAttribute(String(payload.body_class ?? '').trim());
+    const bodyHtml = sanitizePreviewBodyHtml(String(payload.body_html ?? ''));
+    const lang = escapeHtmlAttribute(String(payload.lang ?? 'en').trim() || 'en');
 
     previewFrame.value.srcdoc = `<!doctype html>
-<html lang="${String(payload.lang ?? 'en')}">
+<html lang="${lang}">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
