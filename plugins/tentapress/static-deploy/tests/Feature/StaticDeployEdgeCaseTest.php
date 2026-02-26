@@ -7,6 +7,18 @@ use Illuminate\Support\Facades\Schema;
 use TentaPress\StaticDeploy\StaticDeployServiceProvider;
 use TentaPress\Users\Models\TpUser;
 
+function staticDeployArtifactsDir(): string
+{
+    $base = 'tp-static';
+    $token = (string) getenv('TEST_TOKEN');
+
+    if ($token !== '') {
+        $base .= '-' . $token;
+    }
+
+    return storage_path('app/' . $base);
+}
+
 function registerStaticDeployProviderForEdgeCases(): void
 {
     app()->register(StaticDeployServiceProvider::class);
@@ -52,7 +64,7 @@ it('validates static deploy generate options as booleans', function (): void {
 
 it('returns not found when no static export archive exists', function (): void {
     registerStaticDeployProviderForEdgeCases();
-    File::deleteDirectory(storage_path('app/tp-static'));
+    File::deleteDirectory(staticDeployArtifactsDir());
 
     $admin = TpUser::query()->create([
         'name' => 'Static Deploy Admin',

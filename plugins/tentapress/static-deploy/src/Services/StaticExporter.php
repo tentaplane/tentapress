@@ -47,7 +47,7 @@ final class StaticExporter
         try {
             $timestamp = gmdate('Ymd-His');
 
-            $base = storage_path('app/tp-static');
+            $base = $this->staticBasePath();
             $buildDir = $base . DIRECTORY_SEPARATOR . 'builds' . DIRECTORY_SEPARATOR . $timestamp;
             $exportsDir = $base . DIRECTORY_SEPARATOR . 'exports';
 
@@ -141,7 +141,7 @@ final class StaticExporter
      */
     public function lastBuildInfo(): ?array
     {
-        $path = storage_path('app/tp-static/last.json');
+        $path = $this->staticBasePath() . DIRECTORY_SEPARATOR . 'last.json';
 
         if (!is_file($path)) {
             return null;
@@ -1148,5 +1148,17 @@ final class StaticExporter
     private function json(mixed $data): string
     {
         return json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . "\n";
+    }
+
+    private function staticBasePath(): string
+    {
+        $base = 'tp-static';
+        $token = (string) getenv('TEST_TOKEN');
+
+        if (app()->runningUnitTests() && $token !== '') {
+            $base .= '-' . $token;
+        }
+
+        return storage_path('app/' . $base);
     }
 }

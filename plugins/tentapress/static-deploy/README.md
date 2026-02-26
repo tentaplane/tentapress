@@ -7,7 +7,7 @@ Static site generation for TentaPress.
 | Field | Value |
 |-------|-------|
 | ID | `tentapress/static-deploy` |
-| Version | 0.1.6 |
+| Version | 0.1.7 |
 | Provider | `TentaPress\StaticDeploy\StaticDeployServiceProvider` |
 
 ## Features
