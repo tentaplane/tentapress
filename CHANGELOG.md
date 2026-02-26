@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.36.3](https://github.com/tentaplane/tentapress/compare/v0.36.2...v0.36.3) (2026-02-26)
+
+
+### Bug Fixes
+
+* **builder:** sanitize preview srcdoc payload and harden iframe attributes ([83a33bf](https://github.com/tentaplane/tentapress/commit/83a33bf7da989702ce777f8de9eab08f33f209d6))
+
 ## [0.36.2](https://github.com/tentaplane/tentapress/compare/v0.36.1...v0.36.2) (2026-02-26)
 
 
