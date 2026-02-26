@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.36.1](https://github.com/tentaplane/tentapress/compare/v0.36.0...v0.36.1) (2026-02-26)
+
+
+### Bug Fixes
+
+* **builder:** register editor driver after container resolution for standalone installs ([21da77b](https://github.com/tentaplane/tentapress/commit/21da77b8e05b703d5b35150fb5784ebca6b27b63))
+
 ## [0.36.0](https://github.com/tentaplane/tentapress/compare/v0.35.2...v0.36.0) (2026-02-26)
 
 
