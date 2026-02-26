@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.36.2](https://github.com/tentaplane/tentapress/compare/v0.36.1...v0.36.2) (2026-02-26)
+
+
+### Bug Fixes
+
+* **builder,theme-tailwind:** harden preview isolation and dedupe preview layouts ([99b73ff](https://github.com/tentaplane/tentapress/commit/99b73ff0c6d2e5c1ed722c3f343a45ce7d5f4659))
+
 ## [0.36.1](https://github.com/tentaplane/tentapress/compare/v0.36.0...v0.36.1) (2026-02-26)
 
 
