@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\DB;
 use TentaPress\Menus\Models\TpMenu;
 use TentaPress\Menus\Models\TpMenuItem;
 use TentaPress\Menus\Models\TpMenuLocation;
+use TentaPress\System\Support\Paths;
 use TentaPress\Users\Models\TpUser;
 
 it('redirects guests from menu admin routes to login', function (): void {
@@ -82,7 +83,7 @@ it('allows a super admin to update menu items and assign locations, then delete 
         ]
     );
 
-    $themeCachePath = base_path('bootstrap/cache/tp_theme.php');
+    $themeCachePath = Paths::themeCachePath();
     if (is_file($themeCachePath)) {
         @unlink($themeCachePath);
     }

@@ -16,7 +16,7 @@ final class RuntimeCacheRefresher
         clearstatcache();
 
         return $this->refreshOpcache([
-            base_path('bootstrap/cache/tp_plugins.php'),
+            Paths::pluginCachePath(),
             base_path('bootstrap/cache/packages.php'),
             base_path('bootstrap/cache/services.php'),
         ]);
@@ -32,7 +32,7 @@ final class RuntimeCacheRefresher
         clearstatcache();
 
         return $this->refreshOpcache([
-            base_path('bootstrap/cache/tp_theme.php'),
+            Paths::themeCachePath(),
         ]);
     }
 

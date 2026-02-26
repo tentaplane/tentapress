@@ -408,10 +408,10 @@ final class PluginRegistry
         $path = Paths::pluginCachePath();
         $dir = dirname($path);
 
-        throw_if(! is_dir($dir) && ! mkdir($dir, 0755, true) && ! is_dir($dir), RuntimeException::class, "Unable to create cache directory: {$dir}");
+        throw_if(! is_dir($dir) && ! @mkdir($dir, 0755, true) && ! is_dir($dir), RuntimeException::class, "Unable to create cache directory: {$dir}");
 
         $php = "<?php\n\nreturn ".var_export($payload, true).";\n";
-        $written = file_put_contents($path, $php);
+        $written = file_put_contents($path, $php, LOCK_EX);
 
         throw_if($written === false, RuntimeException::class, "Unable to write plugin cache file: {$path}");
     }
@@ -434,7 +434,7 @@ final class PluginRegistry
             return [];
         }
 
-        $data = require $path;
+        $data = @include $path;
 
         if (! is_array($data) || ! isset($data['plugins']) || ! is_array($data['plugins'])) {
             return [];

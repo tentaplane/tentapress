@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Illuminate\Support\Facades\DB;
 use TentaPress\Menus\Models\TpMenu;
 use TentaPress\Menus\Models\TpMenuLocation;
+use TentaPress\System\Support\Paths;
 use TentaPress\Users\Models\TpUser;
 
 it('denies menus index access to non-super-admin users without capability', function (): void {
@@ -117,7 +118,7 @@ it('ignores unknown location keys when syncing menu assignments', function (): v
         ]
     );
 
-    $themeCachePath = base_path('bootstrap/cache/tp_theme.php');
+    $themeCachePath = Paths::themeCachePath();
     if (is_file($themeCachePath)) {
         @unlink($themeCachePath);
     }

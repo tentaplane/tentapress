@@ -77,7 +77,7 @@ final class PluginAssetPublisher
     {
         $this->deleteDirectory($destination);
 
-        if (! is_dir($destination) && ! mkdir($destination, 0755, true) && ! is_dir($destination)) {
+        if (! is_dir($destination) && ! @mkdir($destination, 0755, true) && ! is_dir($destination)) {
             return;
         }
 

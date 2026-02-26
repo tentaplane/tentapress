@@ -7,7 +7,7 @@ Core platform layer for TentaPress plugin and theme management.
 | Field    | Value                                     |
 |----------|-------------------------------------------|
 | Name     | `tentapress/system`                       |
-| Version  | 0.3.15                                    |
+| Version  | 0.3.16                                    |
 | Provider | `TentaPress\System\SystemServiceProvider` |
 
 ## Overview

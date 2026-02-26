@@ -22,12 +22,12 @@ final class Paths
 
     public static function pluginCachePath(): string
     {
-        return base_path('bootstrap/cache/tp_plugins.php');
+        return self::cachePath('tp_plugins');
     }
 
     public static function themeCachePath(): string
     {
-        return base_path('bootstrap/cache/tp_theme.php');
+        return self::cachePath('tp_theme');
     }
 
     /**
@@ -66,5 +66,25 @@ final class Paths
         }
 
         return array_values(array_filter($roots, is_dir(...)));
+    }
+
+    private static function cachePath(string $cacheKey): string
+    {
+        $suffix = self::parallelTestToken();
+        $filename = $cacheKey.($suffix === '' ? '' : '.'.$suffix).'.php';
+
+        return base_path('bootstrap/cache/'.$filename);
+    }
+
+    private static function parallelTestToken(): string
+    {
+        $token = $_SERVER['TEST_TOKEN'] ?? $_ENV['TEST_TOKEN'] ?? getenv('TEST_TOKEN');
+        $token = trim((string) $token);
+
+        if ($token === '') {
+            return '';
+        }
+
+        return preg_replace('/[^A-Za-z0-9._-]/', '-', $token) ?? '';
     }
 }
