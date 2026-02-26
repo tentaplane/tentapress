@@ -4,6 +4,27 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.36.0](https://github.com/tentaplane/tentapress/compare/v0.35.2...v0.36.0) (2026-02-26)
+
+
+### Features
+
+* **blocks:** add inline child field editing for split layout ([0dcbccf](https://github.com/tentaplane/tentapress/commit/0dcbccf99d2e9c7f3cf3fc3b11042291717b424e))
+* **blocks:** add split layout nested container support ([cfa6071](https://github.com/tentaplane/tentapress/commit/cfa607158541830217c9c010f3f983179d731872))
+* **blocks:** improve nested editor actions and repeater support ([c21a72b](https://github.com/tentaplane/tentapress/commit/c21a72b564bcd2f964aaf849d934247a4dde58c8))
+* **system:** integrate blaze config and invalidate views on plugin lifecycle ([197a0ae](https://github.com/tentaplane/tentapress/commit/197a0aefe3d9c2f72a40e8b34343e9929cc55d31))
+
+
+### Bug Fixes
+
+* **blocks:** default split layout to empty child columns ([4142972](https://github.com/tentaplane/tentapress/commit/414297254021721bd38e34682b486699aa461b0e))
+* **blocks:** unify repeater row action icons ([5709507](https://github.com/tentaplane/tentapress/commit/570950795733c9e343dd432bc1556c49b8448c06))
+* **export,static-deploy:** isolate artifact paths for parallel test workers ([7a6f016](https://github.com/tentaplane/tentapress/commit/7a6f016dd28b6170897a8c8d2cf2100682df498d))
+* **system:** harden blaze toggles and bypass incompatible views ([427d542](https://github.com/tentaplane/tentapress/commit/427d54296d49248b48e578ff5128da7341122e08))
+* **system:** resolve blaze component path from active theme ([7d13e79](https://github.com/tentaplane/tentapress/commit/7d13e794028786844b28690dac5e1f1f0093bbce))
+* **system:** resolve test token from request and env helpers ([74f83f1](https://github.com/tentaplane/tentapress/commit/74f83f161d274023ff032c3890de62e48b844131))
+* **system:** stabilize parallel test cache and asset paths ([398da8d](https://github.com/tentaplane/tentapress/commit/398da8dbf63f94eb5286a73135293514d4dda12a))
+
 ## [0.35.2](https://github.com/tentaplane/tentapress/compare/v0.35.1...v0.35.2) (2026-02-14)
 
 
