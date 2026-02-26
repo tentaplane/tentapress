@@ -16,6 +16,7 @@ it('enables configured default plugins when running defaults action', function (
     $this->artisan('tp:plugins defaults')
         ->expectsOutputToContain('Enabled ')
         ->expectsOutputToContain('Plugin cache rebuilt.')
+        ->expectsOutputToContain('View cache cleared.')
         ->assertSuccessful();
 
     expect(
@@ -33,6 +34,7 @@ it('keeps protected plugins enabled when disabling all without force', function 
 
     $this->artisan('tp:plugins disable --all')
         ->expectsOutputToContain('Note: protected plugins remain enabled unless you pass --force.')
+        ->expectsOutputToContain('View cache cleared.')
         ->assertSuccessful();
 
     expect(
@@ -54,6 +56,7 @@ it('disables protected plugins when disabling all with force', function (): void
 
     $this->artisan('tp:plugins disable --all --force')
         ->expectsOutputToContain('(forced)')
+        ->expectsOutputToContain('View cache cleared.')
         ->assertSuccessful();
 
     expect(
@@ -77,12 +80,14 @@ it('writes and clears plugin cache from command actions', function (): void {
 
     $this->artisan('tp:plugins cache')
         ->expectsOutputToContain('Plugin cache rebuilt.')
+        ->expectsOutputToContain('View cache cleared.')
         ->assertSuccessful();
 
     expect(is_file($cachePath))->toBeTrue();
 
     $this->artisan('tp:plugins clear-cache')
         ->expectsOutputToContain('Plugin cache cleared.')
+        ->expectsOutputToContain('View cache cleared.')
         ->assertSuccessful();
 
     expect(is_file($cachePath))->toBeFalse();

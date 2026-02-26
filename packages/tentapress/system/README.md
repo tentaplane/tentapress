@@ -7,7 +7,7 @@ Core platform layer for TentaPress plugin and theme management.
 | Field    | Value                                     |
 |----------|-------------------------------------------|
 | Name     | `tentapress/system`                       |
-| Version  | 0.3.11                                     |
+| Version  | 0.3.12                                    |
 | Provider | `TentaPress\System\SystemServiceProvider` |
 
 ## Overview
@@ -70,6 +70,8 @@ php artisan tp:plugins clear-cache # Clear plugin cache
 
 Plugin commands no longer run migrations automatically. Run `php artisan migrate` explicitly after plugin installs or
 upgrades.
+Plugin lifecycle/cache actions also clear compiled views so Blade/Blaze output stays coherent after plugin state
+changes.
 
 ### Theme Commands
 
@@ -94,6 +96,19 @@ php artisan tp:themes activate <id> # Activate a theme
 | `bootstrap/cache/tp_theme.php`   | Active theme metadata          |
 
 For OPCache-backed hosts, runtime cache refresh helpers invalidate these files after plugin/theme lifecycle actions.
+
+## Blaze Integration
+
+Blaze is integrated as an opt-in optimization layer for anonymous components.
+
+- Toggle with `TP_BLAZE_ENABLED=true|false` (default `false`).
+- Configure optimized directories in `config/tentapress.php` under `blaze.paths`.
+- Keep `fold` disabled unless a component is fully static and safe for compile-time folding.
+- After changing Blaze path configuration, clear compiled views:
+
+```bash
+php artisan view:clear
+```
 
 ## Discovery
 

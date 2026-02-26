@@ -6,6 +6,7 @@ namespace TentaPress\System;
 
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
+use Livewire\Blaze\Blaze;
 use TentaPress\System\Console\PluginsCommand;
 use TentaPress\System\Console\SeedDemoHomeCommand;
 use TentaPress\System\Console\ThemesCommand;
@@ -41,6 +42,7 @@ final class SystemServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
+        $this->configureBlaze();
 
         $this->app->make(Router::class)->aliasMiddleware('tp.auth', AdminAuthMiddleware::class);
         $this->app->make(Router::class)->aliasMiddleware('tp.can', CanMiddleware::class);
@@ -59,6 +61,47 @@ final class SystemServiceProvider extends ServiceProvider
                 ThemesCommand::class,
                 SeedDemoHomeCommand::class,
             ]);
+        }
+    }
+
+    private function configureBlaze(): void
+    {
+        if (! class_exists(Blaze::class)) {
+            return;
+        }
+
+        $enabled = (bool) config('tentapress.blaze.enabled', false);
+        if (! $enabled) {
+            Blaze::disable();
+
+            return;
+        }
+
+        Blaze::enable();
+
+        $configuredPaths = config('tentapress.blaze.paths', []);
+        if (! is_array($configuredPaths)) {
+            return;
+        }
+
+        $optimizer = Blaze::optimize();
+
+        foreach ($configuredPaths as $entry) {
+            if (! is_array($entry)) {
+                continue;
+            }
+
+            $path = $entry['path'] ?? null;
+            if (! is_string($path) || $path === '' || ! is_dir($path)) {
+                continue;
+            }
+
+            $optimizer->in(
+                path: $path,
+                compile: (bool) ($entry['compile'] ?? true),
+                memo: (bool) ($entry['memo'] ?? false),
+                fold: (bool) ($entry['fold'] ?? false),
+            );
         }
     }
 }

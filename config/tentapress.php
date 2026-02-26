@@ -71,4 +71,25 @@ return [
     'media' => [
         'url_driver' => env('TP_MEDIA_URL_DRIVER', 'local'),
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Blaze
+    |--------------------------------------------------------------------------
+    |
+    | Blaze can optimize anonymous Blade components. Keep this disabled by
+    | default and enable incrementally with explicit paths.
+    |
+    */
+    'blaze' => [
+        'enabled' => (bool) env('TP_BLAZE_ENABLED', false),
+        'paths' => [
+            [
+                'path' => base_path('themes/tentapress/tailwind/views/components'),
+                'compile' => true,
+                'memo' => false,
+                'fold' => false,
+            ],
+        ],
+    ],
 ];

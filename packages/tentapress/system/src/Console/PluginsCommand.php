@@ -58,6 +58,7 @@ final class PluginsCommand extends Command
 
         $this->registry->writeCache();
         $this->info('Plugin cache rebuilt.');
+        $this->clearViewCache();
 
         return self::SUCCESS;
     }
@@ -78,6 +79,7 @@ final class PluginsCommand extends Command
 
         $this->registry->writeCache();
         $this->info('Plugin cache rebuilt.');
+        $this->clearViewCache();
 
         return self::SUCCESS;
     }
@@ -121,6 +123,7 @@ final class PluginsCommand extends Command
 
         $this->registry->writeCache();
         $this->info('Plugin cache rebuilt.');
+        $this->clearViewCache();
 
         return self::SUCCESS;
     }
@@ -145,6 +148,7 @@ final class PluginsCommand extends Command
 
         $this->registry->writeCache();
         $this->info('Plugin cache rebuilt.');
+        $this->clearViewCache();
 
         return self::SUCCESS;
     }
@@ -153,6 +157,7 @@ final class PluginsCommand extends Command
     {
         $this->registry->writeCache();
         $this->info('Plugin cache rebuilt.');
+        $this->clearViewCache();
 
         return self::SUCCESS;
     }
@@ -161,8 +166,15 @@ final class PluginsCommand extends Command
     {
         $this->registry->clearCache();
         $this->info('Plugin cache cleared.');
+        $this->clearViewCache();
 
         return self::SUCCESS;
+    }
+
+    private function clearViewCache(): void
+    {
+        $this->callSilent('view:clear');
+        $this->info('View cache cleared.');
     }
 
     /**
