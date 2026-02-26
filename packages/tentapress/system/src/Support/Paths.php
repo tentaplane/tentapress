@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace TentaPress\System\Support;
 
+use Illuminate\Support\Facades\Request;
+use Illuminate\Support\Env;
+
 final class Paths
 {
     public static function pluginsPath(string $append = ''): string
@@ -78,7 +81,7 @@ final class Paths
 
     private static function parallelTestToken(): string
     {
-        $token = $_SERVER['TEST_TOKEN'] ?? $_ENV['TEST_TOKEN'] ?? getenv('TEST_TOKEN');
+        $token = Request::server('TEST_TOKEN') ?? Env::get('TEST_TOKEN', getenv('TEST_TOKEN'));
         $token = trim((string) $token);
 
         if ($token === '') {
