@@ -1,6 +1,6 @@
 # Project Status and Roadmap
 
-**Last updated:** 2026-02-03
+**Last updated:** 2026-02-10
 
 Single source of truth for current status, priorities, and near-term roadmap.
 
@@ -43,8 +43,10 @@ showcase Tailwind base theme. Distribution is via split repos and Packagist-read
 ### 5) CLI documentation
 - Single canonical reference for user-facing commands and examples.
 
-### 6) Forms builder (exploratory)
-- MVP: form block + submissions table + email notifications.
+### 6) Forms builder
+- Status: in progress.
+- Landed: `tentapress/forms` plugin with `forms/signup` block, local submission route, spam checks, Mailchimp target, and TentaForms stub target.
+- Next: optional local submissions table + admin review screen, then richer field editing UX.
 
 ## Quality and docs gaps
 - No test harness in CI yet; add PHPUnit/Pest when ready.

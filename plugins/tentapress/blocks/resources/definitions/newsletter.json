@@ -1,7 +1,7 @@
 {
     "type": "blocks/newsletter",
     "name": "Newsletter",
-    "description": "A simple newsletter signup form.",
+    "description": "Deprecated. Use the Form block from tentapress/forms for new work.",
     "version": 2,
     "view": "blocks.newsletter",
     "fields": [
@@ -11,7 +11,7 @@
             "key": "actions",
             "label": "Actions",
             "type": "repeater",
-            "help": "Add newsletter actions.",
+            "help": "Deprecated block. Use the Form block from tentapress/forms for new submissions.",
             "columns": [
                 { "key": "label", "label": "Label", "type": "text", "placeholder": "Subscribe" },
                 { "key": "url", "label": "URL", "type": "text", "placeholder": "/newsletter/subscribe" },
