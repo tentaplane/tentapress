@@ -158,7 +158,7 @@ final class FormConfigNormalizer
                 continue;
             }
 
-            $parts = array_map('trim', explode('|', $line, 2));
+            $parts = array_map(trim(...), explode('|', $line, 2));
             $value = (string) ($parts[0] ?? '');
             $label = (string) ($parts[1] ?? $value);
 

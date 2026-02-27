@@ -61,7 +61,7 @@ final readonly class SubmitFormController
             }
         }
 
-        return redirect()->back();
+        return back();
     }
 
     private function statusSessionKey(string $formKey): string

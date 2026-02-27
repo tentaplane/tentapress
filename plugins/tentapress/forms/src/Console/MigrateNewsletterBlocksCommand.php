@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace TentaPress\Forms\Console;
 
+use TentaPress\Pages\Models\TpPage;
+use TentaPress\Posts\Models\TpPost;
 use Illuminate\Console\Command;
 
 final class MigrateNewsletterBlocksCommand extends Command
@@ -18,8 +20,8 @@ final class MigrateNewsletterBlocksCommand extends Command
 
         $this->info($dryRun ? 'Running in dry-run mode. No records will be saved.' : 'Migrating newsletter blocks.');
 
-        $pageChanges = $this->migrateModel('TentaPress\\Pages\\Models\\TpPage');
-        $postChanges = $this->migrateModel('TentaPress\\Posts\\Models\\TpPost');
+        $pageChanges = $this->migrateModel(TpPage::class);
+        $postChanges = $this->migrateModel(TpPost::class);
 
         $total = $pageChanges + $postChanges;
 
@@ -206,7 +208,7 @@ final class MigrateNewsletterBlocksCommand extends Command
                         continue;
                     }
 
-                    $parts = array_map('trim', explode('|', $line));
+                    $parts = array_map(trim(...), explode('|', $line));
                     $fromLines[] = [
                         'label' => (string) ($parts[0] ?? $line),
                         'url' => (string) ($parts[1] ?? ''),

@@ -1,5 +1,5 @@
 {
-    "name": "tentaplane/tentapress-forms",
+    "name": "tentapress/forms",
     "type": "library",
     "license": "MIT",
     "require": {

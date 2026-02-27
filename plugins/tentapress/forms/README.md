@@ -4,10 +4,10 @@ Forms block and submission targets for TentaPress.
 
 ## Plugin Details
 
-| Field | Value |
-|-------|-------|
-| ID | `tentapress/forms` |
-| Version | 0.3.0 |
+| Field    | Value                                   |
+|----------|-----------------------------------------|
+| ID       | `tentapress/forms`                      |
+| Version  | 0.3.1                                   |
 | Provider | `TentaPress\Forms\FormsServiceProvider` |
 
 ## Features
@@ -23,9 +23,9 @@ Forms block and submission targets for TentaPress.
 
 ## Public Routes
 
-| Method | Path | Name |
-|-------|------|------|
-| POST | `/forms/submit/{formKey}` | `tp.forms.submit` |
+| Method | Path                      | Name              |
+|--------|---------------------------|-------------------|
+| POST   | `/forms/submit/{formKey}` | `tp.forms.submit` |
 
 ## Data Handling
 
