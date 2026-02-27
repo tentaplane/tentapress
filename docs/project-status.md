@@ -1,6 +1,6 @@
 # Project Status and Roadmap
 
-**Last updated:** 2026-02-10
+**Last updated:** 2026-02-27
 
 Single source of truth for current status, priorities, and near-term roadmap.
 
@@ -45,7 +45,8 @@ showcase Tailwind base theme. Distribution is via split repos and Packagist-read
 
 ### 6) Forms builder
 - Status: in progress.
-- Landed: `tentapress/forms` plugin with `forms/signup` block, local submission route, spam checks, Mailchimp target, and TentaForms stub target.
+- Landed: `tentapress/forms` plugin with `forms/signup` block, local submission route, spam checks, Mailchimp target, TentaForms target, and Kit destination support.
+- Landed: plugin-level Pest coverage for Kit destination success/failure and provider-config normalization.
 - Next: optional local submissions table + admin review screen, then richer field editing UX.
 
 ## Quality and docs gaps

@@ -7,7 +7,7 @@ Forms block and submission targets for TentaPress.
 | Field    | Value                                   |
 |----------|-----------------------------------------|
 | ID       | `tentapress/forms`                      |
-| Version  | 0.3.1                                   |
+| Version  | 0.4.0                                   |
 | Provider | `TentaPress\Forms\FormsServiceProvider` |
 
 ## Features
@@ -32,6 +32,24 @@ Forms block and submission targets for TentaPress.
 - Submission payloads are forwarded to destination providers.
 - PII is not stored in plugin database tables in MVP.
 - Logs store metadata and optional hashed email for diagnostics.
+
+## For Site Owners (No Code)
+
+You can connect a signup form to Kit in a few minutes:
+
+1. Open the page in the editor and add the **Form** block.
+2. In the block settings, choose **Provider = Kit**.
+3. Paste your **Kit API Key** and **Kit Form ID**.
+4. Optional: add a **Kit Tag ID** if you want new subscribers auto-tagged.
+5. Publish the page and submit a test entry to confirm it works.
+
+If something fails, the form will show a friendly error and your visitor's typed values are kept so they can retry.
+
+## Quick Provider Notes
+
+- **Mailchimp**: use Action URL (+ optional list/GDPR fields).
+- **TentaForms**: use form ID (+ environment).
+- **Kit**: use API Key + Form ID (+ optional Tag ID).
 
 ## Development
 
