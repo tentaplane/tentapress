@@ -4,6 +4,29 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.37.0](https://github.com/tentaplane/tentapress/compare/v0.36.3...v0.37.0) (2026-02-27)
+
+
+### Features
+
+* **forms:** add Kit destination support ([8d7eb5c](https://github.com/tentaplane/tentapress/commit/8d7eb5c804c11a56f065b67acb3f63809afc99db))
+* **forms:** add newsletter migration command ([12ee41e](https://github.com/tentaplane/tentapress/commit/12ee41e5a7c7f4f7d3ea46a328800b31ac184141))
+* **forms:** add submission flow with spam checks and destinations ([6355f05](https://github.com/tentaplane/tentapress/commit/6355f05ba1b6fa987706bc5b7c9d65451bafc5aa))
+* **forms:** scaffold forms plugin and forms/signup block ([1777633](https://github.com/tentaplane/tentapress/commit/1777633a61e7ea00101b4a288e2ea0baddef250f))
+* **headless-api:** add v1 read-only REST endpoints ([6499f02](https://github.com/tentaplane/tentapress/commit/6499f02b13c3eba107166b0c11239b550699ccd1))
+
+
+### Bug Fixes
+
+* **forms:** update composer naming ([cd623e9](https://github.com/tentaplane/tentapress/commit/cd623e98c69d078d6f696e7d43826ab3c266fb32))
+
+
+### Miscellaneous Chores
+
+* **core:** register optional headless-api plugin ([5250e58](https://github.com/tentaplane/tentapress/commit/5250e5856a3b65d0554766ead18e145fc84259f0))
+* **forms:** apply automated test style updates ([18164ca](https://github.com/tentaplane/tentapress/commit/18164ca42b427d760755bbb155c27ae4321e40c6))
+* **forms:** normalize closure formatting in kit tests ([9e1becb](https://github.com/tentaplane/tentapress/commit/9e1becb1685d9e54a83975fe5eba015c25ba38e3))
+
 ## [0.36.3](https://github.com/tentaplane/tentapress/compare/v0.36.2...v0.36.3) (2026-02-26)
 
 
