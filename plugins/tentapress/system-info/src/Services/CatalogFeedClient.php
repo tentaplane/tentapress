@@ -193,6 +193,8 @@ final class CatalogFeedClient
                 'package' => strtolower(trim((string) ($plugin['package'] ?? $id))),
                 'docs_url' => $this->normalizeOptionalUrl($plugin['docs_url'] ?? null),
                 'repo_url' => $this->normalizeOptionalUrl($plugin['repo_url'] ?? null),
+                'icon' => $this->normalizeIcon($plugin['icon'] ?? null),
+                'preview_image' => $this->normalizeOptionalUrl($plugin['preview_image'] ?? null),
                 'latest_version' => trim((string) ($plugin['latest_version'] ?? '')),
                 'tags' => $this->normalizeTags($plugin['tags'] ?? null),
             ];
@@ -223,6 +225,20 @@ final class CatalogFeedClient
         }
 
         return $url;
+    }
+
+    private function normalizeIcon(mixed $value): ?string
+    {
+        if (! is_string($value)) {
+            return null;
+        }
+
+        $icon = trim($value);
+        if ($icon === '') {
+            return null;
+        }
+
+        return mb_substr($icon, 0, 32);
     }
 
     /**

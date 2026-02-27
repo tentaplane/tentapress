@@ -18,6 +18,9 @@ final class CatalogController
             'warning' => $result['warning'],
             'canManagePlugins' => $this->canManagePlugins(),
             'canInstallPlugins' => $this->canInstallPlugins(),
+            'installUrl' => route('tp.plugins.install'),
+            'statusUrlTemplate' => route('tp.plugins.install-attempts.show', ['installId' => '__ID__']),
+            'csrfToken' => csrf_token(),
         ]);
     }
 

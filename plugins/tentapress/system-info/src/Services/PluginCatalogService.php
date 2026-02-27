@@ -58,6 +58,8 @@ final readonly class PluginCatalogService
                 ]),
                 'docs_url' => $hosted['docs_url'] ?? null,
                 'repo_url' => $hosted['repo_url'] ?? null,
+                'icon' => $hosted['icon'] ?? null,
+                'preview_image' => $hosted['preview_image'] ?? null,
                 'tags' => is_array($hosted['tags'] ?? null) ? $hosted['tags'] : [],
                 'latest_version' => $this->firstNonEmpty([
                     $hosted['latest_version'] ?? null,

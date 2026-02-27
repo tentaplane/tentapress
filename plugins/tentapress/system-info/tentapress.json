@@ -2,7 +2,7 @@
     "id": "tentapress/system-info",
     "name": "System Info",
     "description": "Diagnostics, environment information and plugins list for TentaPress.",
-    "version": "0.6.0",
+    "version": "0.7.0",
     "provider": "TentaPress\\SystemInfo\\SystemInfoServiceProvider",
     "requires": [],
     "admin": {
@@ -19,8 +19,8 @@
                 "route": "tp.plugins.catalog",
                 "capability": "view_system_info",
                 "icon": "plug",
-                "position": 39,
-                "parent": "Settings"
+                "position": 10,
+                "parent": "System Info"
             },
             {
                 "label": "Plugins",

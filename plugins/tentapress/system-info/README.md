@@ -7,7 +7,7 @@ Diagnostics and plugin management for TentaPress.
 | Field    | Value                                             |
 | -------- | ------------------------------------------------- |
 | ID       | `tentapress/system-info`                          |
-| Version  | 0.6.0                                             |
+| Version  | 0.7.0                                             |
 | Provider | `TentaPress\SystemInfo\SystemInfoServiceProvider` |
 
 ## Features
@@ -17,7 +17,9 @@ Diagnostics and plugin management for TentaPress.
 - Storage status
 - Cache status
 - Plugin list with enable/disable controls
-- Plugin catalog for discovering first-party plugins (`tentapress/*`)
+- Plugin catalog for discovering first-party plugins (`tentapress/*`) with card-grid visual browsing
+- Catalog icon and preview metadata support from local/hosted catalog sources
+- Install queue progress feedback on catalog install actions
 - Queue-based plugin installs from admin (`vendor/package`, GitHub URL, or Packagist URL)
 - Queue-based plugin updates from admin (defaults to installed plugins; full `composer update` gated by `TP_ALLOW_FULL_COMPOSER_UPDATE=true`)
 - Serialized install jobs to avoid overlapping Composer runs
@@ -50,6 +52,7 @@ None.
 - `local_path` is the maintained source of truth in this monorepo for first-party catalog entries.
 - `url` is optional. If set, hosted data overlays local entries by plugin id.
 - If hosted data is unavailable, the catalog falls back to local data (and cached hosted data when available).
+- Catalog plugin entries can include optional `icon` and `preview_image` fields.
 
 ## Development
 
