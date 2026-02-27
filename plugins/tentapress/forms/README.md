@@ -43,6 +43,12 @@ You can connect a signup form to Kit in a few minutes:
 4. Optional: add a **Kit Tag ID** if you want new subscribers auto-tagged.
 5. Publish the page and submit a test entry to confirm it works.
 
+Where to find these values in Kit:
+
+- **API Key**: Kit account settings -> API.
+- **Form ID**: the numeric ID for the form receiving subscribers.
+- **Tag ID**: optional numeric ID for the tag to auto-apply.
+
 If something fails, the form will show a friendly error and your visitor's typed values are kept so they can retry.
 
 ## Quick Provider Notes

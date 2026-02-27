@@ -45,6 +45,7 @@
             "key": "provider",
             "label": "Provider",
             "type": "select",
+            "help": "Choose where new submissions should be sent.",
             "options": [
                 { "value": "mailchimp", "label": "Mailchimp" },
                 { "value": "tentafor.ms", "label": "TentaForms" },
@@ -64,10 +65,10 @@
                 { "value": "staging", "label": "Staging" }
             ]
         },
-        { "key": "kit_api_key", "label": "Kit API Key", "type": "text", "placeholder": "kit_api_..." },
-        { "key": "kit_form_id", "label": "Kit Form ID", "type": "text", "placeholder": "1234567" },
-        { "key": "kit_tag_id", "label": "Kit Tag ID (optional)", "type": "text", "placeholder": "9876543" },
-        { "key": "provider_config", "label": "Provider Config JSON (optional override)", "type": "textarea", "rows": 4, "placeholder": "{\"action_url\":\"...\"}" }
+        { "key": "kit_api_key", "label": "Kit API Key", "type": "text", "placeholder": "kit_api_...", "help": "Found in your Kit account settings. Keep this secret." },
+        { "key": "kit_form_id", "label": "Kit Form ID", "type": "text", "placeholder": "1234567", "help": "Use the numeric ID of the Kit form you want subscribers added to." },
+        { "key": "kit_tag_id", "label": "Kit Tag ID (optional)", "type": "text", "placeholder": "9876543", "help": "Optional: auto-apply this Kit tag after signup." },
+        { "key": "provider_config", "label": "Provider Config JSON (optional override)", "type": "textarea", "rows": 4, "placeholder": "{\"action_url\":\"...\"}", "help": "Advanced: override provider settings manually. Leave blank for normal use." }
     ],
     "defaults": {
         "form_key": "signup",
