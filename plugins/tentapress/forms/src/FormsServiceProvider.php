@@ -7,6 +7,7 @@ namespace TentaPress\Forms;
 use Illuminate\Support\ServiceProvider;
 use TentaPress\Blocks\Registry\BlockRegistry;
 use TentaPress\Forms\Destinations\DestinationRegistry;
+use TentaPress\Forms\Destinations\KitDestination;
 use TentaPress\Forms\Destinations\MailchimpDestination;
 use TentaPress\Forms\Destinations\TentaFormsDestination;
 use TentaPress\Forms\Discovery\FormsBlockKit;
@@ -26,10 +27,12 @@ final class FormsServiceProvider extends ServiceProvider
         $this->app->singleton(SpamGuard::class);
         $this->app->singleton(MailchimpDestination::class);
         $this->app->singleton(TentaFormsDestination::class);
+        $this->app->singleton(KitDestination::class);
         $this->app->singleton(DestinationRegistry::class, function ($app): DestinationRegistry {
             $registry = new DestinationRegistry();
             $registry->register($app->make(MailchimpDestination::class));
             $registry->register($app->make(TentaFormsDestination::class));
+            $registry->register($app->make(KitDestination::class));
 
             return $registry;
         });

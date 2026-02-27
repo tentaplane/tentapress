@@ -47,7 +47,8 @@
             "type": "select",
             "options": [
                 { "value": "mailchimp", "label": "Mailchimp" },
-                { "value": "tentafor.ms", "label": "TentaForms" }
+                { "value": "tentafor.ms", "label": "TentaForms" },
+                { "value": "kit", "label": "Kit" }
             ]
         },
         { "key": "mailchimp_action_url", "label": "Mailchimp Action URL", "type": "text", "placeholder": "https://...list-manage.com/subscribe/post?..." },
@@ -63,6 +64,9 @@
                 { "value": "staging", "label": "Staging" }
             ]
         },
+        { "key": "kit_api_key", "label": "Kit API Key", "type": "text", "placeholder": "kit_api_..." },
+        { "key": "kit_form_id", "label": "Kit Form ID", "type": "text", "placeholder": "1234567" },
+        { "key": "kit_tag_id", "label": "Kit Tag ID (optional)", "type": "text", "placeholder": "9876543" },
         { "key": "provider_config", "label": "Provider Config JSON (optional override)", "type": "textarea", "rows": 4, "placeholder": "{\"action_url\":\"...\"}" }
     ],
     "defaults": {
@@ -92,6 +96,9 @@
         "mailchimp_gdpr_tag": "",
         "tentaforms_form_id": "",
         "tentaforms_environment": "production",
+        "kit_api_key": "",
+        "kit_form_id": "",
+        "kit_tag_id": "",
         "provider_config": ""
     },
     "example": {
@@ -122,6 +129,9 @@
             "mailchimp_gdpr_tag": "",
             "tentaforms_form_id": "",
             "tentaforms_environment": "production",
+            "kit_api_key": "",
+            "kit_form_id": "",
+            "kit_tag_id": "",
             "provider_config": ""
         }
     }

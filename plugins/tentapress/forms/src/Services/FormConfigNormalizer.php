@@ -64,6 +64,7 @@ final class FormConfigNormalizer
 
         return match ($value) {
             'tentaforms', 'tentafor.ms' => 'tentafor.ms',
+            'kit', 'convertkit' => 'kit',
             default => 'mailchimp',
         };
     }
@@ -110,6 +111,22 @@ final class FormConfigNormalizer
 
         if ($tentaFormsEnvironment !== '' && ! array_key_exists('environment', $base)) {
             $base['environment'] = $tentaFormsEnvironment;
+        }
+
+        $kitApiKey = trim((string) ($payload['kit_api_key'] ?? ''));
+        $kitFormId = trim((string) ($payload['kit_form_id'] ?? ''));
+        $kitTagId = trim((string) ($payload['kit_tag_id'] ?? ''));
+
+        if ($kitApiKey !== '' && ! array_key_exists('api_key', $base)) {
+            $base['api_key'] = $kitApiKey;
+        }
+
+        if ($kitFormId !== '' && ! array_key_exists('form_id', $base)) {
+            $base['form_id'] = $kitFormId;
+        }
+
+        if ($kitTagId !== '' && ! array_key_exists('tag_id', $base)) {
+            $base['tag_id'] = $kitTagId;
         }
 
         return $base;

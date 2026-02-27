@@ -15,7 +15,7 @@ Forms block and submission targets for TentaPress.
 - Registers a `forms/signup` block in the block registry.
 - Renders configurable form fields (email, text, textarea, checkbox, select, hidden).
 - Submits to a local endpoint with CSRF protection, honeypot, and minimum elapsed-time spam checks.
-- Supports provider configuration props for Mailchimp and TentaForms.
+- Supports provider configuration props for Mailchimp, TentaForms, and Kit.
 
 ## Dependencies
 
