@@ -235,9 +235,7 @@ final class CatalogFeedClient
             return [];
         }
 
-        $tags = array_values(array_filter(array_map(static function (mixed $tag): string {
-            return trim((string) $tag);
-        }, $value), static fn (string $tag): bool => $tag !== ''));
+        $tags = array_values(array_filter(array_map(static fn(mixed $tag): string => trim((string) $tag), $value), static fn (string $tag): bool => $tag !== ''));
 
         return array_values(array_unique($tags));
     }
