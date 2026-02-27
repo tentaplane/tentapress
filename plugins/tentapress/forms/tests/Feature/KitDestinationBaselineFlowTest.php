@@ -73,5 +73,5 @@ it('submits to kit through the form submission service', function (): void {
     expect($outcome->message)->toBe('Submitted');
 
     Http::assertSentCount(3);
-    Http::assertSent(fn(Request $request): bool => $request->hasHeader('X-Kit-Api-Key', 'kit_api_key_123'));
+    Http::assertSent(fn (Request $request): bool => $request->hasHeader('X-Kit-Api-Key', 'kit_api_key_123'));
 });
