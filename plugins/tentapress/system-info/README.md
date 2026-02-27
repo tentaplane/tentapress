@@ -7,7 +7,7 @@ Diagnostics and plugin management for TentaPress.
 | Field    | Value                                             |
 | -------- | ------------------------------------------------- |
 | ID       | `tentapress/system-info`                          |
-| Version  | 0.5.3                                             |
+| Version  | 0.6.0                                             |
 | Provider | `TentaPress\SystemInfo\SystemInfoServiceProvider` |
 
 ## Features
@@ -17,6 +17,7 @@ Diagnostics and plugin management for TentaPress.
 - Storage status
 - Cache status
 - Plugin list with enable/disable controls
+- Plugin catalog for discovering first-party plugins (`tentapress/*`)
 - Queue-based plugin installs from admin (`vendor/package`, GitHub URL, or Packagist URL)
 - Queue-based plugin updates from admin (defaults to installed plugins; full `composer update` gated by `TP_ALLOW_FULL_COMPOSER_UPDATE=true`)
 - Serialized install jobs to avoid overlapping Composer runs
@@ -31,7 +32,24 @@ None.
 | Label       | Route              | Capability         | Icon | Position | Parent   |
 | ----------- | ------------------ | ------------------ | ---- | -------- | -------- |
 | System Info | `tp.system-info`   | `view_system_info` | info | 95       | -        |
+| Plugin Catalogue | `tp.plugins.catalog` | `view_system_info` | plug | 39       | Settings |
 | Plugins     | `tp.plugins.index` | `manage_plugins`   | plug | 40       | Settings |
+
+## Configuration
+
+```php
+'catalog' => [
+    'local_path' => 'docs/catalog/first-party-plugins.json',
+    'url' => '',
+    'timeout_seconds' => 5,
+    'cache_ttl_seconds' => 900,
+    'require_https' => true,
+],
+```
+
+- `local_path` is the maintained source of truth in this monorepo for first-party catalog entries.
+- `url` is optional. If set, hosted data overlays local entries by plugin id.
+- If hosted data is unavailable, the catalog falls back to local data (and cached hosted data when available).
 
 ## Development
 

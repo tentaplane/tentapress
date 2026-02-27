@@ -6,6 +6,7 @@ use TentaPress\SystemInfo\Http\Admin\SystemInfoController;
 use TentaPress\SystemInfo\Http\Admin\DiagnosticsDownloadController;
 use Illuminate\Support\Facades\Route;
 use TentaPress\System\Support\AdminRoutes;
+use TentaPress\SystemInfo\Http\Admin\Plugins\CatalogController;
 use TentaPress\SystemInfo\Http\Admin\Plugins\DisableController;
 use TentaPress\SystemInfo\Http\Admin\Plugins\EnableController;
 use TentaPress\SystemInfo\Http\Admin\Plugins\IndexController;
@@ -15,6 +16,10 @@ use TentaPress\SystemInfo\Http\Admin\Plugins\SyncController;
 use TentaPress\SystemInfo\Http\Admin\Plugins\UpdateController;
 
 AdminRoutes::group(function (): void {
+    Route::get('/plugins/catalog', CatalogController::class)
+        ->name('plugins.catalog')
+        ->middleware('tp.can:view_system_info');
+
     Route::get('/plugins', IndexController::class)
         ->name('plugins.index')
         ->middleware('tp.can:manage_plugins');

@@ -62,6 +62,22 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Plugin Catalog
+    |--------------------------------------------------------------------------
+    |
+    | Plugin catalog source configuration for first-party plugin discovery.
+    |
+    */
+    'catalog' => [
+        'local_path' => 'docs/catalog/first-party-plugins.json',
+        'url' => '',
+        'timeout_seconds' => 5,
+        'cache_ttl_seconds' => 900,
+        'require_https' => true,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Media
     |--------------------------------------------------------------------------
     |
