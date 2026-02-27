@@ -7,7 +7,7 @@ Forms block and submission targets for TentaPress.
 | Field    | Value                                   |
 |----------|-----------------------------------------|
 | ID       | `tentapress/forms`                      |
-| Version  | 0.4.2                                   |
+| Version  | 0.4.3                                   |
 | Provider | `TentaPress\Forms\FormsServiceProvider` |
 
 ## Features
@@ -78,6 +78,29 @@ Diagnostics in logs:
 - `forms.submission.result` for all attempts.
 - `forms.submission.failed` for failed attempts.
 - Useful fields include `attempt_id`, `provider`, `status_code`, and `failure_category`.
+
+## Release Notes
+
+### 0.4.3
+
+- Expanded Pest regression coverage for submission flows and migration command behavior.
+- Added Mailchimp destination fake-HTTP regression tests.
+- Completed release-readiness validation pass for forms test suite.
+
+### 0.4.2
+
+- Added structured diagnostics logs for provider submission failures.
+- Added operator rollout and fallback guidance.
+
+### 0.4.1
+
+- Added named forms submission throttling policy.
+- Hardened TentaForms default stub behavior by environment.
+
+### 0.4.0
+
+- Added Kit destination support (API mode) with provider configuration fields.
+- Added baseline Kit destination tests and updated site-owner setup guidance.
 
 ## Development
 
