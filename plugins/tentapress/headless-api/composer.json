@@ -1,5 +1,6 @@
 {
     "name": "tentapress/headless-api",
+    "description": "Headless REST API endpoints for TentaPress content delivery.",
     "type": "library",
     "license": "MIT",
     "require": {

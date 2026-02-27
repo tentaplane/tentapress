@@ -7,7 +7,7 @@ Headless REST API for TentaPress content delivery.
 | Field    | Value                                           |
 |----------|-------------------------------------------------|
 | ID       | `tentapress/headless-api`                       |
-| Version  | 0.1.0                                           |
+| Version  | 0.1.1                                           |
 | Provider | `TentaPress\\HeadlessApi\\HeadlessApiServiceProvider` |
 
 ## Features
@@ -26,6 +26,85 @@ Headless REST API for TentaPress content delivery.
 - `GET /api/v1/posts/{slug}`
 - `GET /api/v1/menus/{location}`
 - `GET /api/v1/media/{id}`
+
+### Query Parameters
+
+- `GET /api/v1/pages`
+  - `per_page` (default `12`, min `1`, max `100`)
+  - `slug` (exact slug filter)
+  - `layout` (exact layout filter)
+- `GET /api/v1/posts`
+  - `per_page` (default `12`, min `1`, max `100`)
+  - `author` (numeric author id)
+  - `q` (searches title and slug)
+
+### Response Examples
+
+#### Success: `GET /api/v1/posts/{slug}`
+
+```json
+{
+    "data": {
+        "id": 42,
+        "type": "post",
+        "title": "Hello API",
+        "slug": "hello-api",
+        "status": "published",
+        "layout": "post",
+        "editor_driver": "blocks",
+        "published_at": "2026-02-27T10:00:00+00:00",
+        "permalink": "/blog/hello-api",
+        "author": {
+            "id": 1,
+            "name": "Headless Author"
+        },
+        "content_raw": {
+            "editor_driver": "blocks",
+            "blocks": [],
+            "content": null
+        },
+        "content_html": "",
+        "seo": {
+            "title": "Post SEO",
+            "description": "Post description",
+            "canonical_url": null,
+            "robots": null,
+            "og_title": null,
+            "og_description": null,
+            "og_image": null,
+            "twitter_title": null,
+            "twitter_description": null,
+            "twitter_image": null
+        },
+        "updated_at": "2026-02-27T10:05:00+00:00"
+    }
+}
+```
+
+#### Not Found: `GET /api/v1/posts/{slug}`
+
+```json
+{
+    "error": {
+        "code": "not_found",
+        "message": "Post not found"
+    }
+}
+```
+
+#### Index Envelope: `GET /api/v1/pages`
+
+```json
+{
+    "data": [],
+    "meta": {
+        "current_page": 1,
+        "per_page": 12,
+        "total": 0,
+        "last_page": 1
+    }
+}
+```
 
 ## Dependencies
 
