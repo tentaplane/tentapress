@@ -7,17 +7,24 @@ namespace TentaPress\HeadlessApi\Http\Api\V1;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
+use TentaPress\HeadlessApi\Support\BlogBaseResolver;
 use TentaPress\HeadlessApi\Support\ContentPayloadBuilder;
+use TentaPress\HeadlessApi\Support\SeoPayloadBuilder;
 use TentaPress\Posts\Models\TpPost;
 use TentaPress\Settings\Services\SettingsStore;
 use TentaPress\Seo\Models\TpSeoPost;
 
 final class PostsIndexController
 {
-    public function __invoke(Request $request, ContentPayloadBuilder $content, SettingsStore $settings): JsonResponse
-    {
+    public function __invoke(
+        Request $request,
+        ContentPayloadBuilder $content,
+        SettingsStore $settings,
+        BlogBaseResolver $blogBaseResolver,
+        SeoPayloadBuilder $seoPayloadBuilder,
+    ): JsonResponse {
         $perPage = max(1, min((int) $request->query('per_page', 12), 100));
-        $blogBase = $this->blogBase($settings);
+        $blogBase = $blogBaseResolver->fromSettings($settings);
 
         $query = TpPost::query()
             ->with('author')
@@ -49,7 +56,7 @@ final class PostsIndexController
             ->get()
             ->keyBy('post_id');
 
-        $data = $posts->getCollection()->map(function (TpPost $post) use ($blogBase, $content, $seoByPostId): array {
+        $data = $posts->getCollection()->map(function (TpPost $post) use ($blogBase, $content, $seoByPostId, $seoPayloadBuilder): array {
             $payload = $content->forPost($post);
             $seo = $seoByPostId->get((int) $post->id);
 
@@ -65,11 +72,11 @@ final class PostsIndexController
                 'permalink' => '/'.$blogBase.'/'.ltrim((string) ($post->slug ?? ''), '/'),
                 'author' => [
                     'id' => is_numeric($post->author_id) ? (int) $post->author_id : null,
-                    'name' => $this->nullableString($post->author?->name),
+                    'name' => $this->nullableAuthorName($post->author?->name),
                 ],
                 'content_raw' => $payload['content_raw'],
                 'content_html' => $payload['content_html'],
-                'seo' => $this->seoPayload($seo),
+                'seo' => $seoPayloadBuilder->forPost($seo),
                 'updated_at' => $post->updated_at?->toIso8601String(),
             ];
         })->values();
@@ -85,44 +92,10 @@ final class PostsIndexController
         ]);
     }
 
-    /**
-     * @return array<string,mixed>|null
-     */
-    private function seoPayload(?TpSeoPost $seo): ?array
-    {
-        if (! $seo) {
-            return null;
-        }
-
-        return [
-            'title' => $this->nullableString($seo->title),
-            'description' => $this->nullableString($seo->description),
-            'canonical_url' => $this->nullableString($seo->canonical_url),
-            'robots' => $this->nullableString($seo->robots),
-            'og_title' => $this->nullableString($seo->og_title),
-            'og_description' => $this->nullableString($seo->og_description),
-            'og_image' => $this->nullableString($seo->og_image),
-            'twitter_title' => $this->nullableString($seo->twitter_title),
-            'twitter_description' => $this->nullableString($seo->twitter_description),
-            'twitter_image' => $this->nullableString($seo->twitter_image),
-        ];
-    }
-
-    private function nullableString(mixed $value): ?string
+    private function nullableAuthorName(mixed $value): ?string
     {
         $normalized = trim((string) ($value ?? ''));
 
         return $normalized === '' ? null : $normalized;
-    }
-
-    private function blogBase(SettingsStore $settings): string
-    {
-        $blogBase = trim((string) $settings->get('site.blog_base', 'blog'), '/');
-
-        if ($blogBase !== '' && preg_match('/^[a-z0-9]+(?:-[a-z0-9]+)*$/', $blogBase) === 1) {
-            return $blogBase;
-        }
-
-        return 'blog';
     }
 }

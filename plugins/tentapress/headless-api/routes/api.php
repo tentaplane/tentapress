@@ -11,7 +11,7 @@ use TentaPress\HeadlessApi\Http\Api\V1\PostsIndexController;
 use TentaPress\HeadlessApi\Http\Api\V1\PostShowController;
 use TentaPress\HeadlessApi\Http\Api\V1\SiteShowController;
 
-Route::middleware(['api', 'throttle:api'])->prefix('api/v1')->group(function (): void {
+Route::middleware(['api', 'throttle:60,1'])->prefix('api/v1')->group(function (): void {
     Route::get('/site', SiteShowController::class)->name('tp.api.v1.site.show');
 
     Route::get('/pages', PagesIndexController::class)->name('tp.api.v1.pages.index');

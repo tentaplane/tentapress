@@ -8,13 +8,17 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 use TentaPress\HeadlessApi\Support\ContentPayloadBuilder;
+use TentaPress\HeadlessApi\Support\SeoPayloadBuilder;
 use TentaPress\Pages\Models\TpPage;
 use TentaPress\Seo\Models\TpSeoPage;
 
 final class PagesIndexController
 {
-    public function __invoke(Request $request, ContentPayloadBuilder $content): JsonResponse
-    {
+    public function __invoke(
+        Request $request,
+        ContentPayloadBuilder $content,
+        SeoPayloadBuilder $seoPayloadBuilder,
+    ): JsonResponse {
         $perPage = max(1, min((int) $request->query('per_page', 12), 100));
 
         $query = TpPage::query()
@@ -38,7 +42,7 @@ final class PagesIndexController
             ->get()
             ->keyBy('page_id');
 
-        $data = $pages->getCollection()->map(function (TpPage $page) use ($content, $seoByPageId): array {
+        $data = $pages->getCollection()->map(function (TpPage $page) use ($content, $seoByPageId, $seoPayloadBuilder): array {
             $payload = $content->forPage($page);
             $seo = $seoByPageId->get((int) $page->id);
 
@@ -54,7 +58,7 @@ final class PagesIndexController
                 'permalink' => '/'.ltrim((string) ($page->slug ?? ''), '/'),
                 'content_raw' => $payload['content_raw'],
                 'content_html' => $payload['content_html'],
-                'seo' => $this->seoPayload($seo),
+                'seo' => $seoPayloadBuilder->forPage($seo),
                 'updated_at' => $page->updated_at?->toIso8601String(),
             ];
         })->values();
@@ -68,35 +72,5 @@ final class PagesIndexController
                 'last_page' => $pages->lastPage(),
             ],
         ]);
-    }
-
-    /**
-     * @return array<string,mixed>|null
-     */
-    private function seoPayload(?TpSeoPage $seo): ?array
-    {
-        if (! $seo) {
-            return null;
-        }
-
-        return [
-            'title' => $this->nullableString($seo->title),
-            'description' => $this->nullableString($seo->description),
-            'canonical_url' => $this->nullableString($seo->canonical_url),
-            'robots' => $this->nullableString($seo->robots),
-            'og_title' => $this->nullableString($seo->og_title),
-            'og_description' => $this->nullableString($seo->og_description),
-            'og_image' => $this->nullableString($seo->og_image),
-            'twitter_title' => $this->nullableString($seo->twitter_title),
-            'twitter_description' => $this->nullableString($seo->twitter_description),
-            'twitter_image' => $this->nullableString($seo->twitter_image),
-        ];
-    }
-
-    private function nullableString(mixed $value): ?string
-    {
-        $normalized = trim((string) ($value ?? ''));
-
-        return $normalized === '' ? null : $normalized;
     }
 }

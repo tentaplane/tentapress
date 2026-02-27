@@ -6,22 +6,18 @@ namespace TentaPress\HeadlessApi\Http\Api\V1;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Response;
+use TentaPress\HeadlessApi\Support\ApiErrorResponder;
 use TentaPress\Media\Contracts\MediaUrlGenerator;
 use TentaPress\Media\Models\TpMedia;
 
 final class MediaShowController
 {
-    public function __invoke(int $id, MediaUrlGenerator $urls): JsonResponse
+    public function __invoke(int $id, MediaUrlGenerator $urls, ApiErrorResponder $errors): JsonResponse
     {
         $media = TpMedia::query()->whereKey($id)->first();
 
         if (! $media) {
-            return Response::json([
-                'error' => [
-                    'code' => 'not_found',
-                    'message' => 'Media not found',
-                ],
-            ], 404);
+            return $errors->notFound('Media not found');
         }
 
         $url = $urls->url($media);
