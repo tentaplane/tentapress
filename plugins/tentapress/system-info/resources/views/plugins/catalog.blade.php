@@ -54,7 +54,9 @@
                 @endphp
                 <article class="tp-panel overflow-hidden border border-slate-200">
                     @if ($previewImage)
-                        <img src="{{ $previewImage }}" alt="{{ $name }} preview" class="h-28 w-full object-cover" loading="lazy" />
+                        <div class="aspect-video w-full overflow-hidden bg-slate-100">
+                            <img src="{{ $previewImage }}" alt="{{ $name }} preview" class="h-full w-full object-cover" loading="lazy" />
+                        </div>
                     @endif
 
                     <div class="space-y-3 p-4">
