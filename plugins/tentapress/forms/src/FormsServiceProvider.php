@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace TentaPress\Forms;
 
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\RateLimiter;
 use TentaPress\Blocks\Registry\BlockRegistry;
 use TentaPress\Forms\Destinations\DestinationRegistry;
 use TentaPress\Forms\Destinations\KitDestination;
@@ -41,6 +44,13 @@ final class FormsServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        RateLimiter::for('tp.forms.submit', function (Request $request): Limit {
+            $formKey = strtolower(trim((string) $request->route('formKey', 'form')));
+            $key = $request->ip().'|'.$formKey;
+
+            return Limit::perMinute(20)->by($key);
+        });
+
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'tentapress-blocks');
         $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
 

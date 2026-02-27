@@ -21,7 +21,9 @@ final class TentaFormsDestination implements SubmissionDestination
             return new DestinationResult(ok: false, error: 'TentaForms form_id is required.');
         }
 
-        $stub = $this->isTruthy($providerConfig['stub'] ?? true);
+        $stub = array_key_exists('stub', $providerConfig)
+            ? $this->isTruthy($providerConfig['stub'])
+            : $this->defaultStub();
 
         if ($stub) {
             return new DestinationResult(ok: true, statusCode: 202);
@@ -87,5 +89,10 @@ final class TentaFormsDestination implements SubmissionDestination
         $scheme = strtolower((string) parse_url($url, PHP_URL_SCHEME));
 
         return in_array($scheme, ['http', 'https'], true);
+    }
+
+    private function defaultStub(): bool
+    {
+        return app()->environment(['local', 'testing']);
     }
 }

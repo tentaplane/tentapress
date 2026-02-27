@@ -7,7 +7,7 @@ Forms block and submission targets for TentaPress.
 | Field    | Value                                   |
 |----------|-----------------------------------------|
 | ID       | `tentapress/forms`                      |
-| Version  | 0.4.0                                   |
+| Version  | 0.4.1                                   |
 | Provider | `TentaPress\Forms\FormsServiceProvider` |
 
 ## Features
@@ -16,6 +16,7 @@ Forms block and submission targets for TentaPress.
 - Renders configurable form fields (email, text, textarea, checkbox, select, hidden).
 - Submits to a local endpoint with CSRF protection, honeypot, and minimum elapsed-time spam checks.
 - Supports provider configuration props for Mailchimp, TentaForms, and Kit.
+- Applies rate limiting to form submissions to reduce abuse.
 
 ## Dependencies
 
@@ -55,6 +56,7 @@ If something fails, the form will show a friendly error and your visitor's typed
 
 - **Mailchimp**: use Action URL (+ optional list/GDPR fields).
 - **TentaForms**: use form ID (+ environment).
+  - In local/testing, TentaForms uses safe stub mode by default unless explicitly disabled.
 - **Kit**: use API Key + Form ID (+ optional Tag ID).
 
 ## Development
