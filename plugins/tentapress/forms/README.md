@@ -7,7 +7,7 @@ Forms block and submission targets for TentaPress.
 | Field    | Value                                   |
 |----------|-----------------------------------------|
 | ID       | `tentapress/forms`                      |
-| Version  | 0.4.1                                   |
+| Version  | 0.4.2                                   |
 | Provider | `TentaPress\Forms\FormsServiceProvider` |
 
 ## Features
@@ -58,6 +58,26 @@ If something fails, the form will show a friendly error and your visitor's typed
 - **TentaForms**: use form ID (+ environment).
   - In local/testing, TentaForms uses safe stub mode by default unless explicitly disabled.
 - **Kit**: use API Key + Form ID (+ optional Tag ID).
+
+## Rollout and Fallback Guidance (Operators)
+
+Recommended rollout:
+
+1. Start with one low-risk form (for example, newsletter signup).
+2. Submit test entries and confirm subscribers appear in your provider.
+3. Roll out to additional forms once the first form is stable.
+
+If a provider has issues:
+
+- Keep the same form fields and switch **Provider** to a known-good destination.
+- Keep a clear fallback message in `error_message` so visitors know to retry.
+- For local/testing environments, TentaForms stays safely stubbed by default.
+
+Diagnostics in logs:
+
+- `forms.submission.result` for all attempts.
+- `forms.submission.failed` for failed attempts.
+- Useful fields include `attempt_id`, `provider`, `status_code`, and `failure_category`.
 
 ## Development
 

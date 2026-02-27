@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace TentaPress\Forms\Services;
 
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use TentaPress\Forms\Destinations\DestinationResult;
 use TentaPress\Forms\Destinations\DestinationRegistry;
 
 final readonly class FormSubmissionService
@@ -23,6 +25,7 @@ final readonly class FormSubmissionService
      */
     public function submit(array $input, string $formKey): SubmissionOutcome
     {
+        $attemptId = (string) Str::uuid();
         $payload = $this->signer->verify((string) ($input['_tp_payload'] ?? ''));
 
         if (! is_array($payload)) {
@@ -74,17 +77,30 @@ final readonly class FormSubmissionService
 
         $emailHash = $this->emailHash($fieldValues, $fields);
 
-        logger()->info('Forms submission attempt', [
+        $failureCategory = $this->failureCategory($result);
+
+        logger()->info('forms.submission.result', [
+            'attempt_id' => $attemptId,
             'form_key' => $formKey,
             'provider' => $provider,
             'ok' => $result->ok,
             'status_code' => $result->statusCode,
-            'error' => $result->error,
+            'error_present' => trim((string) $result->error) !== '',
+            'failure_category' => $failureCategory,
             'field_count' => count($fieldValues),
             'email_hash' => $emailHash,
         ]);
 
         if (! $result->ok) {
+            logger()->warning('forms.submission.failed', [
+                'attempt_id' => $attemptId,
+                'form_key' => $formKey,
+                'provider' => $provider,
+                'status_code' => $result->statusCode,
+                'failure_category' => $failureCategory,
+                'error' => $result->error,
+            ]);
+
             $errorMessage = trim((string) ($payload['error_message'] ?? ''));
 
             return new SubmissionOutcome(false, $errorMessage !== '' ? $errorMessage : 'We could not submit your form. Please try again.');
@@ -219,5 +235,39 @@ final readonly class FormSubmissionService
         $text = strtolower(trim((string) $value));
 
         return in_array($text, ['1', 'true', 'yes', 'on'], true);
+    }
+
+    private function failureCategory(DestinationResult $result): ?string
+    {
+        if ($result->ok) {
+            return null;
+        }
+
+        $statusCode = $result->statusCode;
+        $error = strtolower(trim((string) $result->error));
+
+        if ($statusCode === 429) {
+            return 'rate_limited';
+        }
+
+        if (is_int($statusCode)) {
+            if ($statusCode >= 500) {
+                return 'provider_unavailable';
+            }
+
+            if ($statusCode >= 400) {
+                return 'provider_rejected';
+            }
+        }
+
+        if (str_contains($error, 'required') || str_contains($error, 'invalid')) {
+            return 'configuration';
+        }
+
+        if (str_contains($error, 'timed out') || str_contains($error, 'timeout') || str_contains($error, 'connection')) {
+            return 'transport';
+        }
+
+        return 'unknown';
     }
 }
