@@ -51,20 +51,16 @@ it('emits structured diagnostics when provider submission fails', function (): v
 
     expect($outcome->ok)->toBeFalse();
 
-    Log::assertLogged('info', function (string $message, array $context): bool {
-        return $message === 'forms.submission.result'
-            && ($context['provider'] ?? null) === 'kit'
-            && ($context['ok'] ?? null) === false
-            && ($context['failure_category'] ?? null) === 'configuration'
-            && is_string($context['attempt_id'] ?? null)
-            && ($context['attempt_id'] ?? '') !== '';
-    });
+    Log::assertLogged('info', fn(string $message, array $context): bool => $message === 'forms.submission.result'
+        && ($context['provider'] ?? null) === 'kit'
+        && ($context['ok'] ?? null) === false
+        && ($context['failure_category'] ?? null) === 'configuration'
+        && is_string($context['attempt_id'] ?? null)
+        && ($context['attempt_id'] ?? '') !== '');
 
-    Log::assertLogged('warning', function (string $message, array $context): bool {
-        return $message === 'forms.submission.failed'
-            && ($context['provider'] ?? null) === 'kit'
-            && ($context['failure_category'] ?? null) === 'configuration'
-            && is_string($context['attempt_id'] ?? null)
-            && ($context['attempt_id'] ?? '') !== '';
-    });
+    Log::assertLogged('warning', fn(string $message, array $context): bool => $message === 'forms.submission.failed'
+        && ($context['provider'] ?? null) === 'kit'
+        && ($context['failure_category'] ?? null) === 'configuration'
+        && is_string($context['attempt_id'] ?? null)
+        && ($context['attempt_id'] ?? '') !== '');
 });
