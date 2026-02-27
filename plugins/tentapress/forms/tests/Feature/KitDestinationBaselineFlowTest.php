@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
 use TentaPress\Forms\Destinations\DestinationRegistry;
 use TentaPress\Forms\Destinations\KitDestination;
@@ -17,7 +18,7 @@ it('submits to kit through the form submission service', function (): void {
         'https://api.kit.com/v4/tags/*/subscribers' => Http::response(['id' => 123], 201),
     ]);
 
-    $signer = app(FormPayloadSigner::class);
+    $signer = resolve(FormPayloadSigner::class);
     $registry = new DestinationRegistry();
     $registry->register(new KitDestination());
 
@@ -72,7 +73,5 @@ it('submits to kit through the form submission service', function (): void {
     expect($outcome->message)->toBe('Submitted');
 
     Http::assertSentCount(3);
-    Http::assertSent(function (\Illuminate\Http\Client\Request $request): bool {
-        return $request->hasHeader('X-Kit-Api-Key', 'kit_api_key_123');
-    });
+    Http::assertSent(fn(Request $request): bool => $request->hasHeader('X-Kit-Api-Key', 'kit_api_key_123'));
 });
