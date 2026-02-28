@@ -232,9 +232,7 @@ final class StaticExporter
             ];
         }
 
-        usort($exports, function (array $left, array $right): int {
-            return strcmp($right['timestamp'], $left['timestamp']);
-        });
+        usort($exports, fn(array $left, array $right): int => strcmp((string) $right['timestamp'], (string) $left['timestamp']));
 
         return $exports;
     }
