@@ -13,3 +13,15 @@ it('serves stable admin-shell asset filenames with runtime cache busting', funct
     expect($tags)->toContain('plugins/tentapress/admin-shell/build/admin-styles.css?v=');
     expect($tags)->toContain('plugins/tentapress/admin-shell/build/admin.js?v=');
 });
+
+it('keeps cache busting when the public stylesheet is briefly missing during publish', function (): void {
+    $this->artisan('tp:plugins sync')->assertSuccessful();
+    $this->artisan('tp:plugins enable tentapress/admin-shell')->assertSuccessful();
+
+    @unlink(public_path('plugins/tentapress/admin-shell/build/admin-styles.css'));
+
+    $tags = resolve(PluginAssetRegistry::class)->tags('tentapress/admin-shell');
+
+    expect($tags)->toContain('plugins/tentapress/admin-shell/build/admin-styles.css?v=');
+    expect($tags)->toContain('plugins/tentapress/admin-shell/build/admin.js?v=');
+});

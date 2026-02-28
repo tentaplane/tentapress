@@ -24,6 +24,9 @@ final class PluginAssetRegistry
             return ['scripts' => [], 'styles' => []];
         }
 
+        $enabled = $this->plugins->readCache();
+        $pluginPath = is_array($enabled[$pluginId] ?? null) ? (string) ($enabled[$pluginId]['path'] ?? '') : '';
+
         $manifest = $this->manifestFor($pluginId);
         if ($manifest === null) {
             return ['scripts' => [], 'styles' => []];
@@ -45,14 +48,14 @@ final class PluginAssetRegistry
 
             $file = $item['file'] ?? null;
             if (is_string($file)) {
-                $scripts[] = $this->assetUrl($pluginId, $file);
+                $scripts[] = $this->assetUrl($pluginId, $file, $pluginPath);
             }
 
             $css = $item['css'] ?? [];
             if (is_array($css)) {
                 foreach ($css as $cssFile) {
                     if (is_string($cssFile)) {
-                        $styles[] = $this->assetUrl($pluginId, $cssFile);
+                        $styles[] = $this->assetUrl($pluginId, $cssFile, $pluginPath);
                     }
                 }
             }
@@ -66,7 +69,7 @@ final class PluginAssetRegistry
 
             $file = $item['file'] ?? null;
             if (is_string($file)) {
-                $styles[] = $this->assetUrl($pluginId, $file);
+                $styles[] = $this->assetUrl($pluginId, $file, $pluginPath);
             }
         }
 
@@ -252,31 +255,49 @@ final class PluginAssetRegistry
         return $primary;
     }
 
-    private function assetUrl(string $pluginId, string $file): string
+    private function assetUrl(string $pluginId, string $file, string $pluginPath = ''): string
     {
         $parts = array_values(array_filter(explode('/', $pluginId)));
         [$vendor, $name] = $parts;
 
         $relativePath = 'plugins/'.$vendor.'/'.$name.'/build/'.$file;
-        $version = $this->assetVersion(public_path($relativePath));
+        $version = $this->assetVersion(public_path($relativePath), $pluginPath, $file);
         $separator = str_contains($relativePath, '?') ? '&' : '?';
 
         return asset($relativePath).($version === null ? '' : $separator.'v='.$version);
     }
 
-    private function assetVersion(string $path): ?string
+    private function assetVersion(string $path, string $pluginPath = '', string $file = ''): ?string
     {
-        if (! is_file($path)) {
-            return null;
+        $candidates = [$path];
+
+        if ($pluginPath !== '' && $file !== '') {
+            $sourceRoot = str_replace('\\', '/', $pluginPath);
+            if (! str_starts_with($sourceRoot, '/') && ! (bool) preg_match('/^[A-Za-z]:\//', $sourceRoot)) {
+                $sourceRoot = base_path($sourceRoot);
+            }
+
+            $sourcePath = rtrim($sourceRoot, '/').'/build/'.$file;
+            $candidates[] = $sourcePath;
         }
 
-        $hash = md5_file($path);
+        foreach ($candidates as $candidate) {
+            if (! is_file($candidate)) {
+                continue;
+            }
 
-        if (! is_string($hash) || $hash === '') {
-            return null;
+            clearstatcache(true, $candidate);
+
+            $hash = @md5_file($candidate);
+
+            if (! is_string($hash) || $hash === '') {
+                continue;
+            }
+
+            return substr($hash, 0, 12);
         }
 
-        return substr($hash, 0, 12);
+        return null;
     }
 
     private function ensurePublicAssets(string $pluginId): void
