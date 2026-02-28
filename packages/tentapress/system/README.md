@@ -7,7 +7,7 @@ Core platform layer for TentaPress plugin and theme management.
 | Field    | Value                                     |
 |----------|-------------------------------------------|
 | Name     | `tentapress/system`                       |
-| Version  | 0.4.2                                     |
+| Version  | 0.4.3                                     |
 | Provider | `TentaPress\System\SystemServiceProvider` |
 
 ## Overview
@@ -82,6 +82,16 @@ php artisan tp:themes sync         # Discover themes
 php artisan tp:themes list         # List all themes
 php artisan tp:themes activate <id> # Activate a theme
 ```
+
+### Catalog Commands
+
+```bash
+php artisan tp:catalog generate    # Regenerate docs/catalog/first-party-plugins.json
+php artisan tp:catalog check       # Fail if the committed catalog is stale
+```
+
+The first-party plugin catalog is generated from `plugins/tentapress/*/tentapress.json` manifests and preserves
+catalog-only metadata already present in the committed JSON feed.
 
 ## Database
 
