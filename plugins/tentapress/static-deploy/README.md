@@ -7,7 +7,7 @@ Static site generation for TentaPress.
 | Field | Value |
 |-------|-------|
 | ID | `tentapress/static-deploy` |
-| Version | 0.1.7 |
+| Version | 0.1.8 |
 | Provider | `TentaPress\StaticDeploy\StaticDeployServiceProvider` |
 
 ## Features
@@ -17,6 +17,7 @@ Static site generation for TentaPress.
 - Generate sitemap.xml and robots.txt
 - Generate 404.html
 - Download as ZIP archive
+- Run saved find/replace rules on staged export files before zipping
 
 ## Dependencies
 
@@ -36,6 +37,32 @@ The generated ZIP contains:
 - `sitemap.xml`
 - `robots.txt`
 - `404.html`
+
+## Replacement Rules
+
+Static Deploy can persist reusable find/replace rules in the admin UI and apply them to the staged export right before the ZIP archive is created.
+
+- Rules are stored as JSON in plugin settings.
+- Each rule requires `find` and `replace` values.
+- Optional `files` glob patterns limit which exported files are touched.
+- If `files` is omitted, Static Deploy targets text-like files such as `*.html`, `*.xml`, `*.txt`, `*.css`, `*.js`, and `*.json`.
+
+Example:
+
+```json
+[
+    {
+        "find": "<html",
+        "replace": "<html data-static-export=\"1\"",
+        "files": ["*.html"]
+    },
+    {
+        "find": "https://example.com",
+        "replace": "https://cdn.example.com",
+        "files": ["*.html", "sitemap.xml"]
+    }
+]
+```
 
 ## Development
 

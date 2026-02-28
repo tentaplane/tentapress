@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use TentaPress\Pages\Models\TpPage;
 use TentaPress\Posts\Models\TpPost;
 use TentaPress\Settings\Services\SettingsStore;
+use TentaPress\StaticDeploy\Support\StaticReplacementRules;
 use TentaPress\System\Theme\ThemeManager;
 use ZipArchive;
 
@@ -33,7 +34,10 @@ final class StaticExporter
      *   zip_path:string,
      *   pages_total:int,
      *   pages_written:int,
-     *   warnings:array<int,string>
+     *   warnings:array<int,string>,
+     *   replacement_rules_applied:int,
+     *   replacement_files_updated:int,
+     *   replacement_matches:int
      * }
      */
     public function build(array $options = []): array
@@ -108,6 +112,8 @@ final class StaticExporter
                 $this->copyFileIfExists(public_path('robots.txt'), $publicTarget . DIRECTORY_SEPARATOR . 'robots.txt', $warnings);
             }
 
+            $replacementSummary = $this->applySavedReplacementRules($buildDir, $warnings);
+
             $zipPath = $exportsDir . DIRECTORY_SEPARATOR . 'static-' . $timestamp . '.zip';
             $this->zipDirectory($buildDir, $zipPath);
 
@@ -118,6 +124,9 @@ final class StaticExporter
                 'pages_total' => $pagesTotal,
                 'pages_written' => $pagesWritten,
                 'warnings' => $warnings,
+                'replacement_rules_applied' => $replacementSummary['rules_applied'],
+                'replacement_files_updated' => $replacementSummary['files_updated'],
+                'replacement_matches' => $replacementSummary['matches'],
                 'generated_at_utc' => gmdate('c'),
             ];
 
@@ -130,6 +139,9 @@ final class StaticExporter
                 'pages_total' => $pagesTotal,
                 'pages_written' => $pagesWritten,
                 'warnings' => $warnings,
+                'replacement_rules_applied' => $replacementSummary['rules_applied'],
+                'replacement_files_updated' => $replacementSummary['files_updated'],
+                'replacement_matches' => $replacementSummary['matches'],
             ];
         } finally {
             $this->disableProductionOutput($productionState);
@@ -1123,6 +1135,97 @@ final class StaticExporter
         }
 
         $zip->close();
+    }
+
+    /**
+     * @param array<int,string> $warnings
+     * @return array{rules_applied:int,files_updated:int,matches:int}
+     */
+    private function applySavedReplacementRules(string $buildDir, array &$warnings): array
+    {
+        $rules = $this->replacementRules($warnings);
+
+        if ($rules === []) {
+            return [
+                'rules_applied' => 0,
+                'files_updated' => 0,
+                'matches' => 0,
+            ];
+        }
+
+        $filesUpdated = 0;
+        $matches = 0;
+
+        foreach (File::allFiles($buildDir) as $file) {
+            $fullPath = $file->getPathname();
+            $relativePath = $this->relativePath($buildDir, $fullPath);
+            $contents = File::get($fullPath);
+            $updatedContents = $contents;
+            $fileChanged = false;
+
+            foreach ($rules as $rule) {
+                if (! $this->pathMatchesRule($relativePath, $rule['files'])) {
+                    continue;
+                }
+
+                $replacements = 0;
+                $updatedContents = str_replace($rule['find'], $rule['replace'], $updatedContents, $replacements);
+
+                if ($replacements > 0) {
+                    $matches += $replacements;
+                    $fileChanged = true;
+                }
+            }
+
+            if (! $fileChanged) {
+                continue;
+            }
+
+            File::put($fullPath, $updatedContents);
+            $filesUpdated++;
+        }
+
+        return [
+            'rules_applied' => count($rules),
+            'files_updated' => $filesUpdated,
+            'matches' => $matches,
+        ];
+    }
+
+    /**
+     * @param array<int,string> $warnings
+     * @return array<int,array{find:string,replace:string,files:array<int,string>}>
+     */
+    private function replacementRules(array &$warnings): array
+    {
+        if (! class_exists(StaticReplacementRules::class) || ! app()->bound(StaticReplacementRules::class)) {
+            return [];
+        }
+
+        return resolve(StaticReplacementRules::class)->savedRules($warnings);
+    }
+
+    /**
+     * @param array<int,string> $patterns
+     */
+    private function pathMatchesRule(string $relativePath, array $patterns): bool
+    {
+        $basename = basename($relativePath);
+
+        foreach ($patterns as $pattern) {
+            if (Str::is($pattern, $relativePath) || Str::is($pattern, $basename)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function relativePath(string $basePath, string $fullPath): string
+    {
+        $relative = ltrim(str_replace($basePath, '', $fullPath), DIRECTORY_SEPARATOR);
+
+        return str_replace('\\', '/', $relative);
     }
 
     /**

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schema;
+use TentaPress\Settings\Services\SettingsStore;
 use TentaPress\StaticDeploy\StaticDeployServiceProvider;
 use TentaPress\Users\Models\TpUser;
 
@@ -62,6 +63,25 @@ it('validates static deploy generate options as booleans', function (): void {
         ->assertSessionHasErrors(['include_favicon', 'include_robots', 'compress_html']);
 });
 
+it('validates static deploy replacement rules as JSON rule objects', function (): void {
+    registerStaticDeployProviderForEdgeCases();
+
+    $admin = TpUser::query()->create([
+        'name' => 'Static Deploy Admin',
+        'email' => 'static-deploy-rules-validation@example.test',
+        'password' => 'secret',
+        'is_super_admin' => true,
+    ]);
+
+    $this->actingAs($admin)
+        ->from('/admin/static-deploy')
+        ->post('/admin/static-deploy/rules', [
+            'replacement_rules_json' => '{"find":"broken"}',
+        ])
+        ->assertRedirect('/admin/static-deploy')
+        ->assertSessionHasErrors(['replacement_rules_json']);
+});
+
 it('returns not found when no static export archive exists', function (): void {
     registerStaticDeployProviderForEdgeCases();
     File::deleteDirectory(staticDeployArtifactsDir());
@@ -98,4 +118,44 @@ it('generates a build even when the pages table is unavailable', function (): vo
         ])
         ->assertRedirect('/admin/static-deploy')
         ->assertSessionHas('tp_notice_success');
+});
+
+it('applies saved replacement rules before the static export is zipped', function (): void {
+    registerStaticDeployProviderForEdgeCases();
+
+    $admin = TpUser::query()->create([
+        'name' => 'Static Deploy Admin',
+        'email' => 'static-deploy-replacements@example.test',
+        'password' => 'secret',
+        'is_super_admin' => true,
+    ]);
+
+    resolve(SettingsStore::class)->set('static_deploy.find_replace_rules', json_encode([
+        [
+            'find' => '<html',
+            'replace' => '<html data-static-export="1"',
+            'files' => ['*.html'],
+        ],
+    ], JSON_THROW_ON_ERROR), true);
+
+    $this->actingAs($admin)
+        ->post('/admin/static-deploy/generate', [
+            'include_favicon' => '0',
+            'include_robots' => '0',
+            'compress_html' => '0',
+        ])
+        ->assertRedirect('/admin/static-deploy')
+        ->assertSessionHas('tp_notice_success');
+
+    $last = json_decode(File::get(staticDeployArtifactsDir() . '/last.json'), true, 512, JSON_THROW_ON_ERROR);
+    $exportedHtmlFiles = collect(File::allFiles((string) $last['build_dir']))
+        ->filter(fn (\SplFileInfo $file): bool => $file->getExtension() === 'html')
+        ->map(fn (\SplFileInfo $file): string => File::get($file->getPathname()))
+        ->values();
+
+    expect($exportedHtmlFiles)->not->toBeEmpty()
+        ->and($exportedHtmlFiles->contains(fn (string $contents): bool => str_contains($contents, '<html data-static-export="1"')))->toBeTrue()
+        ->and($last['replacement_rules_applied'])->toBe(1)
+        ->and($last['replacement_files_updated'])->toBeGreaterThanOrEqual(1)
+        ->and($last['replacement_matches'])->toBeGreaterThanOrEqual(1);
 });

@@ -41,6 +41,18 @@
                         <span class="tp-muted">ZIP:</span>
                         <code class="tp-code">{{ basename((string) ($last['zip_path'] ?? '')) }}</code>
                     </div>
+                    <div>
+                        <span class="tp-muted">Replacement rules:</span>
+                        {{ (int) ($last['replacement_rules_applied'] ?? 0) }}
+                    </div>
+                    <div>
+                        <span class="tp-muted">Files updated:</span>
+                        {{ (int) ($last['replacement_files_updated'] ?? 0) }}
+                    </div>
+                    <div>
+                        <span class="tp-muted">Matches:</span>
+                        {{ (int) ($last['replacement_matches'] ?? 0) }}
+                    </div>
                 </div>
 
                 @php
@@ -59,6 +71,42 @@
                 @else
                     <div class="tp-notice-success mb-0">No warnings found.</div>
                 @endif
+            @endif
+        </div>
+    </div>
+
+    <div class="tp-metabox mt-5">
+        <div class="tp-metabox__title">Replacement rules</div>
+        <div class="tp-metabox__body space-y-4">
+            @if (!$canPersistRules)
+                <div class="tp-notice-warning mb-0">
+                    Saved replacement rules need the Settings plugin to be enabled.
+                </div>
+            @else
+                <form method="POST" action="{{ route('tp.static.rules.update') }}" class="space-y-4">
+                    @csrf
+
+                    <div class="tp-field">
+                        <label class="tp-label">Rules (JSON)</label>
+                        <textarea
+                            name="replacement_rules_json"
+                            rows="16"
+                            class="tp-textarea font-mono text-xs">{{ $replacementRulesJson }}</textarea>
+                        <div class="tp-help mt-1 space-y-2">
+                            <p>Saved rules run against the staged export before the ZIP is created.</p>
+                            <p>Each rule needs <code class="tp-code">find</code> and <code class="tp-code">replace</code>. Optional <code class="tp-code">files</code> globs limit which exported files are touched. If omitted, text-like files such as HTML, XML, CSS, JS, TXT, and JSON are targeted.</p>
+                        </div>
+                    </div>
+
+                    <div class="tp-field">
+                        <label class="tp-label">Example</label>
+                        <textarea rows="10" class="tp-textarea font-mono text-xs" readonly>{{ $replacementRulesExample }}</textarea>
+                    </div>
+
+                    <div class="flex gap-2">
+                        <button type="submit" class="tp-button-primary">Save replacement rules</button>
+                    </div>
+                </form>
             @endif
         </div>
     </div>
