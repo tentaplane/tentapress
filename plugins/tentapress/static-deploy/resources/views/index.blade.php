@@ -213,44 +213,35 @@
                     @if (count($storedExports) === 0)
                         <div class="tp-muted text-sm">No stored exports yet.</div>
                     @else
-                        <div class="tp-panel overflow-x-auto">
-                            <table class="min-w-full text-sm">
-                                <thead class="tp-muted text-xs uppercase tracking-[0.18em]">
-                                    <tr>
-                                        <th class="px-3 py-2 text-left font-medium">Archive</th>
-                                        <th class="px-3 py-2 text-left font-medium">Generated</th>
-                                        <th class="px-3 py-2 text-left font-medium">State</th>
-                                        <th class="px-3 py-2 text-right font-medium">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($storedExports as $export)
-                                        <tr class="border-t border-black/5 align-top">
-                                            <td class="px-3 py-3">
-                                                <div class="font-semibold">{{ $export['zip_name'] }}</div>
-                                                <div class="tp-help mt-1">
-                                                    <code class="tp-code">{{ $export['timestamp'] }}</code>
-                                                </div>
-                                            </td>
-                                            <td class="px-3 py-3">{{ $export['generated_at_utc'] }}</td>
-                                            <td class="px-3 py-3">
-                                                @if ($export['is_latest'])
-                                                    <span class="rounded-full bg-black/5 px-2 py-1 text-xs font-semibold">Latest</span>
-                                                @else
-                                                    <span class="tp-muted text-xs">Stored</span>
-                                                @endif
-                                            </td>
-                                            <td class="px-3 py-3 text-right">
-                                                <a
-                                                    href="{{ route('tp.static.download.archive', ['timestamp' => $export['timestamp']]) }}"
-                                                    class="tp-button-secondary">
-                                                    Download
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+                        <div class="space-y-3">
+                            @foreach ($storedExports as $export)
+                                <div class="tp-panel flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                                    <div class="min-w-0 space-y-1">
+                                        <div class="flex flex-wrap items-center gap-2">
+                                            <div class="font-semibold">{{ $export['zip_name'] }}</div>
+                                            @if ($export['is_latest'])
+                                                <span class="rounded-full bg-black/5 px-2 py-1 text-xs font-semibold">Latest</span>
+                                            @endif
+                                        </div>
+
+                                        <div class="tp-help">
+                                            Generated {{ $export['generated_at_utc'] }}
+                                        </div>
+
+                                        <div class="tp-help">
+                                            <code class="tp-code">{{ $export['timestamp'] }}</code>
+                                        </div>
+                                    </div>
+
+                                    <div class="sm:self-center">
+                                        <a
+                                            href="{{ route('tp.static.download.archive', ['timestamp' => $export['timestamp']]) }}"
+                                            class="tp-button-secondary">
+                                            Download
+                                        </a>
+                                    </div>
+                                </div>
+                            @endforeach
                         </div>
                     @endif
                 </div>
