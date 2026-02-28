@@ -4,6 +4,33 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.39.0](https://github.com/tentaplane/tentapress/compare/v0.38.0...v0.39.0) (2026-02-28)
+
+
+### Features
+
+* **static-deploy:** add saved export replacement rules ([bd0c8ce](https://github.com/tentaplane/tentapress/commit/bd0c8ce417eca83ace72f2c770c8ad909a42b922))
+* **static-deploy:** improve replacement rules UX ([5a34f0f](https://github.com/tentaplane/tentapress/commit/5a34f0fef4364cae50c340a721eeb24222d6fbf0))
+* **static-deploy:** list stored export archives ([8d81298](https://github.com/tentaplane/tentapress/commit/8d81298edd7d42ce053614f82d88f845aad5eed3))
+* **static-deploy:** rebalance admin layout ([5bb6be1](https://github.com/tentaplane/tentapress/commit/5bb6be131a9d4a3b186caead8db9ecea7e43f204))
+* **static-deploy:** refine admin column layout ([bc87a66](https://github.com/tentaplane/tentapress/commit/bc87a6607ba0a083a2e20ef9d4d39a3d49d90257))
+* **static-deploy:** restore balanced admin layout ([1c8e843](https://github.com/tentaplane/tentapress/commit/1c8e8431fabadaf03dc737ca16c2c0e01d97c50a))
+* **static-deploy:** simplify stored exports history ([7504d5e](https://github.com/tentaplane/tentapress/commit/7504d5e9ec01ebfcfd19d33275f230af8be8d8d4))
+
+
+### Bug Fixes
+
+* **admin-shell,system:** use stable asset filenames with cache busting ([988e364](https://github.com/tentaplane/tentapress/commit/988e36436f824514d07973f0e590bb96423c540e))
+* **system:** harden asset versioning in parallel tests ([b47d106](https://github.com/tentaplane/tentapress/commit/b47d106b77dc7c3e205582c3639779073264cae7))
+
+
+### Miscellaneous Chores
+
+* **admin-shell:** bump plugin version ([1907e55](https://github.com/tentaplane/tentapress/commit/1907e551e7bb8bec90fb3598c975aab0ed9d9c39))
+* **static-deploy:** apply formatter cleanup ([3de7d5b](https://github.com/tentaplane/tentapress/commit/3de7d5b8ed614969ce7880d326b8d93e0ba96a1f))
+* **static-deploy:** apply rector cleanup ([d4a1751](https://github.com/tentaplane/tentapress/commit/d4a1751212a246683b0cbb89458608de84d3518d))
+* **static-deploy:** apply rector cleanup ([33141c8](https://github.com/tentaplane/tentapress/commit/33141c80317c79034c1e92e5dd48b82b8f863a89))
+
 ## [0.38.0](https://github.com/tentaplane/tentapress/compare/v0.37.0...v0.38.0) (2026-02-28)
 
 
