@@ -257,7 +257,26 @@ final class PluginAssetRegistry
         $parts = array_values(array_filter(explode('/', $pluginId)));
         [$vendor, $name] = $parts;
 
-        return asset('plugins/'.$vendor.'/'.$name.'/build/'.$file);
+        $relativePath = 'plugins/'.$vendor.'/'.$name.'/build/'.$file;
+        $version = $this->assetVersion(public_path($relativePath));
+        $separator = str_contains($relativePath, '?') ? '&' : '?';
+
+        return asset($relativePath).($version === null ? '' : $separator.'v='.$version);
+    }
+
+    private function assetVersion(string $path): ?string
+    {
+        if (! is_file($path)) {
+            return null;
+        }
+
+        $hash = md5_file($path);
+
+        if (! is_string($hash) || $hash === '') {
+            return null;
+        }
+
+        return substr($hash, 0, 12);
     }
 
     private function ensurePublicAssets(string $pluginId): void

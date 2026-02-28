@@ -15,8 +15,9 @@ export default defineConfig({
                 'admin-styles': path.resolve('resources/css/admin.css'),
             },
             output: {
-                assetFileNames: '[name]-[hash][extname]',
-                entryFileNames: '[name]-[hash].js',
+                assetFileNames: '[name][extname]',
+                chunkFileNames: 'chunks/[name].js',
+                entryFileNames: '[name].js',
             },
         },
         outDir: path.resolve(path.dirname(fileURLToPath(import.meta.url)), 'build'),
