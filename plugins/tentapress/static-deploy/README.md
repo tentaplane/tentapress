@@ -7,7 +7,7 @@ Static site generation for TentaPress.
 | Field | Value |
 |-------|-------|
 | ID | `tentapress/static-deploy` |
-| Version | 0.3.0 |
+| Version | 0.4.0 |
 | Provider | `TentaPress\StaticDeploy\StaticDeployServiceProvider` |
 
 ## Features
@@ -19,6 +19,7 @@ Static site generation for TentaPress.
 - Download as ZIP archive
 - Run saved find/replace rules on staged export files before zipping
 - Review and download stored export archives from the admin screen
+- Use a layout weighted toward build context and rule editing on larger screens
 
 ## Dependencies
 

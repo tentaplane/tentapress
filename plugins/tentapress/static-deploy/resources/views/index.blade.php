@@ -18,8 +18,8 @@
         @endif
     </div>
 
-    <div class="grid gap-5 xl:grid-cols-2">
-        <div class="space-y-5">
+    <div class="grid gap-5 xl:grid-cols-3">
+        <div class="space-y-5 xl:col-span-2">
             <div class="tp-metabox">
                 <div class="tp-metabox__title">Last build</div>
                 <div class="tp-metabox__body space-y-3">
@@ -85,52 +85,30 @@
                             Saved replacement rules need the Settings plugin to be enabled.
                         </div>
                     @else
-                        <div class="tp-panel grid gap-4 text-sm xl:grid-cols-3">
-                            <div class="space-y-2">
-                                <div class="tp-muted text-xs uppercase tracking-[0.18em]">Current state</div>
-                                <div class="text-2xl font-semibold">{{ $savedReplacementRuleCount }}</div>
-                                <div class="tp-help">
-                                    {{ $savedReplacementRuleCount === 1 ? 'Saved rule ready for the next export.' : 'Saved rules ready for the next export.' }}
-                                </div>
-                            </div>
-
-                            <div class="space-y-2">
-                                <div class="tp-muted text-xs uppercase tracking-[0.18em]">When they run</div>
-                                <div class="font-semibold">After the staged build, before ZIP creation</div>
-                                <div class="tp-help">
-                                    Use rules to rewrite exported HTML, XML, CSS, JS, TXT, or JSON files without touching your source content.
-                                </div>
-                            </div>
-
-                            <div class="space-y-2">
-                                <div class="tp-muted text-xs uppercase tracking-[0.18em]">How to disable</div>
-                                <div class="font-semibold">Reset to <code class="tp-code">[]</code></div>
-                                <div class="tp-help">
-                                    An empty array disables replacements completely. File globs can target broad patterns like <code class="tp-code">*.html</code> or specific files like <code class="tp-code">sitemap.xml</code>.
-                                </div>
-                            </div>
-                        </div>
-
-                        <form method="POST" action="{{ route('tp.static.rules.update') }}" class="grid gap-4 xl:grid-cols-[minmax(0,2fr)_minmax(18rem,1fr)]">
-                            @csrf
-
-                            <div class="space-y-4">
-                                <div class="tp-field">
-                                    <label class="tp-label">Rules (JSON)</label>
-                                    <textarea
-                                        name="replacement_rules_json"
-                                        rows="18"
-                                        class="tp-textarea min-h-[26rem] font-mono text-xs leading-6">{{ $replacementRulesJson }}</textarea>
-                                    <div class="tp-help mt-1 space-y-2">
-                                        <p>Each rule needs <code class="tp-code">find</code> and <code class="tp-code">replace</code>. Add optional <code class="tp-code">files</code> globs to narrow the match scope.</p>
-                                        <p>Leave <code class="tp-code">files</code> out to target exported text-like files automatically.</p>
+                        <div class="grid gap-4 2xl:grid-cols-[minmax(0,1.6fr)_minmax(18rem,1fr)]">
+                            <div class="tp-panel grid gap-4 text-sm sm:grid-cols-3 2xl:grid-cols-1">
+                                <div class="space-y-2">
+                                    <div class="tp-muted text-xs uppercase tracking-[0.18em]">Current state</div>
+                                    <div class="text-2xl font-semibold">{{ $savedReplacementRuleCount }}</div>
+                                    <div class="tp-help">
+                                        {{ $savedReplacementRuleCount === 1 ? 'Saved rule ready for the next export.' : 'Saved rules ready for the next export.' }}
                                     </div>
                                 </div>
 
-                                <div class="flex flex-wrap gap-2">
-                                    <button type="submit" name="rules_action" value="save" class="tp-button-primary">Save custom rules</button>
-                                    <button type="submit" name="rules_action" value="load_example" class="tp-button-secondary">Load example</button>
-                                    <button type="submit" name="rules_action" value="reset" class="tp-button-secondary">Reset to empty array</button>
+                                <div class="space-y-2 border-t border-black/5 pt-4 sm:border-t-0 sm:border-l sm:pl-4 sm:pt-0 2xl:border-l-0 2xl:border-t 2xl:pl-0 2xl:pt-4">
+                                    <div class="tp-muted text-xs uppercase tracking-[0.18em]">When they run</div>
+                                    <div class="font-semibold">After the staged build, before ZIP creation</div>
+                                    <div class="tp-help">
+                                        Use rules to rewrite exported HTML, XML, CSS, JS, TXT, or JSON files without touching your source content.
+                                    </div>
+                                </div>
+
+                                <div class="space-y-2 border-t border-black/5 pt-4 sm:border-t-0 sm:border-l sm:pl-4 sm:pt-0 2xl:border-l-0 2xl:border-t 2xl:pl-0 2xl:pt-4">
+                                    <div class="tp-muted text-xs uppercase tracking-[0.18em]">How to disable</div>
+                                    <div class="font-semibold">Reset to <code class="tp-code">[]</code></div>
+                                    <div class="tp-help">
+                                        An empty array disables replacements completely. File globs can target broad patterns like <code class="tp-code">*.html</code> or specific files like <code class="tp-code">sitemap.xml</code>.
+                                    </div>
                                 </div>
                             </div>
 
@@ -152,13 +130,37 @@
                                     <textarea rows="12" class="tp-textarea font-mono text-xs" readonly>{{ $replacementRulesExample }}</textarea>
                                 </div>
                             </div>
+                        </div>
+
+                        <form method="POST" action="{{ route('tp.static.rules.update') }}" class="space-y-4">
+                            @csrf
+
+                            <div class="space-y-4">
+                                <div class="tp-field">
+                                    <label class="tp-label">Rules (JSON)</label>
+                                    <textarea
+                                        name="replacement_rules_json"
+                                        rows="18"
+                                        class="tp-textarea min-h-[26rem] font-mono text-xs leading-6">{{ $replacementRulesJson }}</textarea>
+                                    <div class="tp-help mt-1 space-y-2">
+                                        <p>Each rule needs <code class="tp-code">find</code> and <code class="tp-code">replace</code>. Add optional <code class="tp-code">files</code> globs to narrow the match scope.</p>
+                                        <p>Leave <code class="tp-code">files</code> out to target exported text-like files automatically.</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex flex-wrap gap-2">
+                                    <button type="submit" name="rules_action" value="save" class="tp-button-primary">Save custom rules</button>
+                                    <button type="submit" name="rules_action" value="load_example" class="tp-button-secondary">Load example</button>
+                                    <button type="submit" name="rules_action" value="reset" class="tp-button-secondary">Reset to empty array</button>
+                                </div>
+                            </div>
                         </form>
                     @endif
                 </div>
             </div>
         </div>
 
-        <div class="space-y-5">
+        <div class="space-y-5 xl:col-span-1">
             <div class="tp-metabox">
                 <div class="tp-metabox__title">Generate build</div>
                 <div class="tp-metabox__body space-y-4">
@@ -217,7 +219,6 @@
                                     <tr>
                                         <th class="px-3 py-2 text-left font-medium">Archive</th>
                                         <th class="px-3 py-2 text-left font-medium">Generated</th>
-                                        <th class="px-3 py-2 text-left font-medium">Size</th>
                                         <th class="px-3 py-2 text-left font-medium">State</th>
                                         <th class="px-3 py-2 text-right font-medium">Action</th>
                                     </tr>
@@ -232,7 +233,6 @@
                                                 </div>
                                             </td>
                                             <td class="px-3 py-3">{{ $export['generated_at_utc'] }}</td>
-                                            <td class="px-3 py-3">{{ number_format(((int) $export['size_bytes']) / 1024, 1) }} KB</td>
                                             <td class="px-3 py-3">
                                                 @if ($export['is_latest'])
                                                     <span class="rounded-full bg-black/5 px-2 py-1 text-xs font-semibold">Latest</span>
