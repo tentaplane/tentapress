@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.39.1](https://github.com/tentaplane/tentapress/compare/v0.39.0...v0.39.1) (2026-02-28)
+
+
+### Performance Improvements
+
+* **ci:** cancel superseded split publish runs ([977d287](https://github.com/tentaplane/tentapress/commit/977d287b120d1772c4743b1a56ab5d38175fdb1b))
+* **ci:** parallelize split publish targets ([d3a9dc2](https://github.com/tentaplane/tentapress/commit/d3a9dc2ddb9eb42a47fcd554923f1fc08e23deb9))
+* **ci:** split publish only changed components ([cbcfa65](https://github.com/tentaplane/tentapress/commit/cbcfa651fb06e5562c6677923924e2829f77a320))
+
 ## [0.39.0](https://github.com/tentaplane/tentapress/compare/v0.38.0...v0.39.0) (2026-02-28)
 
 
