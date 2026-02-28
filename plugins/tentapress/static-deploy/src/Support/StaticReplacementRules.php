@@ -114,30 +114,22 @@ final class StaticReplacementRules
 
         try {
             $decoded = json_decode($payload, true, 512, JSON_THROW_ON_ERROR);
-        } catch (\JsonException $exception) {
+        } catch (\JsonException) {
             throw new \InvalidArgumentException('JSON could not be parsed.');
         }
 
-        if (! is_array($decoded) || ! Arr::isList($decoded)) {
-            throw new \InvalidArgumentException('Rules must be a JSON array.');
-        }
+        throw_if(! is_array($decoded) || ! Arr::isList($decoded), \InvalidArgumentException::class, 'Rules must be a JSON array.');
 
         $rules = [];
 
         foreach ($decoded as $index => $rule) {
-            if (! is_array($rule)) {
-                throw new \InvalidArgumentException('Rule #' . ($index + 1) . ' must be an object.');
-            }
+            throw_unless(is_array($rule), \InvalidArgumentException::class, 'Rule #' . ($index + 1) . ' must be an object.');
 
             $find = trim((string) ($rule['find'] ?? ''));
 
-            if ($find === '') {
-                throw new \InvalidArgumentException('Rule #' . ($index + 1) . ' requires a non-empty find value.');
-            }
+            throw_if($find === '', \InvalidArgumentException::class, 'Rule #' . ($index + 1) . ' requires a non-empty find value.');
 
-            if (! array_key_exists('replace', $rule) || ! is_string($rule['replace'])) {
-                throw new \InvalidArgumentException('Rule #' . ($index + 1) . ' requires a string replace value.');
-            }
+            throw_if(! array_key_exists('replace', $rule) || ! is_string($rule['replace']), \InvalidArgumentException::class, 'Rule #' . ($index + 1) . ' requires a string replace value.');
 
             $patterns = self::normalizePatterns($rule['files'] ?? null, $index);
 
@@ -161,9 +153,7 @@ final class StaticReplacementRules
             return self::DEFAULT_FILE_PATTERNS;
         }
 
-        if (! is_array($value) || ! Arr::isList($value)) {
-            throw new \InvalidArgumentException('Rule #' . ($index + 1) . ' files must be an array of glob strings.');
-        }
+        throw_if(! is_array($value) || ! Arr::isList($value), \InvalidArgumentException::class, 'Rule #' . ($index + 1) . ' files must be an array of glob strings.');
 
         $patterns = [];
 
