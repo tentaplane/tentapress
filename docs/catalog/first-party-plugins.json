@@ -1,23 +1,21 @@
 {
     "schema_version": 1,
-    "generated_at": "2026-02-27T00:00:00Z",
+    "generated_at": "2026-02-28T15:24:42Z",
     "plugins": [
         {
             "id": "tentapress/admin-shell",
             "name": "Admin Shell",
             "description": "Admin UI shell, layout, navigation and base admin routes.",
             "package": "tentapress/admin-shell",
-            "latest_version": "0.6.9",
-            "icon": "tools",
-            "preview_image": "https://placehold.co/320x180/e2e8f0/334155?text=Admin%20Shell"
+            "latest_version": "0.6.12",
+            "icon": "tools"
         },
         {
             "id": "tentapress/block-markdown-editor",
             "name": "Block - Markdown Editor",
             "description": "Adds a Markdown block with a visual editor.",
             "package": "tentapress/block-markdown-editor",
-            "latest_version": "0.1.3",
-            "preview_image": "https://placehold.co/320x180/e2e8f0/334155?text=Block%20-%20Markdown%20Editor"
+            "latest_version": "0.1.3"
         },
         {
             "id": "tentapress/blocks",
@@ -25,8 +23,7 @@
             "description": "Block registry and rendering for TentaPress pages.",
             "package": "tentapress/blocks",
             "latest_version": "0.11.0",
-            "icon": "blocks",
-            "preview_image": "https://placehold.co/320x180/e2e8f0/334155?text=Blocks"
+            "icon": "blocks"
         },
         {
             "id": "tentapress/builder",
@@ -34,24 +31,21 @@
             "description": "Visual drag-and-drop builder with live theme preview for pages and posts.",
             "package": "tentapress/builder",
             "latest_version": "0.6.7",
-            "icon": "builder",
-            "preview_image": "https://placehold.co/320x180/e2e8f0/334155?text=Builder"
+            "icon": "builder"
         },
         {
             "id": "tentapress/custom-blocks",
             "name": "Custom Blocks",
             "description": "Discover and register single-file custom blocks from the active theme.",
             "package": "tentapress/custom-blocks",
-            "latest_version": "0.1.1",
-            "preview_image": "https://placehold.co/320x180/e2e8f0/334155?text=Custom%20Blocks"
+            "latest_version": "0.1.1"
         },
         {
             "id": "tentapress/export",
             "name": "Export",
-            "description": "Export tooling.",
+            "description": "",
             "package": "tentapress/export",
-            "latest_version": "0.1.10",
-            "preview_image": "https://placehold.co/320x180/e2e8f0/334155?text=Export"
+            "latest_version": "0.1.10"
         },
         {
             "id": "tentapress/forms",
@@ -59,24 +53,21 @@
             "description": "Forms block and submission targets for Mailchimp, TentaForms, and Kit.",
             "package": "tentapress/forms",
             "latest_version": "0.4.3",
-            "icon": "forms",
-            "preview_image": "https://placehold.co/320x180/e2e8f0/334155?text=Forms"
+            "icon": "forms"
         },
         {
             "id": "tentapress/headless-api",
             "name": "Headless API",
-            "description": "Headless REST API endpoints.",
+            "description": "",
             "package": "tentapress/headless-api",
-            "latest_version": "0.1.1",
-            "preview_image": "https://placehold.co/320x180/e2e8f0/334155?text=Headless%20API"
+            "latest_version": "0.1.1"
         },
         {
             "id": "tentapress/import",
             "name": "Import",
-            "description": "Import tooling.",
+            "description": "",
             "package": "tentapress/import",
-            "latest_version": "0.22.0",
-            "preview_image": "https://placehold.co/320x180/e2e8f0/334155?text=Import"
+            "latest_version": "0.22.0"
         },
         {
             "id": "tentapress/media",
@@ -84,56 +75,49 @@
             "description": "Upload and manage media files.",
             "package": "tentapress/media",
             "latest_version": "0.9.13",
-            "icon": "media",
-            "preview_image": "https://placehold.co/320x180/e2e8f0/334155?text=Media"
+            "icon": "media"
         },
         {
             "id": "tentapress/media-optimization-bunny",
             "name": "Media Optimization (Bunny)",
             "description": "Bunny Optimizer provider.",
             "package": "tentapress/media-optimization-bunny",
-            "latest_version": "0.1.0",
-            "preview_image": "https://placehold.co/320x180/e2e8f0/334155?text=Media%20Optimization%20%28Bunny%29"
+            "latest_version": "0.1.0"
         },
         {
             "id": "tentapress/media-optimization-cloudflare",
             "name": "Media Optimization (Cloudflare)",
             "description": "Cloudflare Images optimization provider.",
             "package": "tentapress/media-optimization-cloudflare",
-            "latest_version": "0.1.0",
-            "preview_image": "https://placehold.co/320x180/e2e8f0/334155?text=Media%20Optimization%20%28Cloudflare%29"
+            "latest_version": "0.1.0"
         },
         {
             "id": "tentapress/media-optimization-imagekit",
             "name": "Media Optimization (ImageKit)",
             "description": "ImageKit optimization provider.",
             "package": "tentapress/media-optimization-imagekit",
-            "latest_version": "0.1.0",
-            "preview_image": "https://placehold.co/320x180/e2e8f0/334155?text=Media%20Optimization%20%28ImageKit%29"
+            "latest_version": "0.1.0"
         },
         {
             "id": "tentapress/media-optimization-imgix",
             "name": "Media Optimization (Imgix)",
             "description": "Imgix optimization provider.",
             "package": "tentapress/media-optimization-imgix",
-            "latest_version": "0.1.0",
-            "preview_image": "https://placehold.co/320x180/e2e8f0/334155?text=Media%20Optimization%20%28Imgix%29"
+            "latest_version": "0.1.0"
         },
         {
             "id": "tentapress/media-stock-pexels",
             "name": "Media Stock (Pexels)",
             "description": "Pexels provider for the Media stock library.",
             "package": "tentapress/media-stock-pexels",
-            "latest_version": "0.1.1",
-            "preview_image": "https://placehold.co/320x180/e2e8f0/334155?text=Media%20Stock%20%28Pexels%29"
+            "latest_version": "0.1.1"
         },
         {
             "id": "tentapress/media-stock-unsplash",
             "name": "Media Stock (Unsplash)",
             "description": "Unsplash provider for the Media stock library.",
             "package": "tentapress/media-stock-unsplash",
-            "latest_version": "0.1.1",
-            "preview_image": "https://placehold.co/320x180/e2e8f0/334155?text=Media%20Stock%20%28Unsplash%29"
+            "latest_version": "0.1.1"
         },
         {
             "id": "tentapress/menus",
@@ -141,7 +125,7 @@
             "description": "Manage navigation menus and theme locations.",
             "package": "tentapress/menus",
             "latest_version": "0.3.6",
-            "preview_image": "https://placehold.co/320x180/e2e8f0/334155?text=Menus"
+            "icon": "menu"
         },
         {
             "id": "tentapress/page-editor",
@@ -149,8 +133,7 @@
             "description": "Notion-style page editor with slash commands and inline formatting.",
             "package": "tentapress/page-editor",
             "latest_version": "0.4.0",
-            "icon": "editor",
-            "preview_image": "https://placehold.co/320x180/e2e8f0/334155?text=Page%20Editor"
+            "icon": "editor"
         },
         {
             "id": "tentapress/pages",
@@ -158,8 +141,7 @@
             "description": "Create and manage pages.",
             "package": "tentapress/pages",
             "latest_version": "0.4.1",
-            "icon": "pages",
-            "preview_image": "https://placehold.co/320x180/e2e8f0/334155?text=Pages"
+            "icon": "pages"
         },
         {
             "id": "tentapress/posts",
@@ -167,43 +149,38 @@
             "description": "Create and manage blog posts.",
             "package": "tentapress/posts",
             "latest_version": "0.4.1",
-            "icon": "posts",
-            "preview_image": "https://placehold.co/320x180/e2e8f0/334155?text=Posts"
+            "icon": "posts"
         },
         {
             "id": "tentapress/seo",
             "name": "SEO",
-            "description": "SEO management.",
+            "description": "",
             "package": "tentapress/seo",
             "latest_version": "0.2.10",
-            "icon": "seo",
-            "preview_image": "https://placehold.co/320x180/e2e8f0/334155?text=SEO"
+            "icon": "seo"
         },
         {
             "id": "tentapress/settings",
             "name": "Settings",
-            "description": "Settings management.",
+            "description": "",
             "package": "tentapress/settings",
-            "latest_version": "0.1.5",
-            "preview_image": "https://placehold.co/320x180/e2e8f0/334155?text=Settings"
+            "latest_version": "0.1.5"
         },
         {
             "id": "tentapress/static-deploy",
             "name": "Static Deploy",
             "description": "Generate a downloadable static ZIP archive.",
             "package": "tentapress/static-deploy",
-            "latest_version": "0.1.7",
-            "icon": "deploy",
-            "preview_image": "https://placehold.co/320x180/e2e8f0/334155?text=Static%20Deploy"
+            "latest_version": "0.6.0",
+            "icon": "deploy"
         },
         {
             "id": "tentapress/system-info",
             "name": "System Info",
             "description": "Diagnostics, environment information and plugins list for TentaPress.",
             "package": "tentapress/system-info",
-            "latest_version": "0.8.0",
-            "icon": "system",
-            "preview_image": "https://placehold.co/320x180/e2e8f0/334155?text=System%20Info"
+            "latest_version": "0.8.2",
+            "icon": "system"
         },
         {
             "id": "tentapress/themes",
@@ -211,8 +188,7 @@
             "description": "Admin UI for managing themes.",
             "package": "tentapress/themes",
             "latest_version": "0.1.16",
-            "icon": "themes",
-            "preview_image": "https://placehold.co/320x180/e2e8f0/334155?text=Themes"
+            "icon": "themes"
         },
         {
             "id": "tentapress/users",
@@ -220,8 +196,7 @@
             "description": "Users, roles, capabilities and admin authentication.",
             "package": "tentapress/users",
             "latest_version": "0.1.16",
-            "icon": "users",
-            "preview_image": "https://placehold.co/320x180/e2e8f0/334155?text=Users"
+            "icon": "users"
         }
     ]
 }

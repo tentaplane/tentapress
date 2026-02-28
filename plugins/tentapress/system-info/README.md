@@ -7,7 +7,7 @@ Diagnostics and plugin management for TentaPress.
 | Field    | Value                                             |
 | -------- | ------------------------------------------------- |
 | ID       | `tentapress/system-info`                          |
-| Version  | 0.8.0                                             |
+| Version  | 0.8.2                                             |
 | Provider | `TentaPress\SystemInfo\SystemInfoServiceProvider` |
 
 ## Features
@@ -18,8 +18,7 @@ Diagnostics and plugin management for TentaPress.
 - Cache status
 - Plugin list with enable/disable controls
 - Plugin catalog for discovering first-party plugins (`tentapress/*`) with card-grid visual browsing
-- Catalog icon and preview metadata support from local/hosted catalog sources
-- Catalog placeholders use 16:9 plugin preview images for consistent card presentation
+- Catalog icon metadata support from local/hosted catalog sources
 - Install queue progress feedback on catalog install actions
 - Queue-based plugin installs from admin (`vendor/package`, GitHub URL, or Packagist URL)
 - Queue-based plugin updates from admin (defaults to installed plugins; full `composer update` gated by `TP_ALLOW_FULL_COMPOSER_UPDATE=true`)
@@ -35,7 +34,7 @@ None.
 | Label       | Route              | Capability         | Icon | Position | Parent   |
 | ----------- | ------------------ | ------------------ | ---- | -------- | -------- |
 | System Info | `tp.system-info`   | `view_system_info` | info | 95       | -        |
-| Plugin Catalogue | `tp.plugins.catalog` | `view_system_info` | plug | 39       | Settings |
+| Plugin Catalogue | `tp.plugins.catalog` | `view_system_info` | plug | 10       | System Info |
 | Plugins     | `tp.plugins.index` | `manage_plugins`   | plug | 40       | Settings |
 
 ## Configuration
@@ -50,10 +49,12 @@ None.
 ],
 ```
 
-- `local_path` is the maintained source of truth in this monorepo for first-party catalog entries.
+- `local_path` points to the generated first-party catalog feed in this monorepo.
 - `url` is optional. If set, hosted data overlays local entries by plugin id.
 - If hosted data is unavailable, the catalog falls back to local data (and cached hosted data when available).
-- Catalog plugin entries can include optional `icon` and `preview_image` fields.
+- Catalog plugin entries can include an optional `icon` field.
+- Regenerate the local feed with `php artisan tp:catalog generate`.
+- Validate the committed feed with `php artisan tp:catalog check`.
 
 ## Development
 

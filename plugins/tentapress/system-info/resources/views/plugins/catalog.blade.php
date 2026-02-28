@@ -49,16 +49,9 @@
                     $docsUrl = is_string($entry['docs_url'] ?? null) ? (string) $entry['docs_url'] : null;
                     $repoUrl = is_string($entry['repo_url'] ?? null) ? (string) $entry['repo_url'] : null;
                     $icon = is_string($entry['icon'] ?? null) ? trim((string) $entry['icon']) : '';
-                    $previewImage = is_string($entry['preview_image'] ?? null) ? (string) $entry['preview_image'] : null;
                     $tags = is_array($entry['tags'] ?? null) ? $entry['tags'] : [];
                 @endphp
                 <article class="tp-panel overflow-hidden border border-slate-200">
-                    @if ($previewImage)
-                        <div class="aspect-video w-full overflow-hidden bg-slate-100">
-                            <img src="{{ $previewImage }}" alt="{{ $name }} preview" class="h-full w-full object-cover" loading="lazy" />
-                        </div>
-                    @endif
-
                     <div class="space-y-3 p-4">
                         <div class="flex items-start gap-3">
                             <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-lg font-semibold text-slate-700">

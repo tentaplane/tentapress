@@ -194,7 +194,6 @@ final class CatalogFeedClient
                 'docs_url' => $this->normalizeOptionalUrl($plugin['docs_url'] ?? null),
                 'repo_url' => $this->normalizeOptionalUrl($plugin['repo_url'] ?? null),
                 'icon' => $this->normalizeIcon($plugin['icon'] ?? null),
-                'preview_image' => $this->normalizeOptionalUrl($plugin['preview_image'] ?? null),
                 'latest_version' => trim((string) ($plugin['latest_version'] ?? '')),
                 'tags' => $this->normalizeTags($plugin['tags'] ?? null),
             ];
