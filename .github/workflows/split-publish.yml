@@ -1,5 +1,9 @@
 name: Split & Publish
 
+concurrency:
+  group: split-publish-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   workflow_dispatch:
     inputs:
@@ -108,23 +112,26 @@ jobs:
               exit 0
             fi
 
+            declare -A CHANGED_TARGET_MAP=()
+            for target in "${CHANGED_TARGETS[@]}"; do
+              CHANGED_TARGET_MAP["$target"]=1
+            done
+
             filter_targets() {
-              local prefix="$1"
-              shift
               local -a current=("$@")
               local -a filtered=()
               local target
               for target in "${current[@]}"; do
-                if printf '%s\n' "${CHANGED_TARGETS[@]}" | grep -Fxq "$target"; then
+                if [ -n "${CHANGED_TARGET_MAP[$target]:-}" ]; then
                   filtered+=("$target")
                 fi
               done
               printf '%s\n' "${filtered[@]}"
             }
 
-            mapfile -t PACKAGE_TARGETS < <(filter_targets packages "${PACKAGE_TARGETS[@]}")
-            mapfile -t PLUGIN_TARGETS < <(filter_targets plugins "${PLUGIN_TARGETS[@]}")
-            mapfile -t THEME_TARGETS < <(filter_targets themes "${THEME_TARGETS[@]}")
+            mapfile -t PACKAGE_TARGETS < <(filter_targets "${PACKAGE_TARGETS[@]}")
+            mapfile -t PLUGIN_TARGETS < <(filter_targets "${PLUGIN_TARGETS[@]}")
+            mapfile -t THEME_TARGETS < <(filter_targets "${THEME_TARGETS[@]}")
           fi
 
           echo "Split targets:"
