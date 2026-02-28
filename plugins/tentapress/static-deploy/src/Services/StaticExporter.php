@@ -232,7 +232,7 @@ final class StaticExporter
             ];
         }
 
-        usort($exports, fn(array $left, array $right): int => strcmp((string) $right['timestamp'], (string) $left['timestamp']));
+        usort($exports, fn (array $left, array $right): int => strcmp((string) $right['timestamp'], (string) $left['timestamp']));
 
         return $exports;
     }
