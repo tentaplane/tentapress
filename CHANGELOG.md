@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.39.2](https://github.com/tentaplane/tentapress/compare/v0.39.1...v0.39.2) (2026-02-28)
+
+
+### Bug Fixes
+
+* **setup:** update documentation ([6b7b8ba](https://github.com/tentaplane/tentapress/commit/6b7b8baba7c2e5a54077b218e9e1fb147c015579))
+* **system-info:** remove catalogue preview images ([f32e790](https://github.com/tentaplane/tentapress/commit/f32e79023a27cbb613e822574204d74425d5780e))
+* **system:** generate first-party plugin catalog ([955a465](https://github.com/tentaplane/tentapress/commit/955a465f013090825890b5684c669c32d2cf969f))
+
 ## [0.39.1](https://github.com/tentaplane/tentapress/compare/v0.39.0...v0.39.1) (2026-02-28)
 
 
