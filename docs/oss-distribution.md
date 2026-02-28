@@ -20,6 +20,8 @@ Define how TentaPress core + plugins/themes are distributed as open source, incl
 
 - Workflow file: `.github/workflows/split-publish.yml`.
 - Trigger: push to `main` (plugins/themes) or manual dispatch.
+- Push runs only split repositories whose package/plugin/theme path changed in the pushed range.
+- Manual dispatch defaults to changed components and can optionally publish all split repositories.
 - Naming:
   - Plugins → `plugin-<folder-name>`
   - Themes → `theme-<folder-name>`

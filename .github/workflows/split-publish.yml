@@ -2,6 +2,12 @@ name: Split & Publish
 
 on:
   workflow_dispatch:
+    inputs:
+      publish_all:
+        description: Publish every split repository instead of only changed components
+        required: false
+        type: boolean
+        default: false
   push:
     branches: [ main ]
     paths:
@@ -64,11 +70,71 @@ jobs:
           PACKAGE_PREFIX="${SPLIT_PACKAGE_PREFIX:-package-}"
           PLUGIN_PREFIX="${SPLIT_PLUGIN_PREFIX:-plugin-}"
           THEME_PREFIX="${SPLIT_THEME_PREFIX:-theme-}"
+          PUBLISH_ALL="${{ github.event.inputs.publish_all || 'false' }}"
 
           BEFORE="$(python3 -c 'import json,os; p=os.environ.get("GITHUB_EVENT_PATH",""); print((json.load(open(p,"r",encoding="utf-8")).get("before","") if p and os.path.exists(p) else ""))' 2>/dev/null || true)"
 
           if [ -z "${BEFORE:-}" ] || [ "${BEFORE:-}" = "0000000000000000000000000000000000000000" ]; then
             BEFORE="$(git rev-parse HEAD^ 2>/dev/null || echo '')"
+          fi
+
+          collect_all_targets() {
+            local root="$1"
+            local marker="$2"
+            find "$root" -mindepth 2 -maxdepth 2 -type f -name "$marker" -print \
+              | sed 's#/'"$marker"'$##' \
+              | sort
+          }
+
+          collect_changed_targets() {
+            if [ -z "${BEFORE:-}" ]; then
+              return
+            fi
+
+            git diff --name-only "${BEFORE}" HEAD -- packages plugins themes \
+              | awk -F/ 'NF >= 3 { print $1 "/" $2 "/" $3 }' \
+              | sort -u
+          }
+
+          mapfile -t PACKAGE_TARGETS < <(collect_all_targets packages composer.json)
+          mapfile -t PLUGIN_TARGETS < <(collect_all_targets plugins composer.json)
+          mapfile -t THEME_TARGETS < <(collect_all_targets themes tentapress.json)
+
+          if [ "${PUBLISH_ALL}" != "true" ]; then
+            mapfile -t CHANGED_TARGETS < <(collect_changed_targets)
+
+            if [ "${#CHANGED_TARGETS[@]}" -eq 0 ]; then
+              echo "No package, plugin, or theme changes detected. Nothing to split."
+              exit 0
+            fi
+
+            filter_targets() {
+              local prefix="$1"
+              shift
+              local -a current=("$@")
+              local -a filtered=()
+              local target
+              for target in "${current[@]}"; do
+                if printf '%s\n' "${CHANGED_TARGETS[@]}" | grep -Fxq "$target"; then
+                  filtered+=("$target")
+                fi
+              done
+              printf '%s\n' "${filtered[@]}"
+            }
+
+            mapfile -t PACKAGE_TARGETS < <(filter_targets packages "${PACKAGE_TARGETS[@]}")
+            mapfile -t PLUGIN_TARGETS < <(filter_targets plugins "${PLUGIN_TARGETS[@]}")
+            mapfile -t THEME_TARGETS < <(filter_targets themes "${THEME_TARGETS[@]}")
+          fi
+
+          echo "Split targets:"
+          echo "- packages: ${#PACKAGE_TARGETS[@]}"
+          echo "- plugins: ${#PLUGIN_TARGETS[@]}"
+          echo "- themes: ${#THEME_TARGETS[@]}"
+
+          if [ "${#PACKAGE_TARGETS[@]}" -eq 0 ] && [ "${#PLUGIN_TARGETS[@]}" -eq 0 ] && [ "${#THEME_TARGETS[@]}" -eq 0 ]; then
+            echo "No split targets matched the changed paths."
+            exit 0
           fi
 
           split_push() {
@@ -158,8 +224,7 @@ jobs:
             rm -f "$notes_file"
           }
 
-          for path in packages/*/*; do
-            [ -f "$path/composer.json" ] || continue
+          for path in "${PACKAGE_TARGETS[@]}"; do
             name="$(basename "$path")"
             repo="${PACKAGE_PREFIX}${name}"
             version="$(read_composer_version_file "$path/composer.json")"
@@ -176,8 +241,7 @@ jobs:
             tag_version "$repo" "$version" "$sha" "$prev_version"
           done
 
-          for path in plugins/*/*; do
-            [ -f "$path/composer.json" ] || continue
+          for path in "${PLUGIN_TARGETS[@]}"; do
             name="$(basename "$path")"
             repo="${PLUGIN_PREFIX}${name}"
             version="$(read_version_file "$path/tentapress.json")"
@@ -194,8 +258,7 @@ jobs:
             tag_version "$repo" "$version" "$sha" "$prev_version"
           done
 
-          for path in themes/*/*; do
-            [ -f "$path/tentapress.json" ] || continue
+          for path in "${THEME_TARGETS[@]}"; do
             name="$(basename "$path")"
             repo="${THEME_PREFIX}${name}"
             version="$(read_version_file "$path/tentapress.json")"
