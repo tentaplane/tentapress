@@ -18,8 +18,8 @@
         @endif
     </div>
 
-    <div class="grid gap-5 xl:grid-cols-3">
-        <div class="space-y-5 xl:col-span-2">
+    <div class="grid gap-5 xl:grid-cols-2">
+        <div class="space-y-5">
             <div class="tp-metabox">
                 <div class="tp-metabox__title">Last build</div>
                 <div class="tp-metabox__body space-y-3">
@@ -160,7 +160,7 @@
             </div>
         </div>
 
-        <div class="space-y-5 xl:col-span-1">
+        <div class="space-y-5">
             <div class="tp-metabox">
                 <div class="tp-metabox__title">Generate build</div>
                 <div class="tp-metabox__body space-y-4">
