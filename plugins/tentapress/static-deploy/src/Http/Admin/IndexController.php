@@ -13,11 +13,21 @@ final class IndexController
         StaticExporter $exporter,
         StaticReplacementRules $rules
     ) {
+        $replacementRulesJson = old('replacement_rules_json', $rules->savedJson());
+        $savedRuleCount = 0;
+
+        try {
+            $savedRuleCount = count(StaticReplacementRules::normalize($replacementRulesJson));
+        } catch (\InvalidArgumentException) {
+            $savedRuleCount = 0;
+        }
+
         return view('tentapress-static-deploy::index', [
             'last' => $exporter->lastBuildInfo(),
             'canPersistRules' => $rules->canPersist(),
-            'replacementRulesJson' => old('replacement_rules_json', $rules->savedJson()),
+            'replacementRulesJson' => $replacementRulesJson,
             'replacementRulesExample' => $rules->exampleJson(),
+            'savedReplacementRuleCount' => $savedRuleCount,
         ]);
     }
 }

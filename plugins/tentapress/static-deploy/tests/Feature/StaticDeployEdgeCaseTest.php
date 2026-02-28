@@ -82,6 +82,36 @@ it('validates static deploy replacement rules as JSON rule objects', function ()
         ->assertSessionHasErrors(['replacement_rules_json']);
 });
 
+it('allows a super admin to reset saved replacement rules', function (): void {
+    registerStaticDeployProviderForEdgeCases();
+
+    $admin = TpUser::query()->create([
+        'name' => 'Static Deploy Admin',
+        'email' => 'static-deploy-rules-reset@example.test',
+        'password' => 'secret',
+        'is_super_admin' => true,
+    ]);
+
+    resolve(SettingsStore::class)->set('static_deploy.find_replace_rules', json_encode([
+        [
+            'find' => 'from',
+            'replace' => 'to',
+            'files' => ['*.html'],
+        ],
+    ], JSON_THROW_ON_ERROR), true);
+
+    $this->actingAs($admin)
+        ->post('/admin/static-deploy/rules', [
+            'rules_action' => 'reset',
+            'replacement_rules_json' => '{"ignored":true}',
+        ])
+        ->assertRedirect('/admin/static-deploy')
+        ->assertSessionHas('tp_notice_success', 'Replacement rules reset.');
+
+    expect(json_decode((string) resolve(SettingsStore::class)->get('static_deploy.find_replace_rules'), true, 512, JSON_THROW_ON_ERROR))
+        ->toBe([]);
+});
+
 it('returns not found when no static export archive exists', function (): void {
     registerStaticDeployProviderForEdgeCases();
     File::deleteDirectory(staticDeployArtifactsDir());

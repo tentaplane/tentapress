@@ -7,7 +7,7 @@ Static site generation for TentaPress.
 | Field | Value |
 |-------|-------|
 | ID | `tentapress/static-deploy` |
-| Version | 0.1.8 |
+| Version | 0.2.0 |
 | Provider | `TentaPress\StaticDeploy\StaticDeployServiceProvider` |
 
 ## Features
@@ -46,6 +46,7 @@ Static Deploy can persist reusable find/replace rules in the admin UI and apply 
 - Each rule requires `find` and `replace` values.
 - Optional `files` glob patterns limit which exported files are touched.
 - If `files` is omitted, Static Deploy targets text-like files such as `*.html`, `*.xml`, `*.txt`, `*.css`, `*.js`, and `*.json`.
+- The admin screen includes quick actions to load a working example payload or reset the saved rules to `[]`.
 
 Example:
 

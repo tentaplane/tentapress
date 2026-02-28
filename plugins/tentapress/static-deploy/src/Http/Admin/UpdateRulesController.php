@@ -16,9 +16,20 @@ final readonly class UpdateRulesController
                 ->with('tp_notice_warning', 'Static deploy settings are unavailable because the settings plugin is not enabled.');
         }
 
-        $rules->save((string) $request->input('replacement_rules_json', '[]'));
+        $action = (string) $request->input('rules_action', 'save');
+        $message = 'Static deploy replacement rules saved.';
+
+        if ($action === 'load_example') {
+            $rules->save($rules->exampleJson());
+            $message = 'Example replacement rules loaded.';
+        } elseif ($action === 'reset') {
+            $rules->save($rules->emptyStateJson());
+            $message = 'Replacement rules reset.';
+        } else {
+            $rules->save((string) $request->input('replacement_rules_json', '[]'));
+        }
 
         return to_route('tp.static.index')
-            ->with('tp_notice_success', 'Static deploy replacement rules saved.');
+            ->with('tp_notice_success', $message);
     }
 }

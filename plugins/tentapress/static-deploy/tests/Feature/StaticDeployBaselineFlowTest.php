@@ -68,6 +68,31 @@ it('allows a super admin to save static deploy replacement rules', function (): 
         ->toBe(json_decode($payload, true, 512, JSON_THROW_ON_ERROR));
 });
 
+it('allows a super admin to load the example replacement rules payload', function (): void {
+    registerStaticDeployProvider();
+
+    $admin = TpUser::query()->create([
+        'name' => 'Static Deploy Admin',
+        'email' => 'static-rules-example@example.test',
+        'password' => 'secret',
+        'is_super_admin' => true,
+    ]);
+
+    $this->actingAs($admin)
+        ->post('/admin/static-deploy/rules', [
+            'rules_action' => 'load_example',
+            'replacement_rules_json' => '[]',
+        ])
+        ->assertRedirect('/admin/static-deploy')
+        ->assertSessionHas('tp_notice_success', 'Example replacement rules loaded.');
+
+    $savedRules = json_decode((string) resolve(SettingsStore::class)->get('static_deploy.find_replace_rules'), true, 512, JSON_THROW_ON_ERROR);
+
+    expect($savedRules)->toBeArray()
+        ->and($savedRules)->toHaveCount(2)
+        ->and($savedRules[0]['find'])->toBe('<html');
+});
+
 it('allows a super admin to generate and download a static export', function (): void {
     registerStaticDeployProvider();
 

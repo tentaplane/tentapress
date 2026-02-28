@@ -20,10 +20,15 @@ final class UpdateRulesRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'rules_action' => ['nullable', 'string', 'in:save,load_example,reset'],
             'replacement_rules_json' => [
                 'nullable',
                 'string',
                 function (string $attribute, mixed $value, \Closure $fail): void {
+                    if ($this->input('rules_action', 'save') !== 'save') {
+                        return;
+                    }
+
                     try {
                         StaticReplacementRules::normalize((string) $value);
                     } catch (\InvalidArgumentException $exception) {
@@ -40,6 +45,7 @@ final class UpdateRulesRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'rules_action.in' => 'Unknown replacement rules action.',
             'replacement_rules_json.string' => 'Replacement rules must be a JSON string.',
         ];
     }
