@@ -128,6 +128,21 @@ it('returns not found when no static export archive exists', function (): void {
         ->assertNotFound();
 });
 
+it('returns not found when a requested stored export archive does not exist', function (): void {
+    registerStaticDeployProviderForEdgeCases();
+
+    $admin = TpUser::query()->create([
+        'name' => 'Static Deploy Admin',
+        'email' => 'static-deploy-missing-specific-archive@example.test',
+        'password' => 'secret',
+        'is_super_admin' => true,
+    ]);
+
+    $this->actingAs($admin)
+        ->get('/admin/static-deploy/download/20260228-235959')
+        ->assertNotFound();
+});
+
 it('generates a build even when the pages table is unavailable', function (): void {
     registerStaticDeployProviderForEdgeCases();
 

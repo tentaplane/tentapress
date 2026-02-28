@@ -24,6 +24,7 @@ final class IndexController
 
         return view('tentapress-static-deploy::index', [
             'last' => $exporter->lastBuildInfo(),
+            'storedExports' => $exporter->storedExports(),
             'canPersistRules' => $rules->canPersist(),
             'replacementRulesJson' => $replacementRulesJson,
             'replacementRulesExample' => $rules->exampleJson(),

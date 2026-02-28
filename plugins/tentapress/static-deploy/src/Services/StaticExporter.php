@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace TentaPress\StaticDeploy\Services;
 
+use DateTimeImmutable;
+use DateTimeZone;
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Http\Request as IlluminateRequest;
 use Illuminate\Support\Facades\File;
@@ -181,6 +183,71 @@ final class StaticExporter
         $zip = $last['zip_path'] ?? null;
 
         return is_string($zip) && $zip !== '' ? $zip : null;
+    }
+
+    /**
+     * @return array<int,array{
+     *   timestamp:string,
+     *   generated_at_utc:string,
+     *   zip_path:string,
+     *   zip_name:string,
+     *   size_bytes:int,
+     *   is_latest:bool
+     * }>
+     */
+    public function storedExports(): array
+    {
+        $exportsDir = $this->staticBasePath() . DIRECTORY_SEPARATOR . 'exports';
+
+        if (! is_dir($exportsDir)) {
+            return [];
+        }
+
+        $latestZipPath = $this->lastZipPath();
+        $exports = [];
+
+        foreach (File::files($exportsDir) as $file) {
+            $path = $file->getPathname();
+            $name = $file->getFilename();
+
+            if (! Str::startsWith($name, 'static-') || ! Str::endsWith($name, '.zip')) {
+                continue;
+            }
+
+            $timestamp = Str::between($name, 'static-', '.zip');
+
+            if (preg_match('/^\d{8}-\d{6}$/', $timestamp) !== 1) {
+                continue;
+            }
+
+            $generatedAt = DateTimeImmutable::createFromFormat('Ymd-His', $timestamp, new DateTimeZone('UTC'));
+
+            $exports[] = [
+                'timestamp' => $timestamp,
+                'generated_at_utc' => $generatedAt instanceof DateTimeImmutable ? $generatedAt->format('c') : gmdate('c', $file->getMTime()),
+                'zip_path' => $path,
+                'zip_name' => $name,
+                'size_bytes' => $file->getSize(),
+                'is_latest' => $latestZipPath !== null && realpath($latestZipPath) === realpath($path),
+            ];
+        }
+
+        usort($exports, function (array $left, array $right): int {
+            return strcmp($right['timestamp'], $left['timestamp']);
+        });
+
+        return $exports;
+    }
+
+    public function zipPathForTimestamp(string $timestamp): ?string
+    {
+        if (preg_match('/^\d{8}-\d{6}$/', $timestamp) !== 1) {
+            return null;
+        }
+
+        $path = $this->staticBasePath() . DIRECTORY_SEPARATOR . 'exports' . DIRECTORY_SEPARATOR . 'static-' . $timestamp . '.zip';
+
+        return is_file($path) ? $path : null;
     }
 
     /**

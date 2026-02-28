@@ -2,9 +2,22 @@
 
 declare(strict_types=1);
 
+use Illuminate\Support\Facades\File;
 use TentaPress\Settings\Services\SettingsStore;
 use TentaPress\StaticDeploy\StaticDeployServiceProvider;
 use TentaPress\Users\Models\TpUser;
+
+function staticDeployBaselineArtifactsDir(): string
+{
+    $base = 'tp-static';
+    $token = (string) getenv('TEST_TOKEN');
+
+    if ($token !== '') {
+        $base .= '-' . $token;
+    }
+
+    return storage_path('app/' . $base);
+}
 
 function registerStaticDeployProvider(): void
 {
@@ -20,6 +33,7 @@ it('redirects guests from static deploy admin routes to login', function (): voi
     $this->post('/admin/static-deploy/rules')->assertRedirect('/admin/login');
     $this->post('/admin/static-deploy/generate')->assertRedirect('/admin/login');
     $this->get('/admin/static-deploy/download')->assertRedirect('/admin/login');
+    $this->get('/admin/static-deploy/download/20260228-121500')->assertRedirect('/admin/login');
 });
 
 it('allows a super admin to view static deploy index', function (): void {
@@ -36,7 +50,34 @@ it('allows a super admin to view static deploy index', function (): void {
         ->get('/admin/static-deploy')
         ->assertOk()
         ->assertViewIs('tentapress-static-deploy::index')
-        ->assertSee('Replacement rules');
+        ->assertSee('Replacement rules')
+        ->assertSee('Stored exports');
+});
+
+it('lists stored exports for a super admin', function (): void {
+    registerStaticDeployProvider();
+
+    $admin = TpUser::query()->create([
+        'name' => 'Static Deploy Admin',
+        'email' => 'static-export-history@example.test',
+        'password' => 'secret',
+        'is_super_admin' => true,
+    ]);
+
+    File::ensureDirectoryExists(staticDeployBaselineArtifactsDir() . '/exports');
+    File::put(staticDeployBaselineArtifactsDir() . '/exports/static-20260228-101500.zip', 'older-export');
+    File::put(staticDeployBaselineArtifactsDir() . '/exports/static-20260228-111500.zip', 'latest-export');
+    File::put(staticDeployBaselineArtifactsDir() . '/last.json', json_encode([
+        'timestamp' => '20260228-111500',
+        'zip_path' => staticDeployBaselineArtifactsDir() . '/exports/static-20260228-111500.zip',
+    ], JSON_THROW_ON_ERROR));
+
+    $this->actingAs($admin)
+        ->get('/admin/static-deploy')
+        ->assertOk()
+        ->assertSee('static-20260228-101500.zip')
+        ->assertSee('static-20260228-111500.zip')
+        ->assertSee('Latest');
 });
 
 it('allows a super admin to save static deploy replacement rules', function (): void {
@@ -115,4 +156,22 @@ it('allows a super admin to generate and download a static export', function ():
     $this->actingAs($admin)
         ->get('/admin/static-deploy/download')
         ->assertOk();
+});
+
+it('allows a super admin to download a specific stored export', function (): void {
+    registerStaticDeployProvider();
+
+    $admin = TpUser::query()->create([
+        'name' => 'Static Deploy Admin',
+        'email' => 'static-export-specific@example.test',
+        'password' => 'secret',
+        'is_super_admin' => true,
+    ]);
+
+    File::ensureDirectoryExists(staticDeployBaselineArtifactsDir() . '/exports');
+    File::put(staticDeployBaselineArtifactsDir() . '/exports/static-20260228-121500.zip', 'specific-export');
+
+    $this->actingAs($admin)
+        ->get('/admin/static-deploy/download/20260228-121500')
+        ->assertDownload('static-20260228-121500.zip');
 });

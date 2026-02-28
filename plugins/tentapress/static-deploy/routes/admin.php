@@ -15,5 +15,6 @@ AdminRoutes::group(function (): void {
         Route::post('/static-deploy/rules', UpdateRulesController::class)->name('static.rules.update');
         Route::post('/static-deploy/generate', GenerateController::class)->name('static.generate');
         Route::get('/static-deploy/download', DownloadController::class)->name('static.download');
+        Route::get('/static-deploy/download/{timestamp}', DownloadController::class)->where('timestamp', '\d{8}-\d{6}')->name('static.download.archive');
     });
 });

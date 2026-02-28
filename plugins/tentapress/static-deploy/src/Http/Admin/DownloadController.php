@@ -9,9 +9,11 @@ use TentaPress\StaticDeploy\Services\StaticExporter;
 
 final class DownloadController
 {
-    public function __invoke(StaticExporter $exporter): BinaryFileResponse
+    public function __invoke(StaticExporter $exporter, ?string $timestamp = null): BinaryFileResponse
     {
-        $zipPath = $exporter->lastZipPath();
+        $zipPath = $timestamp === null
+            ? $exporter->lastZipPath()
+            : $exporter->zipPathForTimestamp($timestamp);
 
         abort_if($zipPath === null || !is_file($zipPath), 404);
 
