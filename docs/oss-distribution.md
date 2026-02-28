@@ -23,6 +23,7 @@ Define how TentaPress core + plugins/themes are distributed as open source, incl
 - Push runs only split repositories whose package/plugin/theme path changed in the pushed range.
 - Manual dispatch defaults to changed components and can optionally publish all split repositories.
 - Concurrent runs on the same branch are cancelled so only the newest split publish continues.
+- Changed split targets are published in parallel to reduce wall-clock time when multiple components change together.
 - Naming:
   - Plugins → `plugin-<folder-name>`
   - Themes → `theme-<folder-name>`

@@ -21,8 +21,11 @@ on:
       - '.github/workflows/split-publish.yml'
 
 jobs:
-  split:
+  prepare:
     runs-on: ubuntu-latest
+    outputs:
+      targets: ${{ steps.targets.outputs.targets }}
+      target_count: ${{ steps.targets.outputs.target_count }}
 
     steps:
       - uses: actions/checkout@v4
@@ -30,52 +33,12 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Configure git
-        run: |
-          git config user.name "TentaBot"
-          git config user.email "actions@github.com"
-
-      - name: Verify split token
-        env:
-          SPLIT_TOKEN: ${{ secrets.SPLIT_TOKEN }}
+      - name: Resolve split targets
+        id: targets
         run: |
           set -euo pipefail
 
-          if [ -z "${SPLIT_TOKEN:-}" ]; then
-            echo "Missing SPLIT_TOKEN secret (PAT with repo write access)."
-            exit 1
-          fi
-
-          login="$(curl -s -H "Authorization: token ${SPLIT_TOKEN}" https://api.github.com/user | python3 -c 'import json,sys; print((json.load(sys.stdin).get("login") or ""))' 2>/dev/null || true)"
-
-          if [ -z "${login}" ]; then
-            echo "Unable to validate SPLIT_TOKEN. Check PAT permissions and SSO authorization."
-            exit 1
-          fi
-
-          echo "Using split token for: ${login}"
-
-      - name: Split and push plugins/themes
-        env:
-          SPLIT_TOKEN: ${{ secrets.SPLIT_TOKEN }}
-          SPLIT_ORG: ${{ secrets.SPLIT_ORG }}
-          SPLIT_PACKAGE_PREFIX: ${{ vars.SPLIT_PACKAGE_PREFIX }}
-          SPLIT_PLUGIN_PREFIX: ${{ vars.SPLIT_PLUGIN_PREFIX }}
-          SPLIT_THEME_PREFIX: ${{ vars.SPLIT_THEME_PREFIX }}
-        run: |
-          set -euo pipefail
-
-          if [ -z "${SPLIT_TOKEN:-}" ]; then
-            echo "Missing SPLIT_TOKEN secret (PAT with repo write access)."
-            exit 1
-          fi
-
-          ORG="${SPLIT_ORG:-${GITHUB_REPOSITORY_OWNER}}"
-          PACKAGE_PREFIX="${SPLIT_PACKAGE_PREFIX:-package-}"
-          PLUGIN_PREFIX="${SPLIT_PLUGIN_PREFIX:-plugin-}"
-          THEME_PREFIX="${SPLIT_THEME_PREFIX:-theme-}"
           PUBLISH_ALL="${{ github.event.inputs.publish_all || 'false' }}"
-
           BEFORE="$(python3 -c 'import json,os; p=os.environ.get("GITHUB_EVENT_PATH",""); print((json.load(open(p,"r",encoding="utf-8")).get("before","") if p and os.path.exists(p) else ""))' 2>/dev/null || true)"
 
           if [ -z "${BEFORE:-}" ] || [ "${BEFORE:-}" = "0000000000000000000000000000000000000000" ]; then
@@ -85,7 +48,7 @@ jobs:
           collect_all_targets() {
             local root="$1"
             local marker="$2"
-            find "$root" -mindepth 2 -maxdepth 2 -type f -name "$marker" -print \
+            find "$root" -mindepth 3 -maxdepth 3 -type f -name "$marker" -print \
               | sed 's#/'"$marker"'$##' \
               | sort
           }
@@ -100,15 +63,19 @@ jobs:
               | sort -u
           }
 
-          mapfile -t PACKAGE_TARGETS < <(collect_all_targets packages composer.json)
-          mapfile -t PLUGIN_TARGETS < <(collect_all_targets plugins composer.json)
-          mapfile -t THEME_TARGETS < <(collect_all_targets themes tentapress.json)
+          mapfile -t PACKAGE_TARGETS < <(collect_all_targets packages composer.json | awk '{print "package|" $0}')
+          mapfile -t PLUGIN_TARGETS < <(collect_all_targets plugins composer.json | awk '{print "plugin|" $0}')
+          mapfile -t THEME_TARGETS < <(collect_all_targets themes tentapress.json | awk '{print "theme|" $0}')
 
           if [ "${PUBLISH_ALL}" != "true" ]; then
             mapfile -t CHANGED_TARGETS < <(collect_changed_targets)
 
             if [ "${#CHANGED_TARGETS[@]}" -eq 0 ]; then
               echo "No package, plugin, or theme changes detected. Nothing to split."
+              {
+                echo 'targets=[]'
+                echo 'target_count=0'
+              } >>"$GITHUB_OUTPUT"
               exit 0
             fi
 
@@ -120,10 +87,12 @@ jobs:
             filter_targets() {
               local -a current=("$@")
               local -a filtered=()
-              local target
-              for target in "${current[@]}"; do
-                if [ -n "${CHANGED_TARGET_MAP[$target]:-}" ]; then
-                  filtered+=("$target")
+              local entry
+              local target_path
+              for entry in "${current[@]}"; do
+                target_path="${entry#*|}"
+                if [ -n "${CHANGED_TARGET_MAP[$target_path]:-}" ]; then
+                  filtered+=("$entry")
                 fi
               done
               printf '%s\n' "${filtered[@]}"
@@ -134,15 +103,85 @@ jobs:
             mapfile -t THEME_TARGETS < <(filter_targets "${THEME_TARGETS[@]}")
           fi
 
+          mapfile -t TARGETS < <(printf '%s\n' "${PACKAGE_TARGETS[@]}" "${PLUGIN_TARGETS[@]}" "${THEME_TARGETS[@]}" | sed '/^$/d')
+
           echo "Split targets:"
           echo "- packages: ${#PACKAGE_TARGETS[@]}"
           echo "- plugins: ${#PLUGIN_TARGETS[@]}"
           echo "- themes: ${#THEME_TARGETS[@]}"
 
-          if [ "${#PACKAGE_TARGETS[@]}" -eq 0 ] && [ "${#PLUGIN_TARGETS[@]}" -eq 0 ] && [ "${#THEME_TARGETS[@]}" -eq 0 ]; then
+          if [ "${#TARGETS[@]}" -eq 0 ]; then
             echo "No split targets matched the changed paths."
+            {
+              echo 'targets=[]'
+              echo 'target_count=0'
+            } >>"$GITHUB_OUTPUT"
             exit 0
           fi
+
+          targets_json="$(printf '%s\n' "${TARGETS[@]}" | python3 -c 'import json,sys; print(json.dumps([{"kind": line.split("|",1)[0], "path": line.split("|",1)[1]} for line in sys.stdin.read().splitlines()]))')"
+
+          {
+            echo "targets=${targets_json}"
+            echo "target_count=${#TARGETS[@]}"
+          } >>"$GITHUB_OUTPUT"
+
+  split:
+    needs: prepare
+    if: needs.prepare.outputs.target_count != '0'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 6
+      matrix:
+        target: ${{ fromJson(needs.prepare.outputs.targets) }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Configure git
+        run: |
+          git config user.name "TentaBot"
+          git config user.email "actions@github.com"
+
+      - name: Split and push target
+        env:
+          SPLIT_TOKEN: ${{ secrets.SPLIT_TOKEN }}
+          SPLIT_ORG: ${{ secrets.SPLIT_ORG }}
+          SPLIT_PACKAGE_PREFIX: ${{ vars.SPLIT_PACKAGE_PREFIX }}
+          SPLIT_PLUGIN_PREFIX: ${{ vars.SPLIT_PLUGIN_PREFIX }}
+          SPLIT_THEME_PREFIX: ${{ vars.SPLIT_THEME_PREFIX }}
+          TARGET_KIND: ${{ matrix.target.kind }}
+          TARGET_PATH: ${{ matrix.target.path }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${SPLIT_TOKEN:-}" ]; then
+            echo "Missing SPLIT_TOKEN secret (PAT with repo write access)."
+            exit 1
+          fi
+
+          ORG="${SPLIT_ORG:-${GITHUB_REPOSITORY_OWNER}}"
+          PACKAGE_PREFIX="${SPLIT_PACKAGE_PREFIX:-package-}"
+          PLUGIN_PREFIX="${SPLIT_PLUGIN_PREFIX:-plugin-}"
+          THEME_PREFIX="${SPLIT_THEME_PREFIX:-theme-}"
+          BEFORE="$(python3 -c 'import json,os; p=os.environ.get("GITHUB_EVENT_PATH",""); print((json.load(open(p,"r",encoding="utf-8")).get("before","") if p and os.path.exists(p) else ""))' 2>/dev/null || true)"
+
+          if [ -z "${BEFORE:-}" ] || [ "${BEFORE:-}" = "0000000000000000000000000000000000000000" ]; then
+            BEFORE="$(git rev-parse HEAD^ 2>/dev/null || echo '')"
+          fi
+
+          read_version_file() {
+            local path="$1"
+            python3 -c 'import json,sys; p=sys.argv[1]; data=json.load(open(p,"r",encoding="utf-8")); print((data.get("version") or "").strip())' "$path" 2>/dev/null || true
+          }
+
+          read_version_stdin() {
+            python3 -c 'import json,sys; data=json.load(sys.stdin); print((data.get("version") or "").strip())' 2>/dev/null || true
+          }
 
           split_push() {
             local prefix="$1"
@@ -157,20 +196,6 @@ jobs:
             git push --force "https://x-access-token:${SPLIT_TOKEN}@github.com/${ORG}/${repo}.git" "$ref":"$branch" >&2
             echo "${sha}"
             git branch -D "$ref" >&2
-          }
-
-          read_version_file() {
-            local path="$1"
-            python3 -c 'import json,sys; p=sys.argv[1]; data=json.load(open(p,"r",encoding="utf-8")); print((data.get("version") or "").strip())' "$path" 2>/dev/null || true
-          }
-
-          read_version_stdin() {
-            python3 -c 'import json,sys; data=json.load(sys.stdin); print((data.get("version") or "").strip())' 2>/dev/null || true
-          }
-
-          read_composer_version_file() {
-            local path="$1"
-            python3 -c 'import json,sys; p=sys.argv[1]; data=json.load(open(p,"r",encoding="utf-8")); print((data.get("version") or "").strip())' "$path" 2>/dev/null || true
           }
 
           tag_version() {
@@ -231,53 +256,37 @@ jobs:
             rm -f "$notes_file"
           }
 
-          for path in "${PACKAGE_TARGETS[@]}"; do
-            name="$(basename "$path")"
-            repo="${PACKAGE_PREFIX}${name}"
-            version="$(read_composer_version_file "$path/composer.json")"
-            prev_version=""
-            if [ -n "${BEFORE:-}" ]; then
-              prev_version="$(git show "${BEFORE}:${path}/composer.json" 2>/dev/null | read_version_stdin || true)"
-            fi
-            if [ -z "${version:-}" ]; then
-              echo "Missing version in ${path}/composer.json for ${repo}."
+          name="$(basename "${TARGET_PATH}")"
+          case "${TARGET_KIND}" in
+            package)
+              repo="${PACKAGE_PREFIX}${name}"
+              version_file="${TARGET_PATH}/composer.json"
+              ;;
+            plugin)
+              repo="${PLUGIN_PREFIX}${name}"
+              version_file="${TARGET_PATH}/tentapress.json"
+              ;;
+            theme)
+              repo="${THEME_PREFIX}${name}"
+              version_file="${TARGET_PATH}/tentapress.json"
+              ;;
+            *)
+              echo "Unknown target kind: ${TARGET_KIND}"
               exit 1
-            fi
-            echo "Version for ${repo}: ${version} (prev: ${prev_version:-none})"
-            sha="$(split_push "$path" "$repo")"
-            tag_version "$repo" "$version" "$sha" "$prev_version"
-          done
+              ;;
+          esac
 
-          for path in "${PLUGIN_TARGETS[@]}"; do
-            name="$(basename "$path")"
-            repo="${PLUGIN_PREFIX}${name}"
-            version="$(read_version_file "$path/tentapress.json")"
-            prev_version=""
-            if [ -n "${BEFORE:-}" ]; then
-              prev_version="$(git show "${BEFORE}:${path}/tentapress.json" 2>/dev/null | read_version_stdin || true)"
-            fi
-            if [ -z "${version:-}" ]; then
-              echo "Missing version in ${path}/tentapress.json for ${repo}."
-              exit 1
-            fi
-            echo "Version for ${repo}: ${version} (prev: ${prev_version:-none})"
-            sha="$(split_push "$path" "$repo")"
-            tag_version "$repo" "$version" "$sha" "$prev_version"
-          done
+          version="$(read_version_file "${version_file}")"
+          prev_version=""
+          if [ -n "${BEFORE:-}" ]; then
+            prev_version="$(git show "${BEFORE}:${version_file}" 2>/dev/null | read_version_stdin || true)"
+          fi
 
-          for path in "${THEME_TARGETS[@]}"; do
-            name="$(basename "$path")"
-            repo="${THEME_PREFIX}${name}"
-            version="$(read_version_file "$path/tentapress.json")"
-            prev_version=""
-            if [ -n "${BEFORE:-}" ]; then
-              prev_version="$(git show "${BEFORE}:${path}/tentapress.json" 2>/dev/null | read_version_stdin || true)"
-            fi
-            if [ -z "${version:-}" ]; then
-              echo "Missing version in ${path}/tentapress.json for ${repo}."
-              exit 1
-            fi
-            echo "Version for ${repo}: ${version} (prev: ${prev_version:-none})"
-            sha="$(split_push "$path" "$repo")"
-            tag_version "$repo" "$version" "$sha" "$prev_version"
-          done
+          if [ -z "${version:-}" ]; then
+            echo "Missing version in ${version_file} for ${repo}."
+            exit 1
+          fi
+
+          echo "Version for ${repo}: ${version} (prev: ${prev_version:-none})"
+          sha="$(split_push "${TARGET_PATH}" "${repo}")"
+          tag_version "${repo}" "${version}" "${sha}" "${prev_version}"
