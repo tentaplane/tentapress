@@ -4,6 +4,30 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.38.0](https://github.com/tentaplane/tentapress/compare/v0.37.0...v0.38.0) (2026-02-28)
+
+
+### Features
+
+* **system-info:** add grid catalog cards with install progress ([1b96787](https://github.com/tentaplane/tentapress/commit/1b96787450083a5eddbc6c9adfe4866decbf996b))
+* **system-info:** add placeholder catalogue previews ([bf5049d](https://github.com/tentaplane/tentapress/commit/bf5049d70ba6ded793f0fe3ce6050664d289f451))
+* **system-info:** add plugin catalogue with repo-managed feed ([a3fcd2d](https://github.com/tentaplane/tentapress/commit/a3fcd2db6ca83a82a385a20ab09c9a045fa5dc18))
+
+
+### Bug Fixes
+
+* **forms:** add named throttling and harden tentaforms defaults ([2ae2f66](https://github.com/tentaplane/tentapress/commit/2ae2f663e3f3e0d6a1aea98515e0f80efb947f45))
+* **forms:** add provider failure diagnostics and rollout guidance ([4413a65](https://github.com/tentaplane/tentapress/commit/4413a65a47d4ff344f3bb9449fd9014d71b95859))
+* **headless-api:** stabilize v1 contract helpers and routing ([a5a5632](https://github.com/tentaplane/tentapress/commit/a5a5632301cc8b2754cadc0eab718cce854b17f2))
+
+
+### Miscellaneous Chores
+
+* **forms:** normalize route resolver usage in throttling test ([fc5504e](https://github.com/tentaplane/tentapress/commit/fc5504e0ea24d4ae807b382642c4bcc68cee62ff))
+* **forms:** normalize telemetry test assertions ([c7968b0](https://github.com/tentaplane/tentapress/commit/c7968b05aadb9b913f0d74a703ece5c115834498))
+* **forms:** normalize telemetry test formatting ([3483a31](https://github.com/tentaplane/tentapress/commit/3483a319fad8b6ae61c989071c75104c5cea1dbb))
+* **system-info:** apply automated formatter cleanup ([31f82cf](https://github.com/tentaplane/tentapress/commit/31f82cf990a28c49d6024f4c53351f9eca3d3556))
+
 ## [0.37.0](https://github.com/tentaplane/tentapress/compare/v0.36.3...v0.37.0) (2026-02-27)
 
 
