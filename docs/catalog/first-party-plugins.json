@@ -1,6 +1,6 @@
 {
     "schema_version": 1,
-    "generated_at": "2026-03-01T15:01:29Z",
+    "generated_at": "2026-03-01T15:40:17Z",
     "plugins": [
         {
             "id": "tentapress/admin-shell",
@@ -22,7 +22,7 @@
             "name": "Blocks",
             "description": "Block registry and rendering for TentaPress pages.",
             "package": "tentapress/blocks",
-            "latest_version": "0.11.0",
+            "latest_version": "0.11.1",
             "icon": "blocks"
         },
         {
@@ -30,7 +30,7 @@
             "name": "Builder",
             "description": "Visual drag-and-drop builder with live theme preview for pages and posts.",
             "package": "tentapress/builder",
-            "latest_version": "0.6.7",
+            "latest_version": "0.6.8",
             "icon": "builder"
         },
         {

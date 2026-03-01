@@ -2,6 +2,7 @@
     "name": "tentapress/blocks",
     "type": "library",
     "license": "MIT",
+    "version": "0.11.1",
     "require": {
         "php": "^8.2",
         "tentapress/system": "<1.0",

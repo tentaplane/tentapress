@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use TentaPress\Blocks\Registry\BlockRegistry;
+use TentaPress\Blocks\Render\BlockRenderer;
 
 it('registers first-party block definitions in the registry', function (): void {
     $registry = resolve(BlockRegistry::class);
@@ -107,4 +108,24 @@ it('does not render nested split-layout children recursively', function (): void
     ]);
 
     expect($html)->not->toContain('Should not render');
+});
+
+it('renders embed blocks as static thumbnails in builder preview context', function (): void {
+    $renderer = resolve(BlockRenderer::class);
+
+    $html = $renderer->render([
+        'type' => 'blocks/embed',
+        'props' => [
+            'title' => 'Preview video',
+            'url' => 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+            'aspect' => '16:9',
+        ],
+    ], [
+        'builder_preview' => true,
+    ]);
+
+    expect($html)->toContain('Preview video');
+    expect($html)->toContain('Video preview');
+    expect($html)->toContain('i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg');
+    expect($html)->not->toContain('<iframe');
 });

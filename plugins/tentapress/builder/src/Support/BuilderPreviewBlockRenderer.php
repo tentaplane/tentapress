@@ -28,7 +28,9 @@ final readonly class BuilderPreviewBlockRenderer
                 continue;
             }
 
-            $blockHtml = $this->renderer->render($block);
+            $blockHtml = $this->renderer->render($block, [
+                'builder_preview' => true,
+            ]);
             if (trim($blockHtml) === '') {
                 continue;
             }

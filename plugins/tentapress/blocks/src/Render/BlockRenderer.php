@@ -41,16 +41,18 @@ final readonly class BlockRenderer
 
     /**
      * @param  array{type?:mixed,version?:mixed,props?:mixed}  $block
+     * @param  array<string,mixed>  $context
      */
-    public function render(array $block): string
+    public function render(array $block, array $context = []): string
     {
-        return $this->renderWithDepth($block, 0);
+        return $this->renderWithDepth($block, 0, $context);
     }
 
     /**
      * @param  array{type?:mixed,version?:mixed,props?:mixed}  $block
+     * @param  array<string,mixed>  $context
      */
-    private function renderWithDepth(array $block, int $depth): string
+    private function renderWithDepth(array $block, int $depth, array $context): string
     {
         $type = isset($block['type']) ? (string) $block['type'] : '';
         $props = isset($block['props']) && is_array($block['props']) ? $block['props'] : [];
@@ -74,7 +76,7 @@ final readonly class BlockRenderer
         }
 
         $viewKey = $this->resolveVariantView($viewKey, $variant, $def?->variants ?? []);
-        $renderBlocks = function (array $children) use ($depth): string {
+        $renderBlocks = function (array $children) use ($depth, $context): string {
             if ($depth >= self::MAX_NESTED_DEPTH) {
                 return '';
             }
@@ -91,7 +93,7 @@ final readonly class BlockRenderer
                     continue;
                 }
 
-                $html .= $this->renderWithDepth($child, $depth + 1);
+                $html .= $this->renderWithDepth($child, $depth + 1, $context);
             }
 
             return $html;
@@ -103,6 +105,8 @@ final readonly class BlockRenderer
             'variant' => $variant,
             'renderBlocks' => $renderBlocks,
             'depth' => $depth,
+            'renderContext' => $context,
+            'isBuilderPreview' => (bool) ($context['builder_preview'] ?? false),
         ];
 
         // Theme override first
