@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.40.1](https://github.com/tentaplane/tentapress/compare/v0.40.0...v0.40.1) (2026-03-01)
+
+
+### Bug Fixes
+
+* **system-info:** auto-detect install job binaries ([347ff96](https://github.com/tentaplane/tentapress/commit/347ff9614e6c0eb6b89b37e9f3c40ca75de0f80b))
+* **system-info:** default catalog feed to repo source ([315f052](https://github.com/tentaplane/tentapress/commit/315f052f07c8847be4eccbabda151548424929fe))
+
 ## [0.40.0](https://github.com/tentaplane/tentapress/compare/v0.39.2...v0.40.0) (2026-03-01)
 
 
