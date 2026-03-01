@@ -797,9 +797,9 @@ function applyPreviewDocument(payload: BuilderPreviewDocument): void {
         .map((cssText) => `<style>${cssText}</style>`)
         .join('');
     const uiStyle = `<style>
-        html, body { margin: 0; min-height: 100%; background: #fff; color: #0f172a; }
+        html, body { margin: 0; min-height: 100%; }
         body { overflow-x: hidden; }
-        .tp-builder-preview-document { min-height: 100%; background: #fff; color: #0f172a; overflow-x: hidden; box-sizing: border-box; }
+        .tp-builder-preview-document { min-height: 100%; overflow-x: hidden; box-sizing: border-box; }
         .tp-builder-preview-document * { box-sizing: border-box; }
         .tp-builder-preview-document img, .tp-builder-preview-document video, .tp-builder-preview-document svg { max-width: 100%; }
         .tp-builder-preview-document .w-screen,
