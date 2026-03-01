@@ -1,0 +1,23 @@
+{
+    "name": "tentapress/taxonomies",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "php": "^8.2",
+        "tentapress/system": "<1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "TentaPress\\Taxonomies\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "TentaPress\\Taxonomies\\TaxonomiesServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

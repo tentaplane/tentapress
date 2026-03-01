@@ -1,0 +1,10 @@
+{
+    "id": "tentapress/taxonomies",
+    "name": "Taxonomies",
+    "description": "Standalone taxonomy registration and persistence for TentaPress.",
+    "version": "0.1.0",
+    "provider": "TentaPress\\Taxonomies\\TaxonomiesServiceProvider",
+    "requires": [
+        "tentapress/system"
+    ]
+}
