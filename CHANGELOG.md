@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.40.3](https://github.com/tentaplane/tentapress/compare/v0.40.2...v0.40.3) (2026-03-01)
+
+
+### Bug Fixes
+
+* **builder,blocks,theme-tailwind:** render embed thumbnails in preview ([26876b5](https://github.com/tentaplane/tentapress/commit/26876b5a1b5512213c865b54d970d7901fd10d5f))
+
 ## [0.40.2](https://github.com/tentaplane/tentapress/compare/v0.40.1...v0.40.2) (2026-03-01)
 
 
