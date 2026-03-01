@@ -78,6 +78,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Plugin Lifecycle Binaries
+    |--------------------------------------------------------------------------
+    |
+    | TentaPress will auto-detect usable php and composer binaries for
+    | install/update jobs. Set these only if you need to override detection.
+    |
+    */
+    'plugin_lifecycle' => [
+        'php_binary' => '',
+        'composer_binary' => '',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Media
     |--------------------------------------------------------------------------
     |

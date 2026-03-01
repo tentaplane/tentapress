@@ -12,9 +12,9 @@ use Illuminate\Queue\Middleware\WithoutOverlapping;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Process;
 use RuntimeException;
-use Symfony\Component\Process\ExecutableFinder;
 use Throwable;
 use TentaPress\SystemInfo\Models\TpPluginInstall;
+use TentaPress\SystemInfo\Support\CommandBinaryResolver;
 
 final class InstallPlugin implements ShouldQueue
 {
@@ -40,7 +40,7 @@ final class InstallPlugin implements ShouldQueue
         ];
     }
 
-    public function handle(): void
+    public function handle(CommandBinaryResolver $binaryResolver): void
     {
         $install = TpPluginInstall::query()->find($this->installId);
         if (! $install instanceof TpPluginInstall) {
@@ -60,10 +60,10 @@ final class InstallPlugin implements ShouldQueue
         $install->save();
 
         $log = '';
-        $phpBinary = $this->phpCliBinary();
+        $phpBinary = $binaryResolver->phpCliBinary();
 
         try {
-            $this->runCommand($this->composerRequireCommand($package, $phpBinary), $log);
+            $this->runCommand($this->composerRequireCommand($package, $phpBinary, $binaryResolver), $log);
             $this->runCommand([$phpBinary, 'artisan', 'tp:plugins', 'sync', '--no-interaction'], $log);
             $this->runCommand([$phpBinary, 'artisan', 'tp:plugins', 'enable', $package, '--no-interaction'], $log);
             $this->runCommand([$phpBinary, 'artisan', 'migrate', '--force', '--no-interaction'], $log);
@@ -102,89 +102,9 @@ final class InstallPlugin implements ShouldQueue
     /**
      * @return array<int,string>
      */
-    private function composerRequireCommand(string $package, string $phpBinary): array
+    private function composerRequireCommand(string $package, string $phpBinary, CommandBinaryResolver $binaryResolver): array
     {
-        $finder = new ExecutableFinder();
-        $projectComposer = base_path('composer.phar');
-        if (is_file($projectComposer)) {
-            return [$phpBinary, $projectComposer, 'require', $package, '--no-interaction', '--no-progress'];
-        }
-
-        $configuredBinary = trim((string) env('TP_COMPOSER_BINARY', ''));
-        if ($configuredBinary !== '' && is_file($configuredBinary) && is_executable($configuredBinary)) {
-            return [$configuredBinary, 'require', $package, '--no-interaction', '--no-progress'];
-        }
-
-        $commonComposerPaths = [
-            '/usr/local/bin/composer',
-            '/opt/homebrew/bin/composer',
-            '/usr/bin/composer',
-        ];
-
-        foreach ($commonComposerPaths as $composerPath) {
-            if (is_file($composerPath) && is_executable($composerPath)) {
-                return [$composerPath, 'require', $package, '--no-interaction', '--no-progress'];
-            }
-        }
-
-        $composer = $finder->find('composer');
-        if (is_string($composer) && $composer !== '') {
-            return [$composer, 'require', $package, '--no-interaction', '--no-progress'];
-        }
-
-        throw new RuntimeException('Composer binary not found. Install Composer or set TP_COMPOSER_BINARY to an absolute composer path.');
-    }
-
-    private function phpCliBinary(): string
-    {
-        $finder = new ExecutableFinder();
-
-        $configuredBinary = trim((string) env('TP_PHP_BINARY', ''));
-        if ($this->isUsablePhpCliBinary($configuredBinary)) {
-            return $configuredBinary;
-        }
-
-        if ($this->isUsablePhpCliBinary(PHP_BINARY)) {
-            return PHP_BINARY;
-        }
-
-        $phpBindirBinary = rtrim(PHP_BINDIR, '/') . '/php';
-        if ($this->isUsablePhpCliBinary($phpBindirBinary)) {
-            return $phpBindirBinary;
-        }
-
-        $commonPhpPaths = [
-            '/usr/bin/php',
-            '/usr/local/bin/php',
-            '/opt/homebrew/bin/php',
-            '/usr/bin/php8.4',
-            '/usr/bin/php8.3',
-            '/usr/bin/php8.2',
-        ];
-
-        foreach ($commonPhpPaths as $phpPath) {
-            if ($this->isUsablePhpCliBinary($phpPath)) {
-                return $phpPath;
-            }
-        }
-
-        $php = $finder->find('php');
-        if ($this->isUsablePhpCliBinary($php)) {
-            return (string) $php;
-        }
-
-        throw new RuntimeException('PHP CLI binary not found. Set TP_PHP_BINARY to an absolute php CLI path.');
-    }
-
-    private function isUsablePhpCliBinary(?string $binary): bool
-    {
-        if (! is_string($binary) || $binary === '' || ! is_file($binary) || ! is_executable($binary)) {
-            return false;
-        }
-
-        $name = strtolower(basename($binary));
-
-        return ! str_contains($name, 'fpm');
+        return [...$binaryResolver->composerBaseCommand($phpBinary), 'require', $package, '--no-interaction', '--no-progress'];
     }
 
     /**
