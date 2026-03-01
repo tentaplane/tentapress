@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Fixture\PathPlugin\TestPathPluginServiceProvider;
 use TentaPress\System\Plugin\PluginAssetPublisher;
 use TentaPress\System\Plugin\PluginManager;
 use TentaPress\System\Plugin\PluginRegistry;
@@ -10,7 +11,7 @@ use TentaPress\System\Support\Paths;
 it('registers enabled path plugin providers when composer autoload is unavailable', function (): void {
     config()->set('tentapress.tests.path_plugin_loaded', false);
 
-    $providerClass = 'Fixture\\PathPlugin\\TestPathPluginServiceProvider';
+    $providerClass = TestPathPluginServiceProvider::class;
     $cachePath = Paths::pluginCachePath();
     $originalCache = is_file($cachePath) ? file_get_contents($cachePath) : false;
 
