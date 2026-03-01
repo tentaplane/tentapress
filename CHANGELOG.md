@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.40.2](https://github.com/tentaplane/tentapress/compare/v0.40.1...v0.40.2) (2026-03-01)
+
+
+### Bug Fixes
+
+* **revisions:** decouple pages and posts from plugin runtime ([73a25e5](https://github.com/tentaplane/tentapress/commit/73a25e57dc022578c1fb02c5e8cb4c15d0d60cb8))
+* **revisions:** keep pages and posts plugin-agnostic ([53437ca](https://github.com/tentaplane/tentapress/commit/53437ca65279176cbcac1e5be4efd99438f8f55e))
+* **system:** autoload enabled path plugin providers ([fa8a7d6](https://github.com/tentaplane/tentapress/commit/fa8a7d6404fcfc353a4b611c16248ee131314736))
+
 ## [0.40.1](https://github.com/tentaplane/tentapress/compare/v0.40.0...v0.40.1) (2026-03-01)
 
 
