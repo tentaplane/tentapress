@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.40.4](https://github.com/tentaplane/tentapress/compare/v0.40.3...v0.40.4) (2026-03-01)
+
+
+### Bug Fixes
+
+* **builder:** remove CSS styles for backgrounds so previews display correctly ([5a0407d](https://github.com/tentaplane/tentapress/commit/5a0407d9ef061c8d5274cc0839cf6164a63e3bc4))
+
 ## [0.40.3](https://github.com/tentaplane/tentapress/compare/v0.40.2...v0.40.3) (2026-03-01)
 
 
