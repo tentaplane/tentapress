@@ -241,7 +241,7 @@ final class EditController
 
     private function latestAutosaveFor(string $resourceType, int $resourceId, mixed $updatedAt): mixed
     {
-        $historyClass = 'TentaPress\\Revisions\\Services\\RevisionHistory';
+        $historyClass = 'TentaPress\\Revisions\\Services\\'.'RevisionHistory';
 
         if (! class_exists($historyClass) || ! app()->bound($historyClass)) {
             return null;
