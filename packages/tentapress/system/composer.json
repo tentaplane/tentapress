@@ -2,7 +2,7 @@
     "name": "tentapress/system",
     "type": "library",
     "license": "MIT",
-    "version": "0.4.3",
+    "version": "0.4.4",
     "replace": {
         "tentapress/package-system": "self.version"
     },
