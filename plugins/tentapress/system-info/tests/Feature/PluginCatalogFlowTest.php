@@ -13,7 +13,7 @@ it('redirects guests from plugin catalog to login', function (): void {
 it('allows users with view_system_info capability to view plugin catalog', function (): void {
     $user = makeUserWithCapability('view_system_info', 'viewer-catalog@example.test');
 
-    config()->set('tentapress.catalog.url', 'https://catalog.example.test/plugins.json');
+    config()->set('tentapress-system-info.catalog.url', 'https://catalog.example.test/plugins.json');
 
     Http::fake([
         'https://catalog.example.test/plugins.json' => Http::response([
@@ -41,7 +41,7 @@ it('allows users with view_system_info capability to view plugin catalog', funct
 it('fetches the default github blob catalog url through the raw content endpoint', function (): void {
     $user = makeUserWithCapability('view_system_info', 'viewer-catalog-blob@example.test');
 
-    config()->set('tentapress.catalog.url', 'https://github.com/tentaplane/tentapress/blob/main/docs/catalog/first-party-plugins.json');
+    config()->set('tentapress-system-info.catalog.url', 'https://github.com/tentaplane/tentapress/blob/main/docs/catalog/first-party-plugins.json');
 
     Http::fake([
         'https://raw.githubusercontent.com/tentaplane/tentapress/main/docs/catalog/first-party-plugins.json' => Http::response([
@@ -90,7 +90,7 @@ it('shows local-only plugins when hosted feed is unavailable', function (): void
         'updated_at' => now(),
     ]);
 
-    config()->set('tentapress.catalog.url', 'https://catalog.example.test/plugins.json');
+    config()->set('tentapress-system-info.catalog.url', 'https://catalog.example.test/plugins.json');
 
     Http::fake([
         'https://catalog.example.test/plugins.json' => Http::response('offline', 503),
@@ -107,7 +107,7 @@ it('shows local-only plugins when hosted feed is unavailable', function (): void
 it('hides install action for users without manage_plugins capability', function (): void {
     $user = makeUserWithCapability('view_system_info', 'viewer-catalog-install@example.test');
 
-    config()->set('tentapress.catalog.url', 'https://catalog.example.test/plugins.json');
+    config()->set('tentapress-system-info.catalog.url', 'https://catalog.example.test/plugins.json');
 
     Http::fake([
         'https://catalog.example.test/plugins.json' => Http::response([

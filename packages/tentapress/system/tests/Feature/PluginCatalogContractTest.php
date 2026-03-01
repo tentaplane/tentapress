@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\File;
 use TentaPress\System\Catalog\FirstPartyPluginCatalogGenerator;
 
 it('keeps the committed first-party plugin catalog in sync with plugin manifests', function (): void {
-    $catalogPath = base_path((string) config('tentapress.catalog.local_path'));
+    $catalogPath = base_path('docs/catalog/first-party-plugins.json');
 
     expect(is_file($catalogPath))->toBeTrue();
 

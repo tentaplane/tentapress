@@ -11,6 +11,7 @@ final class SystemInfoServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
+        $this->mergeConfigFrom(__DIR__.'/../config/system-info.php', 'tentapress-system-info');
         $this->app->singleton(SystemInfoService::class);
     }
 

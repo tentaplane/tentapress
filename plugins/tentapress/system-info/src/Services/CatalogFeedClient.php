@@ -16,7 +16,7 @@ final class CatalogFeedClient
      */
     public function fetch(): array
     {
-        $url = $this->resolveRemoteUrl(trim((string) config('tentapress.catalog.url', '')));
+        $url = $this->resolveRemoteUrl(trim((string) config('tentapress-system-info.catalog.url', '')));
         $localPlugins = $this->loadLocalPlugins();
         $warning = null;
 
@@ -28,12 +28,12 @@ final class CatalogFeedClient
         }
 
         $cacheKey = $this->cacheKey($url);
-        $cacheTtl = max(30, (int) config('tentapress.catalog.cache_ttl_seconds', 900));
-        $requireHttps = (bool) config('tentapress.catalog.require_https', true);
+        $cacheTtl = max(30, (int) config('tentapress-system-info.catalog.cache_ttl_seconds', 900));
+        $requireHttps = (bool) config('tentapress-system-info.catalog.require_https', true);
 
         try {
             $this->assertUrl($url, $requireHttps);
-            $timeout = max(1, (int) config('tentapress.catalog.timeout_seconds', 5));
+            $timeout = max(1, (int) config('tentapress-system-info.catalog.timeout_seconds', 10));
 
             $response = Http::connectTimeout($timeout)
                 ->timeout($timeout)
@@ -119,7 +119,7 @@ final class CatalogFeedClient
      */
     private function loadLocalPlugins(): array
     {
-        $path = trim((string) config('tentapress.catalog.local_path', ''));
+        $path = trim((string) config('tentapress-system-info.catalog.local_path', ''));
         if ($path === '') {
             return [];
         }

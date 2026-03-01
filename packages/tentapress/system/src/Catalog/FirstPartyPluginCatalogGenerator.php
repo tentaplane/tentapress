@@ -10,6 +10,8 @@ use TentaPress\System\Support\Paths;
 
 final readonly class FirstPartyPluginCatalogGenerator
 {
+    private const DEFAULT_CATALOG_PATH = 'docs/catalog/first-party-plugins.json';
+
     public function __construct(
         private JsonPayload $jsonPayload,
     ) {
@@ -122,10 +124,10 @@ final readonly class FirstPartyPluginCatalogGenerator
 
     private function resolveCatalogPath(?string $path = null): string
     {
-        $candidate = trim((string) ($path ?? config('tentapress.catalog.local_path', '')));
+        $candidate = trim((string) ($path ?? ''));
 
         if ($candidate === '') {
-            return base_path('docs/catalog/first-party-plugins.json');
+            return base_path(self::DEFAULT_CATALOG_PATH);
         }
 
         return str_starts_with($candidate, '/') ? $candidate : base_path($candidate);

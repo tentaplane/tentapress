@@ -62,36 +62,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Plugin Catalog
-    |--------------------------------------------------------------------------
-    |
-    | Plugin catalog source configuration for first-party plugin discovery.
-    |
-    */
-    'catalog' => [
-        'local_path' => 'docs/catalog/first-party-plugins.json',
-        'url' => 'https://github.com/tentaplane/tentapress/blob/main/docs/catalog/first-party-plugins.json',
-        'timeout_seconds' => 5,
-        'cache_ttl_seconds' => 900,
-        'require_https' => true,
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Plugin Lifecycle Binaries
-    |--------------------------------------------------------------------------
-    |
-    | TentaPress will auto-detect usable php and composer binaries for
-    | install/update jobs. Set these only if you need to override detection.
-    |
-    */
-    'plugin_lifecycle' => [
-        'php_binary' => '',
-        'composer_binary' => '',
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
     | Media
     |--------------------------------------------------------------------------
     |

@@ -13,7 +13,7 @@ final class CommandBinaryResolver
     {
         $finder = new ExecutableFinder();
 
-        $configuredBinary = trim((string) config('tentapress.plugin_lifecycle.php_binary', ''));
+        $configuredBinary = trim((string) config('tentapress-system-info.plugin_lifecycle.php_binary', ''));
         if ($this->isUsablePhpCliBinary($configuredBinary)) {
             return $configuredBinary;
         }
@@ -61,7 +61,7 @@ final class CommandBinaryResolver
             return [$phpBinary, $projectComposer];
         }
 
-        $configuredBinary = trim((string) config('tentapress.plugin_lifecycle.composer_binary', ''));
+        $configuredBinary = trim((string) config('tentapress-system-info.plugin_lifecycle.composer_binary', ''));
         if ($configuredBinary !== '' && is_file($configuredBinary) && is_executable($configuredBinary)) {
             return [$configuredBinary];
         }

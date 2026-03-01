@@ -7,7 +7,7 @@ Diagnostics and plugin management for TentaPress.
 | Field    | Value                                             |
 | -------- | ------------------------------------------------- |
 | ID       | `tentapress/system-info`                          |
-| Version  | 0.8.4                                             |
+| Version  | 0.8.5                                             |
 | Provider | `TentaPress\SystemInfo\SystemInfoServiceProvider` |
 
 ## Features
@@ -41,6 +41,7 @@ None.
 ## Configuration
 
 ```php
+// plugins/tentapress/system-info/config/system-info.php
 'catalog' => [
     'local_path' => 'docs/catalog/first-party-plugins.json',
     'url' => 'https://github.com/tentaplane/tentapress/blob/main/docs/catalog/first-party-plugins.json',
@@ -55,6 +56,7 @@ None.
 ],
 ```
 
+- `system-info` ships its own defaults, so new releases do not depend on changes to the root `config/tentapress.php`.
 - `local_path` points to the generated first-party catalog feed in this monorepo.
 - `url` defaults to the TentaPress repository source-of-truth feed and is resolved to raw GitHub content when fetching.
 - If hosted data is unavailable, the catalog falls back to local data (and cached hosted data when available).
