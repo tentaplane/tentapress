@@ -26,7 +26,7 @@ final class EditorController
         }
 
         $autosave = app()->bound(RevisionHistory::class)
-            ? app(RevisionHistory::class)->latestAutosaveFor('posts', (int) $post->id, $post->updated_at)
+            ? resolve(RevisionHistory::class)->latestAutosaveFor('posts', (int) $post->id, $post->updated_at)
             : null;
 
         $draftBlocksSource = is_array($autosave?->blocks) ? $autosave->blocks : $post->blocks;

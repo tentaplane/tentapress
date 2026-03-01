@@ -17,7 +17,7 @@ final class EditorController
     public function __invoke(TpPage $page, ThemeManager $themes)
     {
         $autosave = app()->bound(RevisionHistory::class)
-            ? app(RevisionHistory::class)->latestAutosaveFor('pages', (int) $page->id, $page->updated_at)
+            ? resolve(RevisionHistory::class)->latestAutosaveFor('pages', (int) $page->id, $page->updated_at)
             : null;
 
         $draftBlocksSource = is_array($autosave?->blocks) ? $autosave->blocks : $page->blocks;
