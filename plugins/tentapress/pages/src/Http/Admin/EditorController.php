@@ -9,19 +9,27 @@ use TentaPress\Blocks\Registry\BlockRegistry;
 use TentaPress\System\Plugin\PluginRegistry;
 use TentaPress\Media\Models\TpMedia;
 use TentaPress\Pages\Models\TpPage;
+use TentaPress\Revisions\Services\RevisionHistory;
 use TentaPress\System\Theme\ThemeManager;
 
 final class EditorController
 {
     public function __invoke(TpPage $page, ThemeManager $themes)
     {
-        $blocks = $this->normalizeBlocks($page->blocks);
+        $autosave = app()->bound(RevisionHistory::class)
+            ? app(RevisionHistory::class)->latestAutosaveFor('pages', (int) $page->id, $page->updated_at)
+            : null;
+
+        $draftBlocksSource = is_array($autosave?->blocks) ? $autosave->blocks : $page->blocks;
+        $draftPageDocSource = is_array($autosave?->content) ? $autosave->content : $page->content;
+
+        $blocks = $this->normalizeBlocks($draftBlocksSource);
         $blocksJson = json_encode($blocks, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         if ($blocksJson === false) {
             $blocksJson = '[]';
         }
 
-        $pageDoc = is_array($page->content) ? $page->content : ['time' => 0, 'blocks' => [], 'version' => '2.28.0'];
+        $pageDoc = is_array($draftPageDocSource) ? $draftPageDocSource : ['time' => 0, 'blocks' => [], 'version' => '2.28.0'];
         $pageDocJson = json_encode($pageDoc, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         if ($pageDocJson === false) {
             $pageDocJson = '{"time":0,"blocks":[],"version":"2.28.0"}';
@@ -37,6 +45,11 @@ final class EditorController
             'blockDefinitions' => $this->blockDefinitions(),
             'mediaOptions' => $this->mediaOptions(),
             'editorMode' => true,
+            'loadedAutosave' => $autosave,
+            'formTitle' => (string) ($autosave?->title ?? $page->title),
+            'formSlug' => (string) ($autosave?->slug ?? $page->slug),
+            'formLayout' => (string) ($autosave?->layout ?? $page->layout),
+            'formEditorDriver' => (string) ($autosave?->editor_driver ?? $page->editor_driver),
         ]);
     }
 

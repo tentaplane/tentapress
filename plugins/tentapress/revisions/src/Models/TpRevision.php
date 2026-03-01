@@ -13,6 +13,7 @@ final class TpRevision extends Model
     protected $fillable = [
         'resource_type',
         'resource_id',
+        'revision_kind',
         'title',
         'slug',
         'status',
@@ -23,6 +24,7 @@ final class TpRevision extends Model
         'author_id',
         'published_at',
         'created_by',
+        'restored_from_revision_id',
         'snapshot_hash',
     ];
 

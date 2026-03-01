@@ -29,7 +29,7 @@
         $editorDriverMap[$definition->id] = $definition;
     }
 
-    $editorDriver = old('editor_driver', $page->editor_driver ?? 'blocks');
+    $editorDriver = old('editor_driver', $formEditorDriver);
     $editorDriver = is_string($editorDriver) && isset($editorDriverMap[$editorDriver]) ? $editorDriver : 'blocks';
     if (! isset($editorDriverMap[$editorDriver])) {
         $editorDriver = array_key_first($editorDriverMap) ?? 'blocks';
@@ -42,6 +42,10 @@
     $editorLabel = $selectedDriver?->label ?? 'Blocks Builder';
     $isBuilderDriver = ($selectedDriver?->id ?? '') === 'builder';
     $canRenderSelectedEditorInline = $editorMode || ! $isBuilderDriver;
+    $formTitle = is_string($formTitle ?? null) ? $formTitle : (string) ($page->title ?? '');
+    $formSlug = is_string($formSlug ?? null) ? $formSlug : (string) ($page->slug ?? '');
+    $formLayout = is_string($formLayout ?? null) ? $formLayout : (string) ($page->layout ?? '');
+    $formEditorDriver = is_string($formEditorDriver ?? null) ? $formEditorDriver : (string) ($page->editor_driver ?? 'blocks');
 @endphp
 
 @if ($editorMode)
@@ -71,6 +75,12 @@
             </div>
         @endif
 
+        @if (($mode === 'edit') && isset($loadedAutosave) && $loadedAutosave instanceof \TentaPress\Revisions\Models\TpRevision)
+            <div class="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+                Loaded autosave draft from {{ $loadedAutosave->created_at?->diffForHumans() ?? 'just now' }}.
+            </div>
+        @endif
+
         <div class="{{ $editorMode ? 'lg:grid-cols-1' : 'lg:grid-cols-4' }} grid grid-cols-1 gap-6">
             <div class="{{ $editorMode ? 'lg:col-span-1' : 'lg:col-span-3' }} space-y-6">
                 <div class="{{ $editorMode ? '' : 'tp-metabox' }}">
@@ -80,6 +90,9 @@
                             action="{{ $mode === 'create' ? route('tp.pages.store') : route('tp.pages.update', ['page' => $page->id]) }}"
                             class="space-y-4"
                             id="page-form"
+                            @if ($mode === 'edit')
+                                data-revisions-autosave-url="{{ route('tp.pages.revisions.autosave', ['page' => $page->id]) }}"
+                            @endif
                             @if ($mode === 'edit' && count($editorDriverMap) > 1)
                                 data-editor-switch-form="1"
                                 data-editor-driver-current="{{ $editorDriver }}"
@@ -90,9 +103,9 @@
                             @endif
 
                             @if ($editorMode)
-                                <input type="hidden" name="title" value="{{ old('title', $page->title) }}" />
-                                <input type="hidden" name="slug" value="{{ old('slug', $page->slug) }}" />
-                                <input type="hidden" name="layout" value="{{ old('layout', $page->layout) }}" />
+                                <input type="hidden" name="title" value="{{ old('title', $formTitle) }}" />
+                                <input type="hidden" name="slug" value="{{ old('slug', $formSlug) }}" />
+                                <input type="hidden" name="layout" value="{{ old('layout', $formLayout) }}" />
                                 <input type="hidden" name="editor_driver" value="{{ $editorDriver }}" />
                                 <input type="hidden" name="return_to" value="editor" />
                             @else
@@ -100,8 +113,8 @@
                                 <div
                                     class="space-y-4"
                                     x-data="{
-                                        title: @js(old('title', $page->title)),
-                                        slug: @js(old('slug', $page->slug)),
+                                        title: @js(old('title', $formTitle)),
+                                        slug: @js(old('slug', $formSlug)),
                                         titleTouched: false,
                                         slugTouched: false,
                                         isSlugValid() {
@@ -113,7 +126,7 @@
                                         <input
                                             name="title"
                                             class="tp-input"
-                                            value="{{ old('title', $page->title) }}"
+                                            value="{{ old('title', $formTitle) }}"
                                             x-model="title"
                                             @blur="titleTouched = true"
                                             required />
@@ -128,7 +141,7 @@
 
                                     @php
                                         $themeLayouts = is_array($themeLayouts ?? null) ? $themeLayouts : [];
-                                        $currentLayout = old('layout', $page->layout);
+                                        $currentLayout = old('layout', $formLayout);
                                         $currentLayout = is_string($currentLayout) ? $currentLayout : '';
                                         $currentLayout = $currentLayout !== '' ? $currentLayout : 'default';
                                     @endphp
@@ -139,7 +152,7 @@
                                             <input
                                                 name="slug"
                                                 class="tp-input"
-                                                value="{{ old('slug', $page->slug) }}"
+                                                value="{{ old('slug', $formSlug) }}"
                                                 x-model="slug"
                                                 @blur="slugTouched = true"
                                                 placeholder="auto-generated if blank (on create)"
@@ -473,6 +486,82 @@
                             });
                         });
                     });
+                });
+            })();
+
+            (() => {
+                const forms = document.querySelectorAll(
+                    'form[data-revisions-autosave-url]',
+                );
+
+                forms.forEach((form) => {
+                    const autosaveUrl = form.dataset.revisionsAutosaveUrl || '';
+                    if (autosaveUrl === '') {
+                        return;
+                    }
+
+                    const statusNode = document.querySelector(
+                        '[data-revisions-autosave-status]',
+                    );
+                    const csrf =
+                        document
+                            .querySelector('meta[name="csrf-token"]')
+                            ?.getAttribute('content') || '';
+                    let dirty = false;
+                    let pending = false;
+
+                    const markStatus = (message) => {
+                        if (statusNode instanceof HTMLElement) {
+                            statusNode.textContent = message;
+                        }
+                    };
+
+                    const scheduleSave = async () => {
+                        if (!dirty || pending) {
+                            return;
+                        }
+
+                        pending = true;
+                        markStatus('Saving autosave...');
+
+                        try {
+                            const response = await fetch(autosaveUrl, {
+                                method: 'POST',
+                                headers: {
+                                    Accept: 'application/json',
+                                    'X-CSRF-TOKEN': csrf,
+                                },
+                                body: new FormData(form),
+                            });
+
+                            if (!response.ok) {
+                                throw new Error('Autosave request failed.');
+                            }
+
+                            const payload = await response.json();
+                            dirty = false;
+                            markStatus(
+                                payload.saved_at
+                                    ? `Autosaved at ${new Date(payload.saved_at).toLocaleTimeString()}.`
+                                    : 'No autosave changes detected.',
+                            );
+                        } catch {
+                            markStatus('Autosave failed. Changes remain local until retry.');
+                        } finally {
+                            pending = false;
+                        }
+                    };
+
+                    form.addEventListener('input', () => {
+                        dirty = true;
+                        markStatus('Autosave pending...');
+                    });
+                    form.addEventListener('change', () => {
+                        dirty = true;
+                        markStatus('Autosave pending...');
+                    });
+
+                    window.setInterval(scheduleSave, 15000);
                 });
             })();
         </script>

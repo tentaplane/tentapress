@@ -10,6 +10,7 @@ use TentaPress\Blocks\Registry\BlockRegistry;
 use TentaPress\System\Plugin\PluginRegistry;
 use TentaPress\Media\Models\TpMedia;
 use TentaPress\Posts\Models\TpPost;
+use TentaPress\Revisions\Services\RevisionHistory;
 use TentaPress\System\Theme\ThemeManager;
 use TentaPress\Users\Models\TpUser;
 
@@ -23,13 +24,24 @@ final class EditController
             $authorId = $nowUserId;
         }
 
-        $blocks = $this->normalizeBlocks($post->blocks);
+        $autosave = app()->bound(RevisionHistory::class)
+            ? app(RevisionHistory::class)->latestAutosaveFor('posts', (int) $post->id, $post->updated_at)
+            : null;
+
+        $draftBlocksSource = is_array($autosave?->blocks) ? $autosave->blocks : $post->blocks;
+        $draftPageDocSource = is_array($autosave?->content) ? $autosave->content : $post->content;
+        $draftAuthorId = (int) ($autosave?->author_id ?? $post->author_id ?? 0);
+        if ($draftAuthorId <= 0 && $nowUserId) {
+            $draftAuthorId = $nowUserId;
+        }
+
+        $blocks = $this->normalizeBlocks($draftBlocksSource);
         $blocksJson = json_encode($blocks, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         if ($blocksJson === false) {
             $blocksJson = '[]';
         }
 
-        $pageDoc = is_array($post->content) ? $post->content : ['time' => 0, 'blocks' => [], 'version' => '2.28.0'];
+        $pageDoc = is_array($draftPageDocSource) ? $draftPageDocSource : ['time' => 0, 'blocks' => [], 'version' => '2.28.0'];
         $pageDocJson = json_encode($pageDoc, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         if ($pageDocJson === false) {
             $pageDocJson = '{"time":0,"blocks":[],"version":"2.28.0"}';
@@ -45,7 +57,13 @@ final class EditController
             'blockDefinitions' => $this->blockDefinitions(),
             'mediaOptions' => $this->mediaOptions(),
             'authors' => $this->authors(),
-            'authorId' => $authorId > 0 ? $authorId : null,
+            'authorId' => $draftAuthorId > 0 ? $draftAuthorId : null,
+            'loadedAutosave' => $autosave,
+            'formTitle' => (string) ($autosave?->title ?? $post->title),
+            'formSlug' => (string) ($autosave?->slug ?? $post->slug),
+            'formLayout' => (string) ($autosave?->layout ?? $post->layout),
+            'formEditorDriver' => (string) ($autosave?->editor_driver ?? $post->editor_driver),
+            'formPublishedAt' => $autosave?->published_at?->format('Y-m-d\\TH:i'),
         ]);
     }
 
