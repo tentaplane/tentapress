@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.40.0](https://github.com/tentaplane/tentapress/compare/v0.39.2...v0.40.0) (2026-03-01)
+
+
+### Features
+
+* **revisions:** add autosave compare and restore flows ([02f085a](https://github.com/tentaplane/tentapress/commit/02f085a05480bb15fe983069b3bc62c219dcaf99))
+* **revisions:** add page and post snapshot history ([ebb9e3c](https://github.com/tentaplane/tentapress/commit/ebb9e3c95c421cee1459714efd65607cbb1677f2))
+
+
+### Bug Fixes
+
+* **revisions:** resolve autosave services consistently ([8c1827d](https://github.com/tentaplane/tentapress/commit/8c1827dc1a2b194defb45656fe190e2d5d84be2c))
+
+
+### Miscellaneous Chores
+
+* **revisions:** bump distribution versions ([50da7fc](https://github.com/tentaplane/tentapress/commit/50da7fc1197450fd5e69909c67cffad20c62226b))
+
 ## [0.39.2](https://github.com/tentaplane/tentapress/compare/v0.39.1...v0.39.2) (2026-02-28)
 
 
