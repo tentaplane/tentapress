@@ -46,6 +46,12 @@
     $formSlug = is_string($formSlug ?? null) ? $formSlug : (string) ($page->slug ?? '');
     $formLayout = is_string($formLayout ?? null) ? $formLayout : (string) ($page->layout ?? '');
     $formEditorDriver = is_string($formEditorDriver ?? null) ? $formEditorDriver : (string) ($page->editor_driver ?? 'blocks');
+    $revisionsEnabled = ($mode === 'edit')
+        && \Illuminate\Support\Facades\Route::has('tp.pages.revisions.autosave')
+        && view()->exists('tentapress-revisions::page-metabox');
+    $loadedAutosaveAt = is_object($loadedAutosave ?? null) && isset($loadedAutosave->created_at)
+        ? $loadedAutosave->created_at
+        : null;
 @endphp
 
 @if ($editorMode)
@@ -75,9 +81,9 @@
             </div>
         @endif
 
-        @if (($mode === 'edit') && isset($loadedAutosave) && $loadedAutosave instanceof \TentaPress\Revisions\Models\TpRevision)
+        @if ($revisionsEnabled && $loadedAutosaveAt)
             <div class="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-                Loaded autosave draft from {{ $loadedAutosave->created_at?->diffForHumans() ?? 'just now' }}.
+                Loaded autosave draft from {{ $loadedAutosaveAt?->diffForHumans() ?? 'just now' }}.
             </div>
         @endif
 
@@ -90,7 +96,7 @@
                             action="{{ $mode === 'create' ? route('tp.pages.store') : route('tp.pages.update', ['page' => $page->id]) }}"
                             class="space-y-4"
                             id="page-form"
-                            @if ($mode === 'edit')
+                            @if ($revisionsEnabled)
                                 data-revisions-autosave-url="{{ route('tp.pages.revisions.autosave', ['page' => $page->id]) }}"
                             @endif
                             @if ($mode === 'edit' && count($editorDriverMap) > 1)
@@ -402,7 +408,9 @@
                         </div>
                     </div>
 
-                    @includeIf('tentapress-revisions::page-metabox', ['page' => $page, 'mode' => $mode])
+                    @if ($revisionsEnabled)
+                        @include('tentapress-revisions::page-metabox', ['page' => $page, 'mode' => $mode])
+                    @endif
                     @includeIf('tentapress-seo::page-metabox', ['page' => $page, 'mode' => $mode])
                 </div>
             @endif

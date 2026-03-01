@@ -51,3 +51,31 @@ it('renders published posts on public index and post routes', function (): void 
         ->assertOk()
         ->assertSee('Published Post');
 });
+
+it('renders the post edit screens without revisions enabled', function (): void {
+    $this->artisan('tp:plugins sync')->assertSuccessful();
+
+    $admin = TpUser::query()->create([
+        'name' => 'Posts Editor',
+        'email' => 'posts-editor@example.test',
+        'password' => 'secret',
+        'is_super_admin' => true,
+    ]);
+
+    $post = TpPost::query()->create([
+        'title' => 'Standalone Post',
+        'slug' => 'standalone-post',
+        'status' => 'draft',
+    ]);
+
+    $this->actingAs($admin)
+        ->get('/admin/posts/'.$post->id.'/edit')
+        ->assertOk()
+        ->assertDontSee('Loaded autosave draft')
+        ->assertDontSee('Revisions');
+
+    $this->actingAs($admin)
+        ->get('/admin/posts/'.$post->id.'/editor')
+        ->assertOk()
+        ->assertDontSee('Loaded autosave draft');
+});

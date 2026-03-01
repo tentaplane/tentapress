@@ -11,7 +11,6 @@ use TentaPress\Blocks\Registry\BlockRegistry;
 use TentaPress\System\Plugin\PluginRegistry;
 use TentaPress\Media\Models\TpMedia;
 use TentaPress\Posts\Models\TpPost;
-use TentaPress\Revisions\Services\RevisionHistory;
 use TentaPress\System\Theme\ThemeManager;
 use TentaPress\Users\Models\TpUser;
 
@@ -25,9 +24,7 @@ final class EditorController
             $authorId = $nowUserId;
         }
 
-        $autosave = app()->bound(RevisionHistory::class)
-            ? resolve(RevisionHistory::class)->latestAutosaveFor('posts', (int) $post->id, $post->updated_at)
-            : null;
+        $autosave = $this->latestAutosaveFor('posts', (int) $post->id, $post->updated_at);
 
         $draftBlocksSource = is_array($autosave?->blocks) ? $autosave->blocks : $post->blocks;
         $draftPageDocSource = is_array($autosave?->content) ? $autosave->content : $post->content;
@@ -242,5 +239,22 @@ final class EditorController
         }
 
         return array_values($raw);
+    }
+
+    private function latestAutosaveFor(string $resourceType, int $resourceId, mixed $updatedAt): mixed
+    {
+        $historyClass = 'TentaPress\\Revisions\\Services\\RevisionHistory';
+
+        if (! class_exists($historyClass) || ! app()->bound($historyClass)) {
+            return null;
+        }
+
+        $history = resolve($historyClass);
+
+        if (! is_object($history) || ! method_exists($history, 'latestAutosaveFor')) {
+            return null;
+        }
+
+        return $history->latestAutosaveFor($resourceType, $resourceId, $updatedAt);
     }
 }

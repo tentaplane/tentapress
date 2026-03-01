@@ -61,3 +61,31 @@ it('allows a super admin to create publish unpublish and delete a page', functio
 
     expect(TpPage::query()->whereKey($page->id)->exists())->toBeFalse();
 });
+
+it('renders the page edit screens without revisions enabled', function (): void {
+    $this->artisan('tp:plugins sync')->assertSuccessful();
+
+    $admin = TpUser::query()->create([
+        'name' => 'Pages Editor',
+        'email' => 'pages-editor@example.test',
+        'password' => 'secret',
+        'is_super_admin' => true,
+    ]);
+
+    $page = TpPage::query()->create([
+        'title' => 'Standalone Page',
+        'slug' => 'standalone-page',
+        'status' => 'draft',
+    ]);
+
+    $this->actingAs($admin)
+        ->get('/admin/pages/'.$page->id.'/edit')
+        ->assertOk()
+        ->assertDontSee('Loaded autosave draft')
+        ->assertDontSee('Revisions');
+
+    $this->actingAs($admin)
+        ->get('/admin/pages/'.$page->id.'/editor')
+        ->assertOk()
+        ->assertDontSee('Loaded autosave draft');
+});
