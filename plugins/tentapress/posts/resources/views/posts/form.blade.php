@@ -432,6 +432,7 @@
                         </div>
                     </div>
 
+                    @includeIf('tentapress-revisions::post-metabox', ['post' => $post, 'mode' => $mode])
                     @includeIf('tentapress-seo::post-metabox', ['post' => $post, 'mode' => $mode])
                 </div>
             @endif

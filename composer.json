@@ -31,7 +31,8 @@
     },
     "autoload": {
         "psr-4": {
-            "App\\": "app/"
+            "App\\": "app/",
+            "TentaPress\\Revisions\\": "plugins/tentapress/revisions/src/"
         }
     },
     "autoload-dev": {
