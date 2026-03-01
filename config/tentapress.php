@@ -70,7 +70,7 @@ return [
     */
     'catalog' => [
         'local_path' => 'docs/catalog/first-party-plugins.json',
-        'url' => '',
+        'url' => 'https://github.com/tentaplane/tentapress/blob/main/docs/catalog/first-party-plugins.json',
         'timeout_seconds' => 5,
         'cache_ttl_seconds' => 900,
         'require_https' => true,

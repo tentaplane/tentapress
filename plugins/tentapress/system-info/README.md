@@ -7,7 +7,7 @@ Diagnostics and plugin management for TentaPress.
 | Field    | Value                                             |
 | -------- | ------------------------------------------------- |
 | ID       | `tentapress/system-info`                          |
-| Version  | 0.8.2                                             |
+| Version  | 0.8.3                                             |
 | Provider | `TentaPress\SystemInfo\SystemInfoServiceProvider` |
 
 ## Features
@@ -42,7 +42,7 @@ None.
 ```php
 'catalog' => [
     'local_path' => 'docs/catalog/first-party-plugins.json',
-    'url' => '',
+    'url' => 'https://github.com/tentaplane/tentapress/blob/main/docs/catalog/first-party-plugins.json',
     'timeout_seconds' => 5,
     'cache_ttl_seconds' => 900,
     'require_https' => true,
@@ -50,7 +50,7 @@ None.
 ```
 
 - `local_path` points to the generated first-party catalog feed in this monorepo.
-- `url` is optional. If set, hosted data overlays local entries by plugin id.
+- `url` defaults to the TentaPress repository source-of-truth feed and is resolved to raw GitHub content when fetching.
 - If hosted data is unavailable, the catalog falls back to local data (and cached hosted data when available).
 - Catalog plugin entries can include an optional `icon` field.
 - Regenerate the local feed with `php artisan tp:catalog generate`.

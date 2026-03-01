@@ -38,6 +38,33 @@ it('allows users with view_system_info capability to view plugin catalog', funct
         ->assertSee('tentapress/forms');
 });
 
+it('fetches the default github blob catalog url through the raw content endpoint', function (): void {
+    $user = makeUserWithCapability('view_system_info', 'viewer-catalog-blob@example.test');
+
+    config()->set('tentapress.catalog.url', 'https://github.com/tentaplane/tentapress/blob/main/docs/catalog/first-party-plugins.json');
+
+    Http::fake([
+        'https://raw.githubusercontent.com/tentaplane/tentapress/main/docs/catalog/first-party-plugins.json' => Http::response([
+            'schema_version' => 1,
+            'plugins' => [
+                [
+                    'id' => 'tentapress/forms',
+                    'name' => 'Forms',
+                    'description' => 'Forms plugin from raw github feed.',
+                    'latest_version' => '0.4.3',
+                    'package' => 'tentapress/forms',
+                ],
+            ],
+        ], 200),
+    ]);
+
+    $this->actingAs($user)
+        ->get('/admin/plugins/catalog')
+        ->assertOk()
+        ->assertSee('Forms')
+        ->assertSee('tentapress/forms');
+});
+
 it('shows local-only plugins when hosted feed is unavailable', function (): void {
     $user = TpUser::query()->create([
         'name' => 'Catalog Admin',

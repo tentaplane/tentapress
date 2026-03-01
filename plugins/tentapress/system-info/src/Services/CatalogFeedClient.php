@@ -16,7 +16,7 @@ final class CatalogFeedClient
      */
     public function fetch(): array
     {
-        $url = trim((string) config('tentapress.catalog.url', ''));
+        $url = $this->resolveRemoteUrl(trim((string) config('tentapress.catalog.url', '')));
         $localPlugins = $this->loadLocalPlugins();
         $warning = null;
 
@@ -77,6 +77,41 @@ final class CatalogFeedClient
     private function cacheKey(string $url): string
     {
         return 'tp:plugin-catalog:feed:'.sha1($url);
+    }
+
+    private function resolveRemoteUrl(string $url): string
+    {
+        if ($url === '') {
+            return '';
+        }
+
+        $parts = parse_url($url);
+        if (! is_array($parts)) {
+            return $url;
+        }
+
+        $host = strtolower((string) ($parts['host'] ?? ''));
+        $path = trim((string) ($parts['path'] ?? ''), '/');
+
+        if ($host !== 'github.com' || $path === '') {
+            return $url;
+        }
+
+        $segments = explode('/', $path);
+        if (count($segments) < 5 || $segments[2] !== 'blob') {
+            return $url;
+        }
+
+        $owner = $segments[0];
+        $repository = $segments[1];
+        $branch = $segments[3];
+        $filePath = implode('/', array_slice($segments, 4));
+
+        if ($owner === '' || $repository === '' || $branch === '' || $filePath === '') {
+            return $url;
+        }
+
+        return sprintf('https://raw.githubusercontent.com/%s/%s/%s/%s', $owner, $repository, $branch, $filePath);
     }
 
     /**

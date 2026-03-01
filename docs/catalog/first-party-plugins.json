@@ -186,7 +186,7 @@
             "name": "System Info",
             "description": "Diagnostics, environment information and plugins list for TentaPress.",
             "package": "tentapress/system-info",
-            "latest_version": "0.8.2",
+            "latest_version": "0.8.3",
             "icon": "system"
         },
         {
