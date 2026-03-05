@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TentaPress\Taxonomies\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 final class TpTaxonomy extends Model
@@ -35,5 +36,17 @@ final class TpTaxonomy extends Model
     public function assignments(): HasMany
     {
         return $this->hasMany(TpTermAssignment::class, 'taxonomy_id');
+    }
+
+    public function descendantAssignments(): HasManyThrough
+    {
+        return $this->hasManyThrough(
+            TpTermAssignment::class,
+            TpTerm::class,
+            'taxonomy_id',
+            'term_id',
+            'id',
+            'id'
+        );
     }
 }

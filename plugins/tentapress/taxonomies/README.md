@@ -7,7 +7,7 @@ Standalone taxonomy registration and persistence for TentaPress.
 | Field    | Value                                    |
 | -------- | ---------------------------------------- |
 | ID       | `tentapress/taxonomies`                  |
-| Version  | 0.1.0                                    |
+| Version  | 0.2.0                                    |
 | Provider | `TentaPress\Taxonomies\TaxonomiesServiceProvider` |
 
 ## Features
@@ -17,6 +17,8 @@ Standalone taxonomy registration and persistence for TentaPress.
 - Persists taxonomies, terms, and polymorphic term assignments
 - Supports hierarchical and flat taxonomy definitions
 - Syncs registered taxonomy definitions into the database at boot once migrations are available
+- Includes admin taxonomy browsing and term CRUD screens
+- Prevents deleting terms that still have child terms or content assignments
 
 ## Dependencies
 
@@ -37,4 +39,5 @@ php artisan tp:plugins sync
 php artisan tp:plugins enable tentapress/taxonomies
 composer test
 composer test:filter -- TaxonomiesBaselineFlowTest
+composer test:filter -- TaxonomiesAdminFlowTest
 ```

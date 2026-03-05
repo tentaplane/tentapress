@@ -2,9 +2,20 @@
     "id": "tentapress/taxonomies",
     "name": "Taxonomies",
     "description": "Standalone taxonomy registration and persistence for TentaPress.",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "provider": "TentaPress\\Taxonomies\\TaxonomiesServiceProvider",
     "requires": [
         "tentapress/system"
-    ]
+    ],
+    "admin": {
+        "menus": [
+            {
+                "label": "Taxonomies",
+                "route": "tp.taxonomies.index",
+                "capability": "manage_posts",
+                "icon": "tags",
+                "position": 35
+            }
+        ]
+    }
 }
