@@ -28,6 +28,9 @@ final class TaxonomiesServiceProvider extends ServiceProvider
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'tentapress-taxonomies');
         $this->loadRoutesFrom(__DIR__.'/../routes/admin.php');
+        $this->app->booted(function (): void {
+            $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
+        });
 
         BuiltinTaxonomies::register($this->app->make(TaxonomyRegistry::class));
         $this->registerContentAssignmentHooks();
