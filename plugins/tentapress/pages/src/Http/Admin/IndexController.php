@@ -18,6 +18,7 @@ final class IndexController
         $search = trim((string) $request->query('s', ''));
         $sort = (string) $request->query('sort', 'title');
         $requestedDirection = strtolower((string) $request->query('direction', 'asc'));
+        $taxonomyTermId = max(0, (int) $request->query('taxonomy_term', 0));
 
         $sortColumns = [
             'title' => 'title',
@@ -45,6 +46,16 @@ final class IndexController
             });
         }
 
+        if ($taxonomyTermId > 0 && Schema::hasTable('tp_term_assignments')) {
+            $query->whereExists(function ($termQuery) use ($taxonomyTermId): void {
+                $termQuery->selectRaw('1')
+                    ->from('tp_term_assignments')
+                    ->whereColumn('tp_term_assignments.assignable_id', 'tp_pages.id')
+                    ->where('tp_term_assignments.assignable_type', TpPage::class)
+                    ->where('tp_term_assignments.term_id', $taxonomyTermId);
+            });
+        }
+
         $pages = $query->paginate(20)->withQueryString();
         $menuUsage = $this->menuUsageForPageCollection($pages->getCollection());
 
@@ -55,6 +66,8 @@ final class IndexController
             'sort' => $sort,
             'direction' => $direction,
             'menuUsage' => $menuUsage,
+            'taxonomyTermId' => $taxonomyTermId,
+            'taxonomyTermOptions' => $this->taxonomyTermOptions(),
         ]);
     }
 
@@ -126,5 +139,33 @@ final class IndexController
         }
 
         return $normalized;
+    }
+
+    /**
+     * @return array<int,array{term_id:int,taxonomy_label:string,term_name:string}>
+     */
+    private function taxonomyTermOptions(): array
+    {
+        if (! Schema::hasTable('tp_taxonomies') || ! Schema::hasTable('tp_terms')) {
+            return [];
+        }
+
+        return DB::table('tp_terms')
+            ->join('tp_taxonomies', 'tp_taxonomies.id', '=', 'tp_terms.taxonomy_id')
+            ->orderBy('tp_taxonomies.label')
+            ->orderBy('tp_terms.name')
+            ->get([
+                'tp_terms.id as term_id',
+                'tp_taxonomies.label as taxonomy_label',
+                'tp_terms.name as term_name',
+            ])
+            ->map(static fn (object $row): array => [
+                'term_id' => (int) ($row->term_id ?? 0),
+                'taxonomy_label' => trim((string) ($row->taxonomy_label ?? '')),
+                'term_name' => trim((string) ($row->term_name ?? '')),
+            ])
+            ->filter(static fn (array $row): bool => $row['term_id'] > 0 && $row['term_name'] !== '')
+            ->values()
+            ->all();
     }
 }

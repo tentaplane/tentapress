@@ -7,6 +7,8 @@
         $sort = in_array(($sort ?? 'updated'), ['title', 'slug', 'status', 'updated'], true) ? $sort : 'updated';
         $direction = ($direction ?? 'desc') === 'asc' ? 'asc' : 'desc';
         $menuUsage = is_array($menuUsage ?? null) ? $menuUsage : [];
+        $taxonomyTermId = max(0, (int) ($taxonomyTermId ?? 0));
+        $taxonomyTermOptions = is_array($taxonomyTermOptions ?? null) ? $taxonomyTermOptions : [];
 
         $nextDirectionFor = function (string $column) use ($sort, $direction): string {
             if ($sort !== $column) {
@@ -16,12 +18,13 @@
             return $direction === 'asc' ? 'desc' : 'asc';
         };
 
-        $sortUrlFor = function (string $column) use ($status, $search, $nextDirectionFor): string {
+        $sortUrlFor = function (string $column) use ($status, $search, $taxonomyTermId, $nextDirectionFor): string {
             return route('tp.pages.index', [
                 'status' => $status,
                 's' => $search,
                 'sort' => $column,
                 'direction' => $nextDirectionFor($column),
+                'taxonomy_term' => $taxonomyTermId > 0 ? $taxonomyTermId : null,
             ]);
         };
 
@@ -59,17 +62,17 @@
                 class="flex flex-col gap-2 sm:flex-row sm:items-center">
                 <div class="flex gap-2">
                     <a
-                        href="{{ route('tp.pages.index', ['status' => 'all', 's' => $search, 'sort' => $sort, 'direction' => $direction]) }}"
+                        href="{{ route('tp.pages.index', ['status' => 'all', 's' => $search, 'sort' => $sort, 'direction' => $direction, 'taxonomy_term' => $taxonomyTermId > 0 ? $taxonomyTermId : null]) }}"
                         class="{{ $status === 'all' ? 'tp-button-primary' : 'tp-button-secondary' }}">
                         All
                     </a>
                     <a
-                        href="{{ route('tp.pages.index', ['status' => 'published', 's' => $search, 'sort' => $sort, 'direction' => $direction]) }}"
+                        href="{{ route('tp.pages.index', ['status' => 'published', 's' => $search, 'sort' => $sort, 'direction' => $direction, 'taxonomy_term' => $taxonomyTermId > 0 ? $taxonomyTermId : null]) }}"
                         class="{{ $status === 'published' ? 'tp-button-primary' : 'tp-button-secondary' }}">
                         Published
                     </a>
                     <a
-                        href="{{ route('tp.pages.index', ['status' => 'draft', 's' => $search, 'sort' => $sort, 'direction' => $direction]) }}"
+                        href="{{ route('tp.pages.index', ['status' => 'draft', 's' => $search, 'sort' => $sort, 'direction' => $direction, 'taxonomy_term' => $taxonomyTermId > 0 ? $taxonomyTermId : null]) }}"
                         class="{{ $status === 'draft' ? 'tp-button-primary' : 'tp-button-secondary' }}">
                         Drafts
                     </a>
@@ -78,6 +81,26 @@
                 <div class="flex-1"></div>
 
                 <div class="flex gap-2">
+                    @if ($taxonomyTermOptions !== [])
+                        <label class="sr-only" for="pages-taxonomy-term">Filter by taxonomy term</label>
+                        <select id="pages-taxonomy-term" name="taxonomy_term" class="tp-select w-full sm:w-64">
+                            <option value="">All terms</option>
+                            @foreach ($taxonomyTermOptions as $option)
+                                @php
+                                    $termId = (int) ($option['term_id'] ?? 0);
+                                    $taxonomyLabel = trim((string) ($option['taxonomy_label'] ?? 'Taxonomy'));
+                                    $termName = trim((string) ($option['term_name'] ?? ''));
+                                @endphp
+
+                                @if ($termId > 0 && $termName !== '')
+                                    <option value="{{ $termId }}" @selected($taxonomyTermId === $termId)>
+                                        {{ $taxonomyLabel }}: {{ $termName }}
+                                    </option>
+                                @endif
+                            @endforeach
+                        </select>
+                    @endif
+
                     <label class="sr-only" for="pages-search">Search pages</label>
                     <input
                         id="pages-search"

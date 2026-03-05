@@ -1,6 +1,6 @@
 {
     "schema_version": 1,
-    "generated_at": "2026-03-01T15:40:17Z",
+    "generated_at": "2026-03-02T08:36:49Z",
     "plugins": [
         {
             "id": "tentapress/admin-shell",
@@ -30,7 +30,7 @@
             "name": "Builder",
             "description": "Visual drag-and-drop builder with live theme preview for pages and posts.",
             "package": "tentapress/builder",
-            "latest_version": "0.6.8",
+            "latest_version": "0.6.9",
             "icon": "builder"
         },
         {
@@ -188,6 +188,14 @@
             "package": "tentapress/system-info",
             "latest_version": "0.8.5",
             "icon": "system"
+        },
+        {
+            "id": "tentapress/taxonomies",
+            "name": "Taxonomies",
+            "description": "Standalone taxonomy registration and persistence for TentaPress.",
+            "package": "tentapress/taxonomies",
+            "latest_version": "0.4.0",
+            "icon": "tags"
         },
         {
             "id": "tentapress/themes",

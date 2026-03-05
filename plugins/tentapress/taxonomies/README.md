@@ -7,7 +7,7 @@ Standalone taxonomy registration and persistence for TentaPress.
 | Field    | Value                                    |
 | -------- | ---------------------------------------- |
 | ID       | `tentapress/taxonomies`                  |
-| Version  | 0.3.0                                    |
+| Version  | 0.4.0                                    |
 | Provider | `TentaPress\Taxonomies\TaxonomiesServiceProvider` |
 
 ## Features
@@ -21,6 +21,7 @@ Standalone taxonomy registration and persistence for TentaPress.
 - Prevents deleting terms that still have child terms or content assignments
 - Adds reusable taxonomy assignment controls for post/page editing flows
 - Validates and persists assigned terms during content create/update operations
+- Adds taxonomy term filters to posts/pages admin index screens
 
 ## Dependencies
 
@@ -43,4 +44,5 @@ composer test
 composer test:filter -- TaxonomiesBaselineFlowTest
 composer test:filter -- TaxonomiesAdminFlowTest
 composer test:filter -- TaxonomiesContentAssignmentFlowTest
+composer test:filter -- TaxonomiesAdminFilteringFlowTest
 ```
