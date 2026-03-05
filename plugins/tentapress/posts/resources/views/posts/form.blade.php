@@ -50,6 +50,7 @@
     $revisionsEnabled = ($mode === 'edit')
         && \Illuminate\Support\Facades\Route::has('tp.posts.revisions.autosave')
         && view()->exists('tentapress-revisions::post-metabox');
+    $taxonomiesPluginEnabled = (bool) ($taxonomiesPluginEnabled ?? true);
     $loadedAutosaveAt = is_object($loadedAutosave ?? null) && isset($loadedAutosave->created_at)
         ? $loadedAutosave->created_at
         : null;
@@ -455,7 +456,9 @@
                     @if ($revisionsEnabled)
                         @include('tentapress-revisions::post-metabox', ['post' => $post, 'mode' => $mode])
                     @endif
-                    @includeIf('tentapress-taxonomies::post-metabox', ['post' => $post, 'mode' => $mode])
+                    @if ($taxonomiesPluginEnabled)
+                        @includeIf('tentapress-taxonomies::post-metabox', ['post' => $post, 'mode' => $mode])
+                    @endif
                     @includeIf('tentapress-seo::post-metabox', ['post' => $post, 'mode' => $mode])
                 </div>
             @endif

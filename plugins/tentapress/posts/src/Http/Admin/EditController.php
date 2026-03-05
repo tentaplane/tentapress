@@ -17,6 +17,7 @@ final class EditController
 {
     public function __invoke(TpPost $post, ThemeManager $themes)
     {
+        $enabledPluginIds = $this->enabledPluginIds();
         $nowUserId = Auth::check() && is_object(Auth::user()) ? (int) (Auth::user()->id ?? 0) : null;
         $authorId = (int) ($post->author_id ?? 0);
         if ($authorId <= 0 && $nowUserId) {
@@ -51,7 +52,7 @@ final class EditController
             'pageDocJson' => $pageDocJson,
             'themeLayouts' => $themes->activeLayouts(),
             'hasTheme' => $themes->hasActiveTheme(),
-            'blockDefinitions' => $this->blockDefinitions(),
+            'blockDefinitions' => $this->blockDefinitions($enabledPluginIds),
             'mediaOptions' => $this->mediaOptions(),
             'authors' => $this->authors(),
             'authorId' => $draftAuthorId > 0 ? $draftAuthorId : null,
@@ -61,13 +62,14 @@ final class EditController
             'formLayout' => (string) ($autosave?->layout ?? $post->layout),
             'formEditorDriver' => (string) ($autosave?->editor_driver ?? $post->editor_driver),
             'formPublishedAt' => $autosave?->published_at?->format('Y-m-d\\TH:i'),
+            'taxonomiesPluginEnabled' => $this->isPluginEnabled($enabledPluginIds, 'tentapress/taxonomies'),
         ]);
     }
 
     /**
      * @return array<int,array{type:string,name:string,description:string,example:array}>
      */
-    private function blockDefinitions(): array
+    private function blockDefinitions(?array $enabledPluginIds): array
     {
         $registryClass = BlockRegistry::class;
 
@@ -103,8 +105,6 @@ final class EditController
                 'view' => isset($def->view) ? (string) $def->view : null,
             ];
         }
-
-        $enabledPluginIds = $this->enabledPluginIds();
 
         return array_values(array_filter($out, static function (array $definition) use ($enabledPluginIds): bool {
             $type = trim((string) ($definition['type'] ?? ''));
@@ -154,6 +154,18 @@ final class EditController
         $ids = array_values(array_filter(array_map(static fn ($id): string => trim((string) $id), array_keys($cache))));
 
         return $ids === [] ? null : $ids;
+    }
+
+    /**
+     * @param  array<int,string>|null  $enabledPluginIds
+     */
+    private function isPluginEnabled(?array $enabledPluginIds, string $pluginId): bool
+    {
+        if ($enabledPluginIds === null) {
+            return true;
+        }
+
+        return in_array($pluginId, $enabledPluginIds, true);
     }
 
     /**

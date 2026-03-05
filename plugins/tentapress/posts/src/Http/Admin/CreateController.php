@@ -18,6 +18,7 @@ final class CreateController
     public function __invoke(ThemeManager $themes)
     {
         $nowUserId = Auth::check() && is_object(Auth::user()) ? (int) (Auth::user()->id ?? 0) : null;
+        $enabledPluginIds = $this->enabledPluginIds();
 
         $post = new TpPost([
             'title' => '',
@@ -42,17 +43,18 @@ final class CreateController
             'pageDocJson' => $pageDocJson,
             'themeLayouts' => $themes->activeLayouts(),
             'hasTheme' => $themes->hasActiveTheme(),
-            'blockDefinitions' => $this->blockDefinitions(),
+            'blockDefinitions' => $this->blockDefinitions($enabledPluginIds),
             'mediaOptions' => $this->mediaOptions(),
             'authors' => $this->authors(),
             'authorId' => $nowUserId ?: null,
+            'taxonomiesPluginEnabled' => $this->isPluginEnabled($enabledPluginIds, 'tentapress/taxonomies'),
         ]);
     }
 
     /**
      * @return array<int,array{type:string,name:string,description:string,example:array}>
      */
-    private function blockDefinitions(): array
+    private function blockDefinitions(?array $enabledPluginIds): array
     {
         $registryClass = BlockRegistry::class;
 
@@ -88,8 +90,6 @@ final class CreateController
                 'view' => isset($def->view) ? (string) $def->view : null,
             ];
         }
-
-        $enabledPluginIds = $this->enabledPluginIds();
 
         return array_values(array_filter($out, static function (array $definition) use ($enabledPluginIds): bool {
             $type = trim((string) ($definition['type'] ?? ''));
@@ -139,6 +139,18 @@ final class CreateController
         $ids = array_values(array_filter(array_map(static fn ($id): string => trim((string) $id), array_keys($cache))));
 
         return $ids === [] ? null : $ids;
+    }
+
+    /**
+     * @param  array<int,string>|null  $enabledPluginIds
+     */
+    private function isPluginEnabled(?array $enabledPluginIds, string $pluginId): bool
+    {
+        if ($enabledPluginIds === null) {
+            return true;
+        }
+
+        return in_array($pluginId, $enabledPluginIds, true);
     }
 
     /**

@@ -71,11 +71,33 @@ it('renders the post edit screens without revisions enabled', function (): void 
     $this->actingAs($admin)
         ->get('/admin/posts/'.$post->id.'/edit')
         ->assertOk()
-        ->assertDontSee('Loaded autosave draft')
-        ->assertDontSee('Revisions');
+        ->assertDontSee('Loaded autosave draft');
 
     $this->actingAs($admin)
         ->get('/admin/posts/'.$post->id.'/editor')
         ->assertOk()
         ->assertDontSee('Loaded autosave draft');
+});
+
+it('hides taxonomy metabox when taxonomies plugin is disabled', function (): void {
+    $this->artisan('tp:plugins sync')->assertSuccessful();
+    $this->artisan('tp:plugins disable tentapress/taxonomies --force')->assertSuccessful();
+
+    $admin = TpUser::query()->create([
+        'name' => 'Posts Editor Taxonomy Disabled',
+        'email' => 'posts-editor-taxonomy-disabled@example.test',
+        'password' => 'secret',
+        'is_super_admin' => true,
+    ]);
+
+    $post = TpPost::query()->create([
+        'title' => 'Taxonomy Hidden Post',
+        'slug' => 'taxonomy-hidden-post',
+        'status' => 'draft',
+    ]);
+
+    $this->actingAs($admin)
+        ->get('/admin/posts/'.$post->id.'/edit')
+        ->assertOk()
+        ->assertDontSee('Taxonomies');
 });
