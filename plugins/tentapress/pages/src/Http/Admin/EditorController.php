@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TentaPress\Pages\Http\Admin;
 
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 use TentaPress\Blocks\Registry\BlockRegistry;
 use TentaPress\System\Plugin\PluginRegistry;
 use TentaPress\Media\Models\TpMedia;
@@ -15,7 +16,9 @@ final class EditorController
 {
     public function __invoke(TpPage $page, ThemeManager $themes)
     {
-        $autosave = $this->latestAutosaveFor('pages', (int) $page->id, $page->updated_at);
+        $enabledPluginIds = $this->enabledPluginIds();
+        $revisionsPluginEnabled = $this->isPluginEnabled($enabledPluginIds, 'tentapress/revisions');
+        $autosave = $revisionsPluginEnabled ? $this->latestAutosaveFor('pages', (int) $page->id, $page->updated_at) : null;
 
         $draftBlocksSource = is_array($autosave?->blocks) ? $autosave->blocks : $page->blocks;
         $draftPageDocSource = is_array($autosave?->content) ? $autosave->content : $page->content;
@@ -39,7 +42,7 @@ final class EditorController
             'pageDocJson' => $pageDocJson,
             'themeLayouts' => $themes->activeLayouts(),
             'hasTheme' => $themes->hasActiveTheme(),
-            'blockDefinitions' => $this->blockDefinitions(),
+            'blockDefinitions' => $this->blockDefinitions($enabledPluginIds),
             'mediaOptions' => $this->mediaOptions(),
             'editorMode' => true,
             'loadedAutosave' => $autosave,
@@ -47,13 +50,15 @@ final class EditorController
             'formSlug' => (string) ($autosave?->slug ?? $page->slug),
             'formLayout' => (string) ($autosave?->layout ?? $page->layout),
             'formEditorDriver' => (string) ($autosave?->editor_driver ?? $page->editor_driver),
+            'revisionsPluginEnabled' => $revisionsPluginEnabled,
+            'taxonomiesPluginEnabled' => $this->isPluginEnabled($enabledPluginIds, 'tentapress/taxonomies'),
         ]);
     }
 
     /**
      * @return array<int,array{type:string,name:string,description:string,example:array}>
      */
-    private function blockDefinitions(): array
+    private function blockDefinitions(?array $enabledPluginIds): array
     {
         $registryClass = BlockRegistry::class;
 
@@ -89,8 +94,6 @@ final class EditorController
                 'view' => isset($def->view) ? (string) $def->view : null,
             ];
         }
-
-        $enabledPluginIds = $this->enabledPluginIds();
 
         return array_values(array_filter($out, static function (array $definition) use ($enabledPluginIds): bool {
             $type = trim((string) ($definition['type'] ?? ''));
@@ -140,6 +143,25 @@ final class EditorController
         $ids = array_values(array_filter(array_map(static fn ($id): string => trim((string) $id), array_keys($cache))));
 
         return $ids === [] ? null : $ids;
+    }
+
+    private function isPluginEnabled(?array $enabledPluginIds, string $pluginId): bool
+    {
+        if (Schema::hasTable('tp_plugins')) {
+            $enabled = DB::table('tp_plugins')
+                ->where('id', $pluginId)
+                ->value('enabled');
+
+            if ($enabled !== null) {
+                return (int) $enabled === 1;
+            }
+        }
+
+        if ($enabledPluginIds === null || $enabledPluginIds === []) {
+            return false;
+        }
+
+        return in_array($pluginId, $enabledPluginIds, true);
     }
 
     /**

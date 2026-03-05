@@ -9,10 +9,10 @@ use TentaPress\Revisions\Models\TpRevision;
 use TentaPress\Users\Models\TpUser;
 
 beforeEach(function (): void {
-    $this->artisan('tp:plugins sync')->assertSuccessful();
-    $this->artisan('tp:plugins enable tentapress/revisions')->assertSuccessful();
     $this->refreshApplication();
     $this->artisan('migrate', ['--force' => true])->assertSuccessful();
+    $this->artisan('tp:plugins sync')->assertSuccessful();
+    $this->artisan('tp:plugins enable tentapress/revisions')->assertSuccessful();
 });
 
 it('captures page revisions on create and update and renders the metabox', function (): void {

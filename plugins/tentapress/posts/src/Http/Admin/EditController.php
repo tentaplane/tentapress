@@ -6,6 +6,7 @@ namespace TentaPress\Posts\Http\Admin;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 use TentaPress\Blocks\Registry\BlockRegistry;
 use TentaPress\System\Plugin\PluginRegistry;
 use TentaPress\Media\Models\TpMedia;
@@ -18,13 +19,14 @@ final class EditController
     public function __invoke(TpPost $post, ThemeManager $themes)
     {
         $enabledPluginIds = $this->enabledPluginIds();
+        $revisionsPluginEnabled = $this->isPluginEnabled($enabledPluginIds, 'tentapress/revisions');
         $nowUserId = Auth::check() && is_object(Auth::user()) ? (int) (Auth::user()->id ?? 0) : null;
         $authorId = (int) ($post->author_id ?? 0);
         if ($authorId <= 0 && $nowUserId) {
             $authorId = $nowUserId;
         }
 
-        $autosave = $this->latestAutosaveFor('posts', (int) $post->id, $post->updated_at);
+        $autosave = $revisionsPluginEnabled ? $this->latestAutosaveFor('posts', (int) $post->id, $post->updated_at) : null;
 
         $draftBlocksSource = is_array($autosave?->blocks) ? $autosave->blocks : $post->blocks;
         $draftPageDocSource = is_array($autosave?->content) ? $autosave->content : $post->content;
@@ -62,6 +64,7 @@ final class EditController
             'formLayout' => (string) ($autosave?->layout ?? $post->layout),
             'formEditorDriver' => (string) ($autosave?->editor_driver ?? $post->editor_driver),
             'formPublishedAt' => $autosave?->published_at?->format('Y-m-d\\TH:i'),
+            'revisionsPluginEnabled' => $revisionsPluginEnabled,
             'taxonomiesPluginEnabled' => $this->isPluginEnabled($enabledPluginIds, 'tentapress/taxonomies'),
         ]);
     }
@@ -161,8 +164,18 @@ final class EditController
      */
     private function isPluginEnabled(?array $enabledPluginIds, string $pluginId): bool
     {
+        if (Schema::hasTable('tp_plugins')) {
+            $enabled = DB::table('tp_plugins')
+                ->where('id', $pluginId)
+                ->value('enabled');
+
+            if ($enabled !== null) {
+                return (int) $enabled === 1;
+            }
+        }
+
         if ($enabledPluginIds === null) {
-            return true;
+            return false;
         }
 
         return in_array($pluginId, $enabledPluginIds, true);

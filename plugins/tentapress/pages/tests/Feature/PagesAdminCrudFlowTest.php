@@ -64,6 +64,7 @@ it('allows a super admin to create publish unpublish and delete a page', functio
 
 it('renders the page edit screens without revisions enabled', function (): void {
     $this->artisan('tp:plugins sync')->assertSuccessful();
+    $this->artisan('tp:plugins disable tentapress/revisions')->assertSuccessful();
 
     $admin = TpUser::query()->create([
         'name' => 'Pages Editor',
@@ -81,7 +82,8 @@ it('renders the page edit screens without revisions enabled', function (): void 
     $this->actingAs($admin)
         ->get('/admin/pages/'.$page->id.'/edit')
         ->assertOk()
-        ->assertDontSee('Loaded autosave draft');
+        ->assertDontSee('Loaded autosave draft')
+        ->assertDontSee('Revisions');
 
     $this->actingAs($admin)
         ->get('/admin/pages/'.$page->id.'/editor')

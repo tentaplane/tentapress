@@ -2,7 +2,7 @@
     "id": "tentapress/revisions",
     "name": "Revisions",
     "description": "Capture and review page and post content revisions.",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "provider": "TentaPress\\Revisions\\RevisionsServiceProvider",
     "requires": ["tentapress/pages", "tentapress/posts"]
 }

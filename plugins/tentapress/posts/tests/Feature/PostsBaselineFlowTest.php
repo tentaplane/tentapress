@@ -54,6 +54,7 @@ it('renders published posts on public index and post routes', function (): void 
 
 it('renders the post edit screens without revisions enabled', function (): void {
     $this->artisan('tp:plugins sync')->assertSuccessful();
+    $this->artisan('tp:plugins disable tentapress/revisions')->assertSuccessful();
 
     $admin = TpUser::query()->create([
         'name' => 'Posts Editor',
@@ -71,7 +72,8 @@ it('renders the post edit screens without revisions enabled', function (): void 
     $this->actingAs($admin)
         ->get('/admin/posts/'.$post->id.'/edit')
         ->assertOk()
-        ->assertDontSee('Loaded autosave draft');
+        ->assertDontSee('Loaded autosave draft')
+        ->assertDontSee('Revisions');
 
     $this->actingAs($admin)
         ->get('/admin/posts/'.$post->id.'/editor')

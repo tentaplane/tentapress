@@ -46,7 +46,8 @@
     $formSlug = is_string($formSlug ?? null) ? $formSlug : (string) ($page->slug ?? '');
     $formLayout = is_string($formLayout ?? null) ? $formLayout : (string) ($page->layout ?? '');
     $formEditorDriver = is_string($formEditorDriver ?? null) ? $formEditorDriver : (string) ($page->editor_driver ?? 'blocks');
-    $revisionsEnabled = ($mode === 'edit')
+    $revisionsEnabled = (bool) ($revisionsPluginEnabled ?? false);
+    $revisionsEnabled = $revisionsEnabled && ($mode === 'edit')
         && \Illuminate\Support\Facades\Route::has('tp.pages.revisions.autosave')
         && view()->exists('tentapress-revisions::page-metabox');
     $taxonomiesPluginEnabled = (bool) ($taxonomiesPluginEnabled ?? true);
