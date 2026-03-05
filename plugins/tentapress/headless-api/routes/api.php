@@ -10,6 +10,8 @@ use TentaPress\HeadlessApi\Http\Api\V1\PageShowController;
 use TentaPress\HeadlessApi\Http\Api\V1\PostsIndexController;
 use TentaPress\HeadlessApi\Http\Api\V1\PostShowController;
 use TentaPress\HeadlessApi\Http\Api\V1\SiteShowController;
+use TentaPress\HeadlessApi\Http\Api\V1\TaxonomiesIndexController;
+use TentaPress\HeadlessApi\Http\Api\V1\TaxonomyTermsIndexController;
 
 Route::middleware(['api', 'throttle:60,1'])->prefix('api/v1')->group(function (): void {
     Route::get('/site', SiteShowController::class)->name('tp.api.v1.site.show');
@@ -23,6 +25,11 @@ Route::middleware(['api', 'throttle:60,1'])->prefix('api/v1')->group(function ()
     Route::get('/posts/{slug}', PostShowController::class)
         ->where('slug', '^[a-z0-9]+(?:-[a-z0-9]+)*$')
         ->name('tp.api.v1.posts.show');
+
+    Route::get('/taxonomies', TaxonomiesIndexController::class)->name('tp.api.v1.taxonomies.index');
+    Route::get('/taxonomies/{taxonomy}/terms', TaxonomyTermsIndexController::class)
+        ->where('taxonomy', '^[a-z0-9]+(?:-[a-z0-9]+)*$')
+        ->name('tp.api.v1.taxonomies.terms.index');
 
     Route::get('/menus/{location}', MenuShowController::class)
         ->where('location', '^[a-z0-9][a-z0-9\\-_]*$')

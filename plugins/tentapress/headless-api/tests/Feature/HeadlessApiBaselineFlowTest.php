@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use TentaPress\Media\Models\TpMedia;
 use TentaPress\Menus\Models\TpMenu;
 use TentaPress\Menus\Models\TpMenuItem;
@@ -13,6 +14,10 @@ use TentaPress\Seo\Models\TpSeoPage;
 use TentaPress\Seo\Models\TpSeoPost;
 use TentaPress\Settings\Services\SettingsStore;
 use TentaPress\System\Support\Paths;
+use TentaPress\Taxonomies\Models\TpTaxonomy;
+use TentaPress\Taxonomies\Models\TpTerm;
+use TentaPress\Taxonomies\Models\TpTermAssignment;
+use TentaPress\Taxonomies\Support\TaxonomySynchronizer;
 use TentaPress\Users\Models\TpUser;
 
 function seedThemeMenuLocation(string $locationKey = 'primary'): void
@@ -48,6 +53,26 @@ function seedThemeMenuLocation(string $locationKey = 'primary'): void
     $themeCachePath = Paths::themeCachePath();
     if (is_file($themeCachePath)) {
         @unlink($themeCachePath);
+    }
+}
+
+if (! function_exists('ensureTaxonomiesApiFixturesAvailable')) {
+    function ensureTaxonomiesApiFixturesAvailable(): void
+    {
+        if (
+            Schema::hasTable('tp_taxonomies')
+            && Schema::hasTable('tp_terms')
+            && Schema::hasTable('tp_term_assignments')
+            && TpTaxonomy::query()->where('key', 'category')->exists()
+        ) {
+            return;
+        }
+
+        test()->artisan('tp:plugins sync')->assertSuccessful();
+        test()->artisan('tp:plugins enable tentapress/taxonomies')->assertSuccessful();
+        test()->refreshApplication();
+        test()->artisan('migrate', ['--force' => true])->assertSuccessful();
+        app()->make(TaxonomySynchronizer::class)->syncRegistered();
     }
 }
 
@@ -198,4 +223,52 @@ it('returns menu and media payloads for valid identifiers', function (): void {
         ->assertJsonPath('data.height', 1080);
 
     expect((string) $mediaResponse->json('data.url'))->not->toBe('');
+});
+
+it('returns taxonomy resources and includes taxonomy terms in post payloads', function (): void {
+    ensureTaxonomiesApiFixturesAvailable();
+
+    $taxonomy = TpTaxonomy::query()->where('key', 'category')->firstOrFail();
+    $term = TpTerm::query()->create([
+        'taxonomy_id' => $taxonomy->id,
+        'name' => 'Announcements',
+        'slug' => 'announcements',
+    ]);
+
+    $author = TpUser::query()->create([
+        'name' => 'Taxonomy API Author',
+        'email' => 'taxonomy-api-author@example.test',
+        'password' => 'secret',
+        'is_super_admin' => true,
+    ]);
+
+    $post = TpPost::query()->create([
+        'title' => 'Taxonomy API Post',
+        'slug' => 'taxonomy-api-post',
+        'status' => 'published',
+        'published_at' => now()->subMinute(),
+        'author_id' => $author->id,
+    ]);
+
+    TpTermAssignment::query()->create([
+        'taxonomy_id' => $taxonomy->id,
+        'term_id' => $term->id,
+        'assignable_type' => TpPost::class,
+        'assignable_id' => $post->id,
+    ]);
+
+    $taxonomies = $this->getJson('/api/v1/taxonomies');
+    $taxonomies->assertOk()
+        ->assertJsonPath('data.0.key', 'category')
+        ->assertJsonPath('data.0.terms.0.slug', 'announcements');
+
+    $terms = $this->getJson('/api/v1/taxonomies/category/terms');
+    $terms->assertOk()
+        ->assertJsonPath('data.taxonomy.key', 'category')
+        ->assertJsonPath('data.terms.0.slug', 'announcements');
+
+    $postShow = $this->getJson('/api/v1/posts/taxonomy-api-post');
+    $postShow->assertOk()
+        ->assertJsonPath('data.taxonomies.0.taxonomy_key', 'category')
+        ->assertJsonPath('data.taxonomies.0.term_slug', 'announcements');
 });

@@ -3,11 +3,16 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use TentaPress\Pages\Models\TpPage;
 use TentaPress\Posts\Models\TpPost;
 use TentaPress\HeadlessApi\Support\ContentPayloadBuilder;
 use TentaPress\Settings\Services\SettingsStore;
 use TentaPress\System\Support\Paths;
+use TentaPress\Taxonomies\Models\TpTaxonomy;
+use TentaPress\Taxonomies\Models\TpTerm;
+use TentaPress\Taxonomies\Models\TpTermAssignment;
+use TentaPress\Taxonomies\Support\TaxonomySynchronizer;
 use TentaPress\Users\Models\TpUser;
 
 function seedThemeWithoutRequestedLocation(): void
@@ -43,6 +48,26 @@ function seedThemeWithoutRequestedLocation(): void
     $themeCachePath = Paths::themeCachePath();
     if (is_file($themeCachePath)) {
         @unlink($themeCachePath);
+    }
+}
+
+if (! function_exists('ensureTaxonomiesApiFixturesAvailable')) {
+    function ensureTaxonomiesApiFixturesAvailable(): void
+    {
+        if (
+            Schema::hasTable('tp_taxonomies')
+            && Schema::hasTable('tp_terms')
+            && Schema::hasTable('tp_term_assignments')
+            && TpTaxonomy::query()->where('key', 'category')->exists()
+        ) {
+            return;
+        }
+
+        test()->artisan('tp:plugins sync')->assertSuccessful();
+        test()->artisan('tp:plugins enable tentapress/taxonomies')->assertSuccessful();
+        test()->refreshApplication();
+        test()->artisan('migrate', ['--force' => true])->assertSuccessful();
+        app()->make(TaxonomySynchronizer::class)->syncRegistered();
     }
 }
 
@@ -108,6 +133,8 @@ it('hides draft and future posts from index and show responses', function (): vo
 });
 
 it('supports index filters and per_page clamping for pages and posts', function (): void {
+    ensureTaxonomiesApiFixturesAvailable();
+
     $authorA = TpUser::query()->create([
         'name' => 'Filter Author A',
         'email' => 'filter-author-a@example.test',
@@ -184,6 +211,27 @@ it('supports index filters and per_page clamping for pages and posts', function 
         ->assertJsonPath('meta.total', 1)
         ->assertJsonPath('data.0.slug', 'beta-story')
         ->assertJsonPath('data.0.permalink', '/blog/beta-story');
+
+    $taxonomy = TpTaxonomy::query()->where('key', 'category')->firstOrFail();
+    $term = TpTerm::query()->create([
+        'taxonomy_id' => $taxonomy->id,
+        'name' => 'Product',
+        'slug' => 'product',
+    ]);
+
+    TpTermAssignment::query()->create([
+        'taxonomy_id' => $taxonomy->id,
+        'term_id' => $term->id,
+        'assignable_type' => TpPost::class,
+        'assignable_id' => TpPost::query()->where('slug', 'alpha-story')->value('id'),
+    ]);
+
+    $postsByTaxonomy = $this->getJson('/api/v1/posts?taxonomy=category&term=product');
+    $postsByTaxonomy->assertOk()
+        ->assertJsonPath('meta.total', 1)
+        ->assertJsonPath('meta.filters.taxonomy', 'category')
+        ->assertJsonPath('meta.filters.term', 'product')
+        ->assertJsonPath('data.0.slug', 'alpha-story');
 });
 
 it('returns consistent not found envelope for unknown menu location and media id', function (): void {
@@ -198,6 +246,13 @@ it('returns consistent not found envelope for unknown menu location and media id
         ->assertNotFound()
         ->assertJsonPath('error.code', 'not_found')
         ->assertJsonPath('error.message', 'Media not found');
+});
+
+it('returns taxonomy not found for unknown taxonomy term endpoints', function (): void {
+    $this->getJson('/api/v1/taxonomies/unknown/terms')
+        ->assertNotFound()
+        ->assertJsonPath('error.code', 'not_found')
+        ->assertJsonPath('error.message', 'Taxonomy not found');
 });
 
 it('supports rendering fallbacks for blocks and page-editor payloads', function (): void {

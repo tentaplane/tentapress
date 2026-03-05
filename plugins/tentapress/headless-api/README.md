@@ -7,15 +7,17 @@ Headless REST API for TentaPress content delivery.
 | Field    | Value                                           |
 |----------|-------------------------------------------------|
 | ID       | `tentapress/headless-api`                       |
-| Version  | 0.1.1                                           |
+| Version  | 0.2.0                                           |
 | Provider | `TentaPress\\HeadlessApi\\HeadlessApiServiceProvider` |
 
 ## Features
 
 - Versioned REST API under `/api/v1`
 - Public read endpoints for site, pages, posts, menus, and media
+- Public taxonomy endpoints for taxonomy/term discovery
 - Published-content filtering for public endpoints
 - SEO payload inclusion for pages and posts
+- Taxonomy term serialization in post payloads
 
 ## Endpoints (v1)
 
@@ -24,6 +26,8 @@ Headless REST API for TentaPress content delivery.
 - `GET /api/v1/pages/{slug}`
 - `GET /api/v1/posts`
 - `GET /api/v1/posts/{slug}`
+- `GET /api/v1/taxonomies`
+- `GET /api/v1/taxonomies/{taxonomy}/terms`
 - `GET /api/v1/menus/{location}`
 - `GET /api/v1/media/{id}`
 
@@ -37,6 +41,8 @@ Headless REST API for TentaPress content delivery.
   - `per_page` (default `12`, min `1`, max `100`)
   - `author` (numeric author id)
   - `q` (searches title and slug)
+  - `taxonomy` (taxonomy key filter)
+  - `term` (term slug filter, optionally combined with `taxonomy`)
 
 ### Response Examples
 
