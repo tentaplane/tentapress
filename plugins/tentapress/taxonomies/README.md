@@ -7,7 +7,7 @@ Standalone taxonomy registration and persistence for TentaPress.
 | Field    | Value                                    |
 | -------- | ---------------------------------------- |
 | ID       | `tentapress/taxonomies`                  |
-| Version  | 0.5.0                                    |
+| Version  | 0.5.1                                    |
 | Provider | `TentaPress\Taxonomies\TaxonomiesServiceProvider` |
 
 ## Features
@@ -47,4 +47,14 @@ composer test:filter -- TaxonomiesAdminFlowTest
 composer test:filter -- TaxonomiesContentAssignmentFlowTest
 composer test:filter -- TaxonomiesAdminFilteringFlowTest
 composer test:filter -- TaxonomiesPublicArchiveFlowTest
+composer test:filter -- TaxonomiesStandaloneReadinessTest
 ```
+
+## Standalone Acceptance Checklist
+
+- [ ] `tp:plugins sync` completes successfully
+- [ ] plugin enablement (`tp:plugins enable tentapress/taxonomies`) succeeds without enabling posts/pages
+- [ ] built-in taxonomies (`category`, `tag`) persist after migration + sync
+- [ ] taxonomy admin index (`/admin/taxonomies`) renders for super admin users
+- [ ] public archive route (`/blog/taxonomy/{taxonomy}/{term}`) renders with empty-state fallback when no posts exist
+- [ ] taxonomy feature suite passes (`composer test:filter -- Taxonomies`)

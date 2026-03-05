@@ -2,7 +2,7 @@
     "id": "tentapress/taxonomies",
     "name": "Taxonomies",
     "description": "Standalone taxonomy registration and persistence for TentaPress.",
-    "version": "0.5.0",
+    "version": "0.5.1",
     "provider": "TentaPress\\Taxonomies\\TaxonomiesServiceProvider",
     "requires": [
         "tentapress/system"
