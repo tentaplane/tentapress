@@ -411,6 +411,7 @@
                     @if ($revisionsEnabled)
                         @include('tentapress-revisions::page-metabox', ['page' => $page, 'mode' => $mode])
                     @endif
+                    @includeIf('tentapress-taxonomies::page-metabox', ['page' => $page, 'mode' => $mode])
                     @includeIf('tentapress-seo::page-metabox', ['page' => $page, 'mode' => $mode])
                 </div>
             @endif

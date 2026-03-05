@@ -455,6 +455,7 @@
                     @if ($revisionsEnabled)
                         @include('tentapress-revisions::post-metabox', ['post' => $post, 'mode' => $mode])
                     @endif
+                    @includeIf('tentapress-taxonomies::post-metabox', ['post' => $post, 'mode' => $mode])
                     @includeIf('tentapress-seo::post-metabox', ['post' => $post, 'mode' => $mode])
                 </div>
             @endif
