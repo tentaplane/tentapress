@@ -55,11 +55,14 @@
                     </div>
 
                     <div class="tp-field">
-                        <label class="tp-label">State</label>
-                        <label class="inline-flex items-center gap-2 mt-2">
-                            <input type="checkbox" name="is_enabled" value="1" @checked((bool) old('is_enabled', $redirect?->is_enabled ?? true)) />
+                        <label class="tp-label block" for="redirect-state-enabled">State</label>
+                        <div class="mt-2 flex items-center gap-2">
+                            <input type="hidden" name="is_enabled" value="0" />
+                            <input id="redirect-state-enabled" type="checkbox" name="is_enabled" value="1"
+                                @checked((bool) old('is_enabled', $redirect?->is_enabled ?? true)) />
                             <span>Enabled</span>
-                        </label>
+                        </div>
+                        <div class="tp-help mt-1">Disable this redirect to keep it saved without serving it publicly.</div>
                     </div>
                 </div>
 

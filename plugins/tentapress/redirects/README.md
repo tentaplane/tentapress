@@ -7,7 +7,7 @@ First-party redirect management for TentaPress.
 | Field    | Value                                           |
 |----------|-------------------------------------------------|
 | ID       | `tentapress/redirects`                          |
-| Version  | 0.3.2                                           |
+| Version  | 0.3.3                                           |
 | Provider | `TentaPress\Redirects\RedirectsServiceProvider` |
 
 ## Goal
