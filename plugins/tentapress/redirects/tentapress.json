@@ -2,7 +2,7 @@
     "id": "tentapress/redirects",
     "name": "Redirects",
     "description": "First-party redirect management for permalink safety.",
-    "version": "0.3.1",
+    "version": "0.3.2",
     "provider": "TentaPress\\Redirects\\RedirectsServiceProvider",
     "admin": {
         "menus": [

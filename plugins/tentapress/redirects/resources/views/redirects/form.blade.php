@@ -8,9 +8,16 @@
             <h1 class="tp-page-title">{{ $redirect ? 'Edit Redirect' : 'Add Redirect' }}</h1>
             <p class="tp-description">Create and validate redirects before publishing.</p>
         </div>
+        <div class="flex gap-2">
+            <a href="{{ route('tp.redirects.index') }}" class="tp-button-secondary">Back to redirects</a>
+            <a href="{{ route('tp.redirects.suggestions.index') }}" class="tp-button-secondary">Suggestions</a>
+        </div>
     </div>
 
     <div class="tp-metabox">
+        <div class="tp-metabox__title">
+            <h2 class="tp-section-title">Redirect details</h2>
+        </div>
         <div class="tp-metabox__body">
             <form method="POST"
                 action="{{ $redirect ? route('tp.redirects.update', ['redirect' => $redirect->id]) : route('tp.redirects.store') }}"
@@ -38,7 +45,7 @@
                     @enderror
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <div class="tp-field">
                         <label class="tp-label">Status code</label>
                         <select name="status_code" class="tp-select">
@@ -61,47 +68,46 @@
                     <textarea name="notes" class="tp-input" rows="4">{{ old('notes', $redirect?->notes) }}</textarea>
                 </div>
 
-                <div class="flex gap-2">
-                    <button type="button" class="tp-button-secondary" id="redirect-run-diagnostics">Run diagnostics</button>
+                <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
                     <button type="submit" class="tp-button-primary">{{ $redirect ? 'Save changes' : 'Create redirect' }}</button>
-                    <a href="{{ route('tp.redirects.index') }}" class="tp-button-secondary">Back</a>
+                    <button type="button" class="tp-button-secondary" id="redirect-run-diagnostics">Run diagnostics</button>
                 </div>
 
-                <div id="redirect-diagnostics" class="tp-help"></div>
+                <div id="redirect-diagnostics" class="tp-help text-sm"></div>
             </form>
         </div>
     </div>
 
     @if ($redirect)
         <div class="tp-metabox mt-4">
-            <div class="tp-metabox__body">
-                <h2 class="tp-section-title mb-3">Recent history</h2>
-                <div class="tp-table-wrap">
-                    <table class="tp-table tp-table--sticky-head">
-                        <thead class="tp-table__thead">
-                            <tr>
-                                <th>Action</th>
-                                <th>Source</th>
-                                <th>Target</th>
-                                <th>When</th>
+            <div class="tp-metabox__title">
+                <h2 class="tp-section-title">Recent history</h2>
+            </div>
+            <div class="tp-table-wrap">
+                <table class="tp-table tp-table--responsive tp-table--sticky-head">
+                    <thead class="tp-table__thead">
+                        <tr>
+                            <th class="tp-table__th">Action</th>
+                            <th class="tp-table__th">Source</th>
+                            <th class="tp-table__th">Target</th>
+                            <th class="tp-table__th">When</th>
+                        </tr>
+                    </thead>
+                    <tbody class="tp-table__tbody">
+                        @forelse (($events ?? collect()) as $event)
+                            <tr class="tp-table__row">
+                                <td data-label="Action" class="tp-table__td align-middle py-4">{{ $event->action }}</td>
+                                <td data-label="Source" class="tp-table__td align-middle py-4"><code class="tp-code">{{ $event->source_path }}</code></td>
+                                <td data-label="Target" class="tp-table__td align-middle py-4"><code class="tp-code">{{ $event->target_path }}</code></td>
+                                <td data-label="When" class="tp-table__td align-middle py-4">{{ $event->created_at?->format('Y-m-d H:i') }}</td>
                             </tr>
-                        </thead>
-                        <tbody class="tp-table__tbody">
-                            @forelse (($events ?? collect()) as $event)
-                                <tr class="tp-table__row">
-                                    <td class="tp-table__td">{{ $event->action }}</td>
-                                    <td class="tp-table__td"><code class="tp-code">{{ $event->source_path }}</code></td>
-                                    <td class="tp-table__td"><code class="tp-code">{{ $event->target_path }}</code></td>
-                                    <td class="tp-table__td">{{ $event->created_at?->format('Y-m-d H:i') }}</td>
-                                </tr>
-                            @empty
-                                <tr class="tp-table__row">
-                                    <td class="tp-table__td" colspan="4">No history yet.</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
+                        @empty
+                            <tr class="tp-table__row">
+                                <td class="tp-table__td" colspan="4">No history yet.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
         </div>
     @endif
@@ -120,10 +126,10 @@
             diagnosticsButton.addEventListener('click', async () => {
                 diagnosticsOutput.textContent = 'Running diagnostics...';
 
-                const sourcePath = form.querySelector('[name=\"source_path\"]')?.value || '';
-                const targetPath = form.querySelector('[name=\"target_path\"]')?.value || '';
-                const statusCode = form.querySelector('[name=\"status_code\"]')?.value || '301';
-                const csrfToken = form.querySelector('[name=\"_token\"]')?.value || '';
+                const sourcePath = form.querySelector('[name="source_path"]')?.value || '';
+                const targetPath = form.querySelector('[name="target_path"]')?.value || '';
+                const statusCode = form.querySelector('[name="status_code"]')?.value || '301';
+                const csrfToken = form.querySelector('[name="_token"]')?.value || '';
                 const ignoreId = '{{ (string) ($redirect?->id ?? '') }}';
 
                 const payload = {

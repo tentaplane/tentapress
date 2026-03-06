@@ -1,6 +1,6 @@
 {
     "schema_version": 1,
-    "generated_at": "2026-03-06T14:21:28Z",
+    "generated_at": "2026-03-06T17:53:04Z",
     "plugins": [
         {
             "id": "tentapress/admin-shell",
@@ -156,7 +156,7 @@
             "name": "Redirects",
             "description": "First-party redirect management for permalink safety.",
             "package": "tentapress/redirects",
-            "latest_version": "0.3.1"
+            "latest_version": "0.3.2"
         },
         {
             "id": "tentapress/revisions",

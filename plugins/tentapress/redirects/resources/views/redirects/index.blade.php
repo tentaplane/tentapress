@@ -3,6 +3,11 @@
 @section('title', 'Redirects')
 
 @section('content')
+    @php
+        $enabledFilter = in_array((string) $enabled, ['', '0', '1'], true) ? (string) $enabled : '';
+        $statusCodeFilter = in_array((string) $statusCode, ['', '301', '302'], true) ? (string) $statusCode : '';
+    @endphp
+
     <div class="tp-page-header">
         <div>
             <h1 class="tp-page-title">Redirects</h1>
@@ -15,79 +20,123 @@
         </div>
     </div>
 
-    <div class="tp-metabox mb-4">
-        <div class="tp-metabox__body">
-            <form method="GET" action="{{ route('tp.redirects.index') }}" class="grid grid-cols-1 md:grid-cols-5 gap-3">
-                <input type="text" name="q" class="tp-input md:col-span-2" placeholder="Search source or target"
-                    value="{{ $search }}" />
-                <select name="status_code" class="tp-select">
-                    <option value="">All status codes</option>
-                    <option value="301" @selected((string) $statusCode === '301')>301</option>
-                    <option value="302" @selected((string) $statusCode === '302')>302</option>
-                </select>
-                <select name="enabled" class="tp-select">
-                    <option value="">Enabled + Disabled</option>
-                    <option value="1" @selected((string) $enabled === '1')>Enabled</option>
-                    <option value="0" @selected((string) $enabled === '0')>Disabled</option>
-                </select>
-                <button type="submit" class="tp-button-secondary">Filter</button>
-            </form>
-        </div>
-    </div>
-
     <div class="tp-metabox">
-        <div class="tp-metabox__body">
-            <form method="POST" action="{{ route('tp.redirects.bulk') }}">
-                @csrf
-                <div class="flex gap-2 mb-3">
-                    <select name="action" class="tp-select">
-                        <option value="enable">Enable selected</option>
-                        <option value="disable">Disable selected</option>
-                    </select>
-                    <button type="submit" class="tp-button-secondary">Apply</button>
+        <div class="tp-metabox__title">
+            <form method="GET" action="{{ route('tp.redirects.index') }}" class="flex flex-col gap-2 sm:flex-row sm:items-center">
+                <div class="flex flex-wrap gap-2">
+                    <a
+                        href="{{ route('tp.redirects.index', ['q' => $search !== '' ? $search : null, 'status_code' => $statusCodeFilter !== '' ? $statusCodeFilter : null]) }}"
+                        class="{{ $enabledFilter === '' ? 'tp-button-primary' : 'tp-button-secondary' }}">
+                        All
+                    </a>
+                    <a
+                        href="{{ route('tp.redirects.index', ['enabled' => '1', 'q' => $search !== '' ? $search : null, 'status_code' => $statusCodeFilter !== '' ? $statusCodeFilter : null]) }}"
+                        class="{{ $enabledFilter === '1' ? 'tp-button-primary' : 'tp-button-secondary' }}">
+                        Enabled
+                    </a>
+                    <a
+                        href="{{ route('tp.redirects.index', ['enabled' => '0', 'q' => $search !== '' ? $search : null, 'status_code' => $statusCodeFilter !== '' ? $statusCodeFilter : null]) }}"
+                        class="{{ $enabledFilter === '0' ? 'tp-button-primary' : 'tp-button-secondary' }}">
+                        Disabled
+                    </a>
                 </div>
-                <div class="tp-table-wrap">
-                    <table class="tp-table tp-table--sticky-head">
-                        <thead class="tp-table__thead">
-                        <tr>
-                            <th>
-                                <input type="checkbox" id="select-all-redirects" />
-                            </th>
-                            <th>Source</th>
-                            <th>Target</th>
-                            <th>Status</th>
-                            <th>State</th>
-                            <th>Updated</th>
-                            <th></th>
-                        </tr>
-                        </thead>
-                        <tbody class="tp-table__tbody">
-                        @forelse ($redirects as $redirect)
-                            <tr class="tp-table__row">
-                                <td class="tp-table__td">
-                                    <input type="checkbox" name="ids[]" value="{{ $redirect->id }}" class="redirect-select-item" />
-                                </td>
-                                <td class="tp-table__td"><code class="tp-code">{{ $redirect->source_path }}</code></td>
-                                <td class="tp-table__td"><code class="tp-code">{{ $redirect->target_path }}</code></td>
-                                <td class="tp-table__td">{{ $redirect->status_code }}</td>
-                                <td class="tp-table__td">{{ $redirect->is_enabled ? 'Enabled' : 'Disabled' }}</td>
-                                <td class="tp-table__td">{{ $redirect->updated_at?->format('Y-m-d H:i') }}</td>
-                                <td class="tp-table__td">
-                                    <a href="{{ route('tp.redirects.edit', ['redirect' => $redirect->id]) }}" class="tp-button-link">Edit</a>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td class="tp-table__td" colspan="7">No redirects found.</td>
-                            </tr>
-                        @endforelse
-                        </tbody>
-                    </table>
+
+                <div class="flex-1"></div>
+
+                <div class="flex flex-wrap gap-2">
+                    <label class="sr-only" for="redirects-status-code">Filter by status code</label>
+                    <select id="redirects-status-code" name="status_code" class="tp-select w-full sm:w-40">
+                        <option value="">All status codes</option>
+                        <option value="301" @selected($statusCodeFilter === '301')>301</option>
+                        <option value="302" @selected($statusCodeFilter === '302')>302</option>
+                    </select>
+
+                    <label class="sr-only" for="redirects-search">Search redirects</label>
+                    <input id="redirects-search" type="text" name="q" class="tp-input w-full sm:w-64" placeholder="Search source or target..."
+                        value="{{ $search }}" />
+
+                    <input type="hidden" name="enabled" value="{{ $enabledFilter }}" />
+
+                    <button type="submit" class="tp-button-secondary">Search</button>
+
+                    @if ($search !== '' || $statusCodeFilter !== '' || $enabledFilter !== '')
+                        <a href="{{ route('tp.redirects.index') }}" class="tp-button-secondary">Reset</a>
+                    @endif
                 </div>
             </form>
-
-            <div class="mt-4">{{ $redirects->links() }}</div>
         </div>
+
+        @if ($redirects->count() === 0)
+            <div class="tp-metabox__body tp-muted text-sm">No redirects found for the current filters.</div>
+        @else
+            <div class="tp-metabox__body">
+                <form method="POST" action="{{ route('tp.redirects.bulk') }}" class="space-y-4">
+                    @csrf
+                    <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
+                        <label class="sr-only" for="redirects-bulk-action">Bulk action</label>
+                        <select id="redirects-bulk-action" name="action" class="tp-select w-full sm:w-56">
+                            <option value="enable">Enable selected</option>
+                            <option value="disable">Disable selected</option>
+                        </select>
+                        <button type="submit" class="tp-button-secondary">Apply</button>
+                        <span class="tp-help">Select rows, then apply action.</span>
+                    </div>
+
+                    <div class="tp-table-wrap">
+                        <table class="tp-table tp-table--responsive tp-table--sticky-head">
+                            <thead class="tp-table__thead">
+                                <tr>
+                                    <th class="tp-table__th">
+                                        <input type="checkbox" id="select-all-redirects" />
+                                    </th>
+                                    <th class="tp-table__th">Source</th>
+                                    <th class="tp-table__th">Target</th>
+                                    <th class="tp-table__th">Status</th>
+                                    <th class="tp-table__th">State</th>
+                                    <th class="tp-table__th">Updated</th>
+                                    <th class="tp-table__th text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="tp-table__tbody">
+                                @foreach ($redirects as $redirect)
+                                    <tr class="tp-table__row">
+                                        <td data-label="Select" class="tp-table__td align-middle py-4">
+                                            <input type="checkbox" name="ids[]" value="{{ $redirect->id }}" class="redirect-select-item" />
+                                        </td>
+                                        <td data-label="Source" class="tp-table__td align-middle py-4">
+                                            <code class="tp-code">{{ $redirect->source_path }}</code>
+                                        </td>
+                                        <td data-label="Target" class="tp-table__td align-middle py-4">
+                                            <code class="tp-code">{{ $redirect->target_path }}</code>
+                                        </td>
+                                        <td data-label="Status" class="tp-table__td align-middle py-4">
+                                            <span class="tp-code">{{ $redirect->status_code }}</span>
+                                        </td>
+                                        <td data-label="State" class="tp-table__td align-middle py-4">
+                                            @if ($redirect->is_enabled)
+                                                <span class="tp-badge tp-badge-success">Enabled</span>
+                                            @else
+                                                <span class="tp-badge tp-badge-info">Disabled</span>
+                                            @endif
+                                        </td>
+                                        <td data-label="Updated" class="tp-table__td tp-muted align-middle py-4">
+                                            {{ $redirect->updated_at?->diffForHumans() ?? '—' }}
+                                        </td>
+                                        <td data-label="Actions" class="tp-table__td align-middle py-4">
+                                            <div class="tp-muted flex justify-end gap-3 text-xs">
+                                                <a href="{{ route('tp.redirects.edit', ['redirect' => $redirect->id]) }}" class="tp-button-link">Edit</a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </form>
+            </div>
+
+            <div class="tp-metabox__body">{{ $redirects->links() }}</div>
+        @endif
     </div>
 @endsection
 
