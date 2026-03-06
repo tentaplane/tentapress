@@ -104,7 +104,9 @@ final class InstallPlugin implements ShouldQueue
      */
     private function composerRequireCommand(string $package, string $phpBinary, CommandBinaryResolver $binaryResolver): array
     {
-        return [...$binaryResolver->composerBaseCommand($phpBinary), 'require', $package, '--no-interaction', '--no-progress'];
+        $requirement = TpPluginInstall::composerRequirement($package);
+
+        return [...$binaryResolver->composerBaseCommand($phpBinary), 'require', $requirement, '--no-interaction', '--no-progress'];
     }
 
     /**

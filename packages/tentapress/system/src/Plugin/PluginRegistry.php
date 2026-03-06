@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use RuntimeException;
 use Symfony\Component\Finder\Finder;
+use TentaPress\System\Support\ComposerPackageRequirement;
 use TentaPress\System\Support\Paths;
 
 final class PluginRegistry
@@ -561,7 +562,7 @@ final class PluginRegistry
             'provider' => $provider,
             'path' => $path,
             'manifest' => $manifest,
-        ]), RuntimeException::class, "Plugin {$id} is not installed. Run: composer require {$id}");
+        ]), RuntimeException::class, 'Plugin ' . $id . ' is not installed. Run: composer require ' . ComposerPackageRequirement::forRequire($id));
     }
 
 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TentaPress\SystemInfo\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use TentaPress\System\Support\ComposerPackageRequirement;
 
 final class TpPluginInstall extends Model
 {
@@ -58,6 +59,11 @@ final class TpPluginInstall extends Model
             return 'composer update tentapress/* --with-all-dependencies --no-interaction --no-progress';
         }
 
-        return 'composer require ' . (string) $this->package;
+        return 'composer require ' . self::composerRequirement((string) $this->package);
+    }
+
+    public static function composerRequirement(string $package): string
+    {
+        return ComposerPackageRequirement::forRequire($package);
     }
 }

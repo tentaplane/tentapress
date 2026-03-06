@@ -7,7 +7,7 @@ Core platform layer for TentaPress plugin and theme management.
 | Field    | Value                                     |
 |----------|-------------------------------------------|
 | Name     | `tentapress/system`                       |
-| Version  | 0.4.4                                     |
+| Version  | 0.4.5                                     |
 | Provider | `TentaPress\System\SystemServiceProvider` |
 
 ## Overview
@@ -74,6 +74,8 @@ Plugin commands no longer run migrations automatically. Run `php artisan migrate
 upgrades.
 Plugin lifecycle/cache actions also clear compiled views so Blade/Blaze output stays coherent after plugin state
 changes.
+First-party pre-1.0 install guidance uses an explicit Composer constraint so admin/manual installs resolve packages that
+are only available as `0.x-dev`.
 
 ### Theme Commands
 
