@@ -1,13 +1,13 @@
 {
     "schema_version": 1,
-    "generated_at": "2026-03-06T18:22:07Z",
+    "generated_at": "2026-03-06T19:40:36Z",
     "plugins": [
         {
             "id": "tentapress/admin-shell",
             "name": "Admin Shell",
             "description": "Admin UI shell, layout, navigation and base admin routes.",
             "package": "tentapress/admin-shell",
-            "latest_version": "0.6.12",
+            "latest_version": "0.6.13",
             "icon": "tools"
         },
         {
@@ -140,7 +140,7 @@
             "name": "Pages",
             "description": "Create and manage pages.",
             "package": "tentapress/pages",
-            "latest_version": "0.4.7",
+            "latest_version": "0.4.8",
             "icon": "pages"
         },
         {
@@ -148,7 +148,7 @@
             "name": "Posts",
             "description": "Create and manage blog posts.",
             "package": "tentapress/posts",
-            "latest_version": "0.4.7",
+            "latest_version": "0.4.8",
             "icon": "posts"
         },
         {
