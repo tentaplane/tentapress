@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TentaPress\Posts\Http\Admin;
 
+use TentaPress\Redirects\Services\SlugRedirector;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
@@ -11,6 +12,7 @@ use Illuminate\Validation\Rule;
 use TentaPress\Posts\Models\TpPost;
 use TentaPress\Posts\Services\PostSlugger;
 use TentaPress\Posts\Support\BlocksNormalizer;
+use TentaPress\Settings\Services\SettingsStore;
 use TentaPress\System\Editor\EditorDriverRegistry;
 
 final readonly class UpdateController
@@ -43,6 +45,7 @@ final readonly class UpdateController
         $pageDocRaw = $hasPageDocJson ? json_decode((string) ($data['page_doc_json'] ?? ''), true) : $post->content;
         $pageDoc = is_array($pageDocRaw) ? $pageDocRaw : $post->content;
         $editorDriver = $this->resolveEditorDriver($data);
+        $previousSlug = (string) $post->slug;
 
         $nowUserId = Auth::check() && is_object(Auth::user()) ? (int) (Auth::user()->id ?? 0) : null;
 
@@ -69,6 +72,7 @@ final readonly class UpdateController
         $post->fill($payload);
 
         $post->save();
+        $this->createSlugRedirectIfNeeded($previousSlug, $slug);
 
         $returnTo = $request->string('return_to')->toString();
 
@@ -110,5 +114,33 @@ final readonly class UpdateController
         $ids = $registry->idsFor('posts');
 
         return $ids !== [] ? $ids : ['blocks'];
+    }
+
+    private function createSlugRedirectIfNeeded(string $previousSlug, string $newSlug): void
+    {
+        $previousSlug = trim($previousSlug);
+        $newSlug = trim($newSlug);
+
+        if ($previousSlug === '' || $newSlug === '' || $previousSlug === $newSlug) {
+            return;
+        }
+
+        $slugRedirectorClass = SlugRedirector::class;
+        if (! class_exists($slugRedirectorClass) || ! app()->bound($slugRedirectorClass)) {
+            return;
+        }
+
+        $blogBase = 'blog';
+        if (class_exists(SettingsStore::class) && app()->bound(SettingsStore::class)) {
+            $rawBase = trim((string) app()->make(SettingsStore::class)->get('site.blog_base', ''), '/');
+            if ($rawBase !== '' && preg_match('/^[a-z0-9]+(?:-[a-z0-9]+)*$/', $rawBase) === 1) {
+                $blogBase = $rawBase;
+            }
+        }
+
+        $oldPath = '/'.$blogBase.'/'.ltrim($previousSlug, '/');
+        $newPath = '/'.$blogBase.'/'.ltrim($newSlug, '/');
+
+        app()->make($slugRedirectorClass)->createOrIgnore($oldPath, $newPath, 'slug_change_post');
     }
 }
