@@ -62,9 +62,9 @@
                 </div>
 
                 <div class="flex gap-2">
-                    <button type="button" class="tp-button" id="redirect-run-diagnostics">Run diagnostics</button>
+                    <button type="button" class="tp-button-secondary" id="redirect-run-diagnostics">Run diagnostics</button>
                     <button type="submit" class="tp-button-primary">{{ $redirect ? 'Save changes' : 'Create redirect' }}</button>
-                    <a href="{{ route('tp.redirects.index') }}" class="tp-button">Back</a>
+                    <a href="{{ route('tp.redirects.index') }}" class="tp-button-secondary">Back</a>
                 </div>
 
                 <div id="redirect-diagnostics" class="tp-help"></div>
@@ -76,30 +76,32 @@
         <div class="tp-metabox mt-4">
             <div class="tp-metabox__body">
                 <h2 class="tp-section-title mb-3">Recent history</h2>
-                <table class="tp-table">
-                    <thead>
-                        <tr>
-                            <th>Action</th>
-                            <th>Source</th>
-                            <th>Target</th>
-                            <th>When</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse (($events ?? collect()) as $event)
+                <div class="tp-table-wrap">
+                    <table class="tp-table tp-table--sticky-head">
+                        <thead class="tp-table__thead">
                             <tr>
-                                <td>{{ $event->action }}</td>
-                                <td><code class="tp-code">{{ $event->source_path }}</code></td>
-                                <td><code class="tp-code">{{ $event->target_path }}</code></td>
-                                <td>{{ $event->created_at?->format('Y-m-d H:i') }}</td>
+                                <th>Action</th>
+                                <th>Source</th>
+                                <th>Target</th>
+                                <th>When</th>
                             </tr>
-                        @empty
-                            <tr>
-                                <td colspan="4">No history yet.</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody class="tp-table__tbody">
+                            @forelse (($events ?? collect()) as $event)
+                                <tr class="tp-table__row">
+                                    <td class="tp-table__td">{{ $event->action }}</td>
+                                    <td class="tp-table__td"><code class="tp-code">{{ $event->source_path }}</code></td>
+                                    <td class="tp-table__td"><code class="tp-code">{{ $event->target_path }}</code></td>
+                                    <td class="tp-table__td">{{ $event->created_at?->format('Y-m-d H:i') }}</td>
+                                </tr>
+                            @empty
+                                <tr class="tp-table__row">
+                                    <td class="tp-table__td" colspan="4">No history yet.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     @endif

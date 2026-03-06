@@ -9,8 +9,8 @@
             <p class="tp-description">Manage permalink redirects and prevent broken links.</p>
         </div>
         <div class="flex gap-2">
-            <a href="{{ route('tp.redirects.suggestions.index') }}" class="tp-button">Suggestions</a>
-            <a href="{{ route('tp.redirects.settings') }}" class="tp-button">Policy</a>
+            <a href="{{ route('tp.redirects.suggestions.index') }}" class="tp-button-secondary">Suggestions</a>
+            <a href="{{ route('tp.redirects.settings') }}" class="tp-button-secondary">Policy</a>
             <a href="{{ route('tp.redirects.create') }}" class="tp-button-primary">Add redirect</a>
         </div>
     </div>
@@ -30,7 +30,7 @@
                     <option value="1" @selected((string) $enabled === '1')>Enabled</option>
                     <option value="0" @selected((string) $enabled === '0')>Disabled</option>
                 </select>
-                <button type="submit" class="tp-button">Filter</button>
+                <button type="submit" class="tp-button-secondary">Filter</button>
             </form>
         </div>
     </div>
@@ -44,10 +44,11 @@
                         <option value="enable">Enable selected</option>
                         <option value="disable">Disable selected</option>
                     </select>
-                    <button type="submit" class="tp-button">Apply</button>
+                    <button type="submit" class="tp-button-secondary">Apply</button>
                 </div>
-                <table class="tp-table">
-                    <thead>
+                <div class="tp-table-wrap">
+                    <table class="tp-table tp-table--sticky-head">
+                        <thead class="tp-table__thead">
                         <tr>
                             <th>
                                 <input type="checkbox" id="select-all-redirects" />
@@ -59,29 +60,30 @@
                             <th>Updated</th>
                             <th></th>
                         </tr>
-                    </thead>
-                    <tbody>
+                        </thead>
+                        <tbody class="tp-table__tbody">
                         @forelse ($redirects as $redirect)
-                            <tr>
-                                <td>
+                            <tr class="tp-table__row">
+                                <td class="tp-table__td">
                                     <input type="checkbox" name="ids[]" value="{{ $redirect->id }}" class="redirect-select-item" />
                                 </td>
-                                <td><code class="tp-code">{{ $redirect->source_path }}</code></td>
-                                <td><code class="tp-code">{{ $redirect->target_path }}</code></td>
-                                <td>{{ $redirect->status_code }}</td>
-                                <td>{{ $redirect->is_enabled ? 'Enabled' : 'Disabled' }}</td>
-                                <td>{{ $redirect->updated_at?->format('Y-m-d H:i') }}</td>
-                                <td>
-                                    <a href="{{ route('tp.redirects.edit', ['redirect' => $redirect->id]) }}" class="tp-link">Edit</a>
+                                <td class="tp-table__td"><code class="tp-code">{{ $redirect->source_path }}</code></td>
+                                <td class="tp-table__td"><code class="tp-code">{{ $redirect->target_path }}</code></td>
+                                <td class="tp-table__td">{{ $redirect->status_code }}</td>
+                                <td class="tp-table__td">{{ $redirect->is_enabled ? 'Enabled' : 'Disabled' }}</td>
+                                <td class="tp-table__td">{{ $redirect->updated_at?->format('Y-m-d H:i') }}</td>
+                                <td class="tp-table__td">
+                                    <a href="{{ route('tp.redirects.edit', ['redirect' => $redirect->id]) }}" class="tp-button-link">Edit</a>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7">No redirects found.</td>
+                                <td class="tp-table__td" colspan="7">No redirects found.</td>
                             </tr>
                         @endforelse
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </div>
             </form>
 
             <div class="mt-4">{{ $redirects->links() }}</div>

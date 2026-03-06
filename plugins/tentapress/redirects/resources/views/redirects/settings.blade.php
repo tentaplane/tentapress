@@ -23,7 +23,7 @@
                 </div>
                 <div class="flex gap-2">
                     <button type="submit" class="tp-button-primary">Save policy</button>
-                    <a href="{{ route('tp.redirects.suggestions.index') }}" class="tp-button">Suggestion queue</a>
+                    <a href="{{ route('tp.redirects.suggestions.index') }}" class="tp-button-secondary">Suggestion queue</a>
                 </div>
             </form>
         </div>
