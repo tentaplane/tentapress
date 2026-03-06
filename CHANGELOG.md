@@ -4,6 +4,27 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.42.0](https://github.com/tentaplane/tentapress/compare/v0.41.0...v0.42.0) (2026-03-06)
+
+
+### Features
+
+* **redirects:** add bulk actions diagnostics and rollout guidance ([b2f1419](https://github.com/tentaplane/tentapress/commit/b2f14190e6e4e587e1bd27b972868334c4d314be))
+* **redirects:** add policy-driven suggestion review workflows ([f315aca](https://github.com/tentaplane/tentapress/commit/f315acacdd678b56c62956994d7baa67ee17378a))
+* **redirects:** add redirects plugin with runtime admin and tests ([6348f76](https://github.com/tentaplane/tentapress/commit/6348f76dc668b55115425e044e01f59a6537f0b6))
+
+
+### Bug Fixes
+
+* **redirects:** align admin screens with platform UI styles ([bbfb77b](https://github.com/tentaplane/tentapress/commit/bbfb77b6fb3fc8325ddd2c880bae16bc50c44d29))
+* **redirects:** align admin UX with core plugin patterns ([3dcbe73](https://github.com/tentaplane/tentapress/commit/3dcbe73135fef639c08cae85de4ad20f4900d009))
+* **redirects:** normalize state toggle layout on form ([6a8b578](https://github.com/tentaplane/tentapress/commit/6a8b578839903b25b1b1107b287a0a2f90250a55))
+
+
+### Miscellaneous Chores
+
+* **plugins:** bump admin-shell pages and posts versions ([3902fd8](https://github.com/tentaplane/tentapress/commit/3902fd8a29c59dbbd21ec45a1a00aeb891a973c6))
+
 ## [0.41.0](https://github.com/tentaplane/tentapress/compare/v0.40.4...v0.41.0) (2026-03-06)
 
 
