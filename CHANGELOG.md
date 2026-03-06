@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.41.0](https://github.com/tentaplane/tentapress/compare/v0.40.4...v0.41.0) (2026-03-06)
+
+
+### Features
+
+* **headless-api:** expose taxonomy endpoints and post filters ([6bd724d](https://github.com/tentaplane/tentapress/commit/6bd724d1851779f77371a167bbb1933bfa165b14))
+* **taxonomies:** add admin taxonomy and term management ([167c384](https://github.com/tentaplane/tentapress/commit/167c3846bbf0c653e622ddc00062d0c2d2447797))
+* **taxonomies:** add public taxonomy archive routes and views ([910e4e7](https://github.com/tentaplane/tentapress/commit/910e4e7f914e9778363f2a83c0e290d82ed46d44))
+* **taxonomies:** add reusable taxonomy assignment controls ([6f918fd](https://github.com/tentaplane/tentapress/commit/6f918fd45bda878f4a9d7ea83b445d8ee424210e))
+* **taxonomies:** add taxonomy filters to admin content indexes ([b5dec67](https://github.com/tentaplane/tentapress/commit/b5dec67904983d33c67c33972f9c52c251457e1e))
+* **taxonomies:** scaffold taxonomy plugin foundation ([e825cf8](https://github.com/tentaplane/tentapress/commit/e825cf8e72f9cd1cf9ad1cb9778f95944aa80ef0))
+
+
+### Bug Fixes
+
+* **posts,pages:** hide taxonomy metabox when taxonomies plugin is disabled ([b6a31c3](https://github.com/tentaplane/tentapress/commit/b6a31c31ba7fda5755da937bd1b748b04436230c))
+* **revisions:** hide editor enhancements when plugin is disabled ([f2f5cb6](https://github.com/tentaplane/tentapress/commit/f2f5cb6a53a474a0b79a1c2f99387543b0d5387d))
+
 ## [0.40.4](https://github.com/tentaplane/tentapress/compare/v0.40.3...v0.40.4) (2026-03-01)
 
 
