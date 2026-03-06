@@ -10,6 +10,8 @@ final readonly class SlugRedirector
 {
     public function __construct(
         private RedirectManager $manager,
+        private RedirectPolicy $policy,
+        private RedirectSuggestionManager $suggestions,
     ) {
     }
 
@@ -25,6 +27,12 @@ final readonly class SlugRedirector
 
         if ($existing instanceof TpRedirect) {
             return $existing;
+        }
+
+        if (! $this->policy->shouldAutoApplySlugRedirects()) {
+            $this->suggestions->stage($oldPath, $newPath, 301, $origin);
+
+            return null;
         }
 
         return $this->manager->create([

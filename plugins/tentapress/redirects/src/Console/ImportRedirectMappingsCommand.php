@@ -8,6 +8,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 use TentaPress\Redirects\Models\TpRedirect;
 use TentaPress\Redirects\Services\RedirectManager;
+use TentaPress\Redirects\Services\RedirectSuggestionManager;
 
 final class ImportRedirectMappingsCommand extends Command
 {
@@ -15,7 +16,7 @@ final class ImportRedirectMappingsCommand extends Command
 
     protected $description = 'Import redirect mappings from a TentaPress import URL mapping report.';
 
-    public function handle(RedirectManager $manager): int
+    public function handle(RedirectManager $manager, RedirectSuggestionManager $suggestions): int
     {
         $inputPath = trim((string) $this->argument('path'));
         $statusCode = (int) $this->option('status');
@@ -36,6 +37,7 @@ final class ImportRedirectMappingsCommand extends Command
         }
 
         $created = 0;
+        $staged = 0;
         $skipped = 0;
 
         foreach ($decoded['mappings'] as $row) {
@@ -62,7 +64,12 @@ final class ImportRedirectMappingsCommand extends Command
 
             $alreadyExists = TpRedirect::query()->fromSource('/'.ltrim($sourcePath, '/'))->exists();
             if ($alreadyExists) {
-                $skipped++;
+                $suggestions->stage($sourcePath, $targetPath, $statusCode, 'import', [
+                    'conflict_type' => 'existing_source',
+                    'source_url' => $sourceUrl,
+                    'destination_url' => $destinationUrl,
+                ], 'existing_source');
+                $staged++;
 
                 continue;
             }
@@ -82,7 +89,7 @@ final class ImportRedirectMappingsCommand extends Command
             }
         }
 
-        $this->components->info("Imported redirects: {$created}; skipped: {$skipped}");
+        $this->components->info("Imported redirects: {$created}; staged suggestions: {$staged}; skipped: {$skipped}");
 
         return self::SUCCESS;
     }

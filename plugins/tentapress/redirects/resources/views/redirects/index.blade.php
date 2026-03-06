@@ -9,6 +9,8 @@
             <p class="tp-description">Manage permalink redirects and prevent broken links.</p>
         </div>
         <div class="flex gap-2">
+            <a href="{{ route('tp.redirects.suggestions.index') }}" class="tp-button">Suggestions</a>
+            <a href="{{ route('tp.redirects.settings') }}" class="tp-button">Policy</a>
             <a href="{{ route('tp.redirects.create') }}" class="tp-button-primary">Add redirect</a>
         </div>
     </div>

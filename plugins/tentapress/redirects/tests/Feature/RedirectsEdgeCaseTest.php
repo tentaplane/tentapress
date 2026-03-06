@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Illuminate\Support\Facades\File;
 use TentaPress\Redirects\Models\TpRedirect;
+use TentaPress\Redirects\Models\TpRedirectSuggestion;
 use TentaPress\Redirects\RedirectsServiceProvider;
 use TentaPress\Users\Models\TpUser;
 
@@ -111,4 +112,77 @@ it('imports redirects from a mapping report command', function (): void {
 
     expect(TpRedirect::query()->fromSource('/legacy-a')->exists())->toBeTrue();
     expect(TpRedirect::query()->fromSource('/legacy-b')->exists())->toBeTrue();
+});
+
+it('approves and rejects pending suggestions from admin queue actions', function (): void {
+    registerRedirectsProviderForEdgeCases();
+
+    $admin = TpUser::query()->create([
+        'name' => 'Queue Admin',
+        'email' => 'queue-admin@example.test',
+        'password' => 'secret',
+        'is_super_admin' => true,
+    ]);
+
+    $pendingSuggestion = TpRedirectSuggestion::query()->create([
+        'source_path' => '/suggested-old',
+        'target_path' => '/suggested-new',
+        'status_code' => 301,
+        'origin' => 'slug_change_page',
+        'state' => 'pending',
+    ]);
+
+    $rejectSuggestion = TpRedirectSuggestion::query()->create([
+        'source_path' => '/reject-old',
+        'target_path' => '/reject-new',
+        'status_code' => 301,
+        'origin' => 'slug_change_page',
+        'state' => 'pending',
+    ]);
+
+    $this->actingAs($admin)
+        ->post('/admin/redirects/suggestions/'.$pendingSuggestion->id.'/approve')
+        ->assertSessionHas('tp_notice_success', 'Suggestion approved and redirect created.');
+
+    expect(TpRedirect::query()->fromSource('/suggested-old')->exists())->toBeTrue();
+    expect((string) $pendingSuggestion->fresh()->state)->toBe('approved');
+
+    $this->actingAs($admin)
+        ->post('/admin/redirects/suggestions/'.$rejectSuggestion->id.'/reject')
+        ->assertSessionHas('tp_notice_success', 'Suggestion rejected.');
+
+    expect((string) $rejectSuggestion->fresh()->state)->toBe('rejected');
+});
+
+it('stages conflicting import mappings as suggestions', function (): void {
+    registerRedirectsProviderForEdgeCases();
+
+    TpRedirect::query()->create([
+        'source_path' => '/legacy-existing',
+        'target_path' => '/existing-target',
+        'status_code' => 301,
+        'is_enabled' => true,
+        'origin' => 'manual',
+    ]);
+
+    $path = storage_path('app/tp-import-reports/test-redirect-conflict-mappings.json');
+    File::ensureDirectoryExists(dirname($path));
+
+    $report = [
+        'source_format' => 'wxr',
+        'mappings' => [
+            [
+                'source_url' => 'https://legacy.example.com/legacy-existing',
+                'destination_url' => '/new-target',
+            ],
+        ],
+    ];
+
+    File::put($path, json_encode($report, JSON_THROW_ON_ERROR));
+
+    $this->artisan('tp:redirects:import-mappings', [
+        'path' => 'tp-import-reports/test-redirect-conflict-mappings.json',
+    ])->assertSuccessful();
+
+    expect(TpRedirectSuggestion::query()->pending()->where('source_path', '/legacy-existing')->exists())->toBeTrue();
 });

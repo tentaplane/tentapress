@@ -12,8 +12,11 @@ use TentaPress\Redirects\Services\RedirectAuditLogger;
 use TentaPress\Redirects\Services\RedirectChainValidator;
 use TentaPress\Redirects\Services\RedirectManager;
 use TentaPress\Redirects\Services\RedirectPathNormalizer;
+use TentaPress\Redirects\Services\RedirectPolicy;
 use TentaPress\Redirects\Services\RedirectRouteConflictChecker;
+use TentaPress\Redirects\Services\RedirectSuggestionManager;
 use TentaPress\Redirects\Services\SlugRedirector;
+use TentaPress\Settings\Services\SettingsStore;
 
 final class RedirectsServiceProvider extends ServiceProvider
 {
@@ -24,6 +27,14 @@ final class RedirectsServiceProvider extends ServiceProvider
         $this->app->singleton(RedirectChainValidator::class);
         $this->app->singleton(RedirectAuditLogger::class);
         $this->app->singleton(RedirectManager::class);
+        $this->app->singleton(RedirectSuggestionManager::class);
+        $this->app->singleton(RedirectPolicy::class, function (): RedirectPolicy {
+            $settings = class_exists(SettingsStore::class) && app()->bound(SettingsStore::class)
+                ? app()->make(SettingsStore::class)
+                : null;
+
+            return new RedirectPolicy($settings);
+        });
         $this->app->singleton(SlugRedirector::class);
     }
 

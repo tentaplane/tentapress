@@ -7,7 +7,7 @@ First-party redirect management for TentaPress.
 | Field    | Value                                           |
 |----------|-------------------------------------------------|
 | ID       | `tentapress/redirects`                          |
-| Version  | 0.1.0                                           |
+| Version  | 0.2.0                                           |
 | Provider | `TentaPress\Redirects\RedirectsServiceProvider` |
 
 ## Goal
@@ -23,6 +23,9 @@ Provide safe, operator-managed redirect governance so slug changes and migration
 - Slug-change auto redirect generation for pages and posts
 - Import mapping report ingestion command for migration redirects
 - Redirect lifecycle audit event records
+- Policy toggle for auto-applying slug-change redirects
+- Suggestion queue with approve/reject workflow
+- Import conflict staging into pending suggestions
 
 ## Admin Menu
 

@@ -5,7 +5,9 @@ declare(strict_types=1);
 use TentaPress\Pages\Models\TpPage;
 use TentaPress\Posts\Models\TpPost;
 use TentaPress\Redirects\Models\TpRedirect;
+use TentaPress\Redirects\Models\TpRedirectSuggestion;
 use TentaPress\Redirects\RedirectsServiceProvider;
+use TentaPress\Settings\Services\SettingsStore;
 use TentaPress\Users\Models\TpUser;
 
 function registerRedirectsProvider(): void
@@ -143,4 +145,39 @@ it('auto-generates a redirect when a post slug changes', function (): void {
     expect($autoRedirect)->not->toBeNull();
     expect((string) $autoRedirect->target_path)->toBe('/blog/updated-post');
     expect((string) $autoRedirect->origin)->toBe('slug_change_post');
+});
+
+it('stages slug-change suggestions when auto-apply policy is disabled', function (): void {
+    registerRedirectsProvider();
+
+    if (app()->bound(SettingsStore::class)) {
+        app()->make(SettingsStore::class)->set('redirects.auto_apply_slug_redirects', '0', true);
+    }
+
+    $admin = TpUser::query()->create([
+        'name' => 'Suggestion Admin',
+        'email' => 'suggestion-admin@example.test',
+        'password' => 'secret',
+        'is_super_admin' => true,
+    ]);
+
+    $page = TpPage::query()->create([
+        'title' => 'Policy Controlled Page',
+        'slug' => 'policy-old-page',
+        'status' => 'draft',
+    ]);
+
+    $this->actingAs($admin)
+        ->put('/admin/pages/'.$page->id, [
+            'title' => 'Policy Controlled Page',
+            'slug' => 'policy-new-page',
+            'layout' => '',
+            'editor_driver' => 'blocks',
+            'blocks_json' => '[]',
+            'page_doc_json' => json_encode(['time' => 0, 'blocks' => [], 'version' => '2.28.0'], JSON_THROW_ON_ERROR),
+        ])
+        ->assertSessionHas('tp_notice_success', 'Page updated.');
+
+    expect(TpRedirect::query()->fromSource('/policy-old-page')->exists())->toBeFalse();
+    expect(TpRedirectSuggestion::query()->where('source_path', '/policy-old-page')->pending()->exists())->toBeTrue();
 });
