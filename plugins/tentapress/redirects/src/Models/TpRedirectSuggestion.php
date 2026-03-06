@@ -36,7 +36,7 @@ final class TpRedirectSuggestion extends Model
     /**
      * @return Builder<TpRedirectSuggestion>
      */
-    public function scopePending(Builder $query): Builder
+    protected function scopePending(Builder $query): Builder
     {
         return $query->where('state', 'pending');
     }

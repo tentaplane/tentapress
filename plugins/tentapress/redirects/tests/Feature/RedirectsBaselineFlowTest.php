@@ -62,6 +62,43 @@ it('allows a super admin to create and update redirects', function (): void {
     expect((int) $redirect->fresh()->status_code)->toBe(302);
 });
 
+it('allows bulk enabling and disabling redirects from the index', function (): void {
+    registerRedirectsProvider();
+
+    $admin = TpUser::query()->create([
+        'name' => 'Bulk Redirect Admin',
+        'email' => 'bulk-redirect-admin@example.test',
+        'password' => 'secret',
+        'is_super_admin' => true,
+    ]);
+
+    $first = TpRedirect::query()->create([
+        'source_path' => '/bulk-a',
+        'target_path' => '/bulk-new-a',
+        'status_code' => 301,
+        'is_enabled' => true,
+        'origin' => 'manual',
+    ]);
+
+    $second = TpRedirect::query()->create([
+        'source_path' => '/bulk-b',
+        'target_path' => '/bulk-new-b',
+        'status_code' => 301,
+        'is_enabled' => true,
+        'origin' => 'manual',
+    ]);
+
+    $this->actingAs($admin)
+        ->post('/admin/redirects/bulk', [
+            'ids' => [(int) $first->id, (int) $second->id],
+            'action' => 'disable',
+        ])
+        ->assertSessionHas('tp_notice_success');
+
+    expect((bool) $first->fresh()->is_enabled)->toBeFalse();
+    expect((bool) $second->fresh()->is_enabled)->toBeFalse();
+});
+
 it('redirects public requests when a matching redirect exists', function (): void {
     registerRedirectsProvider();
 

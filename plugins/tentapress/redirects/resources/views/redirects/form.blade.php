@@ -62,9 +62,12 @@
                 </div>
 
                 <div class="flex gap-2">
+                    <button type="button" class="tp-button" id="redirect-run-diagnostics">Run diagnostics</button>
                     <button type="submit" class="tp-button-primary">{{ $redirect ? 'Save changes' : 'Create redirect' }}</button>
                     <a href="{{ route('tp.redirects.index') }}" class="tp-button">Back</a>
                 </div>
+
+                <div id="redirect-diagnostics" class="tp-help"></div>
             </form>
         </div>
     </div>
@@ -101,3 +104,57 @@
         </div>
     @endif
 @endsection
+
+@push('scripts')
+    <script>
+        (() => {
+            const diagnosticsButton = document.getElementById('redirect-run-diagnostics');
+            const diagnosticsOutput = document.getElementById('redirect-diagnostics');
+            const form = diagnosticsButton?.closest('form');
+            if (!diagnosticsButton || !diagnosticsOutput || !form) {
+                return;
+            }
+
+            diagnosticsButton.addEventListener('click', async () => {
+                diagnosticsOutput.textContent = 'Running diagnostics...';
+
+                const sourcePath = form.querySelector('[name=\"source_path\"]')?.value || '';
+                const targetPath = form.querySelector('[name=\"target_path\"]')?.value || '';
+                const statusCode = form.querySelector('[name=\"status_code\"]')?.value || '301';
+                const csrfToken = form.querySelector('[name=\"_token\"]')?.value || '';
+                const ignoreId = '{{ (string) ($redirect?->id ?? '') }}';
+
+                const payload = {
+                    source_path: sourcePath,
+                    target_path: targetPath,
+                    status_code: Number(statusCode),
+                };
+
+                if (ignoreId !== '') {
+                    payload.ignore_id = Number(ignoreId);
+                }
+
+                const response = await fetch('{{ route('tp.redirects.check') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                    },
+                    body: JSON.stringify(payload),
+                });
+
+                const json = await response.json();
+                if (json.ok) {
+                    diagnosticsOutput.textContent = `Diagnostics passed. Normalized source: ${json.normalized.source_path}; target: ${json.normalized.target_path}`;
+                    diagnosticsOutput.classList.remove('text-red-600');
+                    diagnosticsOutput.classList.add('text-green-700');
+                    return;
+                }
+
+                diagnosticsOutput.textContent = json.message || 'Diagnostics failed.';
+                diagnosticsOutput.classList.remove('text-green-700');
+                diagnosticsOutput.classList.add('text-red-600');
+            });
+        })();
+    </script>
+@endpush

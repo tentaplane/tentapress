@@ -70,6 +70,29 @@ it('blocks redirect creation for owned static routes', function (): void {
         ->assertSessionHasErrors(['source_path']);
 });
 
+it('returns diagnostics validation errors for conflicting payloads', function (): void {
+    registerRedirectsProviderForEdgeCases();
+
+    $admin = TpUser::query()->create([
+        'name' => 'Diagnostics Admin',
+        'email' => 'diagnostics-admin@example.test',
+        'password' => 'secret',
+        'is_super_admin' => true,
+    ]);
+
+    $this->actingAs($admin)
+        ->postJson('/admin/redirects/check', [
+            'source_path' => '/admin',
+            'target_path' => '/admin-new',
+            'status_code' => 301,
+        ])
+        ->assertStatus(422)
+        ->assertJson([
+            'ok' => false,
+            'message' => 'Source path conflicts with an owned route.',
+        ]);
+});
+
 it('does not redirect disabled redirect rules', function (): void {
     registerRedirectsProviderForEdgeCases();
 
