@@ -106,7 +106,7 @@ final class ThemeRegistry
             $activeId = ThemeManager::activeThemeIdFromSettings();
             if ($activeId !== null && ! in_array($activeId, $themeIds, true)) {
                 $this->clearActiveThemeSetting();
-                $this->clearThemeCache();
+                app(ThemeManager::class)->clearCache();
             }
         }
 
@@ -130,14 +130,6 @@ final class ThemeRegistry
     private function clearActiveThemeSetting(): void
     {
         DB::table('tp_settings')->where('key', 'active_theme')->delete();
-    }
-
-    private function clearThemeCache(): void
-    {
-        $path = Paths::themeCachePath();
-        if (is_file($path)) {
-            @unlink($path);
-        }
     }
 
     /**
