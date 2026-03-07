@@ -93,14 +93,22 @@ final class ThemeManager
         throw_unless($theme, RuntimeException::class, "Theme not found in tp_themes: {$themeId}. Did you run `php artisan tp:themes sync`?");
 
         // Store in tp_settings as JSON string to keep flexible
-        DB::table('tp_settings')->updateOrInsert(
-            ['key' => 'active_theme'],
-            [
+        $now = now();
+        $exists = DB::table('tp_settings')->where('key', 'active_theme')->exists();
+
+        if ($exists) {
+            DB::table('tp_settings')->where('key', 'active_theme')->update([
                 'value' => json_encode($themeId, JSON_THROW_ON_ERROR),
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]
-        );
+                'updated_at' => $now,
+            ]);
+        } else {
+            DB::table('tp_settings')->insert([
+                'key' => 'active_theme',
+                'value' => json_encode($themeId, JSON_THROW_ON_ERROR),
+                'created_at' => $now,
+                'updated_at' => $now,
+            ]);
+        }
 
         $this->writeCache();
         $this->registerActiveThemeViews();
