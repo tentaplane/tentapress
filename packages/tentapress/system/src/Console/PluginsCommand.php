@@ -32,7 +32,7 @@ final class PluginsCommand extends Command
         $force = (bool) $this->option('force');
 
         try {
-            $result = match ($action) {
+            return match ($action) {
                 'sync' => $this->doSync(),
                 'list' => $this->doList(),
                 'enable' => $this->doEnable($id, $all),
@@ -42,8 +42,6 @@ final class PluginsCommand extends Command
                 'clear-cache' => $this->doClearCache(),
                 default => $this->fail("Unknown action '{$action}'. Expected: sync|list|enable|disable|defaults|cache|clear-cache"),
             };
-
-            return $result;
         } catch (Throwable $e) {
             $this->error($e->getMessage());
 
@@ -56,9 +54,7 @@ final class PluginsCommand extends Command
         $count = $this->registry->sync();
         $this->info("Synced {$count} plugin(s).");
 
-        $this->registry->writeCache();
-        $this->info('Plugin cache rebuilt.');
-        $this->clearViewCache();
+        $this->rebuildCaches();
 
         return self::SUCCESS;
     }
@@ -77,9 +73,7 @@ final class PluginsCommand extends Command
             $this->line('Install one with: composer require vendor/name');
         }
 
-        $this->registry->writeCache();
-        $this->info('Plugin cache rebuilt.');
-        $this->clearViewCache();
+        $this->rebuildCaches();
 
         return self::SUCCESS;
     }
@@ -121,9 +115,7 @@ final class PluginsCommand extends Command
             $this->info("Enabled {$id}.");
         }
 
-        $this->registry->writeCache();
-        $this->info('Plugin cache rebuilt.');
-        $this->clearViewCache();
+        $this->rebuildCaches();
 
         return self::SUCCESS;
     }
@@ -146,18 +138,14 @@ final class PluginsCommand extends Command
             $this->info("Disabled {$id}.".($force ? ' (forced)' : ''));
         }
 
-        $this->registry->writeCache();
-        $this->info('Plugin cache rebuilt.');
-        $this->clearViewCache();
+        $this->rebuildCaches();
 
         return self::SUCCESS;
     }
 
     private function doCache(): int
     {
-        $this->registry->writeCache();
-        $this->info('Plugin cache rebuilt.');
-        $this->clearViewCache();
+        $this->rebuildCaches();
 
         return self::SUCCESS;
     }
@@ -169,6 +157,13 @@ final class PluginsCommand extends Command
         $this->clearViewCache();
 
         return self::SUCCESS;
+    }
+
+    private function rebuildCaches(): void
+    {
+        $this->registry->writeCache();
+        $this->info('Plugin cache rebuilt.');
+        $this->clearViewCache();
     }
 
     private function clearViewCache(): void
