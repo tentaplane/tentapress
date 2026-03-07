@@ -35,7 +35,15 @@
         <div class="space-y-6 lg:col-span-3">
             <div class="tp-metabox">
                 <div class="tp-metabox__body space-y-4">
-                    <form method="POST" action="{{ $mode === 'create' ? route('tp.global-content.store') : route('tp.global-content.update', ['globalContent' => $globalContent->id]) }}" id="global-content-form" class="space-y-4">
+                    <form
+                        method="POST"
+                        action="{{ $mode === 'create' ? route('tp.global-content.store') : route('tp.global-content.update', ['globalContent' => $globalContent->id]) }}"
+                        id="global-content-form"
+                        class="space-y-4"
+                        @if (count($editorDriverMap) > 1)
+                            data-editor-switch-form="1"
+                            data-editor-driver-current="{{ $editorDriver }}"
+                        @endif>
                         @csrf
                         @if ($mode === 'edit')
                             @method('PUT')
@@ -156,3 +164,79 @@
         </div>
     </div>
 @endsection
+
+@once
+    @push('scripts')
+        <script>
+            (() => {
+                if (window.tpEditorSwitchInit === true) {
+                    return;
+                }
+                window.tpEditorSwitchInit = true;
+
+                const forms = document.querySelectorAll(
+                    'form[data-editor-switch-form="1"]',
+                );
+
+                forms.forEach((form) => {
+                    const radios = Array.from(
+                        form.querySelectorAll(
+                            'input[type="radio"][name="editor_driver"][data-editor-switch-radio]',
+                        ),
+                    );
+
+                    if (radios.length < 2) {
+                        return;
+                    }
+
+                    let suppressChange = false;
+                    let current =
+                        form.dataset.editorDriverCurrent ||
+                        (radios.find((radio) => radio.checked)?.value ?? '');
+
+                    const chooseRadio = (value) => {
+                        const target = radios.find((radio) => radio.value === value);
+                        if (target) {
+                            target.checked = true;
+                        }
+                    };
+
+                    radios.forEach((radio) => {
+                        radio.addEventListener('change', () => {
+                            if (suppressChange || !radio.checked) {
+                                return;
+                            }
+
+                            const next = String(radio.value || '').trim();
+                            if (next === '' || next === current) {
+                                current = next || current;
+                                form.dataset.editorDriverCurrent = current;
+                                return;
+                            }
+
+                            const nextLabel = radio.dataset.editorLabel || 'Editor';
+                            window.tpConfirm(
+                                `Switch to ${nextLabel}? This will save your changes and reload the editor.`,
+                                {
+                                    title: 'Switch editor?',
+                                    confirmText: 'Switch',
+                                },
+                            ).then((ok) => {
+                                if (!ok) {
+                                    suppressChange = true;
+                                    chooseRadio(current);
+                                    suppressChange = false;
+                                    return;
+                                }
+
+                                current = next;
+                                form.dataset.editorDriverCurrent = current;
+                                form.requestSubmit();
+                            });
+                        });
+                    });
+                });
+            })();
+        </script>
+    @endpush
+@endonce

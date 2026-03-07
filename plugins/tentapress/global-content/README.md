@@ -7,7 +7,7 @@ Reusable synced sections and template parts for TentaPress.
 | Field    | Value                                                        |
 |----------|--------------------------------------------------------------|
 | ID       | `tentapress/global-content`                                  |
-| Version  | 0.1.2                                                        |
+| Version  | 0.1.3                                                        |
 | Provider | `TentaPress\\GlobalContent\\GlobalContentServiceProvider`    |
 
 ## Purpose

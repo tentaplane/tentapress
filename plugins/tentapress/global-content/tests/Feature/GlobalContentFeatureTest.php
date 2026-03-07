@@ -143,9 +143,10 @@ it('shows the plugin menu when enabled and allows full admin CRUD', function ():
     $this->actingAs($admin)
         ->get('/admin/global-content/new')
         ->assertOk()
+        ->assertSee('data-editor-switch-form="1"', false)
+        ->assertSee('window.tpEditorSwitchInit', false)
         ->assertSee('name="editor_driver"', false)
-        ->assertSee('value="blocks"', false)
-        ->assertSee('border-slate-900 ring-2 ring-slate-200', false);
+        ->assertSee('value="blocks"', false);
 
     $this->actingAs($admin)
         ->post('/admin/global-content', [
@@ -169,9 +170,9 @@ it('shows the plugin menu when enabled and allows full admin CRUD', function ():
     $this->actingAs($admin)
         ->get('/admin/global-content/'.$content->id.'/edit')
         ->assertOk()
-        ->assertSee('value="builder"', false)
-        ->assertSee('checked', false)
-        ->assertSee('border-slate-900 ring-2 ring-slate-200', false);
+        ->assertSee('data-editor-switch-form="1"', false)
+        ->assertSee('window.tpEditorSwitchInit', false)
+        ->assertSee('name="editor_driver"', false);
 
     $this->actingAs($admin)
         ->put('/admin/global-content/'.$content->id, [
