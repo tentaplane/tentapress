@@ -1,6 +1,6 @@
 {
     "schema_version": 1,
-    "generated_at": "2026-03-06T19:40:36Z",
+    "generated_at": "2026-03-07T10:44:13Z",
     "plugins": [
         {
             "id": "tentapress/admin-shell",
@@ -163,7 +163,7 @@
             "name": "Revisions",
             "description": "Capture and review page and post content revisions.",
             "package": "tentapress/revisions",
-            "latest_version": "1.0.2"
+            "latest_version": "1.0.3"
         },
         {
             "id": "tentapress/seo",

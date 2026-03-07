@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Schema;
 use TentaPress\Pages\Models\TpPage;
 use TentaPress\Posts\Models\TpPost;
 use TentaPress\Revisions\Models\TpRevision;
+use TentaPress\Revisions\Services\RevisionRecorder;
 use TentaPress\Users\Models\TpUser;
 
 beforeEach(function (): void {
@@ -108,6 +109,68 @@ it('captures post revisions without duplicating unchanged saves', function (): v
         ->assertSee('revision-post')
         ->assertSee('Author ID:')
         ->assertSee((string) $admin->id);
+});
+
+it('treats duplicate manual snapshot inserts as a no-op when the unique row already exists', function (): void {
+    $admin = TpUser::query()->create([
+        'name' => 'Duplicate Revision Admin',
+        'email' => 'duplicate-revision-admin@example.test',
+        'password' => 'secret',
+        'is_super_admin' => true,
+    ]);
+
+    $pagePayload = [
+        'title' => 'Duplicate Safe Page',
+        'slug' => 'duplicate-safe-page',
+        'status' => 'published',
+        'layout' => 'default',
+        'editor_driver' => 'builder',
+        'blocks' => [
+            [
+                'type' => 'blocks/content',
+                'props' => ['content' => 'Duplicate safe body'],
+            ],
+        ],
+        'published_at' => now()->subMinute(),
+        'created_by' => $admin->id,
+        'updated_by' => $admin->id,
+    ];
+
+    if (Schema::hasColumn('tp_pages', 'content')) {
+        $pagePayload['content'] = ['time' => 1, 'blocks' => [], 'version' => '2.31.1'];
+    }
+
+    $page = TpPage::query()->create($pagePayload);
+
+    $firstRevision = app(RevisionRecorder::class)->capturePage($page);
+
+    expect($firstRevision)->not->toBeNull();
+    expect(TpRevision::query()->where('resource_type', 'pages')->where('resource_id', $page->id)->count())->toBe(1);
+
+    TpRevision::query()->whereKey($firstRevision->id)->delete();
+
+    TpRevision::query()->create([
+        'resource_type' => 'pages',
+        'resource_id' => (int) $page->id,
+        'revision_kind' => 'manual',
+        'title' => (string) $page->title,
+        'slug' => (string) $page->slug,
+        'status' => (string) $page->status,
+        'layout' => $page->layout !== null ? (string) $page->layout : null,
+        'editor_driver' => (string) $page->editor_driver,
+        'blocks' => is_array($page->blocks) ? $page->blocks : [],
+        'content' => is_array($page->content) ? $page->content : null,
+        'author_id' => null,
+        'published_at' => $page->published_at,
+        'created_by' => $admin->id,
+        'restored_from_revision_id' => null,
+        'snapshot_hash' => (string) $firstRevision->snapshot_hash,
+    ]);
+
+    $duplicate = app(RevisionRecorder::class)->capturePage($page);
+
+    expect($duplicate)->toBeNull();
+    expect(TpRevision::query()->where('resource_type', 'pages')->where('resource_id', $page->id)->count())->toBe(1);
 });
 
 it('persists autosave drafts and reloads them in the page editor', function (): void {

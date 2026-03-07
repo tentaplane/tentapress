@@ -137,10 +137,12 @@ final class RevisionRecorder
             return null;
         }
 
-        return TpRevision::query()->create([
+        $revision = TpRevision::query()->createOrFirst([
             'resource_type' => $resourceType,
             'resource_id' => $resourceId,
             'revision_kind' => $kind,
+            'snapshot_hash' => $snapshotHash,
+        ], [
             'title' => $payload['title'],
             'slug' => $payload['slug'],
             'status' => $payload['status'],
@@ -152,8 +154,9 @@ final class RevisionRecorder
             'published_at' => $payload['published_at'],
             'created_by' => $payload['created_by'],
             'restored_from_revision_id' => $restoredFromRevisionId,
-            'snapshot_hash' => $snapshotHash,
         ]);
+
+        return $revision->wasRecentlyCreated ? $revision : null;
     }
 
     private function normalizeInteger(mixed $value): ?int
