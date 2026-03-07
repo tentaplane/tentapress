@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace TentaPress\System\Support;
 
-use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Env;
+use Illuminate\Support\Facades\Request;
+use RuntimeException;
 
 final class Paths
 {
@@ -69,6 +70,27 @@ final class Paths
         }
 
         return array_values(array_filter($roots, is_dir(...)));
+    }
+
+    /**
+     * Write a PHP cache file that returns the given payload via var_export.
+     *
+     * @param  array<string,mixed>  $payload
+     */
+    public static function writePhpCache(string $path, array $payload): void
+    {
+        $dir = dirname($path);
+
+        throw_if(
+            ! is_dir($dir) && ! @mkdir($dir, 0755, true) && ! is_dir($dir),
+            RuntimeException::class,
+            "Unable to create cache directory: {$dir}"
+        );
+
+        $php = "<?php\n\nreturn ".var_export($payload, true).";\n";
+        $written = file_put_contents($path, $php, LOCK_EX);
+
+        throw_if($written === false, RuntimeException::class, "Unable to write cache file: {$path}");
     }
 
     private static function cachePath(string $cacheKey): string
