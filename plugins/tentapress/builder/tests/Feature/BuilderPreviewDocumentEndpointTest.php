@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use TentaPress\System\Theme\ThemeManager;
 use TentaPress\Builder\BuilderServiceProvider;
 use TentaPress\GlobalContent\GlobalContentServiceProvider;
 use TentaPress\System\Plugin\PluginRegistry;
@@ -58,7 +59,7 @@ function registerBuilderGlobalContentAutoloader(): void
     });
 }
 
-function enableBuilderPreviewDependencies(): void
+function enableBuilderPreviewDependencies(bool $activateTheme = false): void
 {
     registerBuilderGlobalContentAutoloader();
     static $pluginsEnabled = false;
@@ -70,6 +71,7 @@ function enableBuilderPreviewDependencies(): void
             'tentapress/admin-shell',
             'tentapress/blocks',
             'tentapress/builder',
+            'tentapress/themes',
             'tentapress/pages',
             'tentapress/posts',
             'tentapress/global-content',
@@ -79,6 +81,14 @@ function enableBuilderPreviewDependencies(): void
         }
 
         $pluginsEnabled = true;
+    }
+
+    if ($activateTheme) {
+        test()->artisan('tp:themes sync')->assertSuccessful();
+
+        app(ThemeManager::class)->activate('tentapress/tailwind');
+        app(ThemeManager::class)->registerActiveThemeViews();
+        app(ThemeManager::class)->registerActiveThemeProvider();
     }
 
     if (app()->getProvider(GlobalContentServiceProvider::class) === null) {
@@ -280,7 +290,7 @@ it('expires preview document snapshots after ttl', function (): void {
 });
 
 it('returns a valid preview document schema for global content snapshots', function (): void {
-    enableBuilderPreviewDependencies();
+    enableBuilderPreviewDependencies(activateTheme: true);
     registerBuilderDocumentProvider();
 
     $author = TpUser::query()->create([
