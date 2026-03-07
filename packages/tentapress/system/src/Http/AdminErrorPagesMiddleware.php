@@ -19,9 +19,7 @@ final class AdminErrorPagesMiddleware
         try {
             return $next($request);
         } catch (HttpExceptionInterface $e) {
-            $status = (int) $e->getStatusCode();
-
-            if ($status === 403 && ! $request->expectsJson() && $this->isAdminRequest($request)) {
+            if ($e->getStatusCode() === 403 && ! $request->expectsJson() && $this->isAdminRequest($request)) {
                 return response()
                     ->view('tentapress-admin::errors.403', [
                         'message' => $e->getMessage() ?: 'You do not have permission to access this page.',
@@ -34,7 +32,6 @@ final class AdminErrorPagesMiddleware
 
     private function isAdminRequest(Request $request): bool
     {
-        // Matches /admin and /admin/*
-        return $request->is('admin') || $request->is('admin/*');
+        return $request->is('admin', 'admin/*');
     }
 }

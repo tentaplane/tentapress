@@ -114,13 +114,11 @@ final class PluginRegistry
      */
     public function listAll(): array
     {
-        $rows = DB::table('tp_plugins')
+        return DB::table('tp_plugins')
             ->orderBy('id')
             ->get()
             ->map(fn ($r) => (array) $r)
             ->all();
-
-        return $rows;
     }
 
     public function isInstalled(string $id): bool
@@ -422,9 +420,7 @@ final class PluginRegistry
             return [];
         }
 
-        $plugins = $data['plugins'];
-
-        return $plugins;
+        return $data['plugins'];
     }
 
     /**
@@ -545,8 +541,6 @@ final class PluginRegistry
             'manifest' => $manifest,
         ]), RuntimeException::class, 'Plugin ' . $id . ' is not installed. Run: composer require ' . ComposerPackageRequirement::forRequire($id));
     }
-
-
 
     private function assertId(string $id): void
     {

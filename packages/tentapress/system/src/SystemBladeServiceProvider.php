@@ -10,10 +10,6 @@ use TentaPress\System\Plugin\PluginAssetRegistry;
 
 final class SystemBladeServiceProvider extends ServiceProvider
 {
-    public function register(): void
-    {
-    }
-
     public function boot(): void
     {
         Blade::directive('tpPluginAssets', fn ($expression): string => "<?php echo app('".PluginAssetRegistry::class."')->tags({$expression}); ?>");

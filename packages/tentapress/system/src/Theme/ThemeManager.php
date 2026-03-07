@@ -332,10 +332,10 @@ final class ThemeManager
 
         return [
             'id' => (string) $a['id'],
-            'name' => isset($a['name']) ? (string) $a['name'] : '',
-            'version' => isset($a['version']) ? (string) $a['version'] : '',
+            'name' => (string) ($a['name'] ?? ''),
+            'version' => (string) ($a['version'] ?? ''),
             'path' => (string) $a['path'],
-            'manifest' => isset($a['manifest']) && is_array($a['manifest']) ? $a['manifest'] : [],
+            'manifest' => is_array($a['manifest'] ?? null) ? $a['manifest'] : [],
         ];
     }
 

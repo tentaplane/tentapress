@@ -118,13 +118,11 @@ final class ThemeRegistry
      */
     public function listAll(): array
     {
-        $rows = DB::table('tp_themes')
+        return DB::table('tp_themes')
             ->orderBy('id')
             ->get()
             ->map(fn ($r) => (array) $r)
             ->all();
-
-        return $rows;
     }
 
     private function clearActiveThemeSetting(): void

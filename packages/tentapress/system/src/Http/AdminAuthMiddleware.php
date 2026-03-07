@@ -26,7 +26,7 @@ final class AdminAuthMiddleware
         }
 
         // Prefer route name if it exists
-        if (function_exists('route') && resolve('router')->has('tp.login')) {
+        if (resolve('router')->has('tp.login')) {
             return to_route('tp.login');
         }
 

@@ -13,10 +13,6 @@ use Illuminate\Support\Str;
 
 final class SystemHardeningServiceProvider extends ServiceProvider
 {
-    public function register(): void
-    {
-    }
-
     public function boot(): void
     {
         Model::preventLazyLoading(! $this->app->isProduction());

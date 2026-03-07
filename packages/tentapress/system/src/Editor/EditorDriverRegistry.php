@@ -34,13 +34,7 @@ final class EditorDriverRegistry
             static fn (EditorDriverDefinition $definition): bool => $definition->availableFor($resource),
         ));
 
-        usort($definitions, static function (EditorDriverDefinition $left, EditorDriverDefinition $right): int {
-            if ($left->sortOrder !== $right->sortOrder) {
-                return $left->sortOrder <=> $right->sortOrder;
-            }
-
-            return strcasecmp($left->label, $right->label);
-        });
+        usort($definitions, static fn (EditorDriverDefinition $left, EditorDriverDefinition $right): int => $left->sortOrder <=> $right->sortOrder ?: strcasecmp($left->label, $right->label));
 
         return $definitions;
     }
@@ -63,7 +57,7 @@ final class EditorDriverRegistry
 
         $definition = $this->definitions[$id] ?? null;
 
-        if (! $definition instanceof EditorDriverDefinition) {
+        if ($definition === null) {
             return null;
         }
 
@@ -99,7 +93,7 @@ final class EditorDriverRegistry
             default => null,
         };
 
-        if (! is_string($binding) || ! app()->bound($binding)) {
+        if ($binding === null || ! app()->bound($binding)) {
             return;
         }
 
