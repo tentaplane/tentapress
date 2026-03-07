@@ -36,3 +36,4 @@ config.json
 /storage/pail
 /themes/**/node_modules
 /vendor
+/.claude

@@ -1,13 +1,13 @@
 {
     "schema_version": 1,
-    "generated_at": "2026-03-07T10:44:13Z",
+    "generated_at": "2026-03-07T11:19:24Z",
     "plugins": [
         {
             "id": "tentapress/admin-shell",
             "name": "Admin Shell",
             "description": "Admin UI shell, layout, navigation and base admin routes.",
             "package": "tentapress/admin-shell",
-            "latest_version": "0.6.13",
+            "latest_version": "0.6.14",
             "icon": "tools"
         },
         {
@@ -30,7 +30,7 @@
             "name": "Builder",
             "description": "Visual drag-and-drop builder with live theme preview for pages and posts.",
             "package": "tentapress/builder",
-            "latest_version": "0.6.9",
+            "latest_version": "0.6.12",
             "icon": "builder"
         },
         {
@@ -54,6 +54,14 @@
             "package": "tentapress/forms",
             "latest_version": "0.4.3",
             "icon": "forms"
+        },
+        {
+            "id": "tentapress/global-content",
+            "name": "Global Content",
+            "description": "Reusable synced sections and template parts for TentaPress.",
+            "package": "tentapress/global-content",
+            "latest_version": "0.1.5",
+            "icon": "copy"
         },
         {
             "id": "tentapress/headless-api",
