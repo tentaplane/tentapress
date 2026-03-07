@@ -22,7 +22,7 @@ final class PluginAssetRegistry
      */
     private function cachedPlugins(): array
     {
-        return $this->pluginCache ??= $this->cachedPlugins();
+        return $this->pluginCache ??= $this->plugins->readCache();
     }
 
     /**
