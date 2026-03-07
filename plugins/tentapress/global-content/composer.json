@@ -1,0 +1,29 @@
+{
+    "name": "tentapress/global-content",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "php": "^8.2",
+        "tentapress/admin-shell": "<1.0",
+        "tentapress/blocks": "<1.0",
+        "tentapress/builder": "<1.0",
+        "tentapress/page-editor": "<1.0",
+        "tentapress/pages": "<1.0",
+        "tentapress/posts": "<1.0",
+        "tentapress/users": "<1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "TentaPress\\GlobalContent\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "TentaPress\\GlobalContent\\GlobalContentServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
