@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TentaPress\GlobalContent\Services;
 
 use Illuminate\Contracts\View\Factory as ViewFactory;
+use Illuminate\Support\Facades\Route;
 use TentaPress\GlobalContent\Models\TpGlobalContent;
 
 final class GlobalContentReferenceResolver
@@ -46,7 +47,7 @@ final class GlobalContentReferenceResolver
     }
 
     /**
-     * @return array<int,array{id:int,value:string,label:string,slug:string,kind:string,status:string,edit_url:string}>
+     * @return array<int,array{id:int,value:string,label:string,slug:string,kind:string,status:string,edit_url:?string}>
      */
     public function publishedLibrary(): array
     {
@@ -61,7 +62,9 @@ final class GlobalContentReferenceResolver
                 'slug' => (string) $content->slug,
                 'kind' => (string) $content->kind,
                 'status' => (string) $content->status,
-                'edit_url' => route('tp.global-content.edit', ['globalContent' => $content->id]),
+                'edit_url' => Route::has('tp.global-content.edit')
+                    ? route('tp.global-content.edit', ['globalContent' => $content->id])
+                    : null,
             ])
             ->all();
     }
