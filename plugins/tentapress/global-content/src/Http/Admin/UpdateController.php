@@ -45,6 +45,11 @@ final readonly class UpdateController
         ]);
         $globalContent->save();
 
+        if ($request->string('return_to')->toString() === 'editor' || (string) $globalContent->editor_driver === 'builder' && $request->boolean('editor_mode')) {
+            return to_route('tp.global-content.editor', ['globalContent' => $globalContent->id])
+                ->with('tp_notice_success', 'Global content updated.');
+        }
+
         return to_route('tp.global-content.edit', ['globalContent' => $globalContent->id])
             ->with('tp_notice_success', 'Global content updated.');
     }

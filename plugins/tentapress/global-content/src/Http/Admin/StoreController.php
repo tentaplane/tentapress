@@ -45,6 +45,11 @@ final readonly class StoreController
             'updated_by' => $userId > 0 ? $userId : null,
         ]);
 
+        if ((string) $content->editor_driver === 'builder') {
+            return to_route('tp.global-content.editor', ['globalContent' => $content->id])
+                ->with('tp_notice_success', 'Global content created.');
+        }
+
         return to_route('tp.global-content.edit', ['globalContent' => $content->id])
             ->with('tp_notice_success', 'Global content created.');
     }

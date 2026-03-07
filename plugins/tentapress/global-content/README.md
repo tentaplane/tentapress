@@ -7,7 +7,7 @@ Reusable synced sections and template parts for TentaPress.
 | Field    | Value                                                        |
 |----------|--------------------------------------------------------------|
 | ID       | `tentapress/global-content`                                  |
-| Version  | 0.1.3                                                        |
+| Version  | 0.1.4                                                        |
 | Provider | `TentaPress\\GlobalContent\\GlobalContentServiceProvider`    |
 
 ## Purpose
@@ -19,6 +19,7 @@ Provide a central library of reusable sections and template parts that can be re
 - Central CRUD for reusable global content entries
 - Synced reference block for blocks and builder
 - Synced page-editor tool for global content references
+- Visual Builder authoring in full-screen mode only
 - Explicit detach-to-local-copy flow in blocks and builder
 - Theme rendering helper for published template parts via `@tpGlobalContent($slug)`
 - Usage indexing for page and post references

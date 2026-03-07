@@ -47,7 +47,18 @@ function registerGlobalContentAutoloader(): void
 function bootGlobalContentPlugin(): void
 {
     test()->artisan('tp:plugins sync')->assertSuccessful();
-    test()->artisan('tp:plugins enable tentapress/global-content')->assertSuccessful();
+    foreach ([
+        'tentapress/admin-shell',
+        'tentapress/blocks',
+        'tentapress/builder',
+        'tentapress/page-editor',
+        'tentapress/pages',
+        'tentapress/posts',
+        'tentapress/users',
+        'tentapress/global-content',
+    ] as $pluginId) {
+        test()->artisan('tp:plugins enable '.$pluginId)->assertSuccessful();
+    }
     test()->beforeApplicationDestroyed(function (): void {
         if (! Schema::hasTable('tp_plugins')) {
             return;
@@ -143,8 +154,6 @@ it('shows the plugin menu when enabled and allows full admin CRUD', function ():
     $this->actingAs($admin)
         ->get('/admin/global-content/new')
         ->assertOk()
-        ->assertSee('data-editor-switch-form="1"', false)
-        ->assertSee('window.tpEditorSwitchInit', false)
         ->assertSee('name="editor_driver"', false)
         ->assertSee('value="blocks"', false);
 
@@ -164,15 +173,24 @@ it('shows the plugin menu when enabled and allows full admin CRUD', function ():
 
     expect((string) $content->slug)->toBe('header-banner');
     expect((string) $content->status)->toBe('published');
+    expect((string) $content->editor_driver)->toBe('blocks');
 
     $content->update(['editor_driver' => 'builder']);
+    $content->refresh();
 
     $this->actingAs($admin)
         ->get('/admin/global-content/'.$content->id.'/edit')
         ->assertOk()
+        ->assertSee('Visual Builder opens in full-screen mode.')
+        ->assertSee(route('tp.global-content.editor', ['globalContent' => $content->id]), false)
         ->assertSee('data-editor-switch-form="1"', false)
-        ->assertSee('window.tpEditorSwitchInit', false)
-        ->assertSee('name="editor_driver"', false);
+        ->assertSee('window.tpEditorSwitchInit', false);
+
+    $this->actingAs($admin)
+        ->get('/admin/global-content/'.$content->id.'/editor')
+        ->assertOk()
+        ->assertSee('Exit full-screen')
+        ->assertSee('tp-builder-root', false);
 
     $this->actingAs($admin)
         ->put('/admin/global-content/'.$content->id, [
@@ -181,10 +199,12 @@ it('shows the plugin menu when enabled and allows full admin CRUD', function ():
             'kind' => 'template_part',
             'status' => 'draft',
             'description' => 'Updated description.',
-            'editor_driver' => 'blocks',
+            'editor_driver' => 'builder',
             'blocks_json' => json_encode(globalContentBlocks('Updated everywhere'), JSON_THROW_ON_ERROR),
+            'return_to' => 'editor',
+            'editor_mode' => '1',
         ])
-        ->assertSessionHas('tp_notice_success', 'Global content updated.');
+        ->assertRedirect(route('tp.global-content.editor', ['globalContent' => $content->id]));
 
     expect((string) $content->fresh()->title)->toBe('Header Banner Updated');
     expect((string) $content->fresh()->status)->toBe('draft');

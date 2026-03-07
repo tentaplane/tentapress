@@ -1,6 +1,7 @@
 @extends('tentapress-admin::layouts.shell')
 
 @php
+    $editorMode = (bool) ($editorMode ?? false);
     $editorDrivers = is_array($editorDrivers ?? null) ? $editorDrivers : [];
     $editorDriverMap = [];
 
@@ -16,31 +17,44 @@
     $selectedEditorView = $selectedDriver?->viewFor('pages');
     $selectedEditorView = is_string($selectedEditorView) && view()->exists($selectedEditorView) ? $selectedEditorView : null;
     $usesBlocksEditor = $selectedDriver?->usesBlocksEditor ?? true;
+    $isBuilderDriver = ($selectedDriver?->id ?? '') === 'builder';
+    $canRenderSelectedEditorInline = $editorMode || ! $isBuilderDriver;
 @endphp
 
-@section('title', $mode === 'create' ? 'Create Global Content' : 'Edit Global Content')
+@if ($editorMode)
+    @section('shell_fullscreen', '1')
+    @section('body_class', 'bg-slate-100')
+@endif
+
+@section('title', $editorMode ? ($selectedDriver?->label ?? 'Visual Builder') : ($mode === 'create' ? 'Create Global Content' : 'Edit Global Content'))
 
 @section('content')
-    <div class="tp-page-header">
-        <div>
-            <h1 class="tp-page-title">{{ $mode === 'create' ? 'Create Global Content' : 'Edit Global Content' }}</h1>
-            <p class="tp-description">Reusable synced sections and template parts.</p>
-        </div>
-        <div class="flex gap-2">
-            <a href="{{ route('tp.global-content.index') }}" class="tp-button-secondary">Back to library</a>
-        </div>
-    </div>
+    <div class="{{ $editorMode ? 'space-y-0 px-4 pt-0 pb-6 sm:px-6 lg:px-8' : 'space-y-6' }}">
+        @if (! $editorMode)
+            <div class="tp-page-header">
+                <div>
+                    <h1 class="tp-page-title">{{ $mode === 'create' ? 'Create Global Content' : 'Edit Global Content' }}</h1>
+                    <p class="tp-description">Reusable synced sections and template parts.</p>
+                </div>
+                <div class="flex gap-2">
+                    @if ($mode === 'edit' && $isBuilderDriver)
+                        <a href="{{ route('tp.global-content.editor', ['globalContent' => $globalContent->id]) }}" class="tp-button-secondary">Full-screen editor</a>
+                    @endif
+                    <a href="{{ route('tp.global-content.index') }}" class="tp-button-secondary">Back to library</a>
+                </div>
+            </div>
+        @endif
 
-    <div class="grid grid-cols-1 gap-6 lg:grid-cols-4">
-        <div class="space-y-6 lg:col-span-3">
-            <div class="tp-metabox">
-                <div class="tp-metabox__body space-y-4">
+        <div class="{{ $editorMode ? 'lg:grid-cols-1' : 'lg:grid-cols-4' }} grid grid-cols-1 gap-6">
+            <div class="{{ $editorMode ? 'lg:col-span-1' : 'lg:col-span-3' }} space-y-6">
+                <div class="{{ $editorMode ? '' : 'tp-metabox' }}">
+                    <div class="{{ $editorMode ? 'space-y-4' : 'tp-metabox__body space-y-4' }}">
                     <form
                         method="POST"
                         action="{{ $mode === 'create' ? route('tp.global-content.store') : route('tp.global-content.update', ['globalContent' => $globalContent->id]) }}"
                         id="global-content-form"
                         class="space-y-4"
-                        @if (count($editorDriverMap) > 1)
+                        @if ($mode === 'edit' && count($editorDriverMap) > 1)
                             data-editor-switch-form="1"
                             data-editor-driver-current="{{ $editorDriver }}"
                         @endif>
@@ -49,7 +63,16 @@
                             @method('PUT')
                         @endif
 
-                        @if (count($editorDriverMap) > 1)
+                        @if ($editorMode)
+                            <input type="hidden" name="title" value="{{ old('title', $globalContent->title) }}" />
+                            <input type="hidden" name="slug" value="{{ old('slug', $globalContent->slug) }}" />
+                            <input type="hidden" name="kind" value="{{ old('kind', $globalContent->kind) }}" />
+                            <input type="hidden" name="status" value="{{ old('status', $globalContent->status) }}" />
+                            <input type="hidden" name="description" value="{{ old('description', $globalContent->description) }}" />
+                            <input type="hidden" name="editor_driver" value="{{ $editorDriver }}" />
+                            <input type="hidden" name="return_to" value="editor" />
+                            <input type="hidden" name="editor_mode" value="1" />
+                        @elseif (count($editorDriverMap) > 1)
                             <div class="tp-field">
                                 <label class="tp-label">Editing Experience</label>
                                 <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -82,17 +105,35 @@
                             <input type="hidden" name="editor_driver" value="{{ $editorDriver }}" />
                         @endif
 
-                        @if (! $usesBlocksEditor && $selectedEditorView)
+                        @if (! $usesBlocksEditor && $selectedEditorView && $canRenderSelectedEditorInline)
                             @include($selectedEditorView, [
+                                'globalContent' => $globalContent,
                                 'page' => $globalContent,
+                                'editorTitle' => trim((string) ($globalContent->title ?? '')) !== '' ? $globalContent->title : 'Untitled Global Content',
                                 'blocksJson' => $blocksJson ?? '[]',
                                 'blockDefinitions' => $blockDefinitions ?? [],
                                 'mediaOptions' => $mediaOptions ?? [],
                                 'mediaIndexUrl' => \Illuminate\Support\Facades\Route::has('tp.media.index') ? route('tp.media.index') : '',
+                                'editorMode' => $editorMode,
+                                'mode' => $mode,
                                 'resourceOverride' => 'global-content',
                                 'storageKeyOverride' => 'tp.builder.global-content.'.((int) ($globalContent->id ?? 0)),
                             ])
                         @else
+                            @if (! $editorMode && $isBuilderDriver)
+                                <div class="rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-900">
+                                    <div class="font-semibold">Visual Builder opens in full-screen mode.</div>
+                                    <div class="mt-1">
+                                        @if ($mode === 'edit')
+                                            Use full-screen mode to edit layout and block fields.
+                                            <a href="{{ route('tp.global-content.editor', ['globalContent' => $globalContent->id]) }}" class="underline decoration-sky-400 underline-offset-2">Open Visual Builder</a>
+                                        @else
+                                            Save this entry to continue in the full-screen Visual Builder.
+                                        @endif
+                                    </div>
+                                </div>
+                                <textarea name="blocks_json" class="hidden">{{ $blocksJson ?? '[]' }}</textarea>
+                            @else
                             @component('tentapress-blocks::editor', [
                                 'blocksJson' => $blocksJson ?? '[]',
                                 'blockDefinitions' => $blockDefinitions ?? [],
@@ -100,16 +141,18 @@
                                 'mediaIndexUrl' => \Illuminate\Support\Facades\Route::has('tp.media.index') ? route('tp.media.index') : '',
                             ])
                             @endcomponent
+                            @endif
                         @endif
                     </form>
                 </div>
             </div>
         </div>
 
-        <div class="space-y-6 lg:sticky lg:top-6 lg:self-start">
-            <div class="tp-metabox">
-                <div class="tp-metabox__title">Details</div>
-                <div class="tp-metabox__body space-y-4">
+        @if (! $editorMode)
+            <div class="space-y-6 lg:sticky lg:top-6 lg:self-start">
+                <div class="tp-metabox">
+                    <div class="tp-metabox__title">Details</div>
+                    <div class="tp-metabox__body space-y-4">
                     <div class="tp-field">
                         <label class="tp-label">Title</label>
                         <input form="global-content-form" type="text" name="title" class="tp-input" value="{{ old('title', $globalContent->title) }}" required />
@@ -161,7 +204,8 @@
                     </div>
                 </div>
             </div>
-        </div>
+            </div>
+        @endif
     </div>
 @endsection
 
