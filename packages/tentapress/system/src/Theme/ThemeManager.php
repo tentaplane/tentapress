@@ -132,21 +132,9 @@ final class ThemeManager
             return;
         }
 
-        try {
-            $manifest = json_decode((string) ($row->manifest ?? '{}'), true, 512, JSON_THROW_ON_ERROR);
-        } catch (Throwable) {
-            $manifest = [];
-        }
-
         $payload = [
             'generated_at' => now()->toISOString(),
-            'active' => [
-                'id' => (string) $row->id,
-                'name' => (string) $row->name,
-                'version' => (string) ($row->version ?? ''),
-                'path' => (string) $row->path,
-                'manifest' => $manifest,
-            ],
+            'active' => self::themeRowToArray($row),
         ];
 
         Paths::writePhpCache(Paths::themeCachePath(), $payload);
@@ -176,19 +164,7 @@ final class ThemeManager
             return null;
         }
 
-        try {
-            $manifest = json_decode((string) ($row->manifest ?? '{}'), true, 512, JSON_THROW_ON_ERROR);
-        } catch (Throwable) {
-            $manifest = [];
-        }
-
-        return [
-            'id' => (string) $row->id,
-            'name' => (string) $row->name,
-            'version' => (string) ($row->version ?? ''),
-            'path' => (string) $row->path,
-            'manifest' => $manifest,
-        ];
+        return self::themeRowToArray($row);
     }
 
     /**
@@ -353,6 +329,34 @@ final class ThemeManager
             'path' => (string) $a['path'],
             'manifest' => isset($a['manifest']) && is_array($a['manifest']) ? $a['manifest'] : [],
         ];
+    }
+
+    /**
+     * @return array{id:string,name:string,version:string,path:string,manifest:array}
+     */
+    private static function themeRowToArray(object $row): array
+    {
+        return [
+            'id' => (string) $row->id,
+            'name' => (string) $row->name,
+            'version' => (string) ($row->version ?? ''),
+            'path' => (string) $row->path,
+            'manifest' => self::decodeManifestJson((string) ($row->manifest ?? '{}')),
+        ];
+    }
+
+    /**
+     * @return array<string,mixed>
+     */
+    private static function decodeManifestJson(string $raw): array
+    {
+        try {
+            $decoded = json_decode($raw, true, 512, JSON_THROW_ON_ERROR);
+
+            return is_array($decoded) ? $decoded : [];
+        } catch (Throwable) {
+            return [];
+        }
     }
 
     public static function activeThemeIdFromSettings(): ?string
