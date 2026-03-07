@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.43.1](https://github.com/tentaplane/tentapress/compare/v0.43.0...v0.43.1) (2026-03-07)
+
+
+### Bug Fixes
+
+* **posts:** correct scheduled publish command ([e7d2757](https://github.com/tentaplane/tentapress/commit/e7d27578fe129deefb5b209f1bbb9ba3899b3e28))
+
 ## [0.43.0](https://github.com/tentaplane/tentapress/compare/v0.42.0...v0.43.0) (2026-03-07)
 
 
