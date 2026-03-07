@@ -10,9 +10,19 @@ final class PluginAssetRegistry
 {
     private array $manifestCache = [];
 
+    private ?array $pluginCache = null;
+
     public function __construct(
         private readonly PluginRegistry $plugins,
     ) {
+    }
+
+    /**
+     * @return array<string, array{provider:string,path:string,version:string,manifest:array}>
+     */
+    private function cachedPlugins(): array
+    {
+        return $this->pluginCache ??= $this->cachedPlugins();
     }
 
     /**
@@ -24,7 +34,7 @@ final class PluginAssetRegistry
             return ['scripts' => [], 'styles' => []];
         }
 
-        $enabled = $this->plugins->readCache();
+        $enabled = $this->cachedPlugins();
         $pluginPath = is_array($enabled[$pluginId] ?? null) ? (string) ($enabled[$pluginId]['path'] ?? '') : '';
 
         $manifest = $this->manifestFor($pluginId);
@@ -130,7 +140,7 @@ final class PluginAssetRegistry
     public function debugInfo(string $pluginId, string $context = 'admin'): array
     {
         $this->ensurePublicAssets($pluginId);
-        $enabled = $this->plugins->readCache();
+        $enabled = $this->cachedPlugins();
         $pluginPath = is_array($enabled[$pluginId] ?? null) ? (string) ($enabled[$pluginId]['path'] ?? '') : '';
         $manifestPath = $this->manifestPath($pluginId, $pluginPath);
         $manifestFound = $manifestPath !== null && is_file($manifestPath);
@@ -145,7 +155,7 @@ final class PluginAssetRegistry
 
     private function isEnabled(string $pluginId): bool
     {
-        $enabled = $this->plugins->readCache();
+        $enabled = $this->cachedPlugins();
 
         return isset($enabled[$pluginId]);
     }
@@ -161,7 +171,7 @@ final class PluginAssetRegistry
 
         $this->ensurePublicAssets($pluginId);
 
-        $enabled = $this->plugins->readCache();
+        $enabled = $this->cachedPlugins();
         $pluginPath = is_array($enabled[$pluginId] ?? null) ? (string) ($enabled[$pluginId]['path'] ?? '') : '';
         $path = $this->manifestPath($pluginId, $pluginPath);
         if ($path === null || ! is_file($path)) {
@@ -194,7 +204,7 @@ final class PluginAssetRegistry
      */
     private function assetEntries(string $pluginId, string $context): ?array
     {
-        $enabled = $this->plugins->readCache();
+        $enabled = $this->cachedPlugins();
         $manifest = $enabled[$pluginId]['manifest'] ?? null;
         if (! is_array($manifest)) {
             return null;
@@ -314,7 +324,7 @@ final class PluginAssetRegistry
             return;
         }
 
-        $enabled = $this->plugins->readCache();
+        $enabled = $this->cachedPlugins();
         $pluginPath = $enabled[$pluginId]['path'] ?? null;
         if (! is_string($pluginPath) || $pluginPath === '') {
             return;
