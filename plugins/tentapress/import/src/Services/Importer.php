@@ -1097,7 +1097,7 @@ final readonly class Importer
 
                 try {
                     $this->syncTaxonomyAssignments((string) $contentSet['assignable_type'], $destinationId, $assignments);
-                    $synced += array_sum(array_map(static fn (array $termIds): int => count($termIds), $assignments));
+                    $synced += array_sum(array_map(count(...), $assignments));
                     $mappings[] = [
                         'entity' => $contentSet['entity'],
                         'source_post_id' => $sourcePostId,
