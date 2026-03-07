@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.43.3](https://github.com/tentaplane/tentapress/compare/v0.43.2...v0.43.3) (2026-03-07)
+
+
+### Bug Fixes
+
+* **admin-shell:** define structure nav group ordering ([c75050d](https://github.com/tentaplane/tentapress/commit/c75050d33b430a2641e7533fbbffb2ab15623730))
+* **admin-shell:** group structure tools in sidebar ([a9be38b](https://github.com/tentaplane/tentapress/commit/a9be38be57ec0032515241a1d2f2c503562a9f5c))
+
+
+### Miscellaneous Chores
+
+* **admin-shell:** align sidebar menu test helper ([3de945b](https://github.com/tentaplane/tentapress/commit/3de945bf38738d33e69bff8dec312801e11d4a00))
+* **builder:** align preview test helper with rector ([17c5798](https://github.com/tentaplane/tentapress/commit/17c5798a6d5e76875cd04f467bc8e6e6e838a8f1))
+
 ## [0.43.2](https://github.com/tentaplane/tentapress/compare/v0.43.1...v0.43.2) (2026-03-07)
 
 
