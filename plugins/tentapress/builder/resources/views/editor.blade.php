@@ -5,19 +5,28 @@
     $editorTitle = $editorTitle ?? (is_object($model) && trim((string) ($model->title ?? '')) !== '' ? $model->title : 'Untitled');
     $blocksJson = $blocksJson ?? (is_array($model?->blocks ?? null) ? json_encode($model->blocks, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) : '[]');
     $blocksJson = is_string($blocksJson) && $blocksJson !== '' ? $blocksJson : '[]';
-    $resource = $isPost ? 'posts' : 'pages';
+    $resource = is_string($resourceOverride ?? null) && ($resourceOverride ?? '') !== '' ? (string) $resourceOverride : ($isPost ? 'posts' : 'pages');
     $editorMode = (bool) ($editorMode ?? false);
     $mode = $mode ?? 'edit';
     $modelId = is_object($model) ? (int) ($model->id ?? 0) : 0;
-    $storageKey = $isPost ? 'tp.builder.post.'.$modelId : 'tp.builder.page.'.$modelId;
+    $storageKey = is_string($storageKeyOverride ?? null) && ($storageKeyOverride ?? '') !== ''
+        ? (string) $storageKeyOverride
+        : ($isPost ? 'tp.builder.post.'.$modelId : 'tp.builder.page.'.$modelId);
+    $hiddenFieldId = is_string($hiddenFieldIdOverride ?? null) && ($hiddenFieldIdOverride ?? '') !== ''
+        ? (string) $hiddenFieldIdOverride
+        : 'tp-builder-json-field';
     $builderConfig = [
         'initialJson' => $blocksJson,
         'resource' => $resource,
         'snapshotEndpoint' => \Illuminate\Support\Facades\Route::has('tp.builder.snapshots.store') ? route('tp.builder.snapshots.store') : '',
         'storageKey' => $storageKey,
-        'hiddenFieldId' => 'tp-builder-json-field',
+        'hiddenFieldId' => $hiddenFieldId,
         'definitions' => is_array($blockDefinitions ?? null) ? $blockDefinitions : [],
         'mediaOptions' => is_array($mediaOptions ?? null) ? $mediaOptions : [],
+        'globalContentDetachUrl' => \Illuminate\Support\Facades\Route::has('tp.global-content.detach') ? route('tp.global-content.detach') : '',
+        'globalContentEditUrlTemplate' => \Illuminate\Support\Facades\Route::has('tp.global-content.edit')
+            ? route('tp.global-content.edit', ['globalContent' => '__GLOBAL_CONTENT_ID__'])
+            : '',
     ];
 @endphp
 
@@ -68,5 +77,5 @@
         data-config='@json($builderConfig)'>
     </div>
 
-    <textarea id="tp-builder-json-field" name="blocks_json" class="hidden">{{ $blocksJson }}</textarea>
+    <textarea id="{{ $hiddenFieldId }}" name="blocks_json" class="hidden">{{ $blocksJson }}</textarea>
 </div>

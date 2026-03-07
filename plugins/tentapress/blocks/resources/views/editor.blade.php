@@ -3,6 +3,10 @@
     $blockDefinitions = is_array($blockDefinitions ?? null) ? $blockDefinitions : [];
     $mediaOptions = is_array($mediaOptions ?? null) ? $mediaOptions : [];
     $mediaIndexUrl = $mediaIndexUrl ?? (\Illuminate\Support\Facades\Route::has('tp.media.index') ? route('tp.media.index') : '');
+    $globalContentDetachUrl = \Illuminate\Support\Facades\Route::has('tp.global-content.detach') ? route('tp.global-content.detach') : '';
+    $globalContentEditUrlTemplate = \Illuminate\Support\Facades\Route::has('tp.global-content.edit')
+        ? route('tp.global-content.edit', ['globalContent' => '__GLOBAL_CONTENT_ID__'])
+        : '';
     $blocksJson = $blocksJson ?? '[]';
     $initialBlocksJson = old('blocks_json', $blocksJson);
     $initialBlocksJson = is_string($initialBlocksJson) ? $initialBlocksJson : '[]';
@@ -56,6 +60,8 @@
                 definitions: @js($blockDefinitions),
                 mediaOptions: @js($mediaOptions),
                 mediaIndexUrl: @js($mediaIndexUrl),
+                globalContentDetachUrl: @js($globalContentDetachUrl),
+                globalContentEditUrlTemplate: @js($globalContentEditUrlTemplate),
                 editorMode: @js($blocksEditorMode),
             })"
     x-init="init()">
@@ -335,7 +341,7 @@
                                             <template
                                                 x-for="field in fieldsFor(block.type)"
                                                 :key="field.key">
-                                                <div class="tp-field">
+                                                <div class="tp-field" x-show="!isGlobalContentHiddenField(block, field)">
                                                     <label
                                                         class="tp-label"
                                                         x-text="field.label"></label>
@@ -603,7 +609,50 @@
                                                     </template>
 
                                                     <template
-                                                        x-if="field.type === 'select'">
+                                                        x-if="isGlobalContentReferenceField(block, field)">
+                                                        <div class="space-y-3">
+                                                            <input
+                                                                type="search"
+                                                                class="tp-input"
+                                                                placeholder="Search published global content..."
+                                                                :value="String(globalContentSearch[block._key] || '')"
+                                                                @input="setGlobalContentSearch(block._key, $event.target.value)" />
+                                                            <select
+                                                                class="tp-select"
+                                                                :value="String(getProp(index, field.key) ?? '')"
+                                                                @change="syncGlobalContentReference(index, String($event.target.value || ''), field)">
+                                                                <option value="">Choose published global content</option>
+                                                                <template
+                                                                    x-for="opt in globalContentReferenceOptions(field, block._key)"
+                                                                    :key="opt.value">
+                                                                    <option
+                                                                        :value="String(opt.value)"
+                                                                        :selected="String(getProp(index, field.key) ?? '') === String(opt.value)"
+                                                                        x-text="opt.label"></option>
+                                                                </template>
+                                                            </select>
+                                                            <div class="flex flex-wrap items-center gap-3 text-xs">
+                                                                <a
+                                                                    x-show="globalContentEditUrl(getProp(index, field.key))"
+                                                                    :href="globalContentEditUrl(getProp(index, field.key))"
+                                                                    target="_blank"
+                                                                    rel="noreferrer"
+                                                                    class="tp-button-link">
+                                                                    Edit source
+                                                                </a>
+                                                                <button
+                                                                    type="button"
+                                                                    class="tp-button-secondary"
+                                                                    :disabled="!String(getProp(index, field.key) || '').trim() || globalContentDetachLoading[block._key]"
+                                                                    @click="detachGlobalContent(index)">
+                                                                    <span x-text="globalContentDetachLoading[block._key] ? 'Detaching…' : 'Detach to local copy'"></span>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </template>
+
+                                                    <template
+                                                        x-if="field.type === 'select' && !isGlobalContentReferenceField(block, field)">
                                                         <select
                                                             class="tp-select"
                                                             :value="String(getProp(index, field.key) ?? '')"
@@ -1464,6 +1513,14 @@
                 mediaOptions: Array.isArray(opts.mediaOptions) ? opts.mediaOptions : [],
                 mediaIndexUrl:
                     typeof opts.mediaIndexUrl === 'string' ? opts.mediaIndexUrl : '',
+                globalContentDetachUrl:
+                    typeof opts.globalContentDetachUrl === 'string'
+                        ? opts.globalContentDetachUrl
+                        : '',
+                globalContentEditUrlTemplate:
+                    typeof opts.globalContentEditUrlTemplate === 'string'
+                        ? opts.globalContentEditUrlTemplate
+                        : '',
                 editorMode: !!opts.editorMode,
                 saveToastVisible: false,
                 saveToastTimer: null,
@@ -1497,6 +1554,8 @@
                 mediaModalKey: '',
                 mediaModalMode: 'single',
                 mediaModalSelection: {},
+                globalContentSearch: {},
+                globalContentDetachLoading: {},
 
                 init() {
                     if (this.editorMode) {
@@ -1983,6 +2042,155 @@
                             label: String(opt ?? ''),
                         };
                     });
+                },
+
+                isGlobalContentReference(blockOrType) {
+                    const type =
+                        typeof blockOrType === 'string'
+                            ? blockOrType
+                            : String(blockOrType?.type || '');
+                    return type === 'tentapress/global-content/reference';
+                },
+
+                isGlobalContentReferenceField(block, field) {
+                    return (
+                        this.isGlobalContentReference(block) &&
+                        field &&
+                        String(field.key || '') === 'global_content_id'
+                    );
+                },
+
+                isGlobalContentHiddenField(block, field) {
+                    return (
+                        this.isGlobalContentReference(block) &&
+                        field &&
+                        String(field.key || '') === 'global_content_label'
+                    );
+                },
+
+                setGlobalContentSearch(blockKey, value) {
+                    this.globalContentSearch = {
+                        ...this.globalContentSearch,
+                        [String(blockKey || '')]: String(value || ''),
+                    };
+                },
+
+                globalContentReferenceOptions(field, blockKey) {
+                    const options = this.selectOptions(field);
+                    const query = String(this.globalContentSearch[String(blockKey || '')] || '')
+                        .trim()
+                        .toLowerCase();
+
+                    if (!query) {
+                        return options;
+                    }
+
+                    return options.filter((option) =>
+                        `${String(option.label || '')} ${String(option.value || '')}`
+                            .toLowerCase()
+                            .includes(query),
+                    );
+                },
+
+                syncGlobalContentReference(index, value, field) {
+                    const nextValue = String(value || '');
+                    this.setProp(index, 'global_content_id', nextValue);
+                    const option = this.selectOptions(field).find(
+                        (entry) => String(entry.value) === nextValue,
+                    );
+                    this.setProp(
+                        index,
+                        'global_content_label',
+                        option ? String(option.label || '') : '',
+                    );
+                },
+
+                globalContentEditUrl(id) {
+                    const value = String(id || '').trim();
+                    if (!value || !this.globalContentEditUrlTemplate) {
+                        return '';
+                    }
+
+                    return this.globalContentEditUrlTemplate.replace(
+                        '__GLOBAL_CONTENT_ID__',
+                        encodeURIComponent(value),
+                    );
+                },
+
+                csrfToken() {
+                    const meta = document.querySelector('meta[name="csrf-token"]');
+                    if (meta && typeof meta.content === 'string') {
+                        return meta.content;
+                    }
+
+                    const form = this.$el?.closest?.('form');
+                    const input = form?.querySelector?.('input[name="_token"]');
+                    return typeof input?.value === 'string' ? input.value : '';
+                },
+
+                replaceBlockWithBlocks(index, blocks) {
+                    if (!Array.isArray(blocks) || index < 0 || index >= this.blocks.length) {
+                        return;
+                    }
+
+                    const normalized = blocks
+                        .map((block) => this.nestedNormalizeBlock(block))
+                        .filter((block) => !!block)
+                        .map((block) => ({
+                            ...block,
+                            _key: this.uid(),
+                            _collapsed: false,
+                        }));
+
+                    if (!normalized.length) {
+                        return;
+                    }
+
+                    this.blocks.splice(index, 1, ...normalized);
+                    this.selectedIndex = index;
+                    this.storeCollapseState('custom');
+                },
+
+                async detachGlobalContent(index) {
+                    const block = this.blocks[index];
+                    const blockKey = String(block?._key || '');
+                    const globalContentId = String(this.getProp(index, 'global_content_id') || '').trim();
+
+                    if (!block || !globalContentId || !this.globalContentDetachUrl) {
+                        return;
+                    }
+
+                    this.globalContentDetachLoading = {
+                        ...this.globalContentDetachLoading,
+                        [blockKey]: true,
+                    };
+
+                    try {
+                        const response = await fetch(this.globalContentDetachUrl, {
+                            method: 'POST',
+                            credentials: 'same-origin',
+                            headers: {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': this.csrfToken(),
+                            },
+                            body: JSON.stringify({
+                                global_content_id: Number(globalContentId),
+                            }),
+                        });
+
+                        if (!response.ok) {
+                            return;
+                        }
+
+                        const payload = await response.json();
+                        this.replaceBlockWithBlocks(index, payload?.blocks);
+                    } finally {
+                        this.globalContentDetachLoading = {
+                            ...this.globalContentDetachLoading,
+                            [blockKey]: false,
+                        };
+                    }
                 },
 
                 mediaOption(value) {

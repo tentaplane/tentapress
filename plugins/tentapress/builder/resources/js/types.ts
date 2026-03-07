@@ -1,4 +1,4 @@
-export type EditorResource = 'pages' | 'posts';
+export type EditorResource = 'pages' | 'posts' | 'global-content';
 
 export type BlockField = {
     key: string;
@@ -52,6 +52,8 @@ export type BuilderConfig = {
     hiddenFieldId: string;
     definitions: BlockDefinition[];
     mediaOptions: MediaOption[];
+    globalContentDetachUrl?: string;
+    globalContentEditUrlTemplate?: string;
 };
 
 export type BuilderPreviewStyle = {

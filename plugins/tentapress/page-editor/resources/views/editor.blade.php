@@ -9,6 +9,7 @@
     $mode = $mode ?? 'edit';
     $modelId = is_object($model) ? (int) ($model->id ?? 0) : 0;
     $storageKey = $isPost ? 'tp.page_editor.post.'.$modelId : 'tp.page_editor.page.'.$modelId;
+    $globalContentLibraryUrl = \Illuminate\Support\Facades\Route::has('tp.global-content.library') ? route('tp.global-content.library') : '';
 @endphp
 
 @once
@@ -30,6 +31,7 @@
         initialJson: @js($pageDocJson),
         mediaOptions: @js($mediaOptions ?? []),
         mediaIndexUrl: @js($mediaIndexUrl ?? ''),
+        globalContentLibraryUrl: @js($globalContentLibraryUrl),
     })"
     x-init="init()">
     @if ($editorMode && $mode === 'edit' && is_object($model))

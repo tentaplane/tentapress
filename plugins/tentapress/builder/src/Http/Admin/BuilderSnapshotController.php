@@ -24,7 +24,7 @@ final readonly class BuilderSnapshotController
     public function __invoke(Request $request): JsonResponse
     {
         $data = $request->validate([
-            'resource' => ['required', Rule::in(['pages', 'posts'])],
+            'resource' => ['required', Rule::in(['pages', 'posts', 'global-content'])],
             'layout' => ['nullable', 'string', 'max:255'],
             'title' => ['nullable', 'string', 'max:255'],
             'slug' => ['nullable', 'string', 'max:255'],
@@ -36,9 +36,9 @@ final readonly class BuilderSnapshotController
 
         $rawBlocks = is_array($data['blocks'] ?? null) ? $data['blocks'] : [];
 
-        $blocks = $resource === 'pages'
-            ? $this->pageNormalizer->normalize($rawBlocks)
-            : $this->postNormalizer->normalize($rawBlocks);
+        $blocks = $resource === 'posts'
+            ? $this->postNormalizer->normalize($rawBlocks)
+            : $this->pageNormalizer->normalize($rawBlocks);
 
         $userId = (int) (Auth::user()?->id ?? 0);
 
@@ -59,7 +59,11 @@ final readonly class BuilderSnapshotController
     private function authorizeForResource(string $resource): void
     {
         $user = Auth::user();
-        $capability = $resource === 'pages' ? 'manage_pages' : 'manage_posts';
+        $capability = match ($resource) {
+            'pages' => 'manage_pages',
+            'posts' => 'manage_posts',
+            default => 'manage_global_content',
+        };
 
         abort_unless(is_object($user) && method_exists($user, 'can') && $user->can($capability), 403);
     }

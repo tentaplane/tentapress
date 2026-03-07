@@ -41,7 +41,7 @@ final class TpGlobalContent extends Model
     /**
      * @return Builder<TpGlobalContent>
      */
-    public function scopePublished(Builder $query): Builder
+    protected function scopePublished(Builder $query): Builder
     {
         return $query->where('status', 'published');
     }

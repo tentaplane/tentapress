@@ -30,7 +30,7 @@ final class UpdateGlobalContentRequest extends FormRequest
             'kind' => ['required', Rule::in(['section', 'template_part'])],
             'status' => ['required', Rule::in(['draft', 'published'])],
             'description' => ['nullable', 'string'],
-            'editor_driver' => ['required', Rule::in(app(GlobalContentFormData::class)->editorDriverIds())],
+            'editor_driver' => ['required', Rule::in(resolve(GlobalContentFormData::class)->editorDriverIds())],
             'blocks_json' => ['nullable', 'string'],
         ];
     }

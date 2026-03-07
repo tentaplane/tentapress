@@ -16,6 +16,8 @@ const codeToolIcon =
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 9l-4 3 4 3"></path><path d="M16 9l4 3-4 3"></path><path d="M14 5l-4 14"></path></svg>';
 const calloutToolIcon =
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 6v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V9l8-6z"></path><path d="M12 10v4"></path><circle cx="12" cy="17" r="1"></circle></svg>';
+const globalContentToolIcon =
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="6" width="16" height="12" rx="2"></rect><path d="M8 10h8"></path><path d="M8 14h5"></path></svg>';
 
 const resolveEmbed = (url) => {
     if (!url) {
@@ -591,11 +593,201 @@ class MediaImageTool {
     }
 }
 
+class GlobalContentTool {
+    static libraryPromise = null;
+
+    constructor({ data, config }) {
+        this.config = {
+            libraryUrl: typeof config?.libraryUrl === 'string' ? config.libraryUrl : '',
+        };
+        this.data = {
+            global_content_id: Number.isFinite(Number(data?.global_content_id)) ? Number(data.global_content_id) : 0,
+            label: typeof data?.label === 'string' ? data.label : '',
+            edit_url: typeof data?.edit_url === 'string' ? data.edit_url : '',
+        };
+        this.wrapper = null;
+        this.search = '';
+    }
+
+    static get toolbox() {
+        return {
+            title: 'Global Content',
+            icon: globalContentToolIcon,
+        };
+    }
+
+    static get sanitize() {
+        return {
+            global_content_id: true,
+            label: true,
+            edit_url: true,
+        };
+    }
+
+    render() {
+        this.wrapper = document.createElement('div');
+        this.wrapper.className = 'tp-page-editor__global-content';
+        void this.renderContent();
+        return this.wrapper;
+    }
+
+    async renderContent() {
+        if (!this.wrapper) {
+            return;
+        }
+
+        this.wrapper.innerHTML = '';
+
+        if (!this.config.libraryUrl) {
+            const empty = document.createElement('div');
+            empty.className = 'tp-page-editor__global-content-empty';
+            empty.textContent = 'Enable Global Content to insert a synced reference.';
+            this.wrapper.appendChild(empty);
+            return;
+        }
+
+        const entries = await this.fetchEntries();
+        const selected = entries.find((entry) => Number(entry.id) === this.data.global_content_id) || null;
+
+        if (selected) {
+            this.data.label = String(selected.label || '');
+            this.data.edit_url = String(selected.edit_url || '');
+
+            const card = document.createElement('div');
+            card.className = 'tp-page-editor__global-content-card';
+
+            const title = document.createElement('div');
+            title.className = 'tp-page-editor__global-content-title';
+            title.textContent = String(selected.label || `Global Content #${selected.id}`);
+
+            const meta = document.createElement('div');
+            meta.className = 'tp-page-editor__global-content-meta';
+            meta.textContent = `Synced reference · ${String(selected.kind || 'section').replaceAll('_', ' ')}`;
+
+            const actions = document.createElement('div');
+            actions.className = 'tp-page-editor__global-content-actions';
+
+            if (this.data.edit_url) {
+                const edit = document.createElement('a');
+                edit.href = this.data.edit_url;
+                edit.target = '_blank';
+                edit.rel = 'noreferrer';
+                edit.className = 'tp-page-editor__global-content-link';
+                edit.textContent = 'Edit source';
+                actions.appendChild(edit);
+            }
+
+            const replace = document.createElement('button');
+            replace.type = 'button';
+            replace.className = 'tp-page-editor__global-content-link';
+            replace.textContent = 'Replace';
+            replace.addEventListener('click', () => {
+                this.data.global_content_id = 0;
+                this.data.label = '';
+                this.data.edit_url = '';
+                void this.renderContent();
+            });
+            actions.appendChild(replace);
+
+            card.appendChild(title);
+            card.appendChild(meta);
+            card.appendChild(actions);
+            this.wrapper.appendChild(card);
+            return;
+        }
+
+        const input = document.createElement('input');
+        input.type = 'search';
+        input.placeholder = 'Search global content...';
+        input.className = 'tp-page-editor__global-content-search';
+        input.value = this.search;
+        input.addEventListener('input', () => {
+            this.search = input.value;
+            void this.renderContent();
+        });
+
+        const list = document.createElement('div');
+        list.className = 'tp-page-editor__global-content-list';
+        const query = this.search.trim().toLowerCase();
+        const filtered = entries.filter((entry) => {
+            if (!query) {
+                return true;
+            }
+
+            return `${String(entry.label || '')} ${String(entry.slug || '')}`.toLowerCase().includes(query);
+        });
+
+        if (filtered.length === 0) {
+            const empty = document.createElement('div');
+            empty.className = 'tp-page-editor__global-content-empty';
+            empty.textContent = 'No published global content matches this search.';
+            list.appendChild(empty);
+        } else {
+            filtered.forEach((entry) => {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'tp-page-editor__global-content-option';
+                const label = document.createElement('span');
+                label.textContent = String(entry.label || entry.slug || entry.id);
+                const kind = document.createElement('span');
+                kind.textContent = String(entry.kind || 'section').replaceAll('_', ' ');
+                button.appendChild(label);
+                button.appendChild(kind);
+                button.addEventListener('click', () => {
+                    this.data.global_content_id = Number(entry.id);
+                    this.data.label = String(entry.label || '');
+                    this.data.edit_url = String(entry.edit_url || '');
+                    void this.renderContent();
+                });
+                list.appendChild(button);
+            });
+        }
+
+        this.wrapper.appendChild(input);
+        this.wrapper.appendChild(list);
+    }
+
+    async fetchEntries() {
+        if (!this.config.libraryUrl) {
+            return [];
+        }
+
+        if (!GlobalContentTool.libraryPromise) {
+            GlobalContentTool.libraryPromise = fetch(this.config.libraryUrl, {
+                headers: { Accept: 'application/json' },
+                credentials: 'same-origin',
+            })
+                .then(async (response) => {
+                    if (!response.ok) {
+                        return [];
+                    }
+
+                    const payload = await response.json();
+                    return Array.isArray(payload?.entries) ? payload.entries : [];
+                })
+                .catch(() => []);
+        }
+
+        const entries = await GlobalContentTool.libraryPromise;
+        return Array.isArray(entries) ? entries : [];
+    }
+
+    save() {
+        return {
+            global_content_id: this.data.global_content_id > 0 ? this.data.global_content_id : 0,
+            label: this.data.label,
+            edit_url: this.data.edit_url,
+        };
+    }
+}
+
 window.tpPageEditor = function tpPageEditor(config) {
     return {
         json: config?.initialJson || '{"time":0,"blocks":[],"version":"2.28.0"}',
         mediaOptions: Array.isArray(config?.mediaOptions) ? config.mediaOptions : [],
         mediaIndexUrl: typeof config?.mediaIndexUrl === 'string' ? config.mediaIndexUrl : '',
+        globalContentLibraryUrl:
+            typeof config?.globalContentLibraryUrl === 'string' ? config.globalContentLibraryUrl : '',
         mediaModalOpen: false,
         mediaModalSearch: '',
         mediaModalResolve: null,
@@ -634,6 +826,67 @@ window.tpPageEditor = function tpPageEditor(config) {
                     this.mediaModalOpen = true;
                 });
 
+            const tools = {
+                paragraph: {
+                    class: Paragraph,
+                    inlineToolbar: ['bold', 'italic', 'link', 'inlineCode'],
+                },
+                header: {
+                    class: Header,
+                    inlineToolbar: ['bold', 'italic', 'link', 'inlineCode'],
+                    config: {
+                        levels: [1, 2, 3],
+                        defaultLevel: 2,
+                    },
+                },
+                list: {
+                    class: List,
+                    inlineToolbar: ['bold', 'italic', 'link', 'inlineCode'],
+                },
+                quote: {
+                    class: Quote,
+                    inlineToolbar: ['bold', 'italic', 'link', 'inlineCode'],
+                    config: {
+                        quotePlaceholder: 'Write a quote',
+                        captionPlaceholder: 'Quote author',
+                    },
+                },
+                inlineCode: {
+                    class: InlineCode,
+                    shortcut: 'CMD+SHIFT+M',
+                },
+                delimiter: {
+                    class: Delimiter,
+                },
+                image: {
+                    class: MediaImageTool,
+                    config: {
+                        onPick: openMediaPicker,
+                    },
+                },
+                embed: {
+                    class: SimpleEmbedTool,
+                },
+                checklist: {
+                    class: ChecklistTool,
+                },
+                code: {
+                    class: CodeBlockTool,
+                },
+                callout: {
+                    class: CalloutTool,
+                },
+            };
+
+            if (this.globalContentLibraryUrl) {
+                tools.globalContent = {
+                    class: GlobalContentTool,
+                    config: {
+                        libraryUrl: this.globalContentLibraryUrl,
+                    },
+                };
+            }
+
             this.editor = new EditorJS({
                 holder: surface,
                 data,
@@ -655,57 +908,7 @@ window.tpPageEditor = function tpPageEditor(config) {
                         }
                     }
                 },
-                tools: {
-                    paragraph: {
-                        class: Paragraph,
-                        inlineToolbar: ['bold', 'italic', 'link', 'inlineCode'],
-                    },
-                    header: {
-                        class: Header,
-                        inlineToolbar: ['bold', 'italic', 'link', 'inlineCode'],
-                        config: {
-                            levels: [1, 2, 3],
-                            defaultLevel: 2,
-                        },
-                    },
-                    list: {
-                        class: List,
-                        inlineToolbar: ['bold', 'italic', 'link', 'inlineCode'],
-                    },
-                    quote: {
-                        class: Quote,
-                        inlineToolbar: ['bold', 'italic', 'link', 'inlineCode'],
-                        config: {
-                            quotePlaceholder: 'Write a quote',
-                            captionPlaceholder: 'Quote author',
-                        },
-                    },
-                    inlineCode: {
-                        class: InlineCode,
-                        shortcut: 'CMD+SHIFT+M',
-                    },
-                    delimiter: {
-                        class: Delimiter,
-                    },
-                    image: {
-                        class: MediaImageTool,
-                        config: {
-                            onPick: openMediaPicker,
-                        },
-                    },
-                    embed: {
-                        class: SimpleEmbedTool,
-                    },
-                    checklist: {
-                        class: ChecklistTool,
-                    },
-                    code: {
-                        class: CodeBlockTool,
-                    },
-                    callout: {
-                        class: CalloutTool,
-                    },
-                },
+                tools,
             });
 
             this.beforeUnloadHandler = (event) => {
@@ -843,6 +1046,20 @@ window.tpPageEditor = function tpPageEditor(config) {
                 const text = String(data.text || '');
                 if (text.trim() === '') return null;
                 return { type, data: { type: String(data.type || 'info'), text } };
+            }
+            if (type === 'globalContent') {
+                const globalContentId = Number.isFinite(Number(data.global_content_id))
+                    ? Number(data.global_content_id)
+                    : 0;
+                if (globalContentId <= 0) return null;
+                return {
+                    type,
+                    data: {
+                        global_content_id: globalContentId,
+                        label: String(data.label || ''),
+                        edit_url: String(data.edit_url || ''),
+                    },
+                };
             }
             if (type === 'embed') {
                 const embed = String(data.embed || '');
