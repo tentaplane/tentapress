@@ -142,7 +142,7 @@ it('treats duplicate manual snapshot inserts as a no-op when the unique row alre
 
     $page = TpPage::query()->create($pagePayload);
 
-    $firstRevision = app(RevisionRecorder::class)->capturePage($page);
+    $firstRevision = resolve(RevisionRecorder::class)->capturePage($page);
 
     expect($firstRevision)->not->toBeNull();
     expect(TpRevision::query()->where('resource_type', 'pages')->where('resource_id', $page->id)->count())->toBe(1);
@@ -167,7 +167,7 @@ it('treats duplicate manual snapshot inserts as a no-op when the unique row alre
         'snapshot_hash' => (string) $firstRevision->snapshot_hash,
     ]);
 
-    $duplicate = app(RevisionRecorder::class)->capturePage($page);
+    $duplicate = resolve(RevisionRecorder::class)->capturePage($page);
 
     expect($duplicate)->toBeNull();
     expect(TpRevision::query()->where('resource_type', 'pages')->where('resource_id', $page->id)->count())->toBe(1);
