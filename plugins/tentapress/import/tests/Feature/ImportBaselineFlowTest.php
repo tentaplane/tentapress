@@ -11,6 +11,9 @@ use TentaPress\Media\Models\TpMedia;
 use TentaPress\Posts\Models\TpPost;
 use TentaPress\Import\ImportServiceProvider;
 use TentaPress\Pages\Models\TpPage;
+use TentaPress\Taxonomies\Models\TpTaxonomy;
+use TentaPress\Taxonomies\Models\TpTermAssignment;
+use TentaPress\Taxonomies\Support\TaxonomySynchronizer;
 use TentaPress\Users\Models\TpUser;
 
 function registerImportProvider(): void
@@ -18,6 +21,35 @@ function registerImportProvider(): void
     app()->register(ImportServiceProvider::class);
     resolve('router')->getRoutes()->refreshNameLookups();
     resolve('router')->getRoutes()->refreshActionLookups();
+}
+
+function enableTaxonomiesForImportTests(): void
+{
+    test()->artisan('tp:plugins sync')->assertSuccessful();
+    test()->artisan('tp:plugins enable tentapress/taxonomies')->assertSuccessful();
+    test()->refreshApplication();
+    test()->artisan('migrate', ['--force' => true])->assertSuccessful();
+
+    if (app()->bound(TaxonomySynchronizer::class)) {
+        app()->make(TaxonomySynchronizer::class)->syncRegistered();
+    }
+
+    registerImportProvider();
+}
+
+function latestImportReportPath(string $pattern): string
+{
+    $paths = File::glob(storage_path($pattern));
+    if (! is_array($paths) || $paths === []) {
+        return '';
+    }
+
+    usort(
+        $paths,
+        static fn (string $left, string $right): int => filemtime($right) <=> filemtime($left)
+    );
+
+    return (string) ($paths[0] ?? '');
 }
 
 function makeImportBundleWithSinglePage(): UploadedFile
@@ -95,6 +127,7 @@ function makeWxrBundleWithPagePostAndAttachment(): UploadedFile
             <wp:post_name>wxr-page-title</wp:post_name>
             <wp:status>publish</wp:status>
             <link>https://legacy.example.com/page-title</link>
+            <category domain="category" nicename="news"><![CDATA[News]]></category>
             <content:encoded><![CDATA[<p>Page content line 1.</p><p>Page content line 2.</p>]]></content:encoded>
         </item>
         <item>
@@ -109,6 +142,8 @@ function makeWxrBundleWithPagePostAndAttachment(): UploadedFile
                 <wp:meta_key>_thumbnail_id</wp:meta_key>
                 <wp:meta_value>103</wp:meta_value>
             </wp:postmeta>
+            <category domain="category" nicename="news"><![CDATA[News]]></category>
+            <category domain="post_tag" nicename="release"><![CDATA[Release]]></category>
             <content:encoded><![CDATA[<p>Post body.</p>]]></content:encoded>
         </item>
         <item>
@@ -354,8 +389,9 @@ it('allows a super admin to analyze and run a wordpress wxr bundle', function ()
         ->assertRedirect('/admin/import')
         ->assertSessionHas('tp_notice_success', fn (string $message): bool => str_contains($message, 'Source: WordPress WXR')
             && str_contains($message, 'Terms detected: 2')
-            && str_contains($message, 'Terms imported: 0')
-            && str_contains($message, 'Terms skipped: 2')
+            && str_contains($message, 'Terms imported: 2')
+            && str_contains($message, 'Terms skipped: 0')
+            && str_contains($message, 'Term assignment rows synced: 3')
             && str_contains($message, 'Pages skipped: 0')
             && str_contains($message, 'Pages failed: 0')
             && str_contains($message, 'Posts skipped: 0')
@@ -388,11 +424,7 @@ it('allows a super admin to analyze and run a wordpress wxr bundle', function ()
     expect(is_array($report['mappings'] ?? null))->toBeTrue();
     expect(count($report['mappings'] ?? []))->toBeGreaterThanOrEqual(2);
 
-    $referenceReports = File::glob(storage_path('app/tp-import-reports/*-references.json'));
-    expect(is_array($referenceReports))->toBeTrue();
-    expect(count($referenceReports))->toBeGreaterThan(0);
-
-    $latestReferenceReportPath = is_array($referenceReports) && $referenceReports !== [] ? (string) end($referenceReports) : '';
+    $latestReferenceReportPath = latestImportReportPath('app/tp-import-reports/*-references.json');
     expect($latestReferenceReportPath)->not->toBe('');
 
     $referenceReport = json_decode((string) File::get($latestReferenceReportPath), true, flags: JSON_THROW_ON_ERROR);
@@ -412,6 +444,101 @@ it('allows a super admin to analyze and run a wordpress wxr bundle', function ()
     expect((string) ($firstPostReference['destination_slug'] ?? ''))->toBe('wxr-post-title');
     expect((string) ($firstMediaReference['source_post_id'] ?? ''))->toBe('103');
     expect((string) ($firstMediaReference['destination_path'] ?? ''))->toContain('/image-103.jpg');
+});
+
+it('persists wxr taxonomy relationships when the taxonomies plugin is enabled', function (): void {
+    enableTaxonomiesForImportTests();
+
+    $admin = TpUser::query()->create([
+        'name' => 'Import Taxonomy Admin',
+        'email' => 'import-wxr-taxonomies@example.test',
+        'password' => 'secret',
+        'is_super_admin' => true,
+    ]);
+
+    $bundle = makeWxrBundleWithPagePostAndAttachment();
+    Http::fake([
+        'https://example.com/*' => Http::response('fake-image-content', 200, [
+            'Content-Type' => 'image/jpeg',
+        ]),
+    ]);
+
+    $analyzeResponse = $this->actingAs($admin)
+        ->post('/admin/import/analyze', [
+            'bundle' => $bundle,
+        ]);
+
+    $token = (string) $analyzeResponse->viewData('token');
+
+    $this->actingAs($admin)
+        ->post('/admin/import/run', [
+            'token' => $token,
+            'pages_mode' => 'create_only',
+            'settings_mode' => 'merge',
+            'include_posts' => '1',
+            'include_media' => '1',
+            'include_seo' => '0',
+        ])
+        ->assertRedirect('/admin/import')
+        ->assertSessionHas('tp_notice_success', fn (string $message): bool => str_contains($message, 'Terms imported: 2')
+            && str_contains($message, 'Terms skipped: 0')
+            && str_contains($message, 'Term assignment rows synced: 3')
+            && str_contains($message, 'Term assignment rows failed: 0'));
+
+    $category = TpTaxonomy::query()->where('key', 'category')->firstOrFail();
+    $tag = TpTaxonomy::query()->where('key', 'tag')->firstOrFail();
+    $page = TpPage::query()->where('slug', 'wxr-page-title')->firstOrFail();
+    $post = TpPost::query()->where('slug', 'wxr-post-title')->firstOrFail();
+
+    $pageAssignments = TpTermAssignment::query()
+        ->where('assignable_type', TpPage::class)
+        ->where('assignable_id', $page->id)
+        ->orderBy('taxonomy_id')
+        ->orderBy('term_id')
+        ->get();
+
+    $postAssignments = TpTermAssignment::query()
+        ->where('assignable_type', TpPost::class)
+        ->where('assignable_id', $post->id)
+        ->orderBy('taxonomy_id')
+        ->orderBy('term_id')
+        ->get();
+
+    expect($pageAssignments)->toHaveCount(1);
+    expect((int) $pageAssignments[0]->taxonomy_id)->toBe((int) $category->id);
+
+    expect($postAssignments)->toHaveCount(2);
+    expect($postAssignments->pluck('taxonomy_id')->map(static fn (mixed $value): int => (int) $value)->all())
+        ->toBe([(int) $category->id, (int) $tag->id]);
+
+    $latestReferenceReportPath = latestImportReportPath('app/tp-import-reports/*-references.json');
+    $referenceReport = json_decode((string) File::get($latestReferenceReportPath), true, flags: JSON_THROW_ON_ERROR);
+
+    expect(is_array($referenceReport['taxonomies'] ?? null))->toBeTrue();
+    expect(count($referenceReport['taxonomies'] ?? []))->toBe(2);
+
+    $this->actingAs($admin)
+        ->post('/admin/import/run', [
+            'token' => $token,
+            'pages_mode' => 'create_only',
+            'settings_mode' => 'merge',
+            'include_posts' => '1',
+            'include_media' => '1',
+            'include_seo' => '0',
+        ])
+        ->assertRedirect('/admin/import')
+        ->assertSessionHas('tp_notice_success', fn (string $message): bool => str_contains($message, 'Pages created: 0')
+            && str_contains($message, 'Posts created: 0')
+            && str_contains($message, 'Term assignment rows synced: 3'));
+
+    expect(TpTermAssignment::query()
+        ->where('assignable_type', TpPage::class)
+        ->where('assignable_id', $page->id)
+        ->count())->toBe(1);
+    expect(TpTermAssignment::query()
+        ->where('assignable_type', TpPost::class)
+        ->where('assignable_id', $post->id)
+        ->count())->toBe(2);
 });
 
 it('skips duplicate wxr source rows on create-only rerun', function (): void {

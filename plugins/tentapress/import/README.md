@@ -7,7 +7,7 @@ Content import functionality for TentaPress.
 | Field    | Value                                     |
 |----------|-------------------------------------------|
 | ID       | `tentapress/import`                       |
-| Version  | 0.22.0                                    |
+| Version  | 0.23.0                                    |
 | Provider | `TentaPress\Import\ImportServiceProvider` |
 
 ## Features
@@ -36,6 +36,7 @@ Content import functionality for TentaPress.
 - Persist a source-to-destination reference map report with destination IDs/slugs/paths for pages/posts/media
 - Count media variant refreshes only when variant processing succeeds (unreachable media URLs do not inflate refreshed totals)
 - Include explicit WXR term-phase reporting (`Terms detected/imported/skipped`) in run summaries and streamed phase updates
+- Persist WXR category and tag terms into TentaPress taxonomy assignments for imported pages and posts
 - Handles pages, posts, media references, settings
 
 ## Operations

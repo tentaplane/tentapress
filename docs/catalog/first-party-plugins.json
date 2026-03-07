@@ -1,6 +1,6 @@
 {
     "schema_version": 1,
-    "generated_at": "2026-03-07T17:47:28Z",
+    "generated_at": "2026-03-07T23:00:15Z",
     "plugins": [
         {
             "id": "tentapress/admin-shell",
@@ -75,7 +75,7 @@
             "name": "Import",
             "description": "",
             "package": "tentapress/import",
-            "latest_version": "0.22.0"
+            "latest_version": "0.23.0"
         },
         {
             "id": "tentapress/media",

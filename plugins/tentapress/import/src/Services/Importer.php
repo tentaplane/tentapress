@@ -18,6 +18,11 @@ use TentaPress\Pages\Models\TpPage;
 use TentaPress\Posts\Models\TpPost;
 use TentaPress\Settings\Services\SettingsStore;
 use TentaPress\System\Support\JsonPayload;
+use TentaPress\Taxonomies\Models\TpTaxonomy;
+use TentaPress\Taxonomies\Models\TpTerm;
+use TentaPress\Taxonomies\Models\TpTermAssignment;
+use TentaPress\Taxonomies\Support\TaxonomySynchronizer;
+use TentaPress\Taxonomies\Support\TermSlugger;
 use ZipArchive;
 
 final readonly class Importer
@@ -193,6 +198,10 @@ final readonly class Importer
         $unsupportedSamples = [];
         $categories = [];
         $tags = [];
+        $wxrTerms = [
+            'category' => [],
+            'tag' => [],
+        ];
         $urlMappingsPreview = [];
         $featuredImageRefs = [];
         $attachmentSourceIds = [];
@@ -225,27 +234,28 @@ final readonly class Importer
                     $slug = 'imported-' . substr($this->token(), 0, 8);
                 }
 
-                $itemCategories = $item->xpath('category');
-                if (is_array($itemCategories)) {
-                    foreach ($itemCategories as $itemCategory) {
-                        if (!$itemCategory instanceof SimpleXMLElement) {
-                            continue;
-                        }
+                $itemTaxonomyTerms = $this->wxrItemTaxonomyTerms($item);
 
-                        $domain = trim((string) ($itemCategory->attributes()->domain ?? ''));
-                        $label = trim((string) $itemCategory);
-                        if ($label === '') {
-                            continue;
-                        }
+                foreach ($itemTaxonomyTerms['category'] as $term) {
+                    $categories[$term['name']] = true;
+                    $this->rememberWxrTerm(
+                        $wxrTerms['category'],
+                        sourceTermId: null,
+                        name: $term['name'],
+                        slug: $term['slug'],
+                        parentSlug: null,
+                    );
+                }
 
-                        if ($domain === 'category') {
-                            $categories[$label] = true;
-                        }
-
-                        if ($domain === 'post_tag') {
-                            $tags[$label] = true;
-                        }
-                    }
+                foreach ($itemTaxonomyTerms['tag'] as $term) {
+                    $tags[$term['name']] = true;
+                    $this->rememberWxrTerm(
+                        $wxrTerms['tag'],
+                        sourceTermId: null,
+                        name: $term['name'],
+                        slug: $term['slug'],
+                        parentSlug: null,
+                    );
                 }
 
                 if ($postType === 'page') {
@@ -262,6 +272,7 @@ final readonly class Importer
                         'status' => $this->normalizeWxrStatus((string) ($item->xpath('wp:status')[0] ?? '')),
                         'layout' => 'default',
                         'blocks' => $this->contentBlocks($plainContent),
+                        'taxonomy_terms' => $itemTaxonomyTerms,
                     ];
 
                     if (count($urlMappingsPreview) < 25) {
@@ -290,6 +301,7 @@ final readonly class Importer
                             (string) ($item->xpath('wp:post_date')[0] ?? ''),
                         ),
                         'author_id' => null,
+                        'taxonomy_terms' => $itemTaxonomyTerms,
                     ];
 
                     if (count($urlMappingsPreview) < 25) {
@@ -349,6 +361,13 @@ final readonly class Importer
                 $label = trim((string) ($categoryNode->xpath('wp:cat_name')[0] ?? ''));
                 if ($label !== '') {
                     $categories[$label] = true;
+                    $this->rememberWxrTerm(
+                        $wxrTerms['category'],
+                        sourceTermId: trim((string) ($categoryNode->xpath('wp:term_id')[0] ?? '')),
+                        name: $label,
+                        slug: trim((string) ($categoryNode->xpath('wp:category_nicename')[0] ?? '')),
+                        parentSlug: trim((string) ($categoryNode->xpath('wp:category_parent')[0] ?? '')),
+                    );
                 }
             }
         }
@@ -363,6 +382,13 @@ final readonly class Importer
                 $label = trim((string) ($tagNode->xpath('wp:tag_name')[0] ?? ''));
                 if ($label !== '') {
                     $tags[$label] = true;
+                    $this->rememberWxrTerm(
+                        $wxrTerms['tag'],
+                        sourceTermId: trim((string) ($tagNode->xpath('wp:term_id')[0] ?? '')),
+                        name: $label,
+                        slug: trim((string) ($tagNode->xpath('wp:tag_slug')[0] ?? '')),
+                        parentSlug: null,
+                    );
                 }
             }
         }
@@ -385,6 +411,7 @@ final readonly class Importer
                 'theme' => false,
                 'plugins' => false,
                 'seo' => false,
+                'terms' => ($wxrTerms['category'] !== []) || ($wxrTerms['tag'] !== []),
             ],
         ];
 
@@ -401,6 +428,16 @@ final readonly class Importer
         File::put($baseDir . DIRECTORY_SEPARATOR . 'media.json', $this->jsonPayload->encode([
             'count' => count($mediaItems),
             'items' => $mediaItems,
+        ]));
+        File::put($baseDir . DIRECTORY_SEPARATOR . 'terms.json', $this->jsonPayload->encode([
+            'categories' => [
+                'count' => count($wxrTerms['category']),
+                'items' => array_values($wxrTerms['category']),
+            ],
+            'tags' => [
+                'count' => count($wxrTerms['tag']),
+                'items' => array_values($wxrTerms['tag']),
+            ],
         ]));
 
         $featuredImageResolved = 0;
@@ -589,6 +626,124 @@ final readonly class Importer
     }
 
     /**
+     * @return array{category:array<int,array{name:string,slug:string}>,tag:array<int,array{name:string,slug:string}>}
+     */
+    private function wxrItemTaxonomyTerms(SimpleXMLElement $item): array
+    {
+        $terms = [
+            'category' => [],
+            'tag' => [],
+        ];
+
+        $itemCategories = $item->xpath('category');
+        if (! is_array($itemCategories)) {
+            return $terms;
+        }
+
+        foreach ($itemCategories as $itemCategory) {
+            if (! $itemCategory instanceof SimpleXMLElement) {
+                continue;
+            }
+
+            $domain = trim((string) ($itemCategory->attributes()->domain ?? ''));
+            $label = trim((string) $itemCategory);
+            $slug = trim((string) ($itemCategory->attributes()->nicename ?? ''));
+
+            if ($label === '') {
+                continue;
+            }
+
+            if ($domain === 'category') {
+                $terms['category'][] = [
+                    'name' => $label,
+                    'slug' => $slug,
+                ];
+            }
+
+            if ($domain === 'post_tag') {
+                $terms['tag'][] = [
+                    'name' => $label,
+                    'slug' => $slug,
+                ];
+            }
+        }
+
+        return [
+            'category' => $this->uniqueWxrTermRefs($terms['category']),
+            'tag' => $this->uniqueWxrTermRefs($terms['tag']),
+        ];
+    }
+
+    /**
+     * @param  array<string,array{source_term_id:string|null,name:string,slug:string,parent_slug:string|null}>  $terms
+     */
+    private function rememberWxrTerm(array &$terms, ?string $sourceTermId, string $name, string $slug = '', ?string $parentSlug = null): void
+    {
+        $lookup = $this->wxrTermLookupKey($slug, $name);
+        if ($lookup === '') {
+            return;
+        }
+
+        if (! isset($terms[$lookup])) {
+            $terms[$lookup] = [
+                'source_term_id' => $sourceTermId !== null && trim($sourceTermId) !== '' ? trim($sourceTermId) : null,
+                'name' => trim($name),
+                'slug' => trim($slug),
+                'parent_slug' => $parentSlug !== null && trim($parentSlug) !== '' ? trim($parentSlug) : null,
+            ];
+
+            return;
+        }
+
+        if ($terms[$lookup]['source_term_id'] === null && $sourceTermId !== null && trim($sourceTermId) !== '') {
+            $terms[$lookup]['source_term_id'] = trim($sourceTermId);
+        }
+
+        if ($terms[$lookup]['slug'] === '' && trim($slug) !== '') {
+            $terms[$lookup]['slug'] = trim($slug);
+        }
+
+        if ($terms[$lookup]['parent_slug'] === null && $parentSlug !== null && trim($parentSlug) !== '') {
+            $terms[$lookup]['parent_slug'] = trim($parentSlug);
+        }
+    }
+
+    /**
+     * @param  array<int,array{name:string,slug:string}>  $terms
+     * @return array<int,array{name:string,slug:string}>
+     */
+    private function uniqueWxrTermRefs(array $terms): array
+    {
+        $unique = [];
+
+        foreach ($terms as $term) {
+            $lookup = $this->wxrTermLookupKey((string) ($term['slug'] ?? ''), (string) ($term['name'] ?? ''));
+            if ($lookup === '') {
+                continue;
+            }
+
+            $unique[$lookup] = [
+                'name' => trim((string) ($term['name'] ?? '')),
+                'slug' => trim((string) ($term['slug'] ?? '')),
+            ];
+        }
+
+        return array_values($unique);
+    }
+
+    private function wxrTermLookupKey(string $slug, string $name): string
+    {
+        $normalizedSlug = trim($slug);
+        if ($normalizedSlug !== '') {
+            return Str::lower($normalizedSlug);
+        }
+
+        $normalizedName = Str::slug($name);
+
+        return $normalizedName !== '' ? Str::lower($normalizedName) : '';
+    }
+
+    /**
      * @return array{type:string,source_url:string,destination_url:string,source_post_id:string}
      */
     private function urlMappingPreview(string $type, string $sourceLink, string $slug, string $sourcePostId): array
@@ -650,14 +805,15 @@ final readonly class Importer
      * @param  array<int,array<string,string|null>>  $pageMappings
      * @param  array<int,array<string,string|null>>  $postMappings
      * @param  array<int,array<string,string|null>>  $mediaMappings
+     * @param  array<int,array<string,mixed>>  $taxonomyMappings
      */
-    private function writeReferenceMapReport(string $token, array $pageMappings, array $postMappings, array $mediaMappings): ?string
+    private function writeReferenceMapReport(string $token, array $pageMappings, array $postMappings, array $mediaMappings, array $taxonomyMappings = []): ?string
     {
         $pages = array_values(array_filter($pageMappings, fn (array $row): bool => trim((string) ($row['source_post_id'] ?? '')) !== '' || trim((string) ($row['source_url'] ?? '')) !== ''));
         $posts = array_values(array_filter($postMappings, fn (array $row): bool => trim((string) ($row['source_post_id'] ?? '')) !== '' || trim((string) ($row['source_url'] ?? '')) !== ''));
         $media = array_values(array_filter($mediaMappings, fn (array $row): bool => trim((string) ($row['source_post_id'] ?? '')) !== '' || trim((string) ($row['source_url'] ?? '')) !== ''));
 
-        if ($pages === [] && $posts === [] && $media === []) {
+        if ($pages === [] && $posts === [] && $media === [] && $taxonomyMappings === []) {
             return null;
         }
 
@@ -671,6 +827,7 @@ final readonly class Importer
             'pages' => $pages,
             'posts' => $posts,
             'media' => $media,
+            'taxonomies' => array_values($taxonomyMappings),
         ]));
 
         return 'storage/app/tp-import-reports/' . $token . '-references.json';
@@ -712,6 +869,407 @@ final readonly class Importer
         }
 
         return null;
+    }
+
+    /**
+     * @param  array<string,mixed>  $payload
+     * @return array{0:int,1:int,2:int,3:array<string,mixed>|null}
+     */
+    private function importWxrTerms(array $payload): array
+    {
+        $detected = $this->countWxrTerms($payload);
+
+        if (
+            ! class_exists(TpTaxonomy::class)
+            || ! class_exists(TpTerm::class)
+            || ! class_exists(TpTermAssignment::class)
+            || ! Schema::hasTable('tp_taxonomies')
+            || ! Schema::hasTable('tp_terms')
+            || ! Schema::hasTable('tp_term_assignments')
+        ) {
+            return [0, $detected, 0, null];
+        }
+
+        if (class_exists(TaxonomySynchronizer::class) && app()->bound(TaxonomySynchronizer::class)) {
+            resolve(TaxonomySynchronizer::class)->syncRegistered();
+        }
+
+        $taxonomies = TpTaxonomy::query()
+            ->whereIn('key', ['category', 'tag'])
+            ->get()
+            ->keyBy(static fn (TpTaxonomy $taxonomy): string => (string) $taxonomy->key);
+
+        if (! $taxonomies->has('category') || ! $taxonomies->has('tag')) {
+            return [0, $detected, 0, null];
+        }
+
+        $context = [
+            'taxonomies' => [
+                'category' => $taxonomies->get('category'),
+                'tag' => $taxonomies->get('tag'),
+            ],
+            'terms' => [
+                'category' => [],
+                'tag' => [],
+            ],
+        ];
+
+        $imported = 0;
+        $skipped = 0;
+        $failed = 0;
+
+        $categories = $this->wxrTermItemsFromPayload($payload, 'categories');
+        foreach ($categories as $item) {
+            $term = $this->resolveOrCreateWxrTerm('category', $item, $context);
+            if ($term instanceof TpTerm) {
+                $imported++;
+            } else {
+                $skipped++;
+            }
+        }
+
+        foreach ($categories as $item) {
+            $parentLookup = $this->wxrTermLookupKey(
+                (string) ($item['parent_slug'] ?? ''),
+                (string) ($item['parent_name'] ?? ''),
+            );
+
+            if ($parentLookup === '') {
+                continue;
+            }
+
+            $term = $this->resolveOrCreateWxrTerm('category', $item, $context);
+            $parent = $this->resolveOrCreateWxrTerm('category', [
+                'name' => (string) ($item['parent_name'] ?? ''),
+                'slug' => (string) ($item['parent_slug'] ?? ''),
+            ], $context);
+
+            if (! $term instanceof TpTerm || ! $parent instanceof TpTerm || (int) $term->id === (int) $parent->id) {
+                continue;
+            }
+
+            if ((int) ($term->parent_id ?? 0) !== (int) $parent->id) {
+                $term->forceFill(['parent_id' => (int) $parent->id])->save();
+                $context['terms']['category'][$this->wxrTermLookupKey((string) $term->slug, (string) $term->name)] = $term->fresh();
+            }
+        }
+
+        $tags = $this->wxrTermItemsFromPayload($payload, 'tags');
+        foreach ($tags as $item) {
+            $term = $this->resolveOrCreateWxrTerm('tag', $item, $context);
+            if ($term instanceof TpTerm) {
+                $imported++;
+            } else {
+                $skipped++;
+            }
+        }
+
+        $remaining = max(0, $detected - ($imported + $skipped));
+        if ($remaining > 0) {
+            $failed += $remaining;
+        }
+
+        return [$imported, $skipped, $failed, $context];
+    }
+
+    /**
+     * @param  array<string,mixed>|null  $pagesPayload
+     * @param  array<string,mixed>|null  $postsPayload
+     * @param  array<int,array<string,string|null>>  $pageMappings
+     * @param  array<int,array<string,string|null>>  $postMappings
+     * @param  array<string,mixed>  $termContext
+     * @return array{0:int,1:int,2:int,3:array<int,array<string,mixed>>}
+     */
+    private function syncWxrTaxonomyAssignments(
+        ?array $pagesPayload,
+        ?array $postsPayload,
+        array $pageMappings,
+        array $postMappings,
+        array $termContext
+    ): array {
+        $synced = 0;
+        $skipped = 0;
+        $failed = 0;
+        $mappings = [];
+
+        $contentSets = [
+            [
+                'entity' => 'page',
+                'assignable_type' => TpPage::class,
+                'payload' => $pagesPayload,
+                'mappings' => $pageMappings,
+            ],
+            [
+                'entity' => 'post',
+                'assignable_type' => TpPost::class,
+                'payload' => $postsPayload,
+                'mappings' => $postMappings,
+            ],
+        ];
+
+        foreach ($contentSets as $contentSet) {
+            $payload = $contentSet['payload'];
+            if (! is_array($payload)) {
+                continue;
+            }
+
+            $mappingBySourcePostId = [];
+            foreach ($contentSet['mappings'] as $mapping) {
+                $sourcePostId = trim((string) ($mapping['source_post_id'] ?? ''));
+                if ($sourcePostId !== '') {
+                    $mappingBySourcePostId[$sourcePostId] = $mapping;
+                }
+            }
+
+            foreach ($this->itemsFromPayload($payload) as $item) {
+                if (! is_array($item)) {
+                    continue;
+                }
+
+                $sourcePostId = trim((string) ($item['source_post_id'] ?? ''));
+                if ($sourcePostId === '' || ! isset($mappingBySourcePostId[$sourcePostId])) {
+                    continue;
+                }
+
+                $mapping = $mappingBySourcePostId[$sourcePostId];
+                $destinationId = (int) ($mapping['destination_id'] ?? 0);
+                if ($destinationId <= 0) {
+                    $skipped++;
+                    continue;
+                }
+
+                $refsByTaxonomy = $item['taxonomy_terms'] ?? [];
+                if (! is_array($refsByTaxonomy)) {
+                    continue;
+                }
+
+                $assignments = [];
+                $resolvedMappings = [];
+
+                foreach (['category', 'tag'] as $taxonomyKey) {
+                    $termRefs = $refsByTaxonomy[$taxonomyKey] ?? [];
+                    if (! is_array($termRefs) || $termRefs === []) {
+                        continue;
+                    }
+
+                    $termIds = [];
+                    $termSlugs = [];
+                    foreach ($termRefs as $termRef) {
+                        if (! is_array($termRef)) {
+                            continue;
+                        }
+
+                        $term = $this->resolveOrCreateWxrTerm($taxonomyKey, $termRef, $termContext);
+                        if (! $term instanceof TpTerm) {
+                            continue;
+                        }
+
+                        $termIds[] = (int) $term->id;
+                        $termSlugs[] = (string) $term->slug;
+                    }
+
+                    $termIds = array_values(array_unique(array_filter($termIds, static fn (int $id): bool => $id > 0)));
+                    $termSlugs = array_values(array_unique(array_filter($termSlugs, static fn (string $slug): bool => trim($slug) !== '')));
+
+                    if ($termIds === []) {
+                        continue;
+                    }
+
+                    /** @var TpTaxonomy|null $taxonomy */
+                    $taxonomy = $termContext['taxonomies'][$taxonomyKey] ?? null;
+                    if (! $taxonomy instanceof TpTaxonomy) {
+                        continue;
+                    }
+
+                    $assignments[(int) $taxonomy->id] = $termIds;
+                    $resolvedMappings[] = [
+                        'taxonomy_key' => $taxonomyKey,
+                        'taxonomy_id' => (int) $taxonomy->id,
+                        'term_ids' => $termIds,
+                        'term_slugs' => $termSlugs,
+                    ];
+                }
+
+                if ($assignments === []) {
+                    $skipped++;
+                    continue;
+                }
+
+                try {
+                    $this->syncTaxonomyAssignments((string) $contentSet['assignable_type'], $destinationId, $assignments);
+                    $synced += array_sum(array_map(static fn (array $termIds): int => count($termIds), $assignments));
+                    $mappings[] = [
+                        'entity' => $contentSet['entity'],
+                        'source_post_id' => $sourcePostId,
+                        'destination_id' => $destinationId,
+                        'assignments' => $resolvedMappings,
+                    ];
+                } catch (\Throwable $e) {
+                    report($e);
+                    $failed++;
+                }
+            }
+        }
+
+        return [$synced, $skipped, $failed, $mappings];
+    }
+
+    /**
+     * @param  array<string,mixed>  $termData
+     * @param  array<string,mixed>  $context
+     */
+    private function resolveOrCreateWxrTerm(string $taxonomyKey, array $termData, array &$context): ?TpTerm
+    {
+        /** @var TpTaxonomy|null $taxonomy */
+        $taxonomy = $context['taxonomies'][$taxonomyKey] ?? null;
+        if (! $taxonomy instanceof TpTaxonomy) {
+            return null;
+        }
+
+        $name = trim((string) ($termData['name'] ?? ''));
+        $slug = trim((string) ($termData['slug'] ?? ''));
+        $lookup = $this->wxrTermLookupKey($slug, $name);
+
+        if ($lookup === '') {
+            return null;
+        }
+
+        if (isset($context['terms'][$taxonomyKey][$lookup]) && $context['terms'][$taxonomyKey][$lookup] instanceof TpTerm) {
+            return $context['terms'][$taxonomyKey][$lookup];
+        }
+
+        $existing = TpTerm::query()
+            ->where('taxonomy_id', $taxonomy->id)
+            ->where(function ($query) use ($slug, $name): void {
+                if ($slug !== '') {
+                    $query->where('slug', $slug);
+                }
+
+                if ($name !== '') {
+                    $method = $slug !== '' ? 'orWhereRaw' : 'whereRaw';
+                    $query->{$method}('LOWER(name) = ?', [Str::lower($name)]);
+                }
+            })
+            ->orderBy('id')
+            ->first();
+
+        if ($existing instanceof TpTerm) {
+            $context['terms'][$taxonomyKey][$lookup] = $existing;
+
+            return $existing;
+        }
+
+        $fallbackName = $name !== '' ? $name : Str::title(str_replace('-', ' ', $lookup));
+        $resolvedSlug = $slug;
+
+        if (class_exists(TermSlugger::class) && app()->bound(TermSlugger::class)) {
+            $resolvedSlug = resolve(TermSlugger::class)->unique($taxonomy, $slug, $fallbackName);
+        } else {
+            $resolvedSlug = $this->uniqueTaxonomyTermSlug($taxonomy, $slug, $fallbackName);
+        }
+
+        $term = TpTerm::query()->create([
+            'taxonomy_id' => $taxonomy->id,
+            'parent_id' => null,
+            'name' => $fallbackName,
+            'slug' => $resolvedSlug,
+            'description' => null,
+            'metadata' => [],
+        ]);
+
+        $context['terms'][$taxonomyKey][$lookup] = $term;
+        $context['terms'][$taxonomyKey][$this->wxrTermLookupKey((string) $term->slug, (string) $term->name)] = $term;
+
+        return $term;
+    }
+
+    private function uniqueTaxonomyTermSlug(TpTaxonomy $taxonomy, string $requestedSlug, string $fallbackName): string
+    {
+        $base = trim($requestedSlug) !== '' ? trim($requestedSlug) : Str::slug($fallbackName);
+        $base = trim($base, '-');
+
+        if ($base === '') {
+            $base = 'term';
+        }
+
+        $candidate = $base;
+        $suffix = 2;
+
+        while (
+            TpTerm::query()
+                ->where('taxonomy_id', $taxonomy->id)
+                ->where('slug', $candidate)
+                ->exists()
+        ) {
+            $candidate = $base.'-'.$suffix;
+            $suffix++;
+        }
+
+        return $candidate;
+    }
+
+    /**
+     * @param  array<int,array<int>>  $assignments
+     */
+    private function syncTaxonomyAssignments(string $assignableType, int $assignableId, array $assignments): void
+    {
+        if ($assignableId <= 0 || $assignments === []) {
+            return;
+        }
+
+        $taxonomyIds = array_values(array_map(static fn (int|string $id): int => (int) $id, array_keys($assignments)));
+        $taxonomyIds = array_values(array_filter($taxonomyIds, static fn (int $id): bool => $id > 0));
+        if ($taxonomyIds === []) {
+            return;
+        }
+
+        $now = now();
+
+        DB::transaction(function () use ($taxonomyIds, $assignableType, $assignableId, $assignments, $now): void {
+            TpTermAssignment::query()
+                ->where('assignable_type', $assignableType)
+                ->where('assignable_id', $assignableId)
+                ->whereIn('taxonomy_id', $taxonomyIds)
+                ->delete();
+
+            $rows = [];
+
+            foreach ($assignments as $taxonomyId => $termIds) {
+                foreach ($termIds as $termId) {
+                    $rows[] = [
+                        'taxonomy_id' => (int) $taxonomyId,
+                        'term_id' => (int) $termId,
+                        'assignable_type' => $assignableType,
+                        'assignable_id' => $assignableId,
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ];
+                }
+            }
+
+            if ($rows !== []) {
+                TpTermAssignment::query()->insert($rows);
+            }
+        });
+    }
+
+    /**
+     * @param  array<string,mixed>  $payload
+     * @return array<int,array<string,mixed>>
+     */
+    private function wxrTermItemsFromPayload(array $payload, string $key): array
+    {
+        $group = $payload[$key]['items'] ?? [];
+
+        return is_array($group) ? array_values($group) : [];
+    }
+
+    /**
+     * @param  array<string,mixed>  $payload
+     */
+    private function countWxrTerms(array $payload): int
+    {
+        return count($this->wxrTermItemsFromPayload($payload, 'categories')) + count($this->wxrTermItemsFromPayload($payload, 'tags'));
     }
 
     /**
@@ -766,28 +1324,46 @@ final readonly class Importer
         $createdSettings = 0;
         $updatedSettings = 0;
         $importedSeo = 0;
+        $importedTerms = 0;
         $skippedTerms = 0;
+        $failedTerms = 0;
+        $syncedTermAssignments = 0;
+        $skippedTermAssignments = 0;
+        $failedTermAssignments = 0;
         $pageMappings = [];
         $postMappings = [];
         $mediaMappings = [];
+        $taxonomyMappings = [];
+        $pagesPayload = null;
+        $postsPayload = null;
+        $termContext = null;
 
         DB::beginTransaction();
 
         try {
             if (($plan['source_format'] ?? null) === 'wxr') {
-                $skippedTerms = (int) ($plan['categories_count'] ?? 0) + (int) ($plan['tags_count'] ?? 0);
                 $this->emitProgress($progress, [
                     'kind' => 'phase',
                     'entity' => 'term',
                     'status' => 'started',
                 ]);
+
+                $termsPath = $baseDir . DIRECTORY_SEPARATOR . 'terms.json';
+                if (is_file($termsPath)) {
+                    [$importedTerms, $skippedTerms, $failedTerms, $termContext] = $this->importWxrTerms(
+                        $this->readJsonFile($termsPath)
+                    );
+                } else {
+                    $skippedTerms = (int) ($plan['categories_count'] ?? 0) + (int) ($plan['tags_count'] ?? 0);
+                }
+
                 $this->emitProgress($progress, [
                     'kind' => 'phase',
                     'entity' => 'term',
                     'status' => 'completed',
-                    'created' => 0,
+                    'created' => $importedTerms,
                     'skipped' => $skippedTerms,
-                    'failed' => 0,
+                    'failed' => $failedTerms,
                 ]);
             }
 
@@ -820,10 +1396,10 @@ final readonly class Importer
                 $postsPath = $baseDir . DIRECTORY_SEPARATOR . 'posts.json';
                 if (is_file($postsPath)) {
                     $this->emitProgress($progress, [
-                        'kind' => 'phase',
-                        'entity' => 'post',
-                        'status' => 'started',
-                    ]);
+                    'kind' => 'phase',
+                    'entity' => 'post',
+                    'status' => 'started',
+                ]);
                     $postsPayload = $this->readJsonFile($postsPath);
                     [$createdPosts, $skippedPosts, $failedPosts, $postMappings] = $this->importPosts(
                         $postsPayload,
@@ -839,6 +1415,16 @@ final readonly class Importer
                         'failed' => $failedPosts,
                     ]);
                 }
+            }
+
+            if (($plan['source_format'] ?? null) === 'wxr' && is_array($termContext)) {
+                [$syncedTermAssignments, $skippedTermAssignments, $failedTermAssignments, $taxonomyMappings] = $this->syncWxrTaxonomyAssignments(
+                    $pagesPayload,
+                    $postsPayload,
+                    $pageMappings,
+                    $postMappings,
+                    $termContext
+                );
             }
 
             if ($includeMedia) {
@@ -922,9 +1508,12 @@ final readonly class Importer
 
         if (($plan['source_format'] ?? null) === 'wxr') {
             $parts[] = 'Source: WordPress WXR';
-            $parts[] = 'Terms detected: ' . $skippedTerms;
-            $parts[] = 'Terms imported: 0';
-            $parts[] = 'Terms skipped: ' . $skippedTerms;
+            $parts[] = 'Terms detected: ' . ((int) ($plan['categories_count'] ?? 0) + (int) ($plan['tags_count'] ?? 0));
+            $parts[] = "Terms imported: {$importedTerms}";
+            $parts[] = "Terms skipped: {$skippedTerms}";
+            $parts[] = "Term assignment rows synced: {$syncedTermAssignments}";
+            $parts[] = "Term assignment rows skipped: {$skippedTermAssignments}";
+            $parts[] = "Term assignment rows failed: {$failedTermAssignments}";
             $parts[] = 'Unsupported items skipped: '.(int) ($plan['unsupported_items'] ?? 0);
             $parts[] = 'URL mappings previewed: '.(int) ($plan['url_mappings_preview_count'] ?? 0);
 
@@ -933,7 +1522,7 @@ final readonly class Importer
                 $parts[] = "URL mapping report: {$mappingReportPath}";
             }
 
-            $referenceReportPath = $this->writeReferenceMapReport($token, $pageMappings, $postMappings, $mediaMappings);
+            $referenceReportPath = $this->writeReferenceMapReport($token, $pageMappings, $postMappings, $mediaMappings, $taxonomyMappings);
             if ($referenceReportPath !== null) {
                 $parts[] = "Reference map report: {$referenceReportPath}";
             }
@@ -1003,6 +1592,18 @@ final readonly class Importer
             $isSourceMappedItem = trim((string) ($item['source_post_id'] ?? '')) !== ''
                 || trim((string) ($item['source_link'] ?? '')) !== '';
             if ($isSourceMappedItem && DB::table('tp_pages')->where('slug', $slug)->exists()) {
+                $existingId = (int) (TpPage::query()->where('slug', $slug)->value('id') ?? 0);
+                if ($existingId > 0) {
+                    $mappings[] = [
+                        'type' => 'page',
+                        'source_url' => (string) ($item['source_link'] ?? ''),
+                        'source_post_id' => (string) ($item['source_post_id'] ?? ''),
+                        'destination_id' => (string) $existingId,
+                        'destination_slug' => $slug,
+                        'destination_url' => '/'.$slug,
+                    ];
+                }
+
                 $skipped++;
                 $this->emitProgress($progress, [
                     'kind' => 'entity',
@@ -1166,6 +1767,18 @@ final readonly class Importer
             $isSourceMappedItem = trim((string) ($item['source_post_id'] ?? '')) !== ''
                 || trim((string) ($item['source_link'] ?? '')) !== '';
             if ($isSourceMappedItem && DB::table('tp_posts')->where('slug', $slug)->exists()) {
+                $existingId = (int) (TpPost::query()->where('slug', $slug)->value('id') ?? 0);
+                if ($existingId > 0) {
+                    $mappings[] = [
+                        'type' => 'post',
+                        'source_url' => (string) ($item['source_link'] ?? ''),
+                        'source_post_id' => (string) ($item['source_post_id'] ?? ''),
+                        'destination_id' => (string) $existingId,
+                        'destination_slug' => $slug,
+                        'destination_url' => '/'.$this->blogBase().'/'.$slug,
+                    ];
+                }
+
                 $skipped++;
                 $this->emitProgress($progress, [
                     'kind' => 'entity',
