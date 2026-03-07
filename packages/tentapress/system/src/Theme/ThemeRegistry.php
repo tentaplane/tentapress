@@ -103,7 +103,7 @@ final class ThemeRegistry
                 DB::table('tp_themes')->whereNotIn('id', $themeIds)->delete();
             }
 
-            $activeId = $this->activeThemeIdFromSettings();
+            $activeId = ThemeManager::activeThemeIdFromSettings();
             if ($activeId !== null && ! in_array($activeId, $themeIds, true)) {
                 $this->clearActiveThemeSetting();
                 $this->clearThemeCache();
@@ -125,39 +125,6 @@ final class ThemeRegistry
             ->all();
 
         return $rows;
-    }
-
-    private function activeThemeIdFromSettings(): ?string
-    {
-        try {
-            $row = DB::table('tp_settings')->where('key', 'active_theme')->first();
-
-            if (! $row) {
-                return null;
-            }
-
-            $value = $row->value ?? null;
-
-            if (is_string($value)) {
-                $decoded = json_decode($value, true);
-
-                if (is_string($decoded) && $decoded !== '') {
-                    return $decoded;
-                }
-
-                if (is_array($decoded) && isset($decoded['id']) && is_string($decoded['id'])) {
-                    return $decoded['id'];
-                }
-            }
-
-            if (is_array($value) && isset($value['id']) && is_string($value['id'])) {
-                return $value['id'];
-            }
-
-            return is_scalar($value) ? (string) $value : null;
-        } catch (\Throwable) {
-            return null;
-        }
     }
 
     private function clearActiveThemeSetting(): void

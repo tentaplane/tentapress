@@ -116,7 +116,7 @@ final class ThemeManager
 
     public function writeCache(): void
     {
-        $themeId = $this->activeThemeIdFromDb();
+        $themeId = self::activeThemeIdFromSettings();
 
         if ($themeId === null) {
             $this->clearCache();
@@ -172,7 +172,7 @@ final class ThemeManager
         }
 
         // DB fallback
-        $themeId = $this->activeThemeIdFromDb();
+        $themeId = self::activeThemeIdFromSettings();
 
         if ($themeId === null) {
             return null;
@@ -363,7 +363,7 @@ final class ThemeManager
         ];
     }
 
-    private function activeThemeIdFromDb(): ?string
+    public static function activeThemeIdFromSettings(): ?string
     {
         try {
             $row = DB::table('tp_settings')->where('key', 'active_theme')->first();
