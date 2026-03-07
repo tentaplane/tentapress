@@ -11,6 +11,7 @@ use TentaPress\SystemInfo\Http\Admin\Plugins\DisableController;
 use TentaPress\SystemInfo\Http\Admin\Plugins\EnableController;
 use TentaPress\SystemInfo\Http\Admin\Plugins\IndexController;
 use TentaPress\SystemInfo\Http\Admin\Plugins\InstallController;
+use TentaPress\SystemInfo\Http\Admin\Plugins\InstallAttemptDeleteController;
 use TentaPress\SystemInfo\Http\Admin\Plugins\InstallStatusController;
 use TentaPress\SystemInfo\Http\Admin\Plugins\SyncController;
 use TentaPress\SystemInfo\Http\Admin\Plugins\UpdateController;
@@ -47,6 +48,11 @@ AdminRoutes::group(function (): void {
     Route::get('/plugins/install-attempts/{installId}', InstallStatusController::class)
         ->whereNumber('installId')
         ->name('plugins.install-attempts.show')
+        ->middleware('tp.can:manage_plugins');
+
+    Route::delete('/plugins/install-attempts/{installId}', InstallAttemptDeleteController::class)
+        ->whereNumber('installId')
+        ->name('plugins.install-attempts.destroy')
         ->middleware('tp.can:manage_plugins');
 
     Route::get('/system-info', SystemInfoController::class)

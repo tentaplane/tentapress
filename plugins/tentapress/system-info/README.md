@@ -7,7 +7,7 @@ Diagnostics and plugin management for TentaPress.
 | Field    | Value                                             |
 | -------- | ------------------------------------------------- |
 | ID       | `tentapress/system-info`                          |
-| Version  | 0.8.6                                             |
+| Version  | 0.8.7                                             |
 | Provider | `TentaPress\SystemInfo\SystemInfoServiceProvider` |
 
 ## Features
@@ -20,6 +20,7 @@ Diagnostics and plugin management for TentaPress.
 - Plugin catalog for discovering first-party plugins (`tentapress/*`) with card-grid visual browsing
 - Catalog icon metadata support from local/hosted catalog sources
 - Install queue progress feedback on catalog install actions
+- Delete actions for recent install attempts on `/admin/plugins`, including stale running entries
 - Queue-based plugin installs from admin (`vendor/package`, GitHub URL, or Packagist URL)
 - First-party plugin installs use an explicit pre-1.0 Composer constraint so Packagist resolution works on production installs
 - Queue-based plugin updates from admin (defaults to installed plugins; full `composer update` gated by `TP_ALLOW_FULL_COMPOSER_UPDATE=true`)

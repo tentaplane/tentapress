@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Schema;
+use TentaPress\SystemInfo\Models\TpPluginInstall;
 use TentaPress\Users\Models\TpUser;
 
 it('gracefully renders system info when settings table is unavailable', function (): void {
@@ -35,4 +36,52 @@ it('returns a not found json response for missing plugin install attempts', func
         ->assertJson([
             'message' => 'Install attempt not found.',
         ]);
+});
+
+it('deletes completed plugin install attempts', function (): void {
+    $user = TpUser::query()->create([
+        'name' => 'System Admin',
+        'email' => 'system-info-delete-attempt@example.test',
+        'password' => 'secret',
+        'is_super_admin' => true,
+    ]);
+
+    $attempt = TpPluginInstall::query()->create([
+        'package' => 'tentapress/redirects',
+        'status' => 'failed',
+    ]);
+
+    $this->actingAs($user)
+        ->deleteJson('/admin/plugins/install-attempts/' . $attempt->id)
+        ->assertOk()
+        ->assertJson([
+            'message' => 'Install attempt deleted.',
+            'deleted_id' => (int) $attempt->id,
+        ]);
+
+    expect(TpPluginInstall::query()->find($attempt->id))->toBeNull();
+});
+
+it('deletes running plugin install attempts', function (): void {
+    $user = TpUser::query()->create([
+        'name' => 'System Admin',
+        'email' => 'system-info-active-attempt@example.test',
+        'password' => 'secret',
+        'is_super_admin' => true,
+    ]);
+
+    $attempt = TpPluginInstall::query()->create([
+        'package' => 'tentapress/redirects',
+        'status' => 'running',
+    ]);
+
+    $this->actingAs($user)
+        ->deleteJson('/admin/plugins/install-attempts/' . $attempt->id)
+        ->assertOk()
+        ->assertJson([
+            'message' => 'Install attempt deleted.',
+            'deleted_id' => (int) $attempt->id,
+        ]);
+
+    expect(TpPluginInstall::query()->find($attempt->id))->toBeNull();
 });

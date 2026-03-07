@@ -30,6 +30,7 @@
             installUrl: @js(route('tp.plugins.install')),
             updateUrl: @js(route('tp.plugins.update')),
             statusUrlTemplate: @js(route('tp.plugins.install-attempts.show', ['installId' => '__ID__'])),
+            deleteUrlTemplate: @js(route('tp.plugins.install-attempts.destroy', ['installId' => '__ID__'])),
             initialAttempts: @js($installAttempts),
             allowFullComposerUpdate: @js($allowFullComposerUpdate),
         })">
@@ -104,6 +105,7 @@
                                     <th class="tp-table__th">Package</th>
                                     <th class="tp-table__th">Status</th>
                                     <th class="tp-table__th">When</th>
+                                    <th class="tp-table__th text-right">Actions</th>
                                 </tr>
                             </thead>
                             <tbody class="tp-table__tbody">
@@ -129,6 +131,16 @@
                                         </td>
                                         <td data-label="When" class="tp-table__td">
                                             <span class="tp-muted text-xs" x-text="formatDate(attempt.created_at)"></span>
+                                        </td>
+                                        <td data-label="Actions" class="tp-table__td text-right">
+                                            <button
+                                                type="button"
+                                                class="tp-button-secondary"
+                                                :class="canDeleteAttempt(attempt) ? 'tp-button-secondary' : 'tp-button-disabled'"
+                                                :disabled="!canDeleteAttempt(attempt)"
+                                                @click="deleteAttempt(attempt.id)">
+                                                Delete
+                                            </button>
                                         </td>
                                     </tr>
                                 </template>
@@ -295,6 +307,7 @@
                 installUrl: String(config.installUrl || ''),
                 updateUrl: String(config.updateUrl || ''),
                 statusUrlTemplate: String(config.statusUrlTemplate || ''),
+                deleteUrlTemplate: String(config.deleteUrlTemplate || ''),
                 canInstallPlugins: Boolean(config.canInstallPlugins),
                 installTableExists: Boolean(config.installTableExists),
                 allowFullComposerUpdate: Boolean(config.allowFullComposerUpdate),
@@ -335,6 +348,9 @@
                 },
                 hasActiveAttempts() {
                     return this.attempts.some((attempt) => attempt.status === 'pending' || attempt.status === 'running');
+                },
+                canDeleteAttempt(attempt) {
+                    return Boolean(attempt);
                 },
                 startPollingIfNeeded() {
                     if (!this.hasActiveAttempts()) {
@@ -493,6 +509,38 @@
                         }
                     } finally {
                         this.submittingUpdate = false;
+                    }
+                },
+                async deleteAttempt(attemptId) {
+                    const attempt = this.attempts.find((item) => item.id === attemptId);
+                    if (!this.canDeleteAttempt(attempt)) {
+                        return;
+                    }
+
+                    try {
+                        const url = this.deleteUrlTemplate.replace('__ID__', String(attemptId));
+                        const response = await fetch(url, {
+                            method: 'DELETE',
+                            headers: {
+                                Accept: 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'X-CSRF-TOKEN': this.token,
+                            },
+                        });
+
+                        const data = await response.json().catch(() => ({}));
+                        if (!response.ok) {
+                            throw new Error(data.message || 'Unable to delete install attempt.');
+                        }
+
+                        this.attempts = this.attempts.filter((item) => item.id !== attemptId);
+                        if (window.tpToast) {
+                            window.tpToast(data.message || 'Install attempt deleted.', 'success');
+                        }
+                    } catch (error) {
+                        if (window.tpToast) {
+                            window.tpToast(error.message || 'Unable to delete install attempt.', 'error');
+                        }
                     }
                 },
             };
