@@ -141,6 +141,13 @@ it('shows the plugin menu when enabled and allows full admin CRUD', function ():
         ->assertSee('Global Content');
 
     $this->actingAs($admin)
+        ->get('/admin/global-content/new')
+        ->assertOk()
+        ->assertSee('name="editor_driver"', false)
+        ->assertSee('value="blocks"', false)
+        ->assertSee('border-slate-900 ring-2 ring-slate-200', false);
+
+    $this->actingAs($admin)
         ->post('/admin/global-content', [
             'title' => 'Header Banner',
             'slug' => 'header-banner',
@@ -156,6 +163,15 @@ it('shows the plugin menu when enabled and allows full admin CRUD', function ():
 
     expect((string) $content->slug)->toBe('header-banner');
     expect((string) $content->status)->toBe('published');
+
+    $content->update(['editor_driver' => 'builder']);
+
+    $this->actingAs($admin)
+        ->get('/admin/global-content/'.$content->id.'/edit')
+        ->assertOk()
+        ->assertSee('value="builder"', false)
+        ->assertSee('checked', false)
+        ->assertSee('border-slate-900 ring-2 ring-slate-200', false);
 
     $this->actingAs($admin)
         ->put('/admin/global-content/'.$content->id, [
