@@ -231,12 +231,12 @@ final class PluginAssetRegistry
 
     private function manifestPath(string $pluginId, string $pluginPath = ''): ?string
     {
-        $parts = array_values(array_filter(explode('/', $pluginId)));
-        if (count($parts) !== 2) {
+        $split = PluginAssetPublisher::splitPluginId($pluginId);
+        if ($split === null) {
             return null;
         }
 
-        [$vendor, $name] = $parts;
+        [$vendor, $name] = $split;
 
         if ($pluginPath !== '') {
             $pluginBuild = rtrim($pluginPath, '/').'/build';
@@ -267,8 +267,9 @@ final class PluginAssetRegistry
 
     private function assetUrl(string $pluginId, string $file, string $pluginPath = ''): string
     {
-        $parts = array_values(array_filter(explode('/', $pluginId)));
-        [$vendor, $name] = $parts;
+        /** @var array{0:string,1:string} $split — caller guarantees valid pluginId */
+        $split = PluginAssetPublisher::splitPluginId($pluginId);
+        [$vendor, $name] = $split;
 
         $relativePath = 'plugins/'.$vendor.'/'.$name.'/build/'.$file;
         $version = $this->assetVersion(public_path($relativePath), $pluginPath, $file);
@@ -312,12 +313,12 @@ final class PluginAssetRegistry
 
     private function ensurePublicAssets(string $pluginId): void
     {
-        $parts = array_values(array_filter(explode('/', $pluginId)));
-        if (count($parts) !== 2) {
+        $split = PluginAssetPublisher::splitPluginId($pluginId);
+        if ($split === null) {
             return;
         }
 
-        [$vendor, $name] = $parts;
+        [$vendor, $name] = $split;
 
         $publicRoot = public_path('plugins/'.$vendor.'/'.$name.'/build');
         if (is_file($publicRoot.'/manifest.json') || is_file($publicRoot.'/.vite/manifest.json')) {

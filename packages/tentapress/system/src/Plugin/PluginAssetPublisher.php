@@ -6,14 +6,26 @@ namespace TentaPress\System\Plugin;
 
 final class PluginAssetPublisher
 {
-    public function publish(string $pluginId, string $pluginPath): void
+    /**
+     * Split a plugin ID into [vendor, name], or null if malformed.
+     *
+     * @return array{0:string,1:string}|null
+     */
+    public static function splitPluginId(string $pluginId): ?array
     {
         $parts = array_values(array_filter(explode('/', $pluginId)));
-        if (count($parts) !== 2) {
+
+        return count($parts) === 2 ? [$parts[0], $parts[1]] : null;
+    }
+
+    public function publish(string $pluginId, string $pluginPath): void
+    {
+        $split = self::splitPluginId($pluginId);
+        if ($split === null) {
             return;
         }
 
-        [$vendor, $name] = $parts;
+        [$vendor, $name] = $split;
 
         $source = $this->resolveSourcePath($pluginPath, $vendor, $name);
         if ($source === null || ! is_dir($source)) {
@@ -26,12 +38,12 @@ final class PluginAssetPublisher
 
     public function unpublish(string $pluginId): void
     {
-        $parts = array_values(array_filter(explode('/', $pluginId)));
-        if (count($parts) !== 2) {
+        $split = self::splitPluginId($pluginId);
+        if ($split === null) {
             return;
         }
 
-        [$vendor, $name] = $parts;
+        [$vendor, $name] = $split;
         $destination = public_path('plugins/'.$vendor.'/'.$name.'/build');
         $this->deleteDirectory($destination);
     }
