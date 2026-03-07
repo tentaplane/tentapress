@@ -100,7 +100,7 @@ final class GlobalContentServiceProvider extends ServiceProvider
 
     private function registerBladeDirective(): void
     {
-        Blade::directive('tpGlobalContent', fn(string $expression): string => "<?php echo app('".GlobalContentReferenceResolver::class."')->renderPublishedBySlug((string) {$expression}); ?>");
+        Blade::directive('tpGlobalContent', fn (string $expression): string => "<?php echo app('".GlobalContentReferenceResolver::class."')->renderPublishedBySlug((string) {$expression}); ?>");
     }
 
     private function shouldIndexPageUsage(TpPage $page): bool
