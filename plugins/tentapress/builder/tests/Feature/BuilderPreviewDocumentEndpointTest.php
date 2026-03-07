@@ -86,9 +86,9 @@ function enableBuilderPreviewDependencies(bool $activateTheme = false): void
     if ($activateTheme) {
         test()->artisan('tp:themes sync')->assertSuccessful();
 
-        app(ThemeManager::class)->activate('tentapress/tailwind');
-        app(ThemeManager::class)->registerActiveThemeViews();
-        app(ThemeManager::class)->registerActiveThemeProvider();
+        resolve(ThemeManager::class)->activate('tentapress/tailwind');
+        resolve(ThemeManager::class)->registerActiveThemeViews();
+        resolve(ThemeManager::class)->registerActiveThemeProvider();
     }
 
     if (app()->getProvider(GlobalContentServiceProvider::class) === null) {
