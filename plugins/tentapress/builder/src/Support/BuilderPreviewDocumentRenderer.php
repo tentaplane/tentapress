@@ -136,6 +136,9 @@ final readonly class BuilderPreviewDocumentRenderer
      */
     private function renderGlobalContentView(array $payload, string $blocksHtml): string
     {
+        $layoutKey = trim((string) ($payload['layout'] ?? 'default'));
+        $layoutKey = $layoutKey !== '' ? $layoutKey : 'default';
+
         $globalContent = new TpGlobalContent();
         $globalContent->forceFill([
             'id' => 0,
@@ -147,10 +150,31 @@ final readonly class BuilderPreviewDocumentRenderer
             'blocks' => is_array($payload['blocks'] ?? null) ? $payload['blocks'] : [],
         ]);
 
-        return $this->views->make('tentapress-global-content::global-content.render', [
+        $fragmentHtml = $this->views->make('tentapress-global-content::global-content.render', [
             'globalContent' => $globalContent,
             'blocks' => [],
             'blocksHtml' => $blocksHtml,
+        ])->render();
+
+        $resolved = $this->resolveView('pages', $layoutKey);
+        $viewName = $resolved['view'];
+
+        $page = new TpPage([
+            'title' => (string) ($payload['title'] ?? 'Preview'),
+            'slug' => (string) ($payload['slug'] ?? ''),
+            'status' => 'draft',
+            'layout' => $layoutKey,
+            'editor_driver' => 'builder',
+            'blocks' => is_array($payload['blocks'] ?? null) ? $payload['blocks'] : [],
+            'content' => null,
+        ]);
+
+        return $this->views->make($viewName, [
+            'page' => $page,
+            'globalContent' => $globalContent,
+            'layoutKey' => $layoutKey,
+            'blocksHtml' => $fragmentHtml,
+            'isPageEditorContent' => false,
         ])->render();
     }
 

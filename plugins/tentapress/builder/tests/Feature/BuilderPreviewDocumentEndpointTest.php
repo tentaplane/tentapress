@@ -309,4 +309,5 @@ it('returns a valid preview document schema for global content snapshots', funct
     $payload = $response->json();
     expect((string) ($payload['body_html'] ?? ''))->toContain('Global content preview body');
     expect((string) ($payload['body_html'] ?? ''))->not->toContain('<script');
+    expect($payload['styles'] ?? [])->not->toBe([]);
 });
