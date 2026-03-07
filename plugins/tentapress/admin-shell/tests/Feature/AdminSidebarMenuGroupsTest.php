@@ -30,7 +30,7 @@ it('builds an implicit structure menu group for related plugin screens', functio
         $this->artisan('tp:plugins enable '.$pluginId)->assertSuccessful();
     }
 
-    $menu = collect(app(MenuBuilderContract::class)->build($user));
+    $menu = collect(resolve(MenuBuilderContract::class)->build($user));
     $structure = $menu->firstWhere('label', 'Structure');
 
     expect($structure)->not->toBeNull();
