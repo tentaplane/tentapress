@@ -1,0 +1,27 @@
+{
+    "id": "tentapress/global-content",
+    "name": "Global Content",
+    "description": "Reusable synced sections and template parts for TentaPress.",
+    "version": "0.1.0",
+    "provider": "TentaPress\\GlobalContent\\GlobalContentServiceProvider",
+    "requires": [
+        "tentapress/admin-shell",
+        "tentapress/blocks",
+        "tentapress/builder",
+        "tentapress/page-editor",
+        "tentapress/pages",
+        "tentapress/posts",
+        "tentapress/users"
+    ],
+    "admin": {
+        "menus": [
+            {
+                "label": "Global Content",
+                "route": "tp.global-content.index",
+                "capability": "manage_global_content",
+                "icon": "copy",
+                "position": 25
+            }
+        ]
+    }
+}
