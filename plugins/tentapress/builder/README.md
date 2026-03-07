@@ -7,7 +7,7 @@ Visual drag-and-drop builder for TentaPress pages and posts.
 | Field    | Value                                      |
 |----------|--------------------------------------------|
 | ID       | `tentapress/builder`                       |
-| Version  | 0.6.11                                     |
+| Version  | 0.6.12                                     |
 | Provider | `TentaPress\\Builder\\BuilderServiceProvider` |
 
 ## Features
@@ -18,6 +18,7 @@ Visual drag-and-drop builder for TentaPress pages and posts.
 - Essential presentation controls via `props.presentation`
 - Live theme preview via non-iframe server document fragments
 - Global content preview support for full-screen builder flows, including active theme assets
+- Global content reference blocks show the referenced title in builder summaries
 - Preview-safe block rendering for third-party embeds (thumbnail/placeholder instead of live iframe execution)
 - Built-in starter patterns
 - Undo/redo and keyboard shortcuts

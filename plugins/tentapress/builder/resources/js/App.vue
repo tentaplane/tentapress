@@ -54,6 +54,12 @@ const spacingTop = computed(() => String((selectedPresentation.value.spacing as 
 const spacingBottom = computed(() => String((selectedPresentation.value.spacing as { bottom?: string }).bottom ?? 'none'));
 const mediaOptions = computed<MediaOption[]>(() => (Array.isArray(props.config.mediaOptions) ? props.config.mediaOptions : []));
 
+type GlobalContentOption = {
+    value: string;
+    label: string;
+    title: string;
+};
+
 function isGlobalContentReferenceField(field: BlockField): boolean {
     return (
         !!store.selectedBlock &&
@@ -70,14 +76,30 @@ function isGlobalContentHiddenField(field: BlockField): boolean {
     );
 }
 
-function globalContentOptions(field: BlockField): Array<{ value: string; label: string }> {
+function normalizeGlobalContentOption(option: { value?: string; label?: string; title?: string } | string): GlobalContentOption {
+    if (typeof option === 'string') {
+        return {
+            value: option,
+            label: option,
+            title: option,
+        };
+    }
+
+    const value = String(option.value ?? '');
+    const label = String(option.label ?? option.value ?? '');
+    const title = String(option.title ?? '').trim();
+
+    return {
+        value,
+        label,
+        title: title !== '' ? title : label.replace(/\s+\([^)]*\)\s*$/, '').trim() || label,
+    };
+}
+
+function globalContentOptions(field: BlockField): GlobalContentOption[] {
     const query = globalContentSearch.value.trim().toLowerCase();
     const options = Array.isArray(field.options)
-        ? field.options.map((option) =>
-              typeof option === 'string'
-                  ? { value: option, label: option }
-                  : { value: String(option.value ?? ''), label: String(option.label ?? option.value ?? '') },
-          )
+        ? field.options.map((option) => normalizeGlobalContentOption(option))
         : [];
 
     if (query === '') {
@@ -96,16 +118,12 @@ function syncGlobalContentReference(field: BlockField, event: Event): void {
     const option = globalContentOptions(field).find((entry) => entry.value === value)
         ?? (Array.isArray(field.options)
             ? field.options
-                  .map((entry) =>
-                      typeof entry === 'string'
-                          ? { value: entry, label: entry }
-                          : { value: String(entry.value ?? ''), label: String(entry.label ?? entry.value ?? '') },
-                  )
+                  .map((entry) => normalizeGlobalContentOption(entry))
                   .find((entry) => entry.value === value)
             : undefined);
 
     store.setBlockProp(store.selectedIndex, 'global_content_id', value);
-    store.setBlockProp(store.selectedIndex, 'global_content_label', option?.label ?? '');
+    store.setBlockProp(store.selectedIndex, 'global_content_label', option?.title ?? '');
 }
 
 function globalContentEditUrl(): string {
@@ -166,6 +184,22 @@ function blockSummary(index: number): string {
     const block = store.blocks[index];
     if (!block) {
         return '';
+    }
+
+    if (block.type === 'tentapress/global-content/reference') {
+        const cachedTitle = String(block.props.global_content_label ?? '').trim();
+        if (cachedTitle !== '') {
+            return cachedTitle;
+        }
+
+        const globalContentId = String(block.props.global_content_id ?? '').trim();
+        const definition = store.definitionFor(block.type);
+        const referenceField = definition?.fields.find((field) => field.key === 'global_content_id');
+        const matched = referenceField ? globalContentOptions(referenceField).find((option) => option.value === globalContentId) : null;
+
+        if (matched?.title) {
+            return matched.title;
+        }
     }
 
     for (const value of Object.values(block.props)) {

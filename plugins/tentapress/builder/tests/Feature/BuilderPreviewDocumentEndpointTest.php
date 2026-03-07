@@ -60,19 +60,25 @@ function registerBuilderGlobalContentAutoloader(): void
 
 function enableBuilderPreviewDependencies(): void
 {
-    test()->artisan('tp:plugins sync')->assertSuccessful();
     registerBuilderGlobalContentAutoloader();
+    static $pluginsEnabled = false;
 
-    foreach ([
-        'tentapress/admin-shell',
-        'tentapress/blocks',
-        'tentapress/builder',
-        'tentapress/pages',
-        'tentapress/posts',
-        'tentapress/global-content',
-        'tentapress/users',
-    ] as $pluginId) {
-        test()->artisan('tp:plugins enable '.$pluginId)->assertSuccessful();
+    if (! $pluginsEnabled) {
+        test()->artisan('tp:plugins sync')->assertSuccessful();
+
+        foreach ([
+            'tentapress/admin-shell',
+            'tentapress/blocks',
+            'tentapress/builder',
+            'tentapress/pages',
+            'tentapress/posts',
+            'tentapress/global-content',
+            'tentapress/users',
+        ] as $pluginId) {
+            test()->artisan('tp:plugins enable '.$pluginId)->assertSuccessful();
+        }
+
+        $pluginsEnabled = true;
     }
 
     if (app()->getProvider(GlobalContentServiceProvider::class) === null) {

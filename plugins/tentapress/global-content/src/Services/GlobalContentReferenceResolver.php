@@ -47,7 +47,7 @@ final class GlobalContentReferenceResolver
     }
 
     /**
-     * @return array<int,array{id:int,value:string,label:string,slug:string,kind:string,status:string,edit_url:?string}>
+     * @return array<int,array{id:int,value:string,label:string,title:string,slug:string,kind:string,status:string,edit_url:?string}>
      */
     public function publishedLibrary(): array
     {
@@ -59,6 +59,7 @@ final class GlobalContentReferenceResolver
                 'id' => (int) $content->id,
                 'value' => (string) $content->id,
                 'label' => trim((string) $content->title).' ('.trim((string) $content->slug).')',
+                'title' => trim((string) $content->title),
                 'slug' => (string) $content->slug,
                 'kind' => (string) $content->kind,
                 'status' => (string) $content->status,
