@@ -7,7 +7,7 @@ Standalone taxonomy registration and persistence for TentaPress.
 | Field    | Value                                    |
 | -------- | ---------------------------------------- |
 | ID       | `tentapress/taxonomies`                  |
-| Version  | 0.5.1                                    |
+| Version  | 0.5.2                                    |
 | Provider | `TentaPress\Taxonomies\TaxonomiesServiceProvider` |
 
 ## Features
@@ -49,6 +49,12 @@ composer test:filter -- TaxonomiesAdminFilteringFlowTest
 composer test:filter -- TaxonomiesPublicArchiveFlowTest
 composer test:filter -- TaxonomiesStandaloneReadinessTest
 ```
+
+## Admin Menu
+
+| Label      | Parent      | Route                 | Capability     |
+|------------|-------------|-----------------------|----------------|
+| Taxonomies | `Structure` | `tp.taxonomies.index` | `manage_posts` |
 
 ## Standalone Acceptance Checklist
 

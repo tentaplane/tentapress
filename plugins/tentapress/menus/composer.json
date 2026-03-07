@@ -1,5 +1,6 @@
 {
     "name": "tentapress/menus",
+    "version": "0.3.7",
     "type": "library",
     "license": "MIT",
     "require": {

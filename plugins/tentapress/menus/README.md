@@ -7,7 +7,7 @@ Navigation menu management for TentaPress.
 | Field    | Value                                   |
 | -------- | --------------------------------------- |
 | ID       | `tentapress/menus`                      |
-| Version  | 0.3.6                                   |
+| Version  | 0.3.7                                   |
 | Provider | `TentaPress\Menus\MenusServiceProvider` |
 
 ## Goal
@@ -62,9 +62,9 @@ Allow users to define navigation menus and map them to theme locations.
 
 ## Admin Menu
 
-| Label | Route            | Capability     | Icon | Position |
-| ----- | ---------------- | -------------- | ---- | -------- |
-| Menus | `tp.menus.index` | `manage_menus` | menu | 40       |
+| Label | Parent      | Route            | Capability     | Icon | Position |
+| ----- | ----------- | ---------------- | -------------- | ---- | -------- |
+| Menus | `Structure` | `tp.menus.index` | `manage_menus` | menu | 40       |
 
 ## Admin UI (current)
 

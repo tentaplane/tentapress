@@ -7,7 +7,7 @@ Reusable synced sections and template parts for TentaPress.
 | Field    | Value                                                        |
 |----------|--------------------------------------------------------------|
 | ID       | `tentapress/global-content`                                  |
-| Version  | 0.1.5                                                        |
+| Version  | 0.1.6                                                        |
 | Provider | `TentaPress\\GlobalContent\\GlobalContentServiceProvider`    |
 
 ## Purpose
@@ -28,9 +28,9 @@ Provide a central library of reusable sections and template parts that can be re
 
 ## Admin Menu
 
-| Label          | Route                     | Capability               | Icon | Position |
-|----------------|---------------------------|--------------------------|------|----------|
-| Global Content | `tp.global-content.index` | `manage_global_content`  | copy | 25       |
+| Label          | Parent      | Route                     | Capability              | Icon | Position |
+|----------------|-------------|---------------------------|-------------------------|------|----------|
+| Global Content | `Structure` | `tp.global-content.index` | `manage_global_content` | copy | 85       |
 
 ## Dependencies
 

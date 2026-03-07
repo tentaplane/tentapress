@@ -2,7 +2,7 @@
     "id": "tentapress/menus",
     "name": "Menus",
     "description": "Manage navigation menus and theme locations.",
-    "version": "0.3.6",
+    "version": "0.3.7",
     "provider": "TentaPress\\Menus\\MenusServiceProvider",
     "requires": ["tentapress/users", "tentapress/pages", "tentapress/posts", "tentapress/settings"],
     "admin": {
@@ -12,7 +12,8 @@
                 "route": "tp.menus.index",
                 "capability": "manage_menus",
                 "icon": "menu",
-                "position": 40
+                "position": 40,
+                "parent": "Structure"
             }
         ]
     }

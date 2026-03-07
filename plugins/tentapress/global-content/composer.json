@@ -1,7 +1,7 @@
 {
     "name": "tentapress/global-content",
     "type": "library",
-    "version": "0.1.5",
+    "version": "0.1.6",
     "license": "MIT",
     "require": {
         "php": "^8.2",

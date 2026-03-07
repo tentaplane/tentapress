@@ -31,25 +31,38 @@
             @else
                 @php
                     $submenuId = 'tp-admin-submenu-'.$loop->index.'-'.\Illuminate\Support\Str::slug($label);
+                    $canNavigate = is_string($url) && $url !== '';
                 @endphp
                 <div x-data="{ open: {{ $isActive ? 'true' : 'false' }} }">
                     <div class="flex items-center gap-1">
-                        <a
-                            href="{{ $url ?: '#' }}"
-                            @click="sidebarOpen = false"
-                            class="{{ $isActive ? 'bg-[#2b7bc7]/25 text-white ring-1 ring-[#6eaee6]/35 ring-inset' : 'text-white/75 hover:bg-white/8 hover:text-white' }} block flex-1 rounded px-3 py-2 text-sm font-semibold transition">
-                            {{ $label }}
-                        </a>
+                        @if ($canNavigate)
+                            <a
+                                href="{{ $url }}"
+                                @click="sidebarOpen = false"
+                                class="{{ $isActive ? 'bg-[#2b7bc7]/25 text-white ring-1 ring-[#6eaee6]/35 ring-inset' : 'text-white/75 hover:bg-white/8 hover:text-white' }} block flex-1 rounded px-3 py-2 text-sm font-semibold transition">
+                                {{ $label }}
+                            </a>
 
-                        <button
-                            type="button"
-                            @click="open = !open"
-                            class="rounded px-2 py-2 text-white/60 transition hover:bg-white/5 hover:text-white"
-                            :aria-expanded="open ? 'true' : 'false'"
-                            aria-controls="{{ $submenuId }}"
-                            aria-label="Show or hide {{ $label }}">
-                            <span x-text="open ? '–' : '+'"></span>
-                        </button>
+                            <button
+                                type="button"
+                                @click="open = !open"
+                                class="rounded px-2 py-2 text-white/60 transition hover:bg-white/5 hover:text-white"
+                                :aria-expanded="open ? 'true' : 'false'"
+                                aria-controls="{{ $submenuId }}"
+                                aria-label="Show or hide {{ $label }}">
+                                <span x-text="open ? '–' : '+'"></span>
+                            </button>
+                        @else
+                            <button
+                                type="button"
+                                @click="open = !open"
+                                class="{{ $isActive ? 'bg-[#2b7bc7]/25 text-white ring-1 ring-[#6eaee6]/35 ring-inset' : 'text-white/75 hover:bg-white/8 hover:text-white' }} flex w-full items-center justify-between rounded px-3 py-2 text-left text-sm font-semibold transition"
+                                :aria-expanded="open ? 'true' : 'false'"
+                                aria-controls="{{ $submenuId }}">
+                                <span>{{ $label }}</span>
+                                <span class="px-1 text-white/60" x-text="open ? '–' : '+'"></span>
+                            </button>
+                        @endif
                     </div>
 
                     <div id="{{ $submenuId }}" x-show="open" x-cloak class="mt-1 space-y-1 pl-3">
