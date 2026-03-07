@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use TentaPress\Builder\BuilderServiceProvider;
+use TentaPress\GlobalContent\GlobalContentServiceProvider;
 use TentaPress\System\Plugin\PluginRegistry;
 use TentaPress\Users\Models\TpUser;
 
@@ -36,7 +37,53 @@ function registerBuilderDocumentProvider(): void
     }
 }
 
+function registerBuilderGlobalContentAutoloader(): void
+{
+    spl_autoload_register(static function (string $class): void {
+        $prefix = 'TentaPress\\GlobalContent\\';
+
+        if (! str_starts_with($class, $prefix)) {
+            return;
+        }
+
+        $relativeClass = substr($class, strlen($prefix));
+        if (! is_string($relativeClass) || $relativeClass === '') {
+            return;
+        }
+
+        $path = base_path('plugins/tentapress/global-content/src/'.str_replace('\\', '/', $relativeClass).'.php');
+        if (is_file($path)) {
+            require_once $path;
+        }
+    });
+}
+
+function enableBuilderPreviewDependencies(): void
+{
+    test()->artisan('tp:plugins sync')->assertSuccessful();
+    registerBuilderGlobalContentAutoloader();
+
+    foreach ([
+        'tentapress/admin-shell',
+        'tentapress/blocks',
+        'tentapress/builder',
+        'tentapress/pages',
+        'tentapress/posts',
+        'tentapress/global-content',
+        'tentapress/users',
+    ] as $pluginId) {
+        test()->artisan('tp:plugins enable '.$pluginId)->assertSuccessful();
+    }
+
+    if (app()->getProvider(GlobalContentServiceProvider::class) === null) {
+        app()->register(GlobalContentServiceProvider::class);
+        resolve('router')->getRoutes()->refreshNameLookups();
+        resolve('router')->getRoutes()->refreshActionLookups();
+    }
+}
+
 it('returns a valid preview document schema for page snapshots', function (): void {
+    enableBuilderPreviewDependencies();
     registerBuilderDocumentProvider();
 
     $author = TpUser::query()->create([
@@ -86,6 +133,7 @@ it('returns a valid preview document schema for page snapshots', function (): vo
 });
 
 it('strips inline script vectors from preview document body html', function (): void {
+    enableBuilderPreviewDependencies();
     registerBuilderDocumentProvider();
 
     $author = TpUser::query()->create([
@@ -129,6 +177,7 @@ it('strips inline script vectors from preview document body html', function (): 
 });
 
 it('returns a valid preview document schema for post snapshots', function (): void {
+    enableBuilderPreviewDependencies();
     registerBuilderDocumentProvider();
 
     $author = TpUser::query()->create([
@@ -166,6 +215,7 @@ it('returns a valid preview document schema for post snapshots', function (): vo
 });
 
 it('denies cross-user access to preview document snapshots', function (): void {
+    enableBuilderPreviewDependencies();
     registerBuilderDocumentProvider();
 
     $author = TpUser::query()->create([
@@ -197,6 +247,7 @@ it('denies cross-user access to preview document snapshots', function (): void {
 });
 
 it('expires preview document snapshots after ttl', function (): void {
+    enableBuilderPreviewDependencies();
     registerBuilderDocumentProvider();
 
     $author = TpUser::query()->create([
@@ -220,4 +271,42 @@ it('expires preview document snapshots after ttl', function (): void {
     $this->travel(11)->minutes();
 
     $this->actingAs($author)->getJson($documentUrl)->assertNotFound();
+});
+
+it('returns a valid preview document schema for global content snapshots', function (): void {
+    enableBuilderPreviewDependencies();
+    registerBuilderDocumentProvider();
+
+    $author = TpUser::query()->create([
+        'name' => 'Builder Global Content Document',
+        'email' => 'builder-global-content-doc@example.test',
+        'password' => 'secret',
+        'is_super_admin' => true,
+    ]);
+
+    $snapshot = $this->actingAs($author)->post('/admin/builder/snapshots', [
+        'resource' => 'global-content',
+        'title' => 'Preview Global Content',
+        'slug' => 'preview-global-content',
+        'layout' => 'default',
+        'blocks' => [
+            [
+                'type' => 'blocks/content',
+                'props' => [
+                    'content' => 'Global content preview body',
+                ],
+            ],
+        ],
+    ]);
+
+    $snapshot->assertOk();
+    $documentUrl = (string) $snapshot->json('document_url');
+    expect($documentUrl)->not->toBe('');
+
+    $response = $this->actingAs($author)->getJson($documentUrl);
+    $response->assertOk();
+
+    $payload = $response->json();
+    expect((string) ($payload['body_html'] ?? ''))->toContain('Global content preview body');
+    expect((string) ($payload['body_html'] ?? ''))->not->toContain('<script');
 });

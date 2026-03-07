@@ -136,16 +136,19 @@ final readonly class BuilderPreviewDocumentRenderer
      */
     private function renderGlobalContentView(array $payload, string $blocksHtml): string
     {
+        $globalContent = new TpGlobalContent();
+        $globalContent->forceFill([
+            'id' => 0,
+            'title' => (string) ($payload['title'] ?? 'Preview'),
+            'slug' => (string) ($payload['slug'] ?? ''),
+            'kind' => 'section',
+            'status' => 'draft',
+            'editor_driver' => 'builder',
+            'blocks' => is_array($payload['blocks'] ?? null) ? $payload['blocks'] : [],
+        ]);
+
         return $this->views->make('tentapress-global-content::global-content.render', [
-            'globalContent' => new TpGlobalContent([
-                'id' => 0,
-                'title' => (string) ($payload['title'] ?? 'Preview'),
-                'slug' => (string) ($payload['slug'] ?? ''),
-                'kind' => 'section',
-                'status' => 'draft',
-                'editor_driver' => 'builder',
-                'blocks' => is_array($payload['blocks'] ?? null) ? $payload['blocks'] : [],
-            ]),
+            'globalContent' => $globalContent,
             'blocks' => [],
             'blocksHtml' => $blocksHtml,
         ])->render();
