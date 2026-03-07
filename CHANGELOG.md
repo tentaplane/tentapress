@@ -4,6 +4,34 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.43.0](https://github.com/tentaplane/tentapress/compare/v0.42.0...v0.43.0) (2026-03-07)
+
+
+### Features
+
+* **global-content:** add reusable content plugin core ([ba2d66a](https://github.com/tentaplane/tentapress/commit/ba2d66a97ae228e47f68747a200623b3a3dec56d))
+* **global-content:** integrate synced references across editors ([19e23b7](https://github.com/tentaplane/tentapress/commit/19e23b768f2412f6501d7353688c1ee9804e6d94))
+* **system-info:** add install attempt deletion ([9346e0c](https://github.com/tentaplane/tentapress/commit/9346e0cd95b7d53764d29ebed70813b78e42141a))
+
+
+### Bug Fixes
+
+* **admin-shell:** bump version for rebuilt styles ([0baf49e](https://github.com/tentaplane/tentapress/commit/0baf49e4203934c0a1f35c508cb5de6156168f3e))
+* **builder:** include theme assets in global preview ([2079622](https://github.com/tentaplane/tentapress/commit/207962279157be362992579cf6385f528ba8aa94))
+* **builder:** prefer titles for global content references ([beb81da](https://github.com/tentaplane/tentapress/commit/beb81da8991b1968c322bd62da7d539cb9fd7628))
+* **builder:** support global content preview models ([96a3f76](https://github.com/tentaplane/tentapress/commit/96a3f76f071c16fc0bd9bb719c8ac3d17b3a9b35))
+* **global-content:** guard edit links during plugin boot ([fbd5d89](https://github.com/tentaplane/tentapress/commit/fbd5d89362aed7a368082d4ff9d1ba9fe8c41fa2))
+* **global-content:** highlight selected editor experience ([5fe20bf](https://github.com/tentaplane/tentapress/commit/5fe20bfdbc23867262c9f2ed430a138ce31084db))
+* **global-content:** keep builder fullscreen only ([939ced9](https://github.com/tentaplane/tentapress/commit/939ced9b3cb81c4b8f376b8cbde19886db70b16c))
+* **global-content:** wire editor experience switching ([645a756](https://github.com/tentaplane/tentapress/commit/645a75683ae3774ab48208f1f71807d7d7919ba7))
+* **revisions:** handle duplicate manual snapshot writes ([7fba26a](https://github.com/tentaplane/tentapress/commit/7fba26a8336d8e4398253dcb36c86cd159baf74e))
+* **system-info:** require first-party plugins with dev constraint ([e16a368](https://github.com/tentaplane/tentapress/commit/e16a368b470ce35133fe6845f8463764c52864cf))
+
+
+### Miscellaneous Chores
+
+* **global-content:** normalize provider formatting ([20a73bc](https://github.com/tentaplane/tentapress/commit/20a73bc50469e4eb80a9274a10c303409e5b866b))
+
 ## [0.42.0](https://github.com/tentaplane/tentapress/compare/v0.41.0...v0.42.0) (2026-03-06)
 
 
