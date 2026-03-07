@@ -66,26 +66,4 @@ final class CatalogCommand extends Command
 
         return self::SUCCESS;
     }
-
-    /**
-     * Must match Illuminate\Console\Command::fail(Throwable|string|null $exception = null)
-     */
-    public function fail(Throwable|string|null $exception = null): int
-    {
-        if ($exception instanceof Throwable) {
-            $this->error($exception->getMessage());
-
-            return self::FAILURE;
-        }
-
-        if (is_string($exception) && $exception !== '') {
-            $this->error($exception);
-
-            return self::FAILURE;
-        }
-
-        $this->error('Command failed.');
-
-        return self::FAILURE;
-    }
 }
