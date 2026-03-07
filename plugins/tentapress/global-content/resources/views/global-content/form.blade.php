@@ -47,8 +47,21 @@
                                 <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
                                     @foreach ($editorDriverMap as $driverId => $driverDefinition)
                                         <label class="cursor-pointer">
-                                            <input type="radio" name="editor_driver" value="{{ $driverId }}" class="sr-only peer" @checked($editorDriver === $driverId) />
-                                            <div class="rounded-xl border border-slate-200 bg-white p-4 transition peer-checked:border-sky-300 peer-checked:bg-sky-50/60">
+                                            <input
+                                                type="radio"
+                                                name="editor_driver"
+                                                value="{{ $driverId }}"
+                                                class="sr-only peer"
+                                                data-editor-switch-radio
+                                                data-editor-label="{{ $driverDefinition->label }}"
+                                                @checked($editorDriver === $driverId) />
+                                            <div
+                                                @class([
+                                                    'rounded-xl border bg-white p-4 transition',
+                                                    'border-slate-900 ring-2 ring-slate-200' => $editorDriver === $driverId,
+                                                    'border-slate-200' => $editorDriver !== $driverId,
+                                                    'peer-checked:border-slate-900 peer-checked:ring-2 peer-checked:ring-slate-200',
+                                                ])>
                                                 <div class="font-semibold text-slate-900">{{ $driverDefinition->label }}</div>
                                                 <div class="mt-1 text-xs text-slate-500">{{ $driverDefinition->description }}</div>
                                             </div>
