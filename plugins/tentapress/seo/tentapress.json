@@ -9,7 +9,8 @@
                 "label": "SEO",
                 "route": "tp.seo.index",
                 "capability": "manage_seo",
-                "position": 40
+                "position": 30,
+                "parent": "Structure"
             }
         ]
     }

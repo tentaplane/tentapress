@@ -15,6 +15,16 @@ use TentaPress\System\Support\Paths;
 final class MenuBuilder implements MenuBuilderContract
 {
     /**
+     * @var array<string,array{position:int,icon:string|null}>
+     */
+    private const GROUP_DEFINITIONS = [
+        'Structure' => [
+            'position' => 50,
+            'icon' => null,
+        ],
+    ];
+
+    /**
      * Cached flat items (unfiltered).
      */
     private ?array $cached = null;
@@ -208,13 +218,15 @@ final class MenuBuilder implements MenuBuilderContract
                 }
             }
 
+            $groupDefinition = self::GROUP_DEFINITIONS[$parentLabel] ?? null;
+
             $top[$parentLabel] = [
                 'label' => $parentLabel,
                 'route' => null,
                 'url' => null,
                 'capability' => null,
-                'icon' => null,
-                'position' => $minPos,
+                'icon' => $groupDefinition['icon'] ?? null,
+                'position' => $groupDefinition['position'] ?? $minPos,
                 'parent' => null,
                 'active' => false,
                 'children' => [],

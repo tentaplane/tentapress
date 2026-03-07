@@ -33,6 +33,7 @@
                     $submenuId = 'tp-admin-submenu-'.$loop->index.'-'.\Illuminate\Support\Str::slug($label);
                     $canNavigate = is_string($url) && $url !== '';
                 @endphp
+
                 <div x-data="{ open: {{ $isActive ? 'true' : 'false' }} }">
                     <div class="flex items-center gap-1">
                         @if ($canNavigate)
@@ -56,11 +57,11 @@
                             <button
                                 type="button"
                                 @click="open = !open"
-                                class="{{ $isActive ? 'bg-[#2b7bc7]/25 text-white ring-1 ring-[#6eaee6]/35 ring-inset' : 'text-white/75 hover:bg-white/8 hover:text-white' }} flex w-full items-center justify-between rounded px-3 py-2 text-left text-sm font-semibold transition"
+                                class="{{ $isActive ? 'bg-[#2b7bc7]/25 text-white ring-1 ring-[#6eaee6]/35 ring-inset' : 'text-white/75 hover:bg-white/8 hover:text-white' }} flex w-full items-center justify-between rounded py-2 pr-2 pl-3 text-left text-sm font-semibold transition"
                                 :aria-expanded="open ? 'true' : 'false'"
                                 aria-controls="{{ $submenuId }}">
                                 <span>{{ $label }}</span>
-                                <span class="px-1 text-white/60" x-text="open ? '–' : '+'"></span>
+                                <span x-text="open ? '–' : '+'"></span>
                             </button>
                         @endif
                     </div>

@@ -20,7 +20,7 @@
                 "route": "tp.global-content.index",
                 "capability": "manage_global_content",
                 "icon": "copy",
-                "position": 85,
+                "position": 20,
                 "parent": "Structure"
             }
         ]

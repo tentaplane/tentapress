@@ -7,13 +7,14 @@ Admin UI shell providing the base layout, navigation, and shared components for 
 | Field    | Value                                             |
 |----------|---------------------------------------------------|
 | ID       | `tentapress/admin-shell`                          |
-| Version  | 0.6.15                                            |
+| Version  | 0.6.16                                            |
 | Provider | `TentaPress\AdminShell\AdminShellServiceProvider` |
 
 ## Features
 
 - Base admin layout (header, sidebar, content area)
 - Parent-only navigation groups expand inline instead of navigating to placeholder screens
+- Shared admin navigation groups can declare explicit ordering metadata, including the built-in `Structure` group
 - Mobile/tablet responsive behavior for sidebar, topbar, and dashboard widgets
 - Shared responsive admin table pattern (`tp-table--responsive`) for plugin index/list screens
 - Accessibility improvements for dialogs, toast announcements, responsive tables, and mobile navigation controls

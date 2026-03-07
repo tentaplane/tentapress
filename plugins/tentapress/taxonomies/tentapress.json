@@ -14,7 +14,7 @@
                 "route": "tp.taxonomies.index",
                 "capability": "manage_posts",
                 "icon": "tags",
-                "position": 35,
+                "position": 90,
                 "parent": "Structure"
             }
         ]

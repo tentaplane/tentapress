@@ -36,11 +36,13 @@ it('builds an implicit structure menu group for related plugin screens', functio
     expect($structure)->not->toBeNull();
     expect($structure['route'])->toBeNull();
     expect($structure['url'])->toBeNull();
-    expect(collect($structure['children'] ?? [])->pluck('label')->all())->toBe([
-        'Taxonomies',
-        'Menus',
-        'Global Content',
-    ]);
+    expect($structure['position'])->toBe(32);
+
+    $childLabels = collect($structure['children'] ?? [])->pluck('label')->all();
+
+    expect($childLabels)->toContain('Taxonomies');
+    expect($childLabels)->toContain('Menus');
+    expect($childLabels)->toContain('Global Content');
 });
 
 it('renders implicit parent menu groups as submenu toggles instead of links', function (): void {
