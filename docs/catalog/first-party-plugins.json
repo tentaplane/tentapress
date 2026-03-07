@@ -1,6 +1,6 @@
 {
     "schema_version": 1,
-    "generated_at": "2026-03-07T11:19:24Z",
+    "generated_at": "2026-03-07T14:11:13Z",
     "plugins": [
         {
             "id": "tentapress/admin-shell",
@@ -156,7 +156,7 @@
             "name": "Posts",
             "description": "Create and manage blog posts.",
             "package": "tentapress/posts",
-            "latest_version": "0.4.8",
+            "latest_version": "0.4.9",
             "icon": "posts"
         },
         {

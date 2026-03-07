@@ -37,7 +37,7 @@ final class PostsServiceProvider extends ServiceProvider
 
             $this->app->booted(function (): void {
                 $this->app->make(Schedule::class)
-                    ->command('tp:posts publish-scheduled')
+                    ->command('tp:posts:publish-scheduled')
                     ->everyMinute()
                     ->withoutOverlapping();
             });

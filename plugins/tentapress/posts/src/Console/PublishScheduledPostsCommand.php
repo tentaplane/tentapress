@@ -10,7 +10,7 @@ use Throwable;
 
 final class PublishScheduledPostsCommand extends Command
 {
-    protected $signature = 'tp:posts publish-scheduled {--limit=50 : Max posts to publish per run}';
+    protected $signature = 'tp:posts:publish-scheduled {--limit=50 : Max posts to publish per run}';
 
     protected $description = 'Publish scheduled posts whose publish date has passed.';
 

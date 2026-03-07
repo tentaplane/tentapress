@@ -83,7 +83,7 @@ php artisan tp:themes activate tentapress/tailwind
 
 php artisan tp:users:make-admin
 php artisan tp:permissions seed
-php artisan tp:posts
+php artisan tp:posts:publish-scheduled
 ```
 
 ### Development commands
