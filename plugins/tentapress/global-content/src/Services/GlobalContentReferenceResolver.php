@@ -15,7 +15,7 @@ final class GlobalContentReferenceResolver
     private array $renderStack = [];
 
     public function __construct(
-        private ViewFactory $views,
+        private readonly ViewFactory $views,
     ) {
     }
 
@@ -89,7 +89,7 @@ final class GlobalContentReferenceResolver
 
         try {
             if (app()->bound('tp.blocks.render')) {
-                $renderer = app('tp.blocks.render');
+                $renderer = resolve('tp.blocks.render');
 
                 if (is_callable($renderer)) {
                     $html = $renderer(is_array($content->blocks) ? $content->blocks : []);

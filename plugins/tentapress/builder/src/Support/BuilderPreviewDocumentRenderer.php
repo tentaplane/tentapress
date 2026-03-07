@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TentaPress\Builder\Support;
 
+use TentaPress\GlobalContent\Models\TpGlobalContent;
 use Illuminate\Contracts\View\Factory as ViewFactory;
 use Illuminate\Support\Facades\Log;
 use TentaPress\Pages\Models\TpPage;
@@ -35,29 +36,37 @@ final readonly class BuilderPreviewDocumentRenderer
      */
     public function render(string $token, array $payload): array
     {
-        $resource = trim((string) ($payload['resource'] ?? 'pages')) === 'posts' ? 'posts' : 'pages';
+        $resource = match (trim((string) ($payload['resource'] ?? 'pages'))) {
+            'posts' => 'posts',
+            'global-content' => 'global-content',
+            default => 'pages',
+        };
         $layoutKey = trim((string) ($payload['layout'] ?? 'default'));
         $layoutKey = $layoutKey !== '' ? $layoutKey : 'default';
 
         $renderedBlocks = $this->blocks->render(is_array($payload['blocks'] ?? null) ? $payload['blocks'] : []);
 
-        $resolved = $this->resolveView($resource, $layoutKey);
-        $viewName = $resolved['view'];
-        $usesFallback = $resolved['uses_fallback'];
+        if ($resource === 'global-content') {
+            $html = $this->renderGlobalContentView($payload, $renderedBlocks['html']);
+        } else {
+            $resolved = $this->resolveView($resource, $layoutKey);
+            $viewName = $resolved['view'];
+            $usesFallback = $resolved['uses_fallback'];
 
-        if ($usesFallback) {
-            $activeTheme = $this->themes->activeTheme();
-            Log::info('builder.preview.fallback_theme_layout', [
-                'theme' => is_array($activeTheme) ? (string) ($activeTheme['id'] ?? '') : '',
-                'resource' => $resource,
-                'layout' => $layoutKey,
-                'view' => $viewName,
-            ]);
+            if ($usesFallback) {
+                $activeTheme = $this->themes->activeTheme();
+                Log::info('builder.preview.fallback_theme_layout', [
+                    'theme' => is_array($activeTheme) ? (string) ($activeTheme['id'] ?? '') : '',
+                    'resource' => $resource,
+                    'layout' => $layoutKey,
+                    'view' => $viewName,
+                ]);
+            }
+
+            $html = $resource === 'posts'
+                ? $this->renderPostView($viewName, $layoutKey, $payload, $renderedBlocks['html'])
+                : $this->renderPageView($viewName, $layoutKey, $payload, $renderedBlocks['html']);
         }
-
-        $html = $resource === 'posts'
-            ? $this->renderPostView($viewName, $layoutKey, $payload, $renderedBlocks['html'])
-            : $this->renderPageView($viewName, $layoutKey, $payload, $renderedBlocks['html']);
 
         $document = $this->extractor->extract($html);
         $revision = $this->hashDocument($document, $renderedBlocks['block_map']);
@@ -119,6 +128,26 @@ final readonly class BuilderPreviewDocumentRenderer
             'layoutKey' => $layoutKey,
             'blocksHtml' => $blocksHtml,
             'isPageEditorContent' => false,
+        ])->render();
+    }
+
+    /**
+     * @param  array<string,mixed>  $payload
+     */
+    private function renderGlobalContentView(array $payload, string $blocksHtml): string
+    {
+        return $this->views->make('tentapress-global-content::global-content.render', [
+            'globalContent' => new TpGlobalContent([
+                'id' => 0,
+                'title' => (string) ($payload['title'] ?? 'Preview'),
+                'slug' => (string) ($payload['slug'] ?? ''),
+                'kind' => 'section',
+                'status' => 'draft',
+                'editor_driver' => 'builder',
+                'blocks' => is_array($payload['blocks'] ?? null) ? $payload['blocks'] : [],
+            ]),
+            'blocks' => [],
+            'blocksHtml' => $blocksHtml,
         ])->render();
     }
 

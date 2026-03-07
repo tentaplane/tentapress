@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TentaPress\PageEditor\Render;
 
 use Illuminate\Support\Str;
+use TentaPress\GlobalContent\Services\GlobalContentReferenceResolver;
 
 final class PageDocumentRenderer
 {
@@ -46,6 +47,7 @@ final class PageDocumentRenderer
                 'checklist' => $this->renderChecklist($data),
                 'code' => $this->renderCode($data),
                 'callout' => $this->renderCallout($data),
+                'globalContent' => $this->renderGlobalContent($data),
                 'delimiter' => '<hr>',
                 default => '',
             };
@@ -287,6 +289,21 @@ final class PageDocumentRenderer
         }
 
         return '<div class="tp-callout tp-callout-'.$type.'">'.$this->renderInline($text).'</div>';
+    }
+
+    private function renderGlobalContent(array $data): string
+    {
+        if (! class_exists(GlobalContentReferenceResolver::class) || ! app()->bound(GlobalContentReferenceResolver::class)) {
+            return '';
+        }
+
+        $globalContentId = (int) ($data['global_content_id'] ?? 0);
+
+        if ($globalContentId <= 0) {
+            return '';
+        }
+
+        return resolve(GlobalContentReferenceResolver::class)->renderPublishedById($globalContentId);
     }
 
     private function wrap(string $tag, string $content): string

@@ -303,6 +303,26 @@ export const useBuilderEditorStore = defineStore('builder-editor', () => {
         persistDraft();
     }
 
+    function replaceBlockWithMany(index: number, incoming: unknown[]): void {
+        if (index < 0 || index >= blocks.value.length || !Array.isArray(incoming)) {
+            return;
+        }
+
+        const replacements = incoming
+            .map((block) => normalizeBlock(block))
+            .filter((block): block is BuilderBlock => block !== null)
+            .map((block) => ({ ...block, _key: uid() }));
+
+        if (replacements.length === 0) {
+            return;
+        }
+
+        blocks.value.splice(index, 1, ...replacements);
+        selectedIndex.value = index;
+        pushHistory();
+        persistDraft();
+    }
+
     function setBlockProp(index: number, key: string, value: unknown): void {
         updateBlock(index, (block) => {
             block.props[key] = value;
@@ -409,6 +429,7 @@ export const useBuilderEditorStore = defineStore('builder-editor', () => {
         duplicate,
         remove,
         move,
+        replaceBlockWithMany,
         setBlockProp,
         setPresentation,
         setPresentationSpacing,

@@ -28,6 +28,8 @@ const mediaModalSearch = ref('');
 const mediaModalMode = ref<'single' | 'multi'>('single');
 const mediaModalFieldKey = ref('');
 const mediaModalSelection = ref<Record<string, boolean>>({});
+const globalContentSearch = ref('');
+const globalContentDetachLoading = ref(false);
 
 const LAYOUT_STORAGE_KEY = 'tp.builder.layout.v1';
 const LEFT_MIN_WIDTH = 320;
@@ -52,12 +54,113 @@ const spacingTop = computed(() => String((selectedPresentation.value.spacing as 
 const spacingBottom = computed(() => String((selectedPresentation.value.spacing as { bottom?: string }).bottom ?? 'none'));
 const mediaOptions = computed<MediaOption[]>(() => (Array.isArray(props.config.mediaOptions) ? props.config.mediaOptions : []));
 
+function isGlobalContentReferenceField(field: BlockField): boolean {
+    return (
+        !!store.selectedBlock &&
+        store.selectedBlock.type === 'tentapress/global-content/reference' &&
+        field.key === 'global_content_id'
+    );
+}
+
+function isGlobalContentHiddenField(field: BlockField): boolean {
+    return (
+        !!store.selectedBlock &&
+        store.selectedBlock.type === 'tentapress/global-content/reference' &&
+        field.key === 'global_content_label'
+    );
+}
+
+function globalContentOptions(field: BlockField): Array<{ value: string; label: string }> {
+    const query = globalContentSearch.value.trim().toLowerCase();
+    const options = Array.isArray(field.options)
+        ? field.options.map((option) =>
+              typeof option === 'string'
+                  ? { value: option, label: option }
+                  : { value: String(option.value ?? ''), label: String(option.label ?? option.value ?? '') },
+          )
+        : [];
+
+    if (query === '') {
+        return options;
+    }
+
+    return options.filter((option) => `${option.label} ${option.value}`.toLowerCase().includes(query));
+}
+
+function syncGlobalContentReference(field: BlockField, event: Event): void {
+    if (!hasSelection.value) {
+        return;
+    }
+
+    const value = inputValue(event);
+    const option = globalContentOptions(field).find((entry) => entry.value === value)
+        ?? (Array.isArray(field.options)
+            ? field.options
+                  .map((entry) =>
+                      typeof entry === 'string'
+                          ? { value: entry, label: entry }
+                          : { value: String(entry.value ?? ''), label: String(entry.label ?? entry.value ?? '') },
+                  )
+                  .find((entry) => entry.value === value)
+            : undefined);
+
+    store.setBlockProp(store.selectedIndex, 'global_content_id', value);
+    store.setBlockProp(store.selectedIndex, 'global_content_label', option?.label ?? '');
+}
+
+function globalContentEditUrl(): string {
+    if (!hasSelection.value || !store.selectedBlock) {
+        return '';
+    }
+
+    const id = String(store.selectedBlock.props.global_content_id ?? '').trim();
+    if (id === '' || !props.config.globalContentEditUrlTemplate) {
+        return '';
+    }
+
+    return props.config.globalContentEditUrlTemplate.replace('__GLOBAL_CONTENT_ID__', encodeURIComponent(id));
+}
+
+function csrfToken(): string {
+    const meta = document.querySelector('meta[name="csrf-token"]');
+    if (meta instanceof HTMLMetaElement) {
+        return meta.content;
+    }
+
+    const form = document.getElementById(props.config.resource === 'pages' ? 'page-form' : props.config.resource === 'posts' ? 'post-form' : 'global-content-form');
+    const input = form?.querySelector('input[name="_token"]');
+
+    return input instanceof HTMLInputElement ? input.value : '';
+}
+
+function resourceFormId(): string {
+    if (props.config.resource === 'pages') {
+        return 'page-form';
+    }
+
+    if (props.config.resource === 'posts') {
+        return 'post-form';
+    }
+
+    return 'global-content-form';
+}
+
 const layoutStyle = computed<Record<string, string>>(() => ({
     '--tp-builder-left': `${leftPanelWidth.value}px`,
     '--tp-builder-right': `${rightPanelWidth.value}px`,
 }));
 
-const resourceLabel = computed(() => (props.config.resource === 'pages' ? 'page' : 'post'));
+const resourceLabel = computed(() => {
+    if (props.config.resource === 'pages') {
+        return 'page';
+    }
+
+    if (props.config.resource === 'posts') {
+        return 'post';
+    }
+
+    return 'global content';
+});
 
 function blockSummary(index: number): string {
     const block = store.blocks[index];
@@ -182,7 +285,7 @@ function startResize(side: 'left' | 'right', event: PointerEvent): void {
 }
 
 function submitForm(): void {
-    const form = document.getElementById(props.config.resource === 'pages' ? 'page-form' : 'post-form') as HTMLFormElement | null;
+    const form = document.getElementById(resourceFormId()) as HTMLFormElement | null;
     form?.requestSubmit();
 }
 
@@ -574,6 +677,49 @@ function modalApplyMulti(): void {
     closeMediaModal();
 }
 
+async function detachGlobalContent(): Promise<void> {
+    if (
+        !hasSelection.value ||
+        !store.selectedBlock ||
+        !props.config.globalContentDetachUrl ||
+        globalContentDetachLoading.value
+    ) {
+        return;
+    }
+
+    const globalContentId = Number(store.selectedBlock.props.global_content_id ?? 0);
+    if (!Number.isFinite(globalContentId) || globalContentId <= 0) {
+        return;
+    }
+
+    globalContentDetachLoading.value = true;
+
+    try {
+        const response = await fetch(props.config.globalContentDetachUrl, {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken(),
+            },
+            body: JSON.stringify({
+                global_content_id: globalContentId,
+            }),
+        });
+
+        if (!response.ok) {
+            return;
+        }
+
+        const payload = await response.json();
+        const blocks = Array.isArray(payload?.blocks) ? payload.blocks : [];
+        store.replaceBlockWithMany(store.selectedIndex, blocks);
+    } finally {
+        globalContentDetachLoading.value = false;
+    }
+}
+
 function insertBlockFromLibrary(type: string): void {
     store.addBlock(type);
     blockLibraryOpen.value = false;
@@ -612,7 +758,7 @@ function updatePresentationSpacing(key: 'top' | 'bottom', event: Event): void {
 }
 
 function getMetaValue(name: string, fallback = ''): string {
-    const form = document.getElementById(props.config.resource === 'pages' ? 'page-form' : 'post-form') as HTMLFormElement | null;
+    const form = document.getElementById(resourceFormId()) as HTMLFormElement | null;
     const input = form?.querySelector(`[name="${name}"]`) as HTMLInputElement | HTMLSelectElement | null;
 
     if (!input) {
@@ -965,7 +1111,7 @@ onMounted(() => {
     loadLayoutPreference();
     window.addEventListener('keydown', onKeydown);
     document.addEventListener('click', onDocumentClick);
-    const form = document.getElementById(props.config.resource === 'pages' ? 'page-form' : 'post-form') as HTMLFormElement | null;
+    const form = document.getElementById(resourceFormId()) as HTMLFormElement | null;
     form?.addEventListener('submit', () => {
         store.clearDraft();
     });
@@ -992,6 +1138,7 @@ watch(
 watch(
     () => store.selectedIndex,
     () => {
+        globalContentSearch.value = '';
         applyPreviewSelection(true);
     },
 );
@@ -1035,6 +1182,7 @@ watch(
                     <div
                         v-for="field in store.selectedDefinition.fields"
                         :key="field.key"
+                        v-show="!isGlobalContentHiddenField(field)"
                         class="tp-builder__field">
                         <span class="tp-builder__label">{{ field.label }}</span>
 
@@ -1051,6 +1199,45 @@ watch(
                             rows="4"
                             :value="String(store.selectedBlock.props[field.key] ?? '')"
                             @input="updateField(field.key, $event)" />
+
+                        <div v-else-if="isGlobalContentReferenceField(field)" class="tp-builder__field-group">
+                            <input
+                                v-model="globalContentSearch"
+                                type="search"
+                                class="tp-input"
+                                placeholder="Search published global content..." />
+
+                            <select
+                                class="tp-select"
+                                :value="String(store.selectedBlock.props[field.key] ?? '')"
+                                @change="syncGlobalContentReference(field, $event)">
+                                <option value="">Choose published global content</option>
+                                <option
+                                    v-for="option in globalContentOptions(field)"
+                                    :key="option.value"
+                                    :value="option.value">
+                                    {{ option.label }}
+                                </option>
+                            </select>
+
+                            <div class="flex flex-wrap items-center gap-3 text-xs">
+                                <a
+                                    v-if="globalContentEditUrl()"
+                                    :href="globalContentEditUrl()"
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    class="tp-button-link">
+                                    Edit source
+                                </a>
+                                <button
+                                    type="button"
+                                    class="tp-button-secondary"
+                                    :disabled="globalContentDetachLoading || !String(store.selectedBlock.props[field.key] ?? '').trim()"
+                                    @click="detachGlobalContent()">
+                                    {{ globalContentDetachLoading ? 'Detaching...' : 'Detach to local copy' }}
+                                </button>
+                            </div>
+                        </div>
 
                         <select
                             v-else-if="field.type === 'select'"
