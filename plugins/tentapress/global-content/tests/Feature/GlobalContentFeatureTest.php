@@ -25,6 +25,12 @@ function refreshTestApplication(): void
 
 function registerGlobalContentAutoloader(): void
 {
+    static $registered = false;
+
+    if ($registered) {
+        return;
+    }
+
     spl_autoload_register(static function (string $class): void {
         $prefix = 'TentaPress\\GlobalContent\\';
 
@@ -42,6 +48,8 @@ function registerGlobalContentAutoloader(): void
             require_once $path;
         }
     });
+
+    $registered = true;
 }
 
 function bootGlobalContentPlugin(): void
@@ -59,17 +67,6 @@ function bootGlobalContentPlugin(): void
     ] as $pluginId) {
         test()->artisan('tp:plugins enable '.$pluginId)->assertSuccessful();
     }
-    test()->beforeApplicationDestroyed(function (): void {
-        if (! Schema::hasTable('tp_plugins')) {
-            return;
-        }
-
-        DB::table('tp_plugins')
-            ->where('id', 'tentapress/global-content')
-            ->update(['enabled' => 0, 'updated_at' => now()]);
-
-        resolve(PluginRegistry::class)->writeCache();
-    });
     registerGlobalContentAutoloader();
     refreshTestApplication();
 
@@ -418,6 +415,17 @@ it('renders the theme helper for published template parts only', function (): vo
 
 it('removes routes, menu entries, and block registration when the plugin is disabled', function (): void {
     $this->artisan('tp:plugins sync')->assertSuccessful();
+    $this->beforeApplicationDestroyed(function (): void {
+        if (! Schema::hasTable('tp_plugins')) {
+            return;
+        }
+
+        DB::table('tp_plugins')
+            ->where('id', 'tentapress/global-content')
+            ->update(['enabled' => 1, 'updated_at' => now()]);
+
+        resolve(PluginRegistry::class)->writeCache();
+    });
     $this->artisan('tp:plugins disable tentapress/global-content --force')->assertSuccessful();
     refreshTestApplication();
     $this->artisan('migrate --force')->assertSuccessful();

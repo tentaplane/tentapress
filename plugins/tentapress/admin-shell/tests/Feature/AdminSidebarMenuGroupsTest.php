@@ -36,7 +36,7 @@ it('builds an implicit structure menu group for related plugin screens', functio
     expect($structure)->not->toBeNull();
     expect($structure['route'])->toBeNull();
     expect($structure['url'])->toBeNull();
-    expect($structure['position'])->toBe(32);
+    expect($structure['position'])->toBe(50);
 
     $childLabels = collect($structure['children'] ?? [])->pluck('label')->all();
 

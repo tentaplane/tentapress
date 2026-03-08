@@ -40,6 +40,12 @@ function registerBuilderDocumentProvider(): void
 
 function registerBuilderGlobalContentAutoloader(): void
 {
+    static $registered = false;
+
+    if ($registered) {
+        return;
+    }
+
     spl_autoload_register(static function (string $class): void {
         $prefix = 'TentaPress\\GlobalContent\\';
 
@@ -57,30 +63,27 @@ function registerBuilderGlobalContentAutoloader(): void
             require_once $path;
         }
     });
+
+    $registered = true;
 }
 
 function enableBuilderPreviewDependencies(bool $activateTheme = false): void
 {
     registerBuilderGlobalContentAutoloader();
-    static $pluginsEnabled = false;
 
-    if (! $pluginsEnabled) {
-        test()->artisan('tp:plugins sync')->assertSuccessful();
+    test()->artisan('tp:plugins sync')->assertSuccessful();
 
-        foreach ([
-            'tentapress/admin-shell',
-            'tentapress/blocks',
-            'tentapress/builder',
-            'tentapress/themes',
-            'tentapress/pages',
-            'tentapress/posts',
-            'tentapress/global-content',
-            'tentapress/users',
-        ] as $pluginId) {
-            test()->artisan('tp:plugins enable '.$pluginId)->assertSuccessful();
-        }
-
-        $pluginsEnabled = true;
+    foreach ([
+        'tentapress/admin-shell',
+        'tentapress/blocks',
+        'tentapress/builder',
+        'tentapress/themes',
+        'tentapress/pages',
+        'tentapress/posts',
+        'tentapress/global-content',
+        'tentapress/users',
+    ] as $pluginId) {
+        test()->artisan('tp:plugins enable '.$pluginId)->assertSuccessful();
     }
 
     if ($activateTheme) {
