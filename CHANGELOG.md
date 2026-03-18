@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.44.0](https://github.com/tentaplane/tentapress/compare/v0.43.3...v0.44.0) (2026-03-18)
+
+
+### Features
+
+* **import:** persist WXR taxonomy assignments ([e4f87f8](https://github.com/tentaplane/tentapress/commit/e4f87f84d21950c839a5bb88f44e1ed0d00f668c))
+
+
+### Miscellaneous Chores
+
+* **import:** apply taxonomy import cleanup ([e3bfa40](https://github.com/tentaplane/tentapress/commit/e3bfa40a197cdc003edaa48435e2dac1cb1aafc3))
+
 ## [0.43.3](https://github.com/tentaplane/tentapress/compare/v0.43.2...v0.43.3) (2026-03-07)
 
 
