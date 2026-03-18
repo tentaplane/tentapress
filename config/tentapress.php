@@ -36,6 +36,7 @@ return [
     |
     */
     'optional_plugins' => [
+        'tentapress/marketing' => 'Analytics, consent-managed scripts, and marketing integrations',
         'tentapress/import' => 'Import tooling',
         'tentapress/export' => 'Export tooling',
         'tentapress/static-deploy' => 'Static deployments',

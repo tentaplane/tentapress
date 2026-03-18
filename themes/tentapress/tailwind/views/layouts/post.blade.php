@@ -5,9 +5,11 @@
         <meta name="viewport" content="width=device-width, initial-scale=1" />
 
         @include('tentapress-seo::head', ['post' => $post ?? null, 'page' => $page ?? null])
+        @includeIf('tentapress-marketing::head')
         @vite(['resources/css/theme.css', 'resources/js/theme.js'], 'themes/tentapress/tailwind/build')
     </head>
     <body class="bg-page font-sans text-surface-900 antialiased">
+        @includeIf('tentapress-marketing::body-open')
         @php
             $entry = $post ?? $page ?? null;
             $author = $post?->author;
@@ -41,5 +43,7 @@
 
             <x-tp-theme::footer />
         </div>
+        @includeIf('tentapress-marketing::body-close')
+        @includeIf('tentapress-marketing::consent')
     </body>
 </html>

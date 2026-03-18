@@ -3,10 +3,13 @@
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        
+        @include('tentapress-seo::head')
+        @includeIf('tentapress-marketing::head')
+
         @vite(['resources/css/theme.css', 'resources/js/theme.js'], 'themes/tentapress/tailwind/build')
     </head>
     <body class="bg-page font-sans text-surface-900 antialiased">
+        @includeIf('tentapress-marketing::body-open')
         <div class="relative flex min-h-screen flex-col">
             <x-tp-theme::header />
 
@@ -63,5 +66,7 @@
 
             <x-tp-theme::footer />
         </div>
+        @includeIf('tentapress-marketing::body-close')
+        @includeIf('tentapress-marketing::consent')
     </body>
 </html>
