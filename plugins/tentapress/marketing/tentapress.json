@@ -1,0 +1,19 @@
+{
+    "id": "tentapress/marketing",
+    "name": "Marketing",
+    "description": "Analytics providers, consent-managed marketing scripts, and tracking settings.",
+    "version": "0.1.0",
+    "provider": "TentaPress\\Marketing\\MarketingServiceProvider",
+    "requires": ["tentapress/users", "tentapress/settings"],
+    "admin": {
+        "menus": [
+            {
+                "label": "Marketing",
+                "route": "tp.marketing.index",
+                "capability": "manage_marketing",
+                "icon": "chart",
+                "position": 31
+            }
+        ]
+    }
+}

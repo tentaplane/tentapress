@@ -1,6 +1,6 @@
 {
     "schema_version": 1,
-    "generated_at": "2026-03-08T07:55:39Z",
+    "generated_at": "2026-03-18T22:01:37Z",
     "plugins": [
         {
             "id": "tentapress/admin-shell",
@@ -76,6 +76,14 @@
             "description": "",
             "package": "tentapress/import",
             "latest_version": "0.23.1"
+        },
+        {
+            "id": "tentapress/marketing",
+            "name": "Marketing",
+            "description": "Analytics providers, consent-managed marketing scripts, and tracking settings.",
+            "package": "tentapress/marketing",
+            "latest_version": "0.1.0",
+            "icon": "chart"
         },
         {
             "id": "tentapress/media",
