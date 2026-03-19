@@ -7,7 +7,7 @@ Analytics providers, consent-managed script injection, and marketing runtime out
 | Field | Value |
 |-------|-------|
 | ID | `tentapress/marketing` |
-| Version | `0.1.0` |
+| Version | `0.2.0` |
 | Provider | `TentaPress\Marketing\MarketingServiceProvider` |
 
 ## Features

@@ -2,7 +2,7 @@
     "id": "tentapress/marketing",
     "name": "Marketing",
     "description": "Analytics providers, consent-managed marketing scripts, and tracking settings.",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "provider": "TentaPress\\Marketing\\MarketingServiceProvider",
     "requires": ["tentapress/users", "tentapress/settings"],
     "admin": {
