@@ -8,6 +8,7 @@ use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Blaze\Blaze;
 use TentaPress\System\Console\CatalogCommand;
+use TentaPress\System\Console\MakePluginCommand;
 use TentaPress\System\Console\PluginsCommand;
 use TentaPress\System\Console\SeedDemoHomeCommand;
 use TentaPress\System\Console\ThemesCommand;
@@ -66,6 +67,7 @@ final class SystemServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 CatalogCommand::class,
+                MakePluginCommand::class,
                 PluginsCommand::class,
                 ThemesCommand::class,
                 SeedDemoHomeCommand::class,

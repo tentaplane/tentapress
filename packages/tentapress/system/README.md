@@ -7,7 +7,7 @@ Core platform layer for TentaPress plugin and theme management.
 | Field    | Value                                     |
 |----------|-------------------------------------------|
 | Name     | `tentapress/system`                       |
-| Version  | 0.4.6                                     |
+| Version  | 0.5.0                                     |
 | Provider | `TentaPress\System\SystemServiceProvider` |
 
 ## Overview
@@ -19,6 +19,7 @@ The system package provides the foundational infrastructure for TentaPress:
 - Editor driver registry for pluggable page/post editing experiences
 - Admin middleware stack
 - Console commands for plugin/theme operations
+- Boilerplate plugin generation from Packagist or local fallback
 
 ## Components
 
@@ -76,6 +77,39 @@ Plugin lifecycle/cache actions also clear compiled views so Blade/Blaze output s
 changes.
 First-party pre-1.0 install guidance uses an explicit Composer constraint so admin/manual installs resolve packages that
 are only available as `0.x-dev`.
+
+### Boilerplate Plugin Generator
+
+```bash
+php artisan tp:plugin:make
+php artisan tp:plugin:make acme events-schedule "Events Schedule"
+php artisan tp:plugin:make acme events-schedule "Events Schedule" --namespace="Acme\\EventsSchedule"
+php artisan tp:plugin:make acme events-schedule "Events Schedule" --enable
+```
+
+The generator creates a new plugin by copying the published boilerplate template, then rewriting the package id,
+namespace, class names, route names, capability key, settings prefix, view namespace, and human-facing labels.
+
+Default source behaviour is `--source=auto`:
+
+- Try Packagist first using `tentapress/plugin-boilerplate`
+- Fall back to the local repository copy at `plugins/tentapress/plugin-boilerplate` if the package is unavailable
+
+Supported options:
+
+```bash
+php artisan tp:plugin:make <vendor> <slug> "<name>" \
+  --source=auto|packagist|local \
+  --template-package=tentapress/plugin-boilerplate \
+  --template-version=<version> \
+  --namespace="Vendor\\PluginName" \
+  --description="Describe what the plugin does." \
+  --enable
+```
+
+Use `--source=packagist` to require a downloadable template package and fail if it cannot be fetched.
+Use `--source=local` when working on the monorepo template itself or when offline.
+After generation the command syncs the plugin registry, rebuilds plugin cache, and clears compiled views.
 
 ### Theme Commands
 
@@ -156,6 +190,7 @@ This package keeps feature tests locally under `packages/tentapress/system/tests
 composer test:filter -- PluginsListCommandTest
 composer test:filter -- PluginsSyncCommandTest
 composer test:filter -- PluginsFailurePathsCommandTest
+composer test:filter -- PluginBoilerplateMakeCommandTest
 ```
 
 Migration behavior for tests is provided by root Pest config via `RefreshDatabase`, so package migrations are applied
