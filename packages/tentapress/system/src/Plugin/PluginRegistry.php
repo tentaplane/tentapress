@@ -608,21 +608,43 @@ final class PluginRegistry
      */
     private function providerClassCandidates(string $provider, string $path, array $manifest): array
     {
-        $base = base_path($path);
         $providerPath = trim((string) ($manifest['provider_path'] ?? ''));
         $shortClass = $this->shortClassName($provider);
         $candidates = [];
 
-        if ($providerPath !== '') {
-            $candidates[] = $base.'/'.ltrim($providerPath, '/');
-        }
+        foreach ($this->pluginBasePaths($path, $manifest) as $base) {
+            if ($providerPath !== '') {
+                $candidates[] = $base.'/'.ltrim($providerPath, '/');
+            }
 
-        if ($shortClass !== '') {
-            $candidates[] = $base.'/src/'.$shortClass.'.php';
-            $candidates[] = $base.'/'.$shortClass.'.php';
+            if ($shortClass !== '') {
+                $candidates[] = $base.'/src/'.$shortClass.'.php';
+                $candidates[] = $base.'/'.$shortClass.'.php';
+            }
         }
 
         return array_values(array_unique($candidates));
+    }
+
+    /**
+     * @param  array<string,mixed>  $manifest
+     * @return array<int,string>
+     */
+    private function pluginBasePaths(string $path, array $manifest): array
+    {
+        $basePaths = [];
+        $relativePath = trim($path, '/');
+
+        if ($relativePath !== '') {
+            $basePaths[] = base_path($relativePath);
+        }
+
+        $pluginId = trim((string) ($manifest['id'] ?? ''), '/');
+        if ($pluginId !== '') {
+            $basePaths[] = base_path('vendor/'.$pluginId);
+        }
+
+        return array_values(array_unique($basePaths));
     }
 
     private function shortClassName(string $class): string

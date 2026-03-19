@@ -55,7 +55,7 @@ final class PluginManager
         }
 
         if (! class_exists($providerClass)) {
-            $this->registerPathAutoloader($providerClass, $pluginPath);
+            $this->registerPathAutoloader($providerClass, $pluginId, $pluginPath);
         }
 
         if (! class_exists($providerClass)) {
@@ -67,12 +67,12 @@ final class PluginManager
         $this->registeredProviders[$providerClass] = true;
     }
 
-    private function registerPathAutoloader(string $providerClass, string $pluginPath): void
+    private function registerPathAutoloader(string $providerClass, string $pluginId, string $pluginPath): void
     {
         $namespacePrefix = $this->providerNamespacePrefix($providerClass);
         $relativePluginPath = trim($pluginPath, '/');
 
-        if ($namespacePrefix === null || $relativePluginPath === '') {
+        if ($namespacePrefix === null) {
             return;
         }
 
@@ -80,12 +80,12 @@ final class PluginManager
             return;
         }
 
-        $sourcePath = base_path($relativePluginPath.'/src');
-        if (! is_dir($sourcePath)) {
+        $sourcePaths = $this->pluginSourcePaths($pluginId, $relativePluginPath);
+        if ($sourcePaths === []) {
             return;
         }
 
-        spl_autoload_register(static function (string $class) use ($namespacePrefix, $sourcePath): void {
+        spl_autoload_register(static function (string $class) use ($namespacePrefix, $sourcePaths): void {
             if (! str_starts_with($class, $namespacePrefix)) {
                 return;
             }
@@ -95,13 +95,38 @@ final class PluginManager
                 return;
             }
 
-            $classPath = $sourcePath.'/'.str_replace('\\', '/', $relativeClass).'.php';
-            if (is_file($classPath)) {
-                require_once $classPath;
+            $relativeClassPath = '/'.str_replace('\\', '/', $relativeClass).'.php';
+
+            foreach ($sourcePaths as $sourcePath) {
+                $classPath = $sourcePath.$relativeClassPath;
+                if (is_file($classPath)) {
+                    require_once $classPath;
+
+                    return;
+                }
             }
         });
 
         $this->registeredAutoloadPrefixes[$namespacePrefix] = true;
+    }
+
+    /**
+     * @return array<int,string>
+     */
+    private function pluginSourcePaths(string $pluginId, string $relativePluginPath): array
+    {
+        $paths = [];
+
+        if ($relativePluginPath !== '') {
+            $paths[] = base_path($relativePluginPath.'/src');
+        }
+
+        $normalizedPluginId = trim($pluginId, '/');
+        if ($normalizedPluginId !== '') {
+            $paths[] = base_path('vendor/'.$normalizedPluginId.'/src');
+        }
+
+        return array_values(array_unique(array_filter($paths, is_dir(...))));
     }
 
     private function providerNamespacePrefix(string $providerClass): ?string
