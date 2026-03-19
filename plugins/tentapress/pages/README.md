@@ -7,7 +7,7 @@ Page management for TentaPress.
 | Field    | Value                                   |
 | -------- | --------------------------------------- |
 | ID       | `tentapress/pages`                      |
-| Version  | 0.4.8                                   |
+| Version  | 0.5.1                                   |
 | Provider | `TentaPress\Pages\PagesServiceProvider` |
 
 ## Features
@@ -22,6 +22,7 @@ Page management for TentaPress.
 - SEO fields integration
 - Taxonomy metabox only renders when `tentapress/taxonomies` is enabled
 - Revision history, autosave draft reload, compare, and restore integration when `tentapress/revisions` is enabled
+- Workflow approval, assignment, and revision-backed working copy integration when `tentapress/workflow` is enabled
 - Public rendering by slug
 
 ## Dependencies
