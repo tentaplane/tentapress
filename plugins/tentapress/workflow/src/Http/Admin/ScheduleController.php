@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TentaPress\Workflow\Http\Admin;
 
-use Carbon\Carbon;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Auth\Access\AuthorizationException;
 use InvalidArgumentException;
 use TentaPress\Workflow\Http\Requests\ScheduleWorkflowRequest;
@@ -17,7 +17,7 @@ final class ScheduleController
     public function __invoke(ScheduleWorkflowRequest $request, string $resourceType, int $resourceId, WorkflowManager $manager)
     {
         try {
-            $manager->schedule($resourceType, $resourceId, $this->actor(), Carbon::parse((string) $request->validated('scheduled_publish_at')));
+            $manager->schedule($resourceType, $resourceId, $this->actor(), Date::parse((string) $request->validated('scheduled_publish_at')));
         } catch (AuthorizationException $exception) {
             throw $exception;
         } catch (InvalidArgumentException $exception) {

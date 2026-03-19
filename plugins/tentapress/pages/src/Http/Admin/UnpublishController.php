@@ -6,11 +6,24 @@ namespace TentaPress\Pages\Http\Admin;
 
 use Illuminate\Support\Facades\Auth;
 use TentaPress\Pages\Models\TpPage;
+use TentaPress\Users\Models\TpUser;
+use TentaPress\Workflow\Services\WorkflowManager;
 
 final class UnpublishController
 {
     public function __invoke(TpPage $page)
     {
+        if (class_exists(WorkflowManager::class) && app()->bound(WorkflowManager::class)) {
+            /** @var TpUser|null $actor */
+            $actor = Auth::user();
+            abort_unless($actor instanceof TpUser, 403);
+
+            app()->make(WorkflowManager::class)->unpublish('pages', (int) $page->id, $actor);
+
+            return to_route('tp.pages.edit', ['page' => $page->id])
+                ->with('tp_notice_success', 'Page set to draft.');
+        }
+
         $nowUserId = Auth::check() && is_object(Auth::user()) ? (int) (Auth::user()->id ?? 0) : null;
 
         $page->status = 'draft';

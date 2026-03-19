@@ -2,7 +2,7 @@
     "id": "tentapress/posts",
     "name": "Posts",
     "description": "Create and manage blog posts.",
-    "version": "0.4.9",
+    "version": "0.5.1",
     "provider": "TentaPress\\Posts\\PostsServiceProvider",
     "requires": ["tentapress/users", "tentapress/blocks"],
     "admin": {
@@ -12,7 +12,8 @@
                 "route": "tp.posts.index",
                 "capability": "manage_posts",
                 "icon": "file-text",
-                "position": 30
+                "position": 20,
+                "parent": "Publishing"
             }
         ]
     }

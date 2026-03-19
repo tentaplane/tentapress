@@ -71,7 +71,7 @@ final readonly class WorkflowManager
         $query = TpWorkflowItem::query()
             ->with(['owner', 'reviewer', 'approver', 'actor'])
             ->orderByRaw('scheduled_publish_at is null')
-            ->orderBy('scheduled_publish_at')
+            ->oldest('scheduled_publish_at')
             ->latest('updated_at');
 
         $filter = trim($filter);
@@ -147,13 +147,9 @@ final readonly class WorkflowManager
         $item = $this->ensureForResource($resourceType, $resourceId, (int) $actor->id);
         $fromState = (string) $item->editorial_state;
 
-        if (! in_array($fromState, [WorkflowState::Draft, WorkflowState::ChangesRequested], true)) {
-            throw new InvalidArgumentException('Only draft workflow items can be submitted for review.');
-        }
+        throw_unless(in_array($fromState, [WorkflowState::Draft, WorkflowState::ChangesRequested], true), InvalidArgumentException::class, 'Only draft workflow items can be submitted for review.');
 
-        if ((int) ($item->reviewer_user_id ?? 0) <= 0 && (int) ($item->approver_user_id ?? 0) <= 0) {
-            throw new InvalidArgumentException('Assign a reviewer or approver before submitting for review.');
-        }
+        throw_if((int) ($item->reviewer_user_id ?? 0) <= 0 && (int) ($item->approver_user_id ?? 0) <= 0, InvalidArgumentException::class, 'Assign a reviewer or approver before submitting for review.');
 
         $item->editorial_state = WorkflowState::InReview;
         $item->submitted_at = now();
@@ -174,9 +170,7 @@ final readonly class WorkflowManager
         $this->authorizeReviewer($actor, $item);
         $fromState = (string) $item->editorial_state;
 
-        if ($fromState !== WorkflowState::InReview) {
-            throw new InvalidArgumentException('Only items in review can request changes.');
-        }
+        throw_if($fromState !== WorkflowState::InReview, InvalidArgumentException::class, 'Only items in review can request changes.');
 
         $item->editorial_state = WorkflowState::ChangesRequested;
         $item->reviewed_at = now();
@@ -196,12 +190,10 @@ final readonly class WorkflowManager
         $this->authorizeApprover($actor, $item);
         $fromState = (string) $item->editorial_state;
 
-        if ($fromState !== WorkflowState::InReview) {
-            throw new InvalidArgumentException('Only items in review can be approved.');
-        }
+        throw_if($fromState !== WorkflowState::InReview, InvalidArgumentException::class, 'Only items in review can be approved.');
 
         $item->editorial_state = WorkflowState::Approved;
-        $item->reviewed_at = $item->reviewed_at ?? now();
+        $item->reviewed_at ??= now();
         $item->approved_at = now();
         $item->last_transitioned_by = (int) $actor->id;
         $item->save();
@@ -218,9 +210,7 @@ final readonly class WorkflowManager
         $this->authorizeApprover($actor, $item);
         $fromState = (string) $item->editorial_state;
 
-        if ($fromState !== WorkflowState::Approved) {
-            throw new InvalidArgumentException('Only approved items can revoke approval.');
-        }
+        throw_if($fromState !== WorkflowState::Approved, InvalidArgumentException::class, 'Only approved items can revoke approval.');
 
         $item->editorial_state = WorkflowState::Draft;
         $item->approved_at = null;
@@ -239,13 +229,9 @@ final readonly class WorkflowManager
         $item = $this->ensureForResource($resourceType, $resourceId, (int) $actor->id);
         $this->authorizePublisher($actor, $item);
 
-        if ((string) $item->editorial_state !== WorkflowState::Approved) {
-            throw new InvalidArgumentException('Only approved items can be scheduled.');
-        }
+        throw_if((string) $item->editorial_state !== WorkflowState::Approved, InvalidArgumentException::class, 'Only approved items can be scheduled.');
 
-        if ($publishAt->lte(now())) {
-            throw new InvalidArgumentException('Schedule time must be in the future.');
-        }
+        throw_if($publishAt->lte(now()), InvalidArgumentException::class, 'Schedule time must be in the future.');
 
         $item->scheduled_publish_at = $publishAt;
         $item->last_transitioned_by = (int) $actor->id;
@@ -326,9 +312,7 @@ final readonly class WorkflowManager
         $recorder = $this->resolveRecorder();
         $revision = $recorder->capturePageFromRequest($page, $request, 'workflow_pending');
 
-        if (! $revision instanceof TpRevision) {
-            throw new InvalidArgumentException('Unable to capture the workflow draft for this page.');
-        }
+        throw_unless($revision instanceof TpRevision, InvalidArgumentException::class, 'Unable to capture the workflow draft for this page.');
 
         $fromState = (string) $item->editorial_state;
         $item->pending_revision_id = (int) $revision->id;
@@ -358,9 +342,7 @@ final readonly class WorkflowManager
         $recorder = $this->resolveRecorder();
         $revision = $recorder->capturePostFromRequest($post, $request, 'workflow_pending');
 
-        if (! $revision instanceof TpRevision) {
-            throw new InvalidArgumentException('Unable to capture the workflow draft for this post.');
-        }
+        throw_unless($revision instanceof TpRevision, InvalidArgumentException::class, 'Unable to capture the workflow draft for this post.');
 
         $fromState = (string) $item->editorial_state;
         $item->pending_revision_id = (int) $revision->id;
@@ -447,9 +429,7 @@ final readonly class WorkflowManager
 
     private function resolveRecorder(): RevisionRecorder
     {
-        if (! class_exists(RevisionRecorder::class) || ! app()->bound(RevisionRecorder::class)) {
-            throw new InvalidArgumentException('Workflow requires the revisions plugin to stage published content changes.');
-        }
+        throw_if(! class_exists(RevisionRecorder::class) || ! app()->bound(RevisionRecorder::class), InvalidArgumentException::class, 'Workflow requires the revisions plugin to stage published content changes.');
 
         return app()->make(RevisionRecorder::class);
     }
@@ -458,9 +438,7 @@ final readonly class WorkflowManager
     {
         $resource = $this->resources->resolveModel($resourceType, $resourceId);
 
-        if (! $resource instanceof Model) {
-            throw new InvalidArgumentException('Unable to resolve the workflow resource.');
-        }
+        throw_unless($resource instanceof Model, InvalidArgumentException::class, 'Unable to resolve the workflow resource.');
 
         return $resource;
     }
@@ -482,9 +460,7 @@ final readonly class WorkflowManager
         $this->authorizeCapability($actor, 'review_content', 'You do not have permission to review content.');
 
         $reviewerId = (int) ($item->reviewer_user_id ?? 0);
-        if ($reviewerId > 0 && $reviewerId !== (int) $actor->id && ! $actor->isSuperAdmin()) {
-            throw new AuthorizationException('Only the assigned reviewer can request changes.');
-        }
+        throw_if($reviewerId > 0 && $reviewerId !== (int) $actor->id && ! $actor->isSuperAdmin(), AuthorizationException::class, 'Only the assigned reviewer can request changes.');
     }
 
     private function authorizeApprover(TpUser $actor, TpWorkflowItem $item): void
@@ -492,9 +468,7 @@ final readonly class WorkflowManager
         $this->authorizeCapability($actor, 'approve_content', 'You do not have permission to approve content.');
 
         $approverId = (int) ($item->approver_user_id ?? 0);
-        if ($approverId > 0 && $approverId !== (int) $actor->id && ! $actor->isSuperAdmin()) {
-            throw new AuthorizationException('Only the assigned approver can approve this item.');
-        }
+        throw_if($approverId > 0 && $approverId !== (int) $actor->id && ! $actor->isSuperAdmin(), AuthorizationException::class, 'Only the assigned approver can approve this item.');
     }
 
     private function authorizePublisher(TpUser $actor, TpWorkflowItem $item): void
@@ -502,9 +476,7 @@ final readonly class WorkflowManager
         $this->authorizeCapability($actor, 'publish_content', 'You do not have permission to publish content.');
 
         $approverId = (int) ($item->approver_user_id ?? 0);
-        if ($approverId > 0 && $approverId !== (int) $actor->id && ! $actor->isSuperAdmin()) {
-            throw new AuthorizationException('Only the assigned approver can publish this item.');
-        }
+        throw_if($approverId > 0 && $approverId !== (int) $actor->id && ! $actor->isSuperAdmin(), AuthorizationException::class, 'Only the assigned approver can publish this item.');
     }
 
     private function authorizeCapability(TpUser $actor, string $capability, string $message): void

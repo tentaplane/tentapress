@@ -12,6 +12,7 @@ use TentaPress\Posts\Models\TpPost;
 use TentaPress\Posts\Services\PostSlugger;
 use TentaPress\Posts\Support\BlocksNormalizer;
 use TentaPress\System\Editor\EditorDriverRegistry;
+use TentaPress\Workflow\Services\WorkflowManager;
 
 final readonly class StoreController
 {
@@ -72,6 +73,10 @@ final readonly class StoreController
         }
 
         $post = TpPost::query()->create($payload);
+
+        if (class_exists(WorkflowManager::class) && app()->bound(WorkflowManager::class)) {
+            app()->make(WorkflowManager::class)->ensureForResource('posts', (int) $post->id, $nowUserId ?: null);
+        }
 
         return to_route('tp.posts.edit', ['post' => $post->id])
             ->with('tp_notice_success', 'Post created.');

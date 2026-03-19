@@ -298,7 +298,7 @@
                                                         rel="noreferrer">
                                                         View
                                                     </a>
-                                                    @if ($page->status === 'draft')
+                                                    @if (! ($workflowPluginEnabled ?? false) && $page->status === 'draft')
                                                         <form
                                                             method="POST"
                                                             action="{{ route('tp.pages.publish', ['page' => $page->id]) }}">
@@ -307,7 +307,7 @@
                                                         </form>
                                                     @endif
                                 
-                                                    @if ($page->status === 'published')
+                                                    @if (! ($workflowPluginEnabled ?? false) && $page->status === 'published')
                                                         <form
                                                             method="POST"
                                                             action="{{ route('tp.pages.unpublish', ['page' => $page->id]) }}">
@@ -369,7 +369,7 @@
                                     </a>
                                 @endif
 
-                                @if ($mode === 'edit' && $page->status === 'draft')
+                                @if (! ($workflowPluginEnabled ?? false) && $mode === 'edit' && $page->status === 'draft')
                                     <form
                                         method="POST"
                                         action="{{ route('tp.pages.publish', ['page' => $page->id]) }}">
@@ -380,7 +380,7 @@
                                     </form>
                                 @endif
 
-                                @if ($mode === 'edit' && $page->status === 'published')
+                                @if (! ($workflowPluginEnabled ?? false) && $mode === 'edit' && $page->status === 'published')
                                     <form
                                         method="POST"
                                         action="{{ route('tp.pages.unpublish', ['page' => $page->id]) }}">
@@ -412,6 +412,9 @@
 
                     @if ($revisionsEnabled)
                         @include('tentapress-revisions::page-metabox', ['page' => $page, 'mode' => $mode])
+                    @endif
+                    @if (($workflowPluginEnabled ?? false) && $mode === 'edit')
+                        @include('tentapress-workflow::workflow.metabox', ['page' => $page])
                     @endif
                     @if ($taxonomiesPluginEnabled)
                         @includeIf('tentapress-taxonomies::page-metabox', ['page' => $page, 'mode' => $mode])

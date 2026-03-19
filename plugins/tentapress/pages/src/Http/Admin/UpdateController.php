@@ -13,6 +13,8 @@ use TentaPress\Pages\Models\TpPage;
 use TentaPress\Pages\Services\PageSlugger;
 use TentaPress\Pages\Support\BlocksNormalizer;
 use TentaPress\System\Editor\EditorDriverRegistry;
+use TentaPress\Users\Models\TpUser;
+use TentaPress\Workflow\Services\WorkflowManager;
 
 final readonly class UpdateController
 {
@@ -61,10 +63,25 @@ final readonly class UpdateController
             $payload['editor_driver'] = $editorDriver;
         }
 
+        if ((string) $page->status === 'published' && class_exists(WorkflowManager::class) && app()->bound(WorkflowManager::class)) {
+            /** @var TpUser|null $actor */
+            $actor = Auth::user();
+            abort_unless($actor instanceof TpUser, 403);
+
+            app()->make(WorkflowManager::class)->stagePublishedPageUpdate($page, $request, $actor);
+
+            return to_route('tp.pages.edit', ['page' => $page->id])
+                ->with('tp_notice_success', 'Changes saved to the workflow draft. Approve and publish them when ready.');
+        }
+
         $page->fill($payload);
 
         $page->save();
         $this->createSlugRedirectIfNeeded($previousSlug, $slug);
+
+        if (class_exists(WorkflowManager::class) && app()->bound(WorkflowManager::class)) {
+            app()->make(WorkflowManager::class)->ensureForResource('pages', (int) $page->id, $nowUserId ?: null);
+        }
 
         $returnTo = $request->string('return_to')->toString();
 

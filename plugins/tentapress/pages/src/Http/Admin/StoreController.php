@@ -12,6 +12,7 @@ use TentaPress\Pages\Models\TpPage;
 use TentaPress\Pages\Services\PageSlugger;
 use TentaPress\Pages\Support\BlocksNormalizer;
 use TentaPress\System\Editor\EditorDriverRegistry;
+use TentaPress\Workflow\Services\WorkflowManager;
 
 final readonly class StoreController
 {
@@ -64,6 +65,10 @@ final readonly class StoreController
         }
 
         $page = TpPage::query()->create($payload);
+
+        if (class_exists(WorkflowManager::class) && app()->bound(WorkflowManager::class)) {
+            app()->make(WorkflowManager::class)->ensureForResource('pages', (int) $page->id, $nowUserId ?: null);
+        }
 
         return to_route('tp.pages.edit', ['page' => $page->id])
             ->with('tp_notice_success', 'Page created.');

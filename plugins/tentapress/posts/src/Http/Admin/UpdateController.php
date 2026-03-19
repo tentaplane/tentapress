@@ -14,6 +14,8 @@ use TentaPress\Posts\Services\PostSlugger;
 use TentaPress\Posts\Support\BlocksNormalizer;
 use TentaPress\Settings\Services\SettingsStore;
 use TentaPress\System\Editor\EditorDriverRegistry;
+use TentaPress\Users\Models\TpUser;
+use TentaPress\Workflow\Services\WorkflowManager;
 
 final readonly class UpdateController
 {
@@ -69,10 +71,25 @@ final readonly class UpdateController
             $payload['editor_driver'] = $editorDriver;
         }
 
+        if ((string) $post->status === 'published' && class_exists(WorkflowManager::class) && app()->bound(WorkflowManager::class)) {
+            /** @var TpUser|null $actor */
+            $actor = Auth::user();
+            abort_unless($actor instanceof TpUser, 403);
+
+            app()->make(WorkflowManager::class)->stagePublishedPostUpdate($post, $request, $actor);
+
+            return to_route('tp.posts.edit', ['post' => $post->id])
+                ->with('tp_notice_success', 'Changes saved to the workflow draft. Approve and publish them when ready.');
+        }
+
         $post->fill($payload);
 
         $post->save();
         $this->createSlugRedirectIfNeeded($previousSlug, $slug);
+
+        if (class_exists(WorkflowManager::class) && app()->bound(WorkflowManager::class)) {
+            app()->make(WorkflowManager::class)->ensureForResource('posts', (int) $post->id, $nowUserId ?: null);
+        }
 
         $returnTo = $request->string('return_to')->toString();
 
