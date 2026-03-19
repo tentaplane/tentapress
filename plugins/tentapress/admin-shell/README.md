@@ -7,7 +7,7 @@ Admin UI shell providing the base layout, navigation, and shared components for 
 | Field    | Value                                             |
 |----------|---------------------------------------------------|
 | ID       | `tentapress/admin-shell`                          |
-| Version  | 0.6.17                                            |
+| Version  | 0.6.19                                            |
 | Provider | `TentaPress\AdminShell\AdminShellServiceProvider` |
 
 ## Features

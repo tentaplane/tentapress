@@ -1,7 +1,7 @@
 {
     "name": "tentapress/admin-shell",
     "type": "library",
-    "version": "0.6.17",
+    "version": "0.6.19",
     "license": "MIT",
     "require": {
         "php": "^8.2",

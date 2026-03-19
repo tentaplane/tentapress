@@ -4,7 +4,7 @@
     $usersById = collect();
 
     if ($show && class_exists(\TentaPress\Revisions\Services\RevisionHistory::class)) {
-        $revisions = app(\TentaPress\Revisions\Services\RevisionHistory::class)->revisionsFor('pages', (int) $page->id, 8);
+        $revisions = app(\TentaPress\Revisions\Services\RevisionHistory::class)->revisionsFor('pages', (int) $page->id, 5);
 
         $userIds = $revisions
             ->pluck('created_by')
@@ -25,15 +25,15 @@
 @if ($show)
     <div class="tp-metabox">
         <div class="tp-metabox__title">Revisions</div>
-        <div class="tp-metabox__body space-y-4">
-            <div class="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-600" data-revisions-autosave-status>
+        <div class="tp-metabox__body space-y-3 text-sm">
+            <div class="rounded-md border border-black/10 bg-[var(--tp-surface-soft)]/70 px-3 py-2 text-xs text-black/60" data-revisions-autosave-status>
                 Autosave idle.
             </div>
 
             @if ($revisions->isEmpty())
                 <div class="tp-muted text-sm">No revisions captured yet.</div>
             @else
-                <div class="space-y-3">
+                <div class="space-y-2">
                     @foreach ($revisions as $revision)
                         @php
                             $previousRevision = $revisions->get($loop->index + 1);
@@ -41,35 +41,47 @@
                             $actorLabel = trim((string) ($actor->name ?? '')) !== '' ? (string) ($actor->name ?? '') : (trim((string) ($actor->email ?? '')) !== '' ? (string) ($actor->email ?? '') : null);
                             $revisionKind = ucfirst((string) ($revision->revision_kind ?? 'manual'));
                         @endphp
-                        <article class="rounded-xl border border-slate-200 bg-slate-50 px-3 py-3">
-                            <div class="flex flex-wrap items-center justify-between gap-2">
-                                <div class="text-sm font-semibold text-slate-900">
+                        <article class="rounded-md border border-black/10 bg-[var(--tp-surface-soft)]/45 p-2.5">
+                            <div class="flex flex-wrap items-start justify-between gap-x-3 gap-y-1">
+                                <div class="font-semibold text-black/85">
                                     {{ $revision->created_at?->diffForHumans() ?? 'Saved just now' }}
                                 </div>
-                                <div class="flex flex-wrap items-center gap-2">
-                                    <span class="rounded-full border border-slate-200 bg-white px-2 py-0.5 text-[10px] font-semibold tracking-[0.12em] text-slate-500 uppercase">
+                                <div class="flex flex-wrap items-center gap-1.5">
+                                    <span class="tp-badge tp-badge-neutral text-[10px]">
                                         {{ $revisionKind }}
                                     </span>
-                                    <span class="rounded-full border border-slate-200 bg-white px-2 py-0.5 text-[10px] font-semibold tracking-[0.12em] text-slate-500 uppercase">
+                                    <span class="tp-badge tp-badge-neutral text-[10px]">
                                         {{ $revision->editor_driver ?: 'blocks' }}
                                     </span>
                                 </div>
                             </div>
-                            <div class="mt-2 space-y-1 text-xs text-slate-600">
-                                <div><span class="font-semibold text-slate-700">Status:</span> {{ $revision->status }}</div>
-                                <div><span class="font-semibold text-slate-700">Slug:</span> <span class="tp-code">{{ $revision->slug }}</span></div>
+                            <div class="mt-2 space-y-1 text-xs">
+                                <div>
+                                    <span class="tp-muted">Status:</span>
+                                    <span>{{ $revision->status }}</span>
+                                </div>
+                                <div>
+                                    <span class="tp-muted">Slug:</span>
+                                    <span class="tp-code">{{ $revision->slug }}</span>
+                                </div>
                                 @if ($actorLabel)
-                                    <div><span class="font-semibold text-slate-700">Saved by:</span> {{ $actorLabel }}</div>
+                                    <div>
+                                        <span class="tp-muted">Saved by:</span>
+                                        <span>{{ $actorLabel }}</span>
+                                    </div>
                                 @endif
                                 @if ($revision->restored_from_revision_id)
-                                    <div><span class="font-semibold text-slate-700">Restored from:</span> #{{ $revision->restored_from_revision_id }}</div>
+                                    <div>
+                                        <span class="tp-muted">Restored from:</span>
+                                        <span>#{{ $revision->restored_from_revision_id }}</span>
+                                    </div>
                                 @endif
                             </div>
-                            <div class="mt-3 flex flex-wrap gap-2">
+                            <div class="mt-2 flex flex-wrap gap-2">
                                 @if ($previousRevision)
                                     <a
                                         href="{{ route('tp.pages.revisions.compare', ['page' => $page->id, 'left' => $previousRevision->id, 'right' => $revision->id]) }}"
-                                        class="tp-button-secondary">
+                                        class="tp-button-secondary min-h-0 px-2.5 py-1 text-xs">
                                         Compare
                                     </a>
                                 @endif
@@ -78,7 +90,7 @@
                                     action="{{ route('tp.pages.revisions.restore', ['page' => $page->id, 'revision' => $revision->id]) }}"
                                     data-confirm="Restore this revision? Current content will be replaced.">
                                     @csrf
-                                    <button type="submit" class="tp-button-secondary">Restore</button>
+                                    <button type="submit" class="tp-button-secondary min-h-0 px-2.5 py-1 text-xs">Restore</button>
                                 </form>
                             </div>
                         </article>

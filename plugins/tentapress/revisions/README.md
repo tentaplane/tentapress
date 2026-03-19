@@ -7,7 +7,7 @@ Revision history for TentaPress pages and posts.
 | Field    | Value                                           |
 | -------- | ----------------------------------------------- |
 | ID       | `tentapress/revisions`                          |
-| Version  | 0.1.3                                           |
+| Version  | 0.1.4                                           |
 | Provider | `TentaPress\Revisions\RevisionsServiceProvider` |
 
 ## Features
