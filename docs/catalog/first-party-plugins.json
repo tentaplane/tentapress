@@ -1,6 +1,6 @@
 {
     "schema_version": 1,
-    "generated_at": "2026-03-19T08:25:33Z",
+    "generated_at": "2026-03-19T13:40:45Z",
     "plugins": [
         {
             "id": "tentapress/admin-shell",
@@ -158,6 +158,13 @@
             "package": "tentapress/pages",
             "latest_version": "0.4.8",
             "icon": "pages"
+        },
+        {
+            "id": "tentapress/plugin-boilerplate",
+            "name": "Plugin Boilerplate",
+            "description": "Cloneable first-party plugin starter for TentaPress.",
+            "package": "tentapress/plugin-boilerplate",
+            "latest_version": "0.1.0"
         },
         {
             "id": "tentapress/posts",

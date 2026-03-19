@@ -1,0 +1,23 @@
+{
+    "id": "tentapress/plugin-boilerplate",
+    "name": "Plugin Boilerplate",
+    "description": "Cloneable first-party plugin starter for TentaPress.",
+    "version": "0.1.0",
+    "provider": "TentaPress\\PluginBoilerplate\\PluginBoilerplateServiceProvider",
+    "requires": [
+        "tentapress/admin-shell",
+        "tentapress/settings",
+        "tentapress/system"
+    ],
+    "admin": {
+        "menus": [
+            {
+                "label": "Plugin Boilerplate",
+                "route": "tp.plugin-boilerplate.index",
+                "capability": "manage_plugin_boilerplate",
+                "position": 95,
+                "parent": "Settings"
+            }
+        ]
+    }
+}
