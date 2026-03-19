@@ -1,13 +1,13 @@
 {
     "schema_version": 1,
-    "generated_at": "2026-03-19T08:06:50Z",
+    "generated_at": "2026-03-19T08:25:33Z",
     "plugins": [
         {
             "id": "tentapress/admin-shell",
             "name": "Admin Shell",
             "description": "Admin UI shell, layout, navigation and base admin routes.",
             "package": "tentapress/admin-shell",
-            "latest_version": "0.6.16",
+            "latest_version": "0.6.17",
             "icon": "tools"
         },
         {
