@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.47.0](https://github.com/tentaplane/tentapress/compare/v0.46.0...v0.47.0) (2026-03-19)
+
+
+### Features
+
+* **workflow:** add editorial workflow plugin ([6808666](https://github.com/tentaplane/tentapress/commit/6808666053b7e127f02c59c23e5f49637442786c))
+* **workflow:** integrate workflow with pages and posts ([7f591ab](https://github.com/tentaplane/tentapress/commit/7f591ab6a4075f31b18fe9ac503f09a1232ba32f))
+
 ## [0.46.0](https://github.com/tentaplane/tentapress/compare/v0.45.0...v0.46.0) (2026-03-19)
 
 
