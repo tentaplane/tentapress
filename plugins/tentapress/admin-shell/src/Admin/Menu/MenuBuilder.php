@@ -18,6 +18,10 @@ final class MenuBuilder implements MenuBuilderContract
      * @var array<string,array{position:int,icon:string|null}>
      */
     private const GROUP_DEFINITIONS = [
+        'Publishing' => [
+            'position' => 20,
+            'icon' => null,
+        ],
         'Structure' => [
             'position' => 50,
             'icon' => null,

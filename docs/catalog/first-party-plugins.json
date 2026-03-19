@@ -1,13 +1,13 @@
 {
     "schema_version": 1,
-    "generated_at": "2026-03-19T13:40:45Z",
+    "generated_at": "2026-03-19T21:17:36Z",
     "plugins": [
         {
             "id": "tentapress/admin-shell",
             "name": "Admin Shell",
             "description": "Admin UI shell, layout, navigation and base admin routes.",
             "package": "tentapress/admin-shell",
-            "latest_version": "0.6.17",
+            "latest_version": "0.6.18",
             "icon": "tools"
         },
         {
@@ -24,6 +24,13 @@
             "package": "tentapress/blocks",
             "latest_version": "0.11.1",
             "icon": "blocks"
+        },
+        {
+            "id": "tentapress/boilerplate",
+            "name": "Boilerplate",
+            "description": "Cloneable first-party plugin starter for TentaPress.",
+            "package": "tentapress/boilerplate",
+            "latest_version": "0.1.0"
         },
         {
             "id": "tentapress/builder",
@@ -60,7 +67,7 @@
             "name": "Global Content",
             "description": "Reusable synced sections and template parts for TentaPress.",
             "package": "tentapress/global-content",
-            "latest_version": "0.1.7",
+            "latest_version": "0.1.8",
             "icon": "copy"
         },
         {
@@ -82,7 +89,7 @@
             "name": "Marketing",
             "description": "Analytics providers, consent-managed marketing scripts, and tracking settings.",
             "package": "tentapress/marketing",
-            "latest_version": "0.2.0",
+            "latest_version": "0.2.1",
             "icon": "chart"
         },
         {
@@ -90,7 +97,7 @@
             "name": "Media",
             "description": "Upload and manage media files.",
             "package": "tentapress/media",
-            "latest_version": "0.9.13",
+            "latest_version": "0.9.14",
             "icon": "media"
         },
         {
@@ -156,22 +163,15 @@
             "name": "Pages",
             "description": "Create and manage pages.",
             "package": "tentapress/pages",
-            "latest_version": "0.4.8",
+            "latest_version": "0.5.1",
             "icon": "pages"
-        },
-        {
-            "id": "tentapress/boilerplate",
-            "name": "Boilerplate",
-            "description": "Cloneable first-party plugin starter for TentaPress.",
-            "package": "tentapress/boilerplate",
-            "latest_version": "0.1.0"
         },
         {
             "id": "tentapress/posts",
             "name": "Posts",
             "description": "Create and manage blog posts.",
             "package": "tentapress/posts",
-            "latest_version": "0.4.9",
+            "latest_version": "0.5.1",
             "icon": "posts"
         },
         {
@@ -179,7 +179,7 @@
             "name": "Redirects",
             "description": "First-party redirect management for permalink safety.",
             "package": "tentapress/redirects",
-            "latest_version": "0.3.3"
+            "latest_version": "0.3.4"
         },
         {
             "id": "tentapress/revisions",
@@ -224,7 +224,7 @@
             "name": "Taxonomies",
             "description": "Standalone taxonomy registration and persistence for TentaPress.",
             "package": "tentapress/taxonomies",
-            "latest_version": "0.5.2",
+            "latest_version": "0.5.3",
             "icon": "tags"
         },
         {
@@ -242,6 +242,13 @@
             "package": "tentapress/users",
             "latest_version": "0.1.16",
             "icon": "users"
+        },
+        {
+            "id": "tentapress/workflow",
+            "name": "Workflow",
+            "description": "Editorial workflow, approvals, and publishing governance for pages and posts.",
+            "package": "tentapress/workflow",
+            "latest_version": "0.1.0"
         }
     ]
 }

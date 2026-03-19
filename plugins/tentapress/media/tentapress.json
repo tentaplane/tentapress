@@ -2,7 +2,7 @@
     "id": "tentapress/media",
     "name": "Media",
     "description": "Upload and manage media files.",
-    "version": "0.9.13",
+    "version": "0.9.14",
     "provider": "TentaPress\\Media\\MediaServiceProvider",
     "requires": ["tentapress/users"],
     "admin": {
@@ -12,7 +12,8 @@
                 "route": "tp.media.index",
                 "capability": "manage_media",
                 "icon": "image",
-                "position": 35
+                "position": 30,
+                "parent": "Publishing"
             }
         ]
     }

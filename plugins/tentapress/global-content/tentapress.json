@@ -2,7 +2,7 @@
     "id": "tentapress/global-content",
     "name": "Global Content",
     "description": "Reusable synced sections and template parts for TentaPress.",
-    "version": "0.1.7",
+    "version": "0.1.8",
     "provider": "TentaPress\\GlobalContent\\GlobalContentServiceProvider",
     "requires": [
         "tentapress/admin-shell",
@@ -20,7 +20,7 @@
                 "route": "tp.global-content.index",
                 "capability": "manage_global_content",
                 "icon": "copy",
-                "position": 20,
+                "position": 40,
                 "parent": "Structure"
             }
         ]

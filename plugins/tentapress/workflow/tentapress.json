@@ -1,0 +1,26 @@
+{
+    "id": "tentapress/workflow",
+    "name": "Workflow",
+    "description": "Editorial workflow, approvals, and publishing governance for pages and posts.",
+    "version": "0.1.0",
+    "provider": "TentaPress\\Workflow\\WorkflowServiceProvider",
+    "requires": [
+        "tentapress/admin-shell",
+        "tentapress/system",
+        "tentapress/users",
+        "tentapress/pages",
+        "tentapress/posts",
+        "tentapress/revisions"
+    ],
+    "admin": {
+        "menus": [
+            {
+                "label": "Workflow",
+                "route": "tp.workflow.index",
+                "capability": "view_workflow_queue",
+                "position": 40,
+                "parent": "Publishing"
+            }
+        ]
+    }
+}

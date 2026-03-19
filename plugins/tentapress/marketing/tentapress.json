@@ -2,7 +2,7 @@
     "id": "tentapress/marketing",
     "name": "Marketing",
     "description": "Analytics providers, consent-managed marketing scripts, and tracking settings.",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "provider": "TentaPress\\Marketing\\MarketingServiceProvider",
     "requires": ["tentapress/users", "tentapress/settings"],
     "admin": {
@@ -12,7 +12,8 @@
                 "route": "tp.marketing.index",
                 "capability": "manage_marketing",
                 "icon": "chart",
-                "position": 31
+                "position": 20,
+                "parent": "Structure"
             }
         ]
     }

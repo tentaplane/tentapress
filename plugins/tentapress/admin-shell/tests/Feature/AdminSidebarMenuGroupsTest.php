@@ -5,7 +5,7 @@ declare(strict_types=1);
 use TentaPress\AdminShell\Admin\Menu\MenuBuilderContract;
 use TentaPress\Users\Models\TpUser;
 
-it('builds an implicit structure menu group for related plugin screens', function (): void {
+it('builds implicit publishing and structure menu groups for related plugin screens', function (): void {
     $user = TpUser::query()->create([
         'name' => 'Sidebar Admin',
         'email' => 'sidebar-admin@example.test',
@@ -20,29 +20,39 @@ it('builds an implicit structure menu group for related plugin screens', functio
         'tentapress/blocks',
         'tentapress/builder',
         'tentapress/global-content',
+        'tentapress/marketing',
+        'tentapress/media',
         'tentapress/menus',
         'tentapress/page-editor',
         'tentapress/pages',
         'tentapress/posts',
+        'tentapress/redirects',
+        'tentapress/seo',
         'tentapress/taxonomies',
         'tentapress/users',
+        'tentapress/workflow',
     ] as $pluginId) {
         $this->artisan('tp:plugins enable '.$pluginId)->assertSuccessful();
     }
 
     $menu = collect(resolve(MenuBuilderContract::class)->build($user));
+    $publishing = $menu->firstWhere('label', 'Publishing');
     $structure = $menu->firstWhere('label', 'Structure');
 
+    expect($publishing)->not->toBeNull();
+    expect($publishing['route'])->toBeNull();
+    expect($publishing['url'])->toBeNull();
+    expect($publishing['position'])->toBe(20);
     expect($structure)->not->toBeNull();
     expect($structure['route'])->toBeNull();
     expect($structure['url'])->toBeNull();
     expect($structure['position'])->toBe(50);
 
+    $publishingChildLabels = collect($publishing['children'] ?? [])->pluck('label')->all();
     $childLabels = collect($structure['children'] ?? [])->pluck('label')->all();
 
-    expect($childLabels)->toContain('Taxonomies');
-    expect($childLabels)->toContain('Menus');
-    expect($childLabels)->toContain('Global Content');
+    expect($publishingChildLabels)->toBe(['Pages', 'Posts', 'Media', 'Workflow']);
+    expect($childLabels)->toBe(['Menus', 'Marketing', 'SEO', 'Global Content', 'Taxonomies', 'Redirects']);
 });
 
 it('renders implicit parent menu groups as submenu toggles instead of links', function (): void {
