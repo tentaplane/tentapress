@@ -1,4 +1,4 @@
-# Plugin Boilerplate
+# Boilerplate
 
 Cloneable first-party plugin starter for TentaPress.
 
@@ -6,9 +6,9 @@ Cloneable first-party plugin starter for TentaPress.
 
 | Field | Value |
 |------|-------|
-| ID | `tentapress/plugin-boilerplate` |
+| ID | `tentapress/boilerplate` |
 | Version | `0.1.0` |
-| Provider | `TentaPress\\PluginBoilerplate\\PluginBoilerplateServiceProvider` |
+| Provider | `TentaPress\\Boilerplate\\BoilerplateServiceProvider` |
 
 ## Purpose
 
@@ -29,12 +29,12 @@ Provide a small, explicit starting point for new TentaPress plugins without intr
 
 - Package name in `composer.json`
 - Plugin ID, label, menu route, and version in `tentapress.json`
-- Namespace `TentaPress\\PluginBoilerplate`
+- Namespace `TentaPress\\Boilerplate`
 - Route URI and route names
-- Capability key `manage_plugin_boilerplate`
-- Settings keys under `plugin_boilerplate.*`
-- View namespace `tentapress-plugin-boilerplate`
-- Command signature `tp:plugin-boilerplate:check`
+- Capability key `manage_boilerplate`
+- Settings keys under `boilerplate.*`
+- View namespace `tentapress-boilerplate`
+- Command signature `tp:boilerplate:check`
 
 ## Suggested Next Steps
 
@@ -47,7 +47,7 @@ Provide a small, explicit starting point for new TentaPress plugins without intr
 
 ```bash
 php artisan tp:plugins sync
-php artisan tp:plugins enable tentapress/plugin-boilerplate
+php artisan tp:plugins enable tentapress/boilerplate
 ./vendor/bin/pint --dirty
-composer test:filter -- PluginBoilerplate
+composer test:filter -- Boilerplate
 ```

@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace TentaPress\PluginBoilerplate\Console;
+namespace TentaPress\Boilerplate\Console;
 
 use Illuminate\Console\Command;
-use TentaPress\PluginBoilerplate\Services\PluginBoilerplateSettings;
+use TentaPress\Boilerplate\Services\BoilerplateSettings;
 
-final class PluginBoilerplateCheckCommand extends Command
+final class BoilerplateCheckCommand extends Command
 {
-    protected $signature = 'tp:plugin-boilerplate:check';
+    protected $signature = 'tp:boilerplate:check';
 
     protected $description = 'Show the current boilerplate plugin settings.';
 
-    public function handle(PluginBoilerplateSettings $settings): int
+    public function handle(BoilerplateSettings $settings): int
     {
         $this->components->twoColumnDetail('Enabled', $settings->isEnabled() ? 'yes' : 'no');
         $this->components->twoColumnDetail('Endpoint prefix', $settings->endpointPrefix());

@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace TentaPress\PluginBoilerplate\Services;
+namespace TentaPress\Boilerplate\Services;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-final class PluginBoilerplateCapabilitySeeder
+final class BoilerplateCapabilitySeeder
 {
     public function run(): void
     {
@@ -16,9 +16,9 @@ final class PluginBoilerplateCapabilitySeeder
         }
 
         DB::table('tp_capabilities')->updateOrInsert(
-            ['key' => 'manage_plugin_boilerplate'],
+            ['key' => 'manage_boilerplate'],
             [
-                'label' => 'Manage Plugin Boilerplate',
+                'label' => 'Manage Boilerplate',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -32,7 +32,7 @@ final class PluginBoilerplateCapabilitySeeder
             DB::table('tp_role_capability')->updateOrInsert(
                 [
                     'role_id' => (int) $roleId,
-                    'capability_key' => 'manage_plugin_boilerplate',
+                    'capability_key' => 'manage_boilerplate',
                 ],
                 [],
             );

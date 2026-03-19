@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace TentaPress\PluginBoilerplate\Http\Requests;
+namespace TentaPress\Boilerplate\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-final class UpdatePluginBoilerplateSettingsRequest extends FormRequest
+final class UpdateBoilerplateSettingsRequest extends FormRequest
 {
     public function authorize(): bool
     {

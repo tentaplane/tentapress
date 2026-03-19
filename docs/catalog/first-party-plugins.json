@@ -160,10 +160,10 @@
             "icon": "pages"
         },
         {
-            "id": "tentapress/plugin-boilerplate",
-            "name": "Plugin Boilerplate",
+            "id": "tentapress/boilerplate",
+            "name": "Boilerplate",
             "description": "Cloneable first-party plugin starter for TentaPress.",
-            "package": "tentapress/plugin-boilerplate",
+            "package": "tentapress/boilerplate",
             "latest_version": "0.1.0"
         },
         {

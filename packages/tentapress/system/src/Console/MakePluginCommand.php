@@ -6,7 +6,7 @@ namespace TentaPress\System\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
-use TentaPress\System\Plugin\PluginBoilerplateGenerator;
+use TentaPress\System\Plugin\BoilerplateGenerator;
 use TentaPress\System\Plugin\PluginRegistry;
 use Throwable;
 
@@ -17,17 +17,17 @@ final class MakePluginCommand extends Command
         {slug? : Plugin slug in kebab-case}
         {name? : Human-readable plugin name}
         {--source=auto : Template source: auto, packagist, or local}
-        {--template-package=tentapress/plugin-boilerplate : Packagist template package}
+        {--template-package=tentapress/boilerplate : Packagist template package}
         {--template-version= : Specific Packagist template version}
         {--namespace= : Root PHP namespace, for example TentaPress\\ExamplePlugin}
         {--description= : Plugin description written to tentapress.json and README}
         {--enable : Enable the plugin after generating it}
     ';
 
-    protected $description = 'Clone the plugin boilerplate into a new plugin package';
+    protected $description = 'Clone the boilerplate template into a new plugin package';
 
     public function __construct(
-        private readonly PluginBoilerplateGenerator $generator,
+        private readonly BoilerplateGenerator $generator,
         private readonly PluginRegistry $registry,
     ) {
         parent::__construct();

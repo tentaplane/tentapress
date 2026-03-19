@@ -1,5 +1,5 @@
 {
-    "name": "tentapress/plugin-boilerplate",
+    "name": "tentapress/boilerplate",
     "type": "library",
     "version": "0.1.0",
     "license": "MIT",
@@ -11,13 +11,13 @@
     },
     "autoload": {
         "psr-4": {
-            "TentaPress\\PluginBoilerplate\\": "src/"
+            "TentaPress\\Boilerplate\\": "src/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "TentaPress\\PluginBoilerplate\\PluginBoilerplateServiceProvider"
+                "TentaPress\\Boilerplate\\BoilerplateServiceProvider"
             ]
         }
     },

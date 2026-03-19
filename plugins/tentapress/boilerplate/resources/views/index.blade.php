@@ -1,18 +1,18 @@
 @extends('tentapress-admin::layouts.shell')
 
-@section('title', 'Plugin Boilerplate')
+@section('title', 'Boilerplate')
 
 @section('content')
     <div class="tp-page-header">
         <div>
-            <h1 class="tp-page-title">Plugin Boilerplate</h1>
+            <h1 class="tp-page-title">Boilerplate</h1>
             <p class="tp-description">Use this starter as the baseline for new first-party TentaPress plugins.</p>
         </div>
     </div>
 
     <div class="tp-metabox">
         <div class="tp-metabox__body">
-            <form method="POST" action="{{ route('tp.plugin-boilerplate.update') }}" class="space-y-5">
+            <form method="POST" action="{{ route('tp.boilerplate.update') }}" class="space-y-5">
                 @csrf
 
                 <div class="tp-field">

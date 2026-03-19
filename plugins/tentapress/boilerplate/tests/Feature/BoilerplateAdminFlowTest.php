@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-use TentaPress\PluginBoilerplate\PluginBoilerplateServiceProvider;
-use TentaPress\PluginBoilerplate\Services\PluginBoilerplateSettings;
+use TentaPress\Boilerplate\BoilerplateServiceProvider;
+use TentaPress\Boilerplate\Services\BoilerplateSettings;
 use TentaPress\Users\Models\TpUser;
 
-function registerPluginBoilerplateAutoloader(): void
+function registerBoilerplateAutoloader(): void
 {
     static $registered = false;
 
@@ -15,7 +15,7 @@ function registerPluginBoilerplateAutoloader(): void
     }
 
     spl_autoload_register(static function (string $class): void {
-        $prefix = 'TentaPress\\PluginBoilerplate\\';
+        $prefix = 'TentaPress\\Boilerplate\\';
 
         if (! str_starts_with($class, $prefix)) {
             return;
@@ -26,7 +26,7 @@ function registerPluginBoilerplateAutoloader(): void
             return;
         }
 
-        $path = base_path('plugins/tentapress/plugin-boilerplate/src/'.str_replace('\\', '/', $relativeClass).'.php');
+        $path = base_path('plugins/tentapress/boilerplate/src/'.str_replace('\\', '/', $relativeClass).'.php');
         if (is_file($path)) {
             require_once $path;
         }
@@ -35,59 +35,59 @@ function registerPluginBoilerplateAutoloader(): void
     $registered = true;
 }
 
-function registerPluginBoilerplateProvider(): void
+function registerBoilerplateProvider(): void
 {
-    registerPluginBoilerplateAutoloader();
+    registerBoilerplateAutoloader();
 
-    app()->register(PluginBoilerplateServiceProvider::class);
+    app()->register(BoilerplateServiceProvider::class);
     resolve('router')->getRoutes()->refreshNameLookups();
     resolve('router')->getRoutes()->refreshActionLookups();
 }
 
 it('redirects guests from the boilerplate admin route to login', function (): void {
-    registerPluginBoilerplateProvider();
+    registerBoilerplateProvider();
 
-    $this->get('/admin/plugin-boilerplate')->assertRedirect('/admin/login');
+    $this->get('/admin/boilerplate')->assertRedirect('/admin/login');
 });
 
 it('allows a super admin to view the boilerplate settings page', function (): void {
-    registerPluginBoilerplateProvider();
+    registerBoilerplateProvider();
 
     $admin = TpUser::query()->create([
-        'name' => 'Plugin Boilerplate Admin',
-        'email' => 'plugin-boilerplate-admin@example.test',
+        'name' => 'Boilerplate Admin',
+        'email' => 'boilerplate-admin@example.test',
         'password' => 'secret',
         'is_super_admin' => true,
     ]);
 
     $this->actingAs($admin)
-        ->get('/admin/plugin-boilerplate')
+        ->get('/admin/boilerplate')
         ->assertOk()
-        ->assertViewIs('tentapress-plugin-boilerplate::index')
-        ->assertSee('Plugin Boilerplate')
+        ->assertViewIs('tentapress-boilerplate::index')
+        ->assertSee('Boilerplate')
         ->assertSee('Endpoint prefix');
 });
 
 it('persists boilerplate settings through the shared settings store', function (): void {
-    registerPluginBoilerplateProvider();
+    registerBoilerplateProvider();
 
     $admin = TpUser::query()->create([
-        'name' => 'Plugin Boilerplate Editor',
-        'email' => 'plugin-boilerplate-editor@example.test',
+        'name' => 'Boilerplate Editor',
+        'email' => 'boilerplate-editor@example.test',
         'password' => 'secret',
         'is_super_admin' => true,
     ]);
 
     $this->actingAs($admin)
-        ->post('/admin/plugin-boilerplate', [
+        ->post('/admin/boilerplate', [
             'plugin_enabled' => '1',
             'endpoint_prefix' => 'starter-plugin',
             'admin_notice' => 'Use explicit dependencies and small services.',
         ])
-        ->assertRedirect('/admin/plugin-boilerplate')
-        ->assertSessionHas('tp_notice_success', 'Plugin boilerplate settings saved.');
+        ->assertRedirect('/admin/boilerplate')
+        ->assertSessionHas('tp_notice_success', 'Boilerplate settings saved.');
 
-    $settings = app()->make(PluginBoilerplateSettings::class);
+    $settings = app()->make(BoilerplateSettings::class);
 
     expect($settings->isEnabled())->toBeTrue();
     expect($settings->endpointPrefix())->toBe('starter-plugin');
@@ -95,9 +95,9 @@ it('persists boilerplate settings through the shared settings store', function (
 });
 
 it('registers the boilerplate check command', function (): void {
-    registerPluginBoilerplateProvider();
+    registerBoilerplateProvider();
 
-    $this->artisan('tp:plugin-boilerplate:check')
+    $this->artisan('tp:boilerplate:check')
         ->expectsOutputToContain('Enabled')
         ->expectsOutputToContain('Endpoint prefix')
         ->assertSuccessful();

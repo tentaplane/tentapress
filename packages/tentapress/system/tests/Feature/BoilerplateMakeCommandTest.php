@@ -26,7 +26,7 @@ function cleanupGeneratedPluginFixture(): void
     DB::table('tp_plugins')->where('id', 'acme/test-starter')->delete();
 }
 
-it('clones the plugin boilerplate into a renamed plugin package', function (): void {
+it('clones the boilerplate template into a renamed plugin package', function (): void {
     $this->artisan('tp:plugin:make', [
         'vendor' => 'acme',
         'slug' => 'test-starter',

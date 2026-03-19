@@ -92,15 +92,15 @@ namespace, class names, route names, capability key, settings prefix, view names
 
 Default source behaviour is `--source=auto`:
 
-- Try Packagist first using `tentapress/plugin-boilerplate`
-- Fall back to the local repository copy at `plugins/tentapress/plugin-boilerplate` if the package is unavailable
+- Try Packagist first using `tentapress/boilerplate`
+- Fall back to the local repository copy at `plugins/tentapress/boilerplate` if the package is unavailable
 
 Supported options:
 
 ```bash
 php artisan tp:plugin:make <vendor> <slug> "<name>" \
   --source=auto|packagist|local \
-  --template-package=tentapress/plugin-boilerplate \
+  --template-package=tentapress/boilerplate \
   --template-version=<version> \
   --namespace="Vendor\\PluginName" \
   --description="Describe what the plugin does." \
@@ -190,7 +190,7 @@ This package keeps feature tests locally under `packages/tentapress/system/tests
 composer test:filter -- PluginsListCommandTest
 composer test:filter -- PluginsSyncCommandTest
 composer test:filter -- PluginsFailurePathsCommandTest
-composer test:filter -- PluginBoilerplateMakeCommandTest
+composer test:filter -- BoilerplateMakeCommandTest
 ```
 
 Migration behavior for tests is provided by root Pest config via `RefreshDatabase`, so package migrations are applied

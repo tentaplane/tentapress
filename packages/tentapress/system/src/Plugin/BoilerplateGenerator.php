@@ -11,7 +11,7 @@ use InvalidArgumentException;
 use TentaPress\System\Support\Paths;
 use ZipArchive;
 
-final class PluginBoilerplateGenerator
+final class BoilerplateGenerator
 {
     /**
      * @return array{package_id:string,path:string,source:string,fallback_reason:?string}
@@ -23,7 +23,7 @@ final class PluginBoilerplateGenerator
         string $namespace,
         string $description,
         string $source = 'auto',
-        string $templatePackage = 'tentapress/plugin-boilerplate',
+        string $templatePackage = 'tentapress/boilerplate',
         ?string $templateVersion = null,
     ): array {
         $destinationPath = Paths::pluginsPath($vendor.'/'.$slug);
@@ -47,9 +47,10 @@ final class PluginBoilerplateGenerator
             namespace: $namespace,
             description: $description,
         );
+        $classStem = $this->namespaceLeaf($namespace);
 
         $this->rewriteFileContents($destinationPath, $replacements);
-        $this->renameGeneratedPaths($destinationPath, $replacements['PluginBoilerplate']);
+        $this->renameGeneratedPaths($destinationPath, $classStem);
 
         if (($resolvedTemplate['cleanup_path'] ?? null) !== null) {
             File::deleteDirectory((string) $resolvedTemplate['cleanup_path']);
@@ -102,9 +103,9 @@ final class PluginBoilerplateGenerator
 
     private function localTemplatePath(): string
     {
-        $sourcePath = Paths::pluginsPath('tentapress/plugin-boilerplate');
+        $sourcePath = Paths::pluginsPath('tentapress/boilerplate');
 
-        throw_unless(File::isDirectory($sourcePath), InvalidArgumentException::class, 'Plugin boilerplate source directory was not found.');
+        throw_unless(File::isDirectory($sourcePath), InvalidArgumentException::class, 'Boilerplate source directory was not found.');
 
         return $sourcePath;
     }
@@ -134,7 +135,7 @@ final class PluginBoilerplateGenerator
 
         throw_unless(is_string($distUrl) && $distUrl !== '', InvalidArgumentException::class, "No downloadable dist archive found for {$package}.");
 
-        $temporaryRoot = storage_path('app/tp-plugin-boilerplate/'.Str::uuid()->toString());
+        $temporaryRoot = storage_path('app/tp-boilerplate/'.Str::uuid()->toString());
         $archivePath = $temporaryRoot.'/template.zip';
         $extractPath = $temporaryRoot.'/extract';
 
@@ -214,31 +215,33 @@ final class PluginBoilerplateGenerator
         string $description,
     ): array {
         $snakeSlug = Str::of($slug)->replace('-', '_')->toString();
-        $studlySlug = $this->namespaceLeaf($namespace);
         $viewNamespace = $vendor.'-'.$slug;
         $capability = 'manage_'.$snakeSlug;
         $escapedNamespace = str_replace('\\', '\\\\', $namespace);
+        $studlySlug = $this->namespaceLeaf($namespace);
 
         return [
             'Cloneable first-party plugin starter for TentaPress.' => $description,
             'Cloneable first-party plugin starter' => $name,
-            'Plugin Boilerplate' => $name,
-            'Plugin boilerplate' => $name,
-            'Manage Plugin Boilerplate' => 'Manage '.$name,
+            'Boilerplate' => $name,
+            'Manage Boilerplate' => 'Manage '.$name,
             'Show the current boilerplate plugin settings.' => "Show the current {$name} plugin settings.",
             'Use this starter as the baseline for new first-party TentaPress plugins.' => "Use {$name} as the baseline for this plugin.",
             'Simple example setting stored via the shared settings plugin.' => "Example setting storage for {$name}.",
             'Example content field for a plugin-owned admin view.' => "Example content field for {$name}.",
-            'Plugin boilerplate settings saved.' => "{$name} settings saved.",
-            'tentapress/plugin-boilerplate' => $vendor.'/'.$slug,
-            'tentapress-plugin-boilerplate' => $viewNamespace,
-            'plugin-boilerplate' => $slug,
-            'plugin_boilerplate' => $snakeSlug,
-            'TentaPress\\\\PluginBoilerplate\\\\' => $escapedNamespace.'\\\\',
-            'TentaPress\\\\PluginBoilerplate' => $escapedNamespace,
-            'PluginBoilerplate' => $studlySlug,
-            'TentaPress\\PluginBoilerplate' => $namespace,
-            'manage_plugin_boilerplate' => $capability,
+            'Boilerplate settings saved.' => "{$name} settings saved.",
+            'tentapress/boilerplate' => $vendor.'/'.$slug,
+            'tentapress-boilerplate' => $viewNamespace,
+            'TentaPress\\\\Boilerplate\\\\' => $escapedNamespace.'\\\\',
+            'TentaPress\\\\Boilerplate' => $escapedNamespace,
+            'TentaPress\\Boilerplate' => $namespace,
+            'BoilerplateServiceProvider' => $studlySlug.'ServiceProvider',
+            'BoilerplateCheckCommand' => $studlySlug.'CheckCommand',
+            'BoilerplateSettings' => $studlySlug.'Settings',
+            'BoilerplateCapabilitySeeder' => $studlySlug.'CapabilitySeeder',
+            'UpdateBoilerplateSettingsRequest' => 'Update'.$studlySlug.'SettingsRequest',
+            'manage_boilerplate' => $capability,
+            'boilerplate' => $slug,
         ];
     }
 
@@ -269,7 +272,7 @@ final class PluginBoilerplateGenerator
         foreach ($iterator as $item) {
             $path = $item->getPathname();
             $basename = basename((string) $path);
-            $rewrittenBasename = str_replace('PluginBoilerplate', $classStem, $basename);
+            $rewrittenBasename = str_replace('Boilerplate', $classStem, $basename);
 
             if ($basename === $rewrittenBasename) {
                 continue;
