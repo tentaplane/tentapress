@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.46.0](https://github.com/tentaplane/tentapress/compare/v0.45.0...v0.46.0) (2026-03-19)
+
+
+### Features
+
+* **plugin-boilerplate:** add cloneable plugin starter ([ea2df30](https://github.com/tentaplane/tentapress/commit/ea2df309f1d6929b5fb4ffd699f0df4b813c557e))
+* **system:** add plugin boilerplate generator ([1cfe5cc](https://github.com/tentaplane/tentapress/commit/1cfe5cc130c0ea6b0356158ba0f7bca251a34a25))
+
 ## [0.45.0](https://github.com/tentaplane/tentapress/compare/v0.44.0...v0.45.0) (2026-03-19)
 
 
