@@ -6,10 +6,10 @@ namespace TentaPress\PluginBoilerplate\Services;
 
 use TentaPress\Settings\Services\SettingsStore;
 
-final class PluginBoilerplateSettings
+final readonly class PluginBoilerplateSettings
 {
     public function __construct(
-        private readonly SettingsStore $settingsStore,
+        private SettingsStore $settingsStore,
     ) {
     }
 
