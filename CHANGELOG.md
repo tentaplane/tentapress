@@ -4,6 +4,25 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.45.0](https://github.com/tentaplane/tentapress/compare/v0.44.0...v0.45.0) (2026-03-19)
+
+
+### Features
+
+* **marketing:** add marketing plugin ([ce1115a](https://github.com/tentaplane/tentapress/commit/ce1115adec764945bc43615c351b09993efbba24))
+* **marketing:** improve admin settings UX ([078b6fc](https://github.com/tentaplane/tentapress/commit/078b6fc0820ef53fab35c3b4a406888c82271a65))
+
+
+### Bug Fixes
+
+* **system:** support composer-installed plugin paths ([eee7e55](https://github.com/tentaplane/tentapress/commit/eee7e55c3ce268c8e3a4cfa6fc783b2a63bc700d))
+
+
+### Miscellaneous Chores
+
+* **admin-shell:** admin UI assets ([db15edd](https://github.com/tentaplane/tentapress/commit/db15edd901f02739e3692af10b530c6d0637f547))
+* **system:** bump package version ([6180248](https://github.com/tentaplane/tentapress/commit/6180248e2984f7acde372dedfe817b43b8990d77))
+
 ## [0.44.0](https://github.com/tentaplane/tentapress/compare/v0.43.3...v0.44.0) (2026-03-18)
 
 
