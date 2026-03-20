@@ -7,7 +7,7 @@ Editorial workflow, approvals, and publishing governance for TentaPress pages an
 | Field | Value |
 |------|-------|
 | ID | `tentapress/workflow` |
-| Version | `0.1.0` |
+| Version | `0.1.1` |
 | Provider | `TentaPress\\Workflow\\WorkflowServiceProvider` |
 
 ## Purpose

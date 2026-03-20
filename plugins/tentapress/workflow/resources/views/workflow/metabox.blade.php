@@ -17,6 +17,9 @@
     $canPublishWorkflow = is_object($currentUser) && method_exists($currentUser, 'hasCapability')
         ? ($currentUser->isSuperAdmin() || $currentUser->hasCapability('publish_content'))
         : false;
+    $routeUrl = static function (string $name, string $path, array $parameters = []): string {
+        return \Illuminate\Support\Facades\Route::has($name) ? route($name, $parameters) : url($path);
+    };
 @endphp
 
 @if ($workflowItem)
@@ -45,7 +48,7 @@
             <div class="tp-divider"></div>
 
             @if ($canManageWorkflowResource)
-                <form method="POST" action="{{ route('tp.workflow.assign', ['resourceType' => $workflowResourceType, 'resourceId' => $resourceId]) }}" class="space-y-3">
+                <form method="POST" action="{{ $routeUrl('tp.workflow.assign', '/admin/workflow/'.$workflowResourceType.'/'.$resourceId.'/assign', ['resourceType' => $workflowResourceType, 'resourceId' => $resourceId]) }}" class="space-y-3">
                     @csrf
 
                     <div class="tp-field">
@@ -92,40 +95,40 @@
 
             <div class="space-y-2">
                 @if ($canManageWorkflowResource && in_array((string) $workflowItem->editorial_state, ['draft', 'changes_requested'], true))
-                    <form method="POST" action="{{ route('tp.workflow.submit', ['resourceType' => $workflowResourceType, 'resourceId' => $resourceId]) }}">
+                    <form method="POST" action="{{ $routeUrl('tp.workflow.submit', '/admin/workflow/'.$workflowResourceType.'/'.$resourceId.'/submit', ['resourceType' => $workflowResourceType, 'resourceId' => $resourceId]) }}">
                         @csrf
                         <button type="submit" class="tp-button-primary w-full justify-center">Submit for review</button>
                     </form>
                 @endif
 
                 @if ($canReviewWorkflow && (string) $workflowItem->editorial_state === 'in_review')
-                    <form method="POST" action="{{ route('tp.workflow.changes', ['resourceType' => $workflowResourceType, 'resourceId' => $resourceId]) }}">
+                    <form method="POST" action="{{ $routeUrl('tp.workflow.changes', '/admin/workflow/'.$workflowResourceType.'/'.$resourceId.'/changes', ['resourceType' => $workflowResourceType, 'resourceId' => $resourceId]) }}">
                         @csrf
                         <button type="submit" class="tp-button-secondary w-full justify-center">Request changes</button>
                     </form>
                 @endif
 
                 @if ($canApproveWorkflow && (string) $workflowItem->editorial_state === 'in_review')
-                    <form method="POST" action="{{ route('tp.workflow.approve', ['resourceType' => $workflowResourceType, 'resourceId' => $resourceId]) }}">
+                    <form method="POST" action="{{ $routeUrl('tp.workflow.approve', '/admin/workflow/'.$workflowResourceType.'/'.$resourceId.'/approve', ['resourceType' => $workflowResourceType, 'resourceId' => $resourceId]) }}">
                         @csrf
                         <button type="submit" class="tp-button-primary w-full justify-center">Approve</button>
                     </form>
                 @endif
 
                 @if ($canApproveWorkflow && (string) $workflowItem->editorial_state === 'approved')
-                    <form method="POST" action="{{ route('tp.workflow.revoke', ['resourceType' => $workflowResourceType, 'resourceId' => $resourceId]) }}">
+                    <form method="POST" action="{{ $routeUrl('tp.workflow.revoke', '/admin/workflow/'.$workflowResourceType.'/'.$resourceId.'/revoke', ['resourceType' => $workflowResourceType, 'resourceId' => $resourceId]) }}">
                         @csrf
                         <button type="submit" class="tp-button-secondary w-full justify-center">Revoke approval</button>
                     </form>
                 @endif
 
                 @if ($canPublishWorkflow && (string) $workflowItem->editorial_state === 'approved')
-                    <form method="POST" action="{{ route('tp.workflow.publish', ['resourceType' => $workflowResourceType, 'resourceId' => $resourceId]) }}">
+                    <form method="POST" action="{{ $routeUrl('tp.workflow.publish', '/admin/workflow/'.$workflowResourceType.'/'.$resourceId.'/publish', ['resourceType' => $workflowResourceType, 'resourceId' => $resourceId]) }}">
                         @csrf
                         <button type="submit" class="tp-button-primary w-full justify-center">Publish now</button>
                     </form>
 
-                    <form method="POST" action="{{ route('tp.workflow.schedule', ['resourceType' => $workflowResourceType, 'resourceId' => $resourceId]) }}" class="space-y-2">
+                    <form method="POST" action="{{ $routeUrl('tp.workflow.schedule', '/admin/workflow/'.$workflowResourceType.'/'.$resourceId.'/schedule', ['resourceType' => $workflowResourceType, 'resourceId' => $resourceId]) }}" class="space-y-2">
                         @csrf
                         <div class="tp-field">
                             <label class="tp-label" for="workflow-scheduled-{{ $resourceId }}">Schedule publish</label>
@@ -140,7 +143,7 @@
                     </form>
                 @endif
 
-                <a href="{{ route('tp.workflow.index') }}" class="tp-button-link">Open workflow queue</a>
+                <a href="{{ $routeUrl('tp.workflow.index', '/admin/workflow') }}" class="tp-button-link">Open workflow queue</a>
             </div>
         </div>
     </div>

@@ -5,6 +5,11 @@ declare(strict_types=1);
 use TentaPress\Posts\Models\TpPost;
 use TentaPress\Users\Models\TpUser;
 
+beforeEach(function (): void {
+    $this->artisan('tp:plugins sync')->assertSuccessful();
+    $this->artisan('tp:plugins disable tentapress/workflow')->assertSuccessful();
+});
+
 it('redirects guests from posts admin routes to login', function (): void {
     $this->get('/admin/posts')->assertRedirect('/admin/login');
     $this->post('/admin/posts')->assertRedirect('/admin/login');

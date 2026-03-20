@@ -2,7 +2,7 @@
     "id": "tentapress/workflow",
     "name": "Workflow",
     "description": "Editorial workflow, approvals, and publishing governance for pages and posts.",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "provider": "TentaPress\\Workflow\\WorkflowServiceProvider",
     "requires": [
         "tentapress/admin-shell",

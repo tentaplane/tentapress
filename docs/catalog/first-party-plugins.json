@@ -1,6 +1,6 @@
 {
     "schema_version": 1,
-    "generated_at": "2026-03-20T08:31:20Z",
+    "generated_at": "2026-03-20T21:45:44Z",
     "plugins": [
         {
             "id": "tentapress/admin-shell",
@@ -45,7 +45,7 @@
             "name": "Content Types",
             "description": "Admin-defined publishable content types for TentaPress.",
             "package": "tentapress/content-types",
-            "latest_version": "0.1.0",
+            "latest_version": "0.2.0",
             "icon": "layers"
         },
         {
@@ -171,7 +171,7 @@
             "name": "Pages",
             "description": "Create and manage pages.",
             "package": "tentapress/pages",
-            "latest_version": "0.5.1",
+            "latest_version": "0.6.1",
             "icon": "pages"
         },
         {
@@ -179,7 +179,7 @@
             "name": "Posts",
             "description": "Create and manage blog posts.",
             "package": "tentapress/posts",
-            "latest_version": "0.5.1",
+            "latest_version": "0.6.1",
             "icon": "posts"
         },
         {
@@ -201,7 +201,7 @@
             "name": "SEO",
             "description": "",
             "package": "tentapress/seo",
-            "latest_version": "0.2.11",
+            "latest_version": "0.2.10",
             "icon": "seo"
         },
         {
@@ -256,7 +256,7 @@
             "name": "Workflow",
             "description": "Editorial workflow, approvals, and publishing governance for pages and posts.",
             "package": "tentapress/workflow",
-            "latest_version": "0.1.0"
+            "latest_version": "0.1.1"
         }
     ]
 }

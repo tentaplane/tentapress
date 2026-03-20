@@ -8,6 +8,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
 use TentaPress\Users\Models\TpUser;
+use TentaPress\Workflow\Support\WorkflowPluginState;
 
 final readonly class WorkflowFormComposer
 {
@@ -18,6 +19,12 @@ final readonly class WorkflowFormComposer
 
     public function compose(View $view): void
     {
+        if (! WorkflowPluginState::isEnabled()) {
+            $view->with('workflowPluginEnabled', false);
+
+            return;
+        }
+
         $data = $view->getData();
         $page = $data['page'] ?? null;
         $post = $data['post'] ?? null;

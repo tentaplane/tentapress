@@ -7,6 +7,11 @@ use TentaPress\System\Editor\EditorDriverDefinition;
 use TentaPress\System\Editor\EditorDriverRegistry;
 use TentaPress\Users\Models\TpUser;
 
+beforeEach(function (): void {
+    $this->artisan('tp:plugins sync')->assertSuccessful();
+    $this->artisan('tp:plugins disable tentapress/workflow')->assertSuccessful();
+});
+
 it('creates unique slugs from duplicate page titles when slug is omitted', function (): void {
     $admin = TpUser::query()->create([
         'name' => 'Pages Admin',

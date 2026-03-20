@@ -3,6 +3,11 @@
 @section('title', 'Workflow')
 
 @section('content')
+    @php
+        $routeUrl = static function (string $name, string $path, array $parameters = []): string {
+            return \Illuminate\Support\Facades\Route::has($name) ? route($name, $parameters) : url($path);
+        };
+    @endphp
     <div class="tp-page-header">
         <div>
             <h1 class="tp-page-title">Workflow</h1>
@@ -13,10 +18,10 @@
     <div class="tp-metabox">
         <div class="tp-metabox__title">
             <div class="flex flex-wrap gap-2">
-                <a href="{{ route('tp.workflow.index') }}" class="{{ $filter === 'all' ? 'tp-button-primary' : 'tp-button-secondary' }}">All</a>
-                <a href="{{ route('tp.workflow.index', ['filter' => 'mine']) }}" class="{{ $filter === 'mine' ? 'tp-button-primary' : 'tp-button-secondary' }}">Assigned to me</a>
-                <a href="{{ route('tp.workflow.index', ['filter' => 'review']) }}" class="{{ $filter === 'review' ? 'tp-button-primary' : 'tp-button-secondary' }}">Awaiting review</a>
-                <a href="{{ route('tp.workflow.index', ['filter' => 'scheduled']) }}" class="{{ $filter === 'scheduled' ? 'tp-button-primary' : 'tp-button-secondary' }}">Scheduled</a>
+                <a href="{{ $routeUrl('tp.workflow.index', '/admin/workflow') }}" class="{{ $filter === 'all' ? 'tp-button-primary' : 'tp-button-secondary' }}">All</a>
+                <a href="{{ $routeUrl('tp.workflow.index', '/admin/workflow?filter=mine', ['filter' => 'mine']) }}" class="{{ $filter === 'mine' ? 'tp-button-primary' : 'tp-button-secondary' }}">Assigned to me</a>
+                <a href="{{ $routeUrl('tp.workflow.index', '/admin/workflow?filter=review', ['filter' => 'review']) }}" class="{{ $filter === 'review' ? 'tp-button-primary' : 'tp-button-secondary' }}">Awaiting review</a>
+                <a href="{{ $routeUrl('tp.workflow.index', '/admin/workflow?filter=scheduled', ['filter' => 'scheduled']) }}" class="{{ $filter === 'scheduled' ? 'tp-button-primary' : 'tp-button-secondary' }}">Scheduled</a>
             </div>
         </div>
 

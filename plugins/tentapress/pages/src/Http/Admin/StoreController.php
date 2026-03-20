@@ -6,6 +6,7 @@ namespace TentaPress\Pages\Http\Admin;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\Rule;
 use TentaPress\Pages\Models\TpPage;
@@ -66,7 +67,7 @@ final readonly class StoreController
 
         $page = TpPage::query()->create($payload);
 
-        if (class_exists(WorkflowManager::class) && app()->bound(WorkflowManager::class)) {
+        if ($this->workflowPluginEnabled() && class_exists(WorkflowManager::class) && app()->bound(WorkflowManager::class)) {
             app()->make(WorkflowManager::class)->ensureForResource('pages', (int) $page->id, $nowUserId ?: null);
         }
 
@@ -103,5 +104,16 @@ final readonly class StoreController
         $ids = $registry->idsFor('pages');
 
         return $ids !== [] ? $ids : ['blocks'];
+    }
+
+    private function workflowPluginEnabled(): bool
+    {
+        if (! Schema::hasTable('tp_plugins')) {
+            return false;
+        }
+
+        return (int) DB::table('tp_plugins')
+            ->where('id', 'tentapress/workflow')
+            ->value('enabled') === 1;
     }
 }

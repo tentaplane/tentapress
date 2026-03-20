@@ -5,8 +5,10 @@ declare(strict_types=1);
 use Illuminate\Support\Facades\DB;
 use TentaPress\Pages\Models\TpPage;
 use TentaPress\Posts\Models\TpPost;
-use TentaPress\Workflow\Models\TpWorkflowItem;
+use TentaPress\Revisions\RevisionsServiceProvider;
 use TentaPress\Users\Models\TpUser;
+use TentaPress\Workflow\Models\TpWorkflowItem;
+use TentaPress\Workflow\WorkflowServiceProvider;
 
 beforeEach(function (): void {
     $this->refreshApplication();
@@ -23,7 +25,8 @@ function enableWorkflowPlugin(): void
 {
     test()->artisan('tp:plugins enable tentapress/revisions')->assertSuccessful();
     test()->artisan('tp:plugins enable tentapress/workflow')->assertSuccessful();
-    test()->refreshApplication();
+    app()->register(RevisionsServiceProvider::class);
+    app()->register(WorkflowServiceProvider::class);
     test()->artisan('migrate', ['--force' => true])->assertSuccessful();
 }
 

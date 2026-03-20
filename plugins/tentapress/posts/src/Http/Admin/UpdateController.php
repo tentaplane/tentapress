@@ -7,6 +7,7 @@ namespace TentaPress\Posts\Http\Admin;
 use TentaPress\Redirects\Services\SlugRedirector;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\Rule;
 use TentaPress\Posts\Models\TpPost;
@@ -71,7 +72,7 @@ final readonly class UpdateController
             $payload['editor_driver'] = $editorDriver;
         }
 
-        if ((string) $post->status === 'published' && class_exists(WorkflowManager::class) && app()->bound(WorkflowManager::class)) {
+        if ((string) $post->status === 'published' && $this->workflowPluginEnabled() && class_exists(WorkflowManager::class) && app()->bound(WorkflowManager::class)) {
             /** @var TpUser|null $actor */
             $actor = Auth::user();
             abort_unless($actor instanceof TpUser, 403);
@@ -87,7 +88,7 @@ final readonly class UpdateController
         $post->save();
         $this->createSlugRedirectIfNeeded($previousSlug, $slug);
 
-        if (class_exists(WorkflowManager::class) && app()->bound(WorkflowManager::class)) {
+        if ($this->workflowPluginEnabled() && class_exists(WorkflowManager::class) && app()->bound(WorkflowManager::class)) {
             app()->make(WorkflowManager::class)->ensureForResource('posts', (int) $post->id, $nowUserId ?: null);
         }
 
@@ -159,5 +160,16 @@ final readonly class UpdateController
         $newPath = '/'.$blogBase.'/'.ltrim($newSlug, '/');
 
         app()->make($slugRedirectorClass)->createOrIgnore($oldPath, $newPath, 'slug_change_post');
+    }
+
+    private function workflowPluginEnabled(): bool
+    {
+        if (! Schema::hasTable('tp_plugins')) {
+            return false;
+        }
+
+        return (int) DB::table('tp_plugins')
+            ->where('id', 'tentapress/workflow')
+            ->value('enabled') === 1;
     }
 }

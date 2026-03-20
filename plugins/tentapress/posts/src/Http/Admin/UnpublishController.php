@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace TentaPress\Posts\Http\Admin;
 
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use TentaPress\Posts\Models\TpPost;
 use TentaPress\Users\Models\TpUser;
 use TentaPress\Workflow\Services\WorkflowManager;
@@ -13,7 +15,7 @@ final class UnpublishController
 {
     public function __invoke(TpPost $post)
     {
-        if (class_exists(WorkflowManager::class) && app()->bound(WorkflowManager::class)) {
+        if ($this->workflowPluginEnabled() && class_exists(WorkflowManager::class) && app()->bound(WorkflowManager::class)) {
             /** @var TpUser|null $actor */
             $actor = Auth::user();
             abort_unless($actor instanceof TpUser, 403);
@@ -32,5 +34,16 @@ final class UnpublishController
 
         return to_route('tp.posts.edit', ['post' => $post->id])
             ->with('tp_notice_success', 'Post reverted to draft.');
+    }
+
+    private function workflowPluginEnabled(): bool
+    {
+        if (! Schema::hasTable('tp_plugins')) {
+            return false;
+        }
+
+        return (int) DB::table('tp_plugins')
+            ->where('id', 'tentapress/workflow')
+            ->value('enabled') === 1;
     }
 }
