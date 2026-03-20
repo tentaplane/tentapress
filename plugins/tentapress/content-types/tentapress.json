@@ -16,7 +16,7 @@
                 "route": "tp.content-types.index",
                 "capability": "manage_content_types",
                 "icon": "layers",
-                "position": 60,
+                "position": 50,
                 "parent": "Structure"
             }
         ]

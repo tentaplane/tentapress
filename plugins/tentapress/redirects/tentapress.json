@@ -10,7 +10,7 @@
                 "label": "Redirects",
                 "route": "tp.redirects.index",
                 "capability": "manage_seo",
-                "position": 60,
+                "position": 90,
                 "parent": "Structure"
             }
         ]
