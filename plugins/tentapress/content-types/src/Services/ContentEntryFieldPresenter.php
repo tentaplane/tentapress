@@ -51,17 +51,17 @@ final readonly class ContentEntryFieldPresenter
         return match ((string) $field->field_type) {
             'boolean' => filter_var($value, FILTER_VALIDATE_BOOL) ? 'Yes' : 'No',
             'date_time' => Date::parse((string) $value)->format('j M Y H:i'),
-            'relation' => $this->displayRelation((int) $value),
+            'relation' => $this->displayRelation($value),
             'select' => $this->displaySelect($field, (string) $value),
             default => (string) $value,
         };
     }
 
-    private function displayRelation(int $entryId): string
+    private function displayRelation(mixed $value): string
     {
-        $entry = $this->relations->find($entryId);
+        $entry = $this->relations->find($value);
 
-        return $entry?->title ?? (string) $entryId;
+        return $entry?->title ?? (string) $value;
     }
 
     private function displaySelect(TpContentTypeField $field, string $value): string

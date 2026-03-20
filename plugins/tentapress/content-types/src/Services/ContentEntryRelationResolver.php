@@ -4,31 +4,52 @@ declare(strict_types=1);
 
 namespace TentaPress\ContentTypes\Services;
 
-use Illuminate\Database\Eloquent\Collection;
-use TentaPress\ContentTypes\Models\TpContentEntry;
+use TentaPress\System\ContentReference\ContentReference;
+use TentaPress\System\ContentReference\ContentReferenceRegistry;
 
-final class ContentEntryRelationResolver
+final readonly class ContentEntryRelationResolver
 {
-    public function find(int $entryId): ?TpContentEntry
+    public function __construct(
+        private ContentReferenceRegistry $references,
+    ) {
+    }
+
+    public function find(mixed $value): ?ContentReference
     {
-        return TpContentEntry::query()
-            ->with('contentType')
-            ->find($entryId);
+        if (is_int($value) || (is_string($value) && preg_match('/^[1-9][0-9]*$/', $value) === 1)) {
+            return $this->references->find('content-types', (string) $value);
+        }
+
+        $reference = trim((string) $value);
+
+        if ($reference === '' || ! str_contains($reference, ':')) {
+            return null;
+        }
+
+        [$source, $id] = explode(':', $reference, 2);
+
+        $source = trim($source);
+        $id = trim($id);
+
+        if ($source === '' || $id === '') {
+            return null;
+        }
+
+        return $this->references->find($source, $id);
     }
 
     /**
-     * @param  array<int,string>  $allowedTypeKeys
-     * @return Collection<int,TpContentEntry>
+     * @param  array<int,string>  $allowedSources
+     * @param  array<string,array<string,mixed>>  $constraintsBySource
+     * @return array<int,ContentReference>
      */
-    public function options(array $allowedTypeKeys = []): Collection
+    public function options(array $allowedSources = ['content-types'], array $constraintsBySource = []): array
     {
-        return TpContentEntry::query()
-            ->with('contentType')
-            ->when(
-                $allowedTypeKeys !== [],
-                fn ($query) => $query->whereHas('contentType', fn ($nested) => $nested->whereIn('key', $allowedTypeKeys))
-            )
-            ->orderBy('title')
-            ->get();
+        return $this->references->options($allowedSources, $constraintsBySource);
+    }
+
+    public function canonicalValue(mixed $value): ?string
+    {
+        return $this->find($value)?->value();
     }
 }

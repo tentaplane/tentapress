@@ -7,7 +7,7 @@ Admin-defined publishable content types for TentaPress.
 | Field | Value |
 |------|-------|
 | ID | `tentapress/content-types` |
-| Version | `0.1.0` |
+| Version | `0.2.0` |
 | Provider | `TentaPress\\ContentTypes\\ContentTypesServiceProvider` |
 
 ## Purpose
@@ -20,6 +20,7 @@ Model structured content beyond pages and posts, such as case studies, team memb
 - Per-type base paths for archive and single routes
 - Publishable entries with blocks-based body authoring
 - Custom field support for text, textarea, number, boolean, date/time, select, and relation fields
+- Optional relation sources for Pages and Posts via the shared content reference registry
 - Plugin-owned JSON API with per-type visibility controls
 - Theme-aware single rendering with plugin fallbacks
 

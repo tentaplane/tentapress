@@ -27,6 +27,8 @@ final class EditController
             'entry' => $entry,
             'driverDefinitions' => $editorDrivers->definitions(),
             'relationOptions' => $formDataFactory->relationOptions($contentType),
+            'blockDefinitions' => $formDataFactory->blockDefinitions(),
+            'mediaOptions' => $formDataFactory->mediaOptions(),
             'mode' => 'edit',
         ]);
     }

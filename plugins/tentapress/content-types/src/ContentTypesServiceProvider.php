@@ -7,6 +7,7 @@ namespace TentaPress\ContentTypes;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
+use TentaPress\ContentTypes\ContentReference\ContentTypeEntryReferenceSource;
 use TentaPress\ContentTypes\Http\Public\ArchiveController;
 use TentaPress\ContentTypes\Http\Public\ShowController;
 use TentaPress\ContentTypes\Models\TpContentType;
@@ -22,6 +23,7 @@ use TentaPress\ContentTypes\Services\ContentTypeFormDataFactory;
 use TentaPress\ContentTypes\Services\ContentFieldSchemaNormalizer;
 use TentaPress\ContentTypes\Services\ContentTypesCapabilitySeeder;
 use TentaPress\ContentTypes\Support\BlocksNormalizer;
+use TentaPress\System\ContentReference\ContentReferenceRegistry;
 
 final class ContentTypesServiceProvider extends ServiceProvider
 {
@@ -39,6 +41,7 @@ final class ContentTypesServiceProvider extends ServiceProvider
         $this->app->singleton(ContentTypesCapabilitySeeder::class);
         $this->app->singleton(BlocksNormalizer::class);
         $this->app->singleton(ContentEntryRenderer::class);
+        $this->app->singleton(ContentTypeEntryReferenceSource::class);
     }
 
     public function boot(): void
@@ -50,6 +53,12 @@ final class ContentTypesServiceProvider extends ServiceProvider
         $this->registerPublicRoutes();
 
         $this->app->booted(function (): void {
+            if ($this->app->bound(ContentReferenceRegistry::class)) {
+                $this->app->make(ContentReferenceRegistry::class)->register(
+                    $this->app->make(ContentTypeEntryReferenceSource::class)
+                );
+            }
+
             $this->app->make(ContentTypesCapabilitySeeder::class)->run();
         });
     }

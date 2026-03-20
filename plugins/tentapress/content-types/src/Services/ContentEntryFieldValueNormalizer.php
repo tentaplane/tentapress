@@ -105,15 +105,21 @@ final readonly class ContentEntryFieldValueNormalizer
         return $string;
     }
 
-    private function normalizeRelation(TpContentTypeField $field, mixed $value): int
+    private function normalizeRelation(TpContentTypeField $field, mixed $value): string
     {
-        $entryId = (int) $value;
+        $reference = $this->relations->find($value);
 
-        throw_if($entryId <= 0, RuntimeException::class, "Field '{$field->label}' must reference a valid content entry.");
+        throw_if($reference === null, RuntimeException::class, "Field '{$field->label}' must reference an existing item.");
 
-        $entry = $this->relations->find($entryId);
+        $allowedSources = collect($field->config['allowed_sources'] ?? ['content-types'])
+            ->map(fn (mixed $source): string => trim((string) $source))
+            ->filter()
+            ->values()
+            ->all();
 
-        throw_if($entry === null, RuntimeException::class, "Field '{$field->label}' must reference an existing content entry.");
+        if ($allowedSources === []) {
+            $allowedSources = ['content-types'];
+        }
 
         $allowedTypeKeys = collect($field->config['allowed_type_keys'] ?? [])
             ->map(fn (mixed $typeKey): string => trim((string) $typeKey))
@@ -121,16 +127,22 @@ final readonly class ContentEntryFieldValueNormalizer
             ->values()
             ->all();
 
-        if ($allowedTypeKeys !== []) {
-            $entryTypeKey = (string) ($entry->contentType?->key ?? '');
+        throw_if(
+            $allowedSources !== [] && ! in_array($reference->source, $allowedSources, true),
+            RuntimeException::class,
+            "Field '{$field->label}' must reference an allowed source."
+        );
+
+        if ($reference->source === 'content-types' && $allowedTypeKeys !== []) {
+            $contentTypeKey = trim((string) ($reference->meta['content_type_key'] ?? ''));
 
             throw_if(
-                ! in_array($entryTypeKey, $allowedTypeKeys, true),
+                $contentTypeKey === '' || ! in_array($contentTypeKey, $allowedTypeKeys, true),
                 RuntimeException::class,
                 "Field '{$field->label}' must reference an allowed content type."
             );
         }
 
-        return $entryId;
+        return $reference->value();
     }
 }

@@ -100,7 +100,22 @@ final class ContentFieldSchemaNormalizer
         }
 
         if ($fieldType === 'relation') {
+            $sources = [];
             $typeKeys = [];
+
+            foreach ($config['allowed_sources'] ?? ['content-types'] as $source) {
+                $normalizedSource = trim((string) $source);
+
+                if ($normalizedSource === '') {
+                    continue;
+                }
+
+                $sources[] = $normalizedSource;
+            }
+
+            if ($sources === []) {
+                $sources[] = 'content-types';
+            }
 
             foreach ($config['allowed_type_keys'] ?? [] as $typeKey) {
                 $normalized = Str::slug((string) $typeKey);
@@ -113,6 +128,7 @@ final class ContentFieldSchemaNormalizer
             }
 
             return [
+                'allowed_sources' => array_values(array_unique($sources)),
                 'allowed_type_keys' => array_values(array_unique($typeKeys)),
             ];
         }

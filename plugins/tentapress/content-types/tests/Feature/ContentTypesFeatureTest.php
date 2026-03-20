@@ -5,11 +5,14 @@ declare(strict_types=1);
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use TentaPress\ContentTypes\Services\ContentEntryRenderer;
+use TentaPress\ContentTypes\Services\ContentTypeFormDataFactory;
 use TentaPress\ContentTypes\Http\Public\ArchiveController as PublicArchiveController;
 use TentaPress\ContentTypes\Http\Public\ShowController as PublicShowController;
 use TentaPress\ContentTypes\Models\TpContentEntry;
 use TentaPress\ContentTypes\Models\TpContentType;
 use TentaPress\ContentTypes\Models\TpContentTypeField;
+use TentaPress\Pages\Models\TpPage;
+use TentaPress\Posts\Models\TpPost;
 use TentaPress\Users\Models\TpUser;
 
 beforeEach(function (): void {
@@ -247,7 +250,7 @@ it('creates, updates, and validates content entries with structured fields', fun
 
     expect($entry->field_values)->toMatchArray([
         'status' => 'live',
-        'related_case_study' => $related->id,
+        'related_case_study' => 'content-types:'.$related->id,
     ]);
 
     $this->actingAs($admin)
@@ -274,7 +277,7 @@ it('creates, updates, and validates content entries with structured fields', fun
     expect($entry->layout)->toBe('landing');
     expect($entry->field_values)->toMatchArray([
         'status' => 'planned',
-        'related_case_study' => $related->id,
+        'related_case_study' => 'content-types:'.$related->id,
     ]);
 
     $this->actingAs($admin)
@@ -291,6 +294,97 @@ it('creates, updates, and validates content entries with structured fields', fun
             ],
         ])
         ->assertSessionHasErrors('field_values');
+});
+
+it('supports optional page and post references without making them required', function (): void {
+    enableContentTypesPlugin();
+    $this->artisan('migrate', ['--force' => true])->assertSuccessful();
+
+    $admin = makeAdminUser();
+    $contentType = createContentType();
+    addField($contentType);
+
+    addField($contentType, [
+        'key' => 'featured_page',
+        'label' => 'Featured page',
+        'field_type' => 'relation',
+        'sort_order' => 2,
+        'required' => false,
+        'config' => ['allowed_sources' => ['pages']],
+    ]);
+
+    addField($contentType, [
+        'key' => 'featured_post',
+        'label' => 'Featured post',
+        'field_type' => 'relation',
+        'sort_order' => 3,
+        'required' => false,
+        'config' => ['allowed_sources' => ['posts']],
+    ]);
+
+    $page = TpPage::query()->create([
+        'title' => 'About TentaPress',
+        'slug' => 'about',
+        'status' => 'published',
+        'layout' => 'default',
+        'editor_driver' => 'blocks',
+        'blocks' => [],
+    ]);
+
+    $post = TpPost::query()->create([
+        'title' => 'Launch Notes',
+        'slug' => 'launch-notes',
+        'status' => 'published',
+        'layout' => 'default',
+        'editor_driver' => 'blocks',
+        'blocks' => [],
+    ]);
+
+    $this->actingAs($admin)
+        ->get('/admin/content-types/'.$contentType->id.'/entries/new')
+        ->assertOk()
+        ->assertSee('About TentaPress')
+        ->assertSee('Launch Notes');
+
+    $this->actingAs($admin)
+        ->post('/admin/content-types/'.$contentType->id.'/entries', [
+            'title' => 'Integration record',
+            'slug' => 'integration-record',
+            'layout' => 'default',
+            'editor_driver' => 'blocks',
+            'blocks_json' => '[]',
+            'page_doc_json' => '{"time":0,"blocks":[],"version":"2.28.0"}',
+            'field_values' => [
+                'status' => 'live',
+                'featured_page' => 'pages:'.$page->id,
+                'featured_post' => 'posts:'.$post->id,
+            ],
+        ])
+        ->assertRedirect('/admin/content-types/'.$contentType->id.'/entries/1/edit')
+        ->assertSessionHas('tp_notice_success', 'Content entry created.');
+
+    $entry = TpContentEntry::query()->where('slug', 'integration-record')->firstOrFail();
+
+    expect($entry->field_values)->toMatchArray([
+        'status' => 'live',
+        'featured_page' => 'pages:'.$page->id,
+        'featured_post' => 'posts:'.$post->id,
+    ]);
+});
+
+it('loads first-party block definitions in the content entry editor', function (): void {
+    enableContentTypesPlugin();
+
+    $admin = makeAdminUser();
+    $contentType = createContentType();
+    $definitions = resolve(ContentTypeFormDataFactory::class)->blockDefinitions();
+
+    $this->actingAs($admin)
+        ->get('/admin/content-types/'.$contentType->id.'/entries/new')
+        ->assertOk()
+        ->assertSee('Add block');
+
+    expect(collect($definitions)->pluck('type')->all())->toContain('blocks/content');
 });
 
 it('publishes, unpublishes, and renders public routes correctly', function (): void {

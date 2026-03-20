@@ -110,6 +110,7 @@
                         @php
                             $fieldValue = $fieldValues[$field->key] ?? null;
                             $fieldName = 'field_values['.$field->key.']';
+                            $selectedRelationValue = is_numeric($fieldValue) ? 'content-types:'.$fieldValue : (string) $fieldValue;
                         @endphp
 
                         <label class="block {{ $field->field_type === 'textarea' ? 'md:col-span-2' : '' }}">
@@ -149,9 +150,9 @@
                                 </select>
                             @elseif ($field->field_type === 'relation')
                                 <select name="{{ $fieldName }}" class="tp-select mt-2 w-full">
-                                    <option value="">Select an entry</option>
+                                    <option value="">Select an item</option>
                                     @foreach ($relationOptions[$field->key] ?? [] as $option)
-                                        <option value="{{ $option['id'] }}" @selected((int) $fieldValue === (int) $option['id'])>
+                                        <option value="{{ $option['id'] }}" @selected($selectedRelationValue === (string) $option['id'])>
                                             {{ $option['title'] }}@if (($option['type_label'] ?? '') !== '') - {{ $option['type_label'] }}@endif
                                         </option>
                                     @endforeach
@@ -178,16 +179,16 @@
                         'contentType' => $contentType,
                         'pageDocJson' => $pageDocJson,
                         'blocksJson' => $blocksJson,
-                        'blockDefinitions' => [],
-                        'mediaOptions' => [],
+                        'blockDefinitions' => $blockDefinitions ?? [],
+                        'mediaOptions' => $mediaOptions ?? [],
                     ])
                 @else
                     @component('tentapress-blocks::editor', [
                         'blocksEditorMode' => true,
                         'editorTitle' => trim($formTitle) !== '' ? $formTitle : 'Untitled '.$contentType->singular_label,
                         'blocksJson' => $blocksJson,
-                        'blockDefinitions' => [],
-                        'mediaOptions' => [],
+                        'blockDefinitions' => $blockDefinitions ?? [],
+                        'mediaOptions' => $mediaOptions ?? [],
                         'mediaIndexUrl' => \Illuminate\Support\Facades\Route::has('tp.media.index') ? route('tp.media.index') : '',
                     ])
                     @endcomponent

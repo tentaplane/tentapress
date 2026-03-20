@@ -202,13 +202,23 @@
 
                         <div class="mt-4" x-show="field.field_type === 'relation'">
                             <label class="block">
+                                <span class="tp-label">Allowed sources</span>
+                                <input
+                                    x-model="field.allowed_sources"
+                                    type="text"
+                                    class="tp-input mt-2 w-full"
+                                    placeholder="content-types, pages, posts" />
+                                <span class="mt-2 block text-xs text-black/60">Comma-separated source keys. Leave the default to keep relations scoped to content type entries.</span>
+                            </label>
+
+                            <label class="block">
                                 <span class="tp-label">Allowed content type keys</span>
                                 <input
                                     x-model="field.allowed_type_keys"
                                     type="text"
                                     class="tp-input mt-2 w-full"
                                     placeholder="{{ implode(', ', $existingTypeKeys) }}" />
-                                <span class="mt-2 block text-xs text-black/60">Comma-separated. Leave blank to allow any content type entry.</span>
+                                <span class="mt-2 block text-xs text-black/60">Only applied to the `content-types` source. Leave blank to allow any content type entry from that source.</span>
                             </label>
                         </div>
                     </div>
@@ -239,6 +249,9 @@
                     allowed_type_keys: Array.isArray(field.config?.allowed_type_keys)
                         ? field.config.allowed_type_keys.join(', ')
                         : '',
+                    allowed_sources: Array.isArray(field.config?.allowed_sources)
+                        ? field.config.allowed_sources.join(', ')
+                        : 'content-types',
                 })),
                 addField() {
                     this.fields.push({
@@ -248,6 +261,7 @@
                         field_type: 'text',
                         required: false,
                         select_options: '',
+                        allowed_sources: 'content-types',
                         allowed_type_keys: '',
                     });
                 },
@@ -284,6 +298,10 @@
 
                     if (field.field_type === 'relation') {
                         return {
+                            allowed_sources: String(field.allowed_sources || '')
+                                .split(',')
+                                .map((value) => value.trim())
+                                .filter(Boolean),
                             allowed_type_keys: String(field.allowed_type_keys || '')
                                 .split(',')
                                 .map((value) => value.trim())

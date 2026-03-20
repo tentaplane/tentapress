@@ -2,7 +2,7 @@
     "id": "tentapress/content-types",
     "name": "Content Types",
     "description": "Admin-defined publishable content types for TentaPress.",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "provider": "TentaPress\\ContentTypes\\ContentTypesServiceProvider",
     "requires": [
         "tentapress/admin-shell",

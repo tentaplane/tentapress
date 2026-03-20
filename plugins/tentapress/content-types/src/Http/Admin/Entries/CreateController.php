@@ -24,9 +24,13 @@ final class CreateController
             'entry' => new TpContentEntry([
                 'status' => 'draft',
                 'editor_driver' => 'blocks',
+                'blocks' => [],
+                'content' => ['time' => 0, 'blocks' => [], 'version' => '2.28.0'],
             ]),
             'driverDefinitions' => $editorDrivers->definitions(),
             'relationOptions' => $formDataFactory->relationOptions($contentType),
+            'blockDefinitions' => $formDataFactory->blockDefinitions(),
+            'mediaOptions' => $formDataFactory->mediaOptions(),
             'mode' => 'create',
         ]);
     }
