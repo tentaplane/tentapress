@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.48.0](https://github.com/tentaplane/tentapress/compare/v0.47.1...v0.48.0) (2026-03-20)
+
+
+### Features
+
+* **content-types:** add structured content types plugin ([8fd24ab](https://github.com/tentaplane/tentapress/commit/8fd24abf233d8f95bc8245f692b54377e1d80a7e))
+
+
+### Miscellaneous Chores
+
+* rearrange menu positions ([65d3bff](https://github.com/tentaplane/tentapress/commit/65d3bff3ec1142bd3e4683c7a35a46352dc371db))
+* **seo:** move navigation to Structure ([c971d1c](https://github.com/tentaplane/tentapress/commit/c971d1c45846178f3b50bff70389e4bf3825c351))
+
 ## [0.47.1](https://github.com/tentaplane/tentapress/compare/v0.47.0...v0.47.1) (2026-03-19)
 
 
