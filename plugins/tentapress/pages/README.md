@@ -7,7 +7,7 @@ Page management for TentaPress.
 | Field    | Value                                   |
 | -------- | --------------------------------------- |
 | ID       | `tentapress/pages`                      |
-| Version  | 0.5.1                                   |
+| Version  | 0.6.0                                   |
 | Provider | `TentaPress\Pages\PagesServiceProvider` |
 
 ## Features
@@ -24,6 +24,7 @@ Page management for TentaPress.
 - Revision history, autosave draft reload, compare, and restore integration when `tentapress/revisions` is enabled
 - Workflow approval, assignment, and revision-backed working copy integration when `tentapress/workflow` is enabled
 - Public rendering by slug
+- Optional content reference source registration for cross-plugin linking
 
 ## Dependencies
 

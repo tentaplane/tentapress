@@ -12,6 +12,7 @@ use TentaPress\System\Console\MakePluginCommand;
 use TentaPress\System\Console\PluginsCommand;
 use TentaPress\System\Console\SeedDemoHomeCommand;
 use TentaPress\System\Console\ThemesCommand;
+use TentaPress\System\ContentReference\ContentReferenceRegistry;
 use TentaPress\System\Editor\EditorDriverDefinition;
 use TentaPress\System\Editor\EditorDriverRegistry;
 use TentaPress\System\Http\AdminAuthMiddleware;
@@ -40,6 +41,7 @@ final class SystemServiceProvider extends ServiceProvider
         $this->app->singleton(PluginAssetPublisher::class);
         $this->app->singleton(RuntimeCacheRefresher::class);
         $this->app->singleton(AdminMiddleware::class);
+        $this->app->singleton(ContentReferenceRegistry::class);
         $this->app->singleton(EditorDriverRegistry::class);
 
         $this->app->singleton(ThemeRegistry::class);

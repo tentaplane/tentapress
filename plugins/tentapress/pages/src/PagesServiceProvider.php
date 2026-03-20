@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace TentaPress\Pages;
 
 use Illuminate\Support\ServiceProvider;
+use TentaPress\Pages\ContentReference\PageContentReferenceSource;
 use TentaPress\Pages\Services\PageRenderer;
 use TentaPress\Pages\Services\PageSlugger;
 use TentaPress\Pages\Support\BlocksNormalizer;
+use TentaPress\System\ContentReference\ContentReferenceRegistry;
 
 final class PagesServiceProvider extends ServiceProvider
 {
@@ -16,6 +18,7 @@ final class PagesServiceProvider extends ServiceProvider
         $this->app->singleton(PageSlugger::class);
         $this->app->singleton(PageRenderer::class);
         $this->app->singleton(BlocksNormalizer::class);
+        $this->app->singleton(PageContentReferenceSource::class);
     }
 
     public function boot(): void
@@ -30,6 +33,16 @@ final class PagesServiceProvider extends ServiceProvider
         // to reduce the chance it captures routes defined by other plugins.
         $this->app->booted(function (): void {
             $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
+        });
+
+        $this->app->booted(function (): void {
+            if (! $this->app->bound(ContentReferenceRegistry::class)) {
+                return;
+            }
+
+            $this->app->make(ContentReferenceRegistry::class)->register(
+                $this->app->make(PageContentReferenceSource::class)
+            );
         });
     }
 }

@@ -7,7 +7,7 @@ Blog post management for TentaPress.
 | Field    | Value                                   |
 | -------- | --------------------------------------- |
 | ID       | `tentapress/posts`                      |
-| Version  | 0.5.1                                   |
+| Version  | 0.6.0                                   |
 | Provider | `TentaPress\Posts\PostsServiceProvider` |
 
 ## Features
@@ -24,6 +24,7 @@ Blog post management for TentaPress.
 - Taxonomy metabox only renders when `tentapress/taxonomies` is enabled
 - Revision history, autosave draft reload, compare, and restore integration when `tentapress/revisions` is enabled
 - Workflow approval, assignment, and revision-backed working copy integration when `tentapress/workflow` is enabled
+- Optional content reference source registration for cross-plugin linking
 
 ## Dependencies
 
