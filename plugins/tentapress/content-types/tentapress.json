@@ -1,0 +1,24 @@
+{
+    "id": "tentapress/content-types",
+    "name": "Content Types",
+    "description": "Admin-defined publishable content types for TentaPress.",
+    "version": "0.1.0",
+    "provider": "TentaPress\\ContentTypes\\ContentTypesServiceProvider",
+    "requires": [
+        "tentapress/admin-shell",
+        "tentapress/blocks",
+        "tentapress/system"
+    ],
+    "admin": {
+        "menus": [
+            {
+                "label": "Content Types",
+                "route": "tp.content-types.index",
+                "capability": "manage_content_types",
+                "icon": "layers",
+                "position": 60,
+                "parent": "Structure"
+            }
+        ]
+    }
+}

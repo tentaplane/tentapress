@@ -1,0 +1,26 @@
+{
+    "name": "tentapress/content-types",
+    "type": "library",
+    "version": "0.1.0",
+    "license": "MIT",
+    "require": {
+        "php": "^8.2",
+        "tentapress/admin-shell": "<1.0",
+        "tentapress/blocks": "<1.0",
+        "tentapress/system": "<1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "TentaPress\\ContentTypes\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "TentaPress\\ContentTypes\\ContentTypesServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
