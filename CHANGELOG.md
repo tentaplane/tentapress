@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.49.0](https://github.com/tentaplane/tentapress/compare/v0.48.0...v0.49.0) (2026-03-21)
+
+
+### Features
+
+* **content-types:** support optional page and post references ([2228ff5](https://github.com/tentaplane/tentapress/commit/2228ff59490822b4fd38d19bf338af14fe92ccf4))
+* **system:** add shared content reference registry ([22fc3a5](https://github.com/tentaplane/tentapress/commit/22fc3a5ca800f9954d36c3477a757b8eea5f6041))
+
+
+### Bug Fixes
+
+* **workflow:** honour plugin state across page and post flows ([f83916b](https://github.com/tentaplane/tentapress/commit/f83916b0eae0c012bd5cfdd34fedad0ccdebec1a))
+
+
+### Miscellaneous Chores
+
+* **revisions:** move metabox for revisions to bottom of the editing screens ([c1df0a3](https://github.com/tentaplane/tentapress/commit/c1df0a3123567f94d212609417b2cb72563bf218))
+
 ## [0.48.0](https://github.com/tentaplane/tentapress/compare/v0.47.1...v0.48.0) (2026-03-20)
 
 
