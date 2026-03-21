@@ -1,6 +1,6 @@
 {
     "schema_version": 1,
-    "generated_at": "2026-03-20T21:45:44Z",
+    "generated_at": "2026-03-21T08:00:48Z",
     "plugins": [
         {
             "id": "tentapress/admin-shell",
@@ -171,7 +171,7 @@
             "name": "Pages",
             "description": "Create and manage pages.",
             "package": "tentapress/pages",
-            "latest_version": "0.6.1",
+            "latest_version": "0.6.2",
             "icon": "pages"
         },
         {
@@ -179,7 +179,7 @@
             "name": "Posts",
             "description": "Create and manage blog posts.",
             "package": "tentapress/posts",
-            "latest_version": "0.6.1",
+            "latest_version": "0.6.2",
             "icon": "posts"
         },
         {
@@ -194,14 +194,14 @@
             "name": "Revisions",
             "description": "Capture and review page and post content revisions.",
             "package": "tentapress/revisions",
-            "latest_version": "0.1.4"
+            "latest_version": "0.1.5"
         },
         {
             "id": "tentapress/seo",
             "name": "SEO",
             "description": "",
             "package": "tentapress/seo",
-            "latest_version": "0.2.10",
+            "latest_version": "0.2.11",
             "icon": "seo"
         },
         {

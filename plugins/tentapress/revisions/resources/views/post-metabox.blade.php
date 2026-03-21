@@ -23,9 +23,30 @@
 @endphp
 
 @if ($show)
-    <div class="tp-metabox">
-        <div class="tp-metabox__title">Revisions</div>
-        <div class="tp-metabox__body space-y-3 text-sm">
+    <div class="tp-metabox" x-data="{ open: false }">
+        <button
+            type="button"
+            class="tp-metabox__title flex w-full items-center justify-between gap-3 text-left"
+            x-on:click="open = ! open"
+            x-bind:aria-expanded="open.toString()">
+            <span>Revisions</span>
+            <span class="flex items-center gap-2">
+                <span class="tp-muted text-xs">{{ $revisions->count() }}</span>
+                <svg
+                    class="h-4 w-4 text-black/45 transition-transform"
+                    x-bind:class="{ 'rotate-180': open }"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                    aria-hidden="true">
+                    <path
+                        fill-rule="evenodd"
+                        d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.17l3.71-3.94a.75.75 0 1 1 1.08 1.04l-4.25 4.5a.75.75 0 0 1-1.08 0l-4.25-4.5a.75.75 0 0 1 .02-1.06Z"
+                        clip-rule="evenodd" />
+                </svg>
+            </span>
+        </button>
+        <div x-cloak x-show="open" x-transition.opacity.duration.150ms class="tp-metabox__body space-y-3 text-sm">
             <div class="rounded-md border border-black/10 bg-[var(--tp-surface-soft)]/70 px-3 py-2 text-xs text-black/60" data-revisions-autosave-status>
                 Autosave idle.
             </div>

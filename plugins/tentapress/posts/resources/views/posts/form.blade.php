@@ -454,9 +454,6 @@
                         </div>
                     </div>
 
-                    @if ($revisionsEnabled)
-                        @include('tentapress-revisions::post-metabox', ['post' => $post, 'mode' => $mode])
-                    @endif
                     @if (($workflowPluginEnabled ?? false) && $mode === 'edit')
                         @include('tentapress-workflow::workflow.metabox', ['post' => $post])
                     @endif
@@ -464,6 +461,9 @@
                         @includeIf('tentapress-taxonomies::post-metabox', ['post' => $post, 'mode' => $mode])
                     @endif
                     @includeIf('tentapress-seo::post-metabox', ['post' => $post, 'mode' => $mode])
+                    @if ($revisionsEnabled)
+                        @include('tentapress-revisions::post-metabox', ['post' => $post, 'mode' => $mode])
+                    @endif
                 </div>
             @endif
         </div>
